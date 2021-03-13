@@ -6,6 +6,7 @@ import com.tracelytics.joboe.*;
 import com.tracelytics.joboe.config.InvalidConfigException;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.api.trace.SpanContext;
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
@@ -40,10 +41,10 @@ public class AppOpticsAutoAgentSpanExporter implements SpanExporter {
                 try {
                     Metadata parentMetadata = null;
                     if (spanData.getParentSpanContext().isValid()) {
-                        parentMetadata = new Metadata(buildXTraceId(spanData.getTraceId(), spanData.getParentSpanId(), spanData.getSpanContext().isSampled()));
+                        parentMetadata = new Metadata(Util.buildXTraceId(spanData.getParentSpanContext()));
                     }
 
-                    String entryXTraceId = buildXTraceId(spanData.getTraceId(), spanData.getSpanId(), spanData.getSpanContext().isSampled());
+                    String entryXTraceId = Util.buildXTraceId(spanData.getSpanContext());
 
                     String spanName = spanData.getKind().toString() + "." + spanData.getName();
 
@@ -90,16 +91,6 @@ public class AppOpticsAutoAgentSpanExporter implements SpanExporter {
     }
 
 
-    private String buildXTraceId(String traceId, String spanId, boolean isSampled) {
-        final String HEADER = "2B";
-        String hexString = HEADER +
-                Strings.padEnd(traceId, Constants.MAX_TASK_ID_LEN * 2, '0') +
-                Strings.padEnd(spanId, Constants.MAX_OP_ID_LEN * 2, '0');
-        hexString += isSampled ? "01" : "00";
-
-
-        return hexString.toUpperCase();
-    }
 
 
     private static final Map<String, String> ATTRIBUTE_TO_TAG = new HashMap<String, String>();
@@ -109,10 +100,10 @@ public class AppOpticsAutoAgentSpanExporter implements SpanExporter {
         ATTRIBUTE_TO_TAG.put("net.peer.ip", "ClientIP");
         ATTRIBUTE_TO_TAG.put("http.url", "URL");
         ATTRIBUTE_TO_TAG.put("http.method", "HTTPMethod");
+        ATTRIBUTE_TO_TAG.put("db.connection_string", "RemoteHost");
+        ATTRIBUTE_TO_TAG.put("db.system", "Flavor");
         ATTRIBUTE_TO_TAG.put("db.statement", "Query");
         ATTRIBUTE_TO_TAG.put("db.url", "RemoteHost");
-
-
         TAG_VALUE_TYPE.put("Status", IntConverter.INSTANCE);
     }
 
@@ -120,10 +111,11 @@ public class AppOpticsAutoAgentSpanExporter implements SpanExporter {
         Map<String, Object> tags = new HashMap<String, Object>();
         for (Map.Entry<AttributeKey<?>, Object> entry : attributes.asMap().entrySet()) {
             Object attributeValue = entry.getValue();
-            tags.put(entry.getKey().getKey(), attributeValue);
+            String attributeKey = entry.getKey().getKey();
+            tags.put(attributeKey, attributeValue);
 
-            if (ATTRIBUTE_TO_TAG.containsKey(entry.getKey())) {
-                String tagKey = ATTRIBUTE_TO_TAG.get(entry.getKey());
+            if (ATTRIBUTE_TO_TAG.containsKey(attributeKey)) {
+                String tagKey = ATTRIBUTE_TO_TAG.get(attributeKey);
                 if (TAG_VALUE_TYPE.containsKey(tagKey)) {
                     attributeValue = TAG_VALUE_TYPE.get(tagKey).convert(attributeValue);
                 }
