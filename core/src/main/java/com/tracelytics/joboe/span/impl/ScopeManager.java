@@ -10,12 +10,6 @@ public class ScopeManager implements com.tracelytics.joboe.span.ScopeManager {
 
     public static final ScopeManager INSTANCE = new ScopeManager();
     private static ScopeContext scopeContext = new ThreadLocalScopeContext();
-    private static ScopeListener listener;
-
-    public interface ScopeListener {
-        void onAddScope(Scope scope);
-        void onRemoveScope(Scope scope);
-    }
 
     private ScopeManager() {
     }
@@ -28,10 +22,6 @@ public class ScopeManager implements com.tracelytics.joboe.span.ScopeManager {
     @Override
     public Scope activate(com.tracelytics.joboe.span.Span span) {
         return activate(span, false);
-    }
-
-    public static void registerListener(ScopeListener listener) {
-        ScopeManager.listener = listener;
     }
 
     @Override
@@ -66,9 +56,6 @@ public class ScopeManager implements com.tracelytics.joboe.span.ScopeManager {
     
     void addScope(Scope scope) {
         scopeContext.addScope(scope);
-        if (!scope.span().getSpanPropertyValue(Span.SpanProperty.IS_SYNC_SPAN) && listener != null) {
-            listener.onAddScope(scope);
-        }
     }
     
     Scope removeScope() {
@@ -82,9 +69,7 @@ public class ScopeManager implements com.tracelytics.joboe.span.ScopeManager {
                 Context.clearMetadata();
             }
         }
-        if (listener != null && removedScope != null && !removedScope.span().getSpanPropertyValue(Span.SpanProperty.IS_SYNC_SPAN)) {
-            listener.onRemoveScope(removedScope);
-        }
+
         return removedScope;
     }
 

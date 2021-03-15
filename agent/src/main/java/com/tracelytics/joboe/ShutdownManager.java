@@ -1,7 +1,6 @@
 package com.tracelytics.joboe;
 
 import com.tracelytics.joboe.EventImpl;
-import com.tracelytics.joboe.rpc.RpcClientManager;
 import com.tracelytics.joboe.rpc.thrift.ThriftClientManager;
 import com.tracelytics.monitor.SystemMonitorController;
 
@@ -23,7 +22,7 @@ public class ShutdownManager {
                 if (EventImpl.getEventReporter() != null) {
                     EventImpl.getEventReporter().close(); //close event reporter properly to give it chance to send out pending events in queue
                 }
-                RpcClientManager.closeAllManagers(); //close all rpc client, this should flush out all messages or stop immediately (if Thrift is not connected)
+                ThriftClientManager.closeAll(); //close all thrift client, this should flush out all messages (if Thrift is connected) or stop immediately (if Thrift is not connected)   
             }
         };
         

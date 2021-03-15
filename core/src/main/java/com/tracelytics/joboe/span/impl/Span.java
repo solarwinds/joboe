@@ -98,7 +98,6 @@ public class Span implements com.tracelytics.joboe.span.Span {
         for (SpanReporter reporter : reporters) {
             reporter.reportOnStart(this);
         }
-        context.markEntryMetadata();
     }
 
     public void finish() {
@@ -295,7 +294,7 @@ public class Span implements com.tracelytics.joboe.span.Span {
         
         return log(timestampMicroseconds, fields);
     }
-
+    
     public boolean isRoot() {
         return context.getParentId() == null && context.getPreviousMetadata() == null; //consider as root only if there's no existing context from legacy instrumentation when this span was created
     }
@@ -341,8 +340,6 @@ public class Span implements com.tracelytics.joboe.span.Span {
         public static final SpanProperty<Boolean> IS_ENTRY_SERVICE_ROOT = new SpanProperty<Boolean>(false);
         public static final SpanProperty<TraceDecision> TRACE_DECISION = new SpanProperty<TraceDecision>((TraceDecision) null);
         public static final SpanProperty<XTraceOptions> X_TRACE_OPTIONS = new SpanProperty<XTraceOptions>();
-        public static final SpanProperty<Metadata> ENTRY_SPAN_METADATA = new SpanProperty<Metadata>();
-        public static final SpanProperty<Boolean> IS_SYNC_SPAN = new SpanProperty<Boolean>(false);
 
 
         private V defaultValue;

@@ -8,7 +8,7 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>test-spring-boot</name>
+	<name>test-reactor</name>
 	<description>Reactor tests</description>
 
 	<parent>

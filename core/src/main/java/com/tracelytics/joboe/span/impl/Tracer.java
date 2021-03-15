@@ -98,14 +98,7 @@ public class Tracer implements com.tracelytics.joboe.span.Tracer {
             Long newTraceId = null;
             
             if (parentContext != null) {
-                Metadata parentMetadata;
-                if (!parentContext.getMetadata().isValid() && parentContext.getEntryMetadata() != null) { //parent metadata is invalided, span probably comes in not in chronological ordering
-                    parentMetadata = parentContext.getEntryMetadata();
-                } else {
-                    parentMetadata = parentContext.getMetadata();
-                }
-
-                Metadata newMetadata = new Metadata(parentMetadata); //create metadata clone from parent span - so it appears as a branch
+                Metadata newMetadata = new Metadata(parentContext.getMetadata()); //create metadata clone from parent span - so it appears as a branch
                 Scope existingScope = ScopeManager.INSTANCE.active();
 
                 newSpan = new Span(Tracer.this,
@@ -126,14 +119,8 @@ public class Tracer implements com.tracelytics.joboe.span.Tracer {
                 if (existingScope != null && existingScope.isAsyncPropagation()) {
                     newSpan.setSpanPropertyValue(SpanProperty.IS_ASYNC, true);
                 }
-            } else if (Context.isValid() || properties.containsKey(SpanProperty.ENTRY_SPAN_METADATA)) { //existing context NOT as parent context
-                Metadata spanMetadata;
-                if (properties.containsKey(SpanProperty.ENTRY_SPAN_METADATA)) { //explicitly stated entry x-trace id
-                    spanMetadata = (Metadata) properties.get(SpanProperty.ENTRY_SPAN_METADATA);
-                } else { //traces started by legacy "event based" way or only legacy context is propagated to this thread
-                    spanMetadata = new Metadata(Context.getMetadata()); //create metadata clone so it appears as a branch
-                }
-
+            } else if (Context.isValid()) { //traces started by legacy "event based" way or only legacy context is propagated to this thread
+                Metadata spanMetadata = new Metadata(Context.getMetadata()); //create metadata clone so it appears as a branch
                 if (spanMetadata.getTraceId() == null) { //a trace has already been started and this propagated context should not trigger a new trace ID
                     newTraceId = random.nextLong();
                     spanMetadata.setTraceId(newTraceId);
@@ -153,42 +140,25 @@ public class Tracer implements com.tracelytics.joboe.span.Tracer {
                                    startTimestamp, 
                                    tags,
                                    reporters);
-            } else { //then it's a root span and no other existing context
+            } else { //then it's a root span
                 TraceDecisionParameters samplingParameters = (TraceDecisionParameters) properties.get(SpanProperty.TRACE_DECISION_PARAMETERS);
                 Metadata spanMetadata;
-                String xtrace = null;
-                XTraceOptions xTraceOptions = null;
-                TraceDecision traceDecision = null;
-
                 if (samplingParameters != null) { //expected trace entry point, get tracing decision to see whether we want to start tracing/metrics reporting
                     Map<XTraceHeader, String> xTraceHeaders = samplingParameters.getHeaders();
-                    xtrace = xTraceHeaders.get(XTraceHeader.TRACE_ID);
-
+                    String xtrace =  xTraceHeaders.get(XTraceHeader.TRACE_ID);
+                    
                     if (xtrace != null && !Metadata.isCompatible(xtrace)) { //ignore x-trace id if it's not compatible
                         logger.debug("Not accepting X-Trace ID [" + xtrace + "] for trace continuation");
                         xtrace = null;
                     }
-
-                    //extract X-Trace-Options
-                    xTraceOptions = XTraceOptions.getXTraceOptions(xTraceHeaders.get(XTraceHeader.TRACE_OPTIONS), xTraceHeaders.get(XTraceHeader.TRACE_OPTIONS_SIGNATURE));
-
-
-                    if (properties.containsKey(SpanProperty.TRACE_DECISION)) { //Sampling decision is already made
-                        //TODO extract http headers still?
-                        traceDecision = (TraceDecision) properties.get(SpanProperty.TRACE_DECISION);
-                    } else if (samplingParameters != null ){
-                        traceDecision = TraceDecisionUtil.shouldTraceRequest(operationName, xtrace, xTraceOptions, samplingParameters.getResource());
-                        withSpanProperty(SpanProperty.TRACE_DECISION, traceDecision);
-                    } else { //not an expected trace entry point, and there's no parent span/valid context, hence it's an no-op, we should still create a span though
-                        traceDecision = null;
-                    }
                     
-                    if (traceDecision != null) {
-                        spanMetadata = createTraceContext(traceDecision); //set the trace context based on the trace decision
-                    } else {
-                        spanMetadata = new Metadata(); //just create an empty context
-                    }
+                    //extract X-Trace-Options
+                    XTraceOptions xTraceOptions = XTraceOptions.getXTraceOptions(xTraceHeaders.get(XTraceHeader.TRACE_OPTIONS), xTraceHeaders.get(XTraceHeader.TRACE_OPTIONS_SIGNATURE));
 
+                    TraceDecision traceDecision = TraceDecisionUtil.shouldTraceRequest(operationName, xtrace, xTraceOptions, samplingParameters.getResource());
+
+                    spanMetadata = createTraceContext(traceDecision); //set the trace context based on the trace decision
+                    
                     if (xtrace == null) {
                         withSpanProperty(SpanProperty.IS_ENTRY_SERVICE_ROOT, true);
                     }
@@ -201,7 +171,6 @@ public class Tracer implements com.tracelytics.joboe.span.Tracer {
                 }
                 
                 
-
                 newTraceId = random.nextLong();
                 spanMetadata.setTraceId(newTraceId);
                 
@@ -212,10 +181,8 @@ public class Tracer implements com.tracelytics.joboe.span.Tracer {
             for (Entry<SpanProperty<?>, Object> propertyEntry : properties.entrySet()) {
                 newSpan.setSpanPropertyValue((SpanProperty) propertyEntry.getKey(), propertyEntry.getValue());
             }
-
+            
             newSpan.start();
-
-//            newSpan.setSpanPropertyValue(SpanProperty.ENTRY_XID, newSpan.context().getMetadata().toHexString()); //tag it as the metatdata will get updated/invalidated later on
             
             return newSpan;
         }

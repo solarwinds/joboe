@@ -11,7 +11,6 @@ import com.tracelytics.instrumentation.*;
 import com.tracelytics.joboe.StartupManager;
 import com.tracelytics.logging.Logger;
 import com.tracelytics.logging.LoggerFactory;
-import com.tracelytics.monitor.framework.FrameworkRecorder;
 
 import java.io.File;
 import java.lang.instrument.ClassFileTransformer;

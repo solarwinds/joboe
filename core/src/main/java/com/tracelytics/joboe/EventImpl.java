@@ -49,7 +49,7 @@ public class EventImpl extends Event {
     };
 
     
-    public EventImpl(Metadata ctxMetadata, boolean addEdge) {
+    EventImpl(Metadata ctxMetadata, boolean addEdge) {
         super(new Metadata(ctxMetadata));
         if (ctxMetadata.isSampled()) { //only further init the metadata if it's being traced
             init();
@@ -60,7 +60,7 @@ public class EventImpl extends Event {
     }
 
     /** Creates an event with a previously determined metadataID . See ServletInstrumentation for an example where this was needed.*/
-    public EventImpl(Metadata ctxMetadata, String metadataID, boolean addEdge)
+    EventImpl(Metadata ctxMetadata, String metadataID, boolean addEdge)
         throws OboeException {
         super(new Metadata(metadataID));
         initOverride();

@@ -23,8 +23,6 @@ public class SpanContext implements com.tracelytics.joboe.span.SpanContext {
     
     private final Metadata metadata;
     private final Metadata previousMetadata;
-
-    private Metadata entryMetadata;
     
     /**
      * 
@@ -85,17 +83,6 @@ public class SpanContext implements com.tracelytics.joboe.span.SpanContext {
     
     public Metadata getPreviousMetadata() {
         return previousMetadata;
-    }
-
-    /**
-     *  keep a reference on the state of the entry metadata, as otherwise it will be lost when the metadata get updated
-     */
-    public void markEntryMetadata() {
-        this.entryMetadata = new Metadata(metadata);
-    }
-
-    public Metadata getEntryMetadata() {
-        return entryMetadata;
     }
 
     /**
@@ -166,7 +153,7 @@ public class SpanContext implements com.tracelytics.joboe.span.SpanContext {
         return metadata;
     }
     
-
+    
     
 	@Override
 	public int hashCode() {

@@ -71,7 +71,7 @@ public enum ConfigProperty {
     MONITOR_SPAN_METRICS_ENABLE (new ConfigKey("monitor.spanMetrics.enable", "APPOPTICS_SPAN_METRICS_ENABLE"), ConfigGroup.MONITOR, Boolean.class),
 
     PROFILER(new ConfigKey("profiler"), ConfigGroup.PROFILER, String.class),
-    PROFILER_ENABLED_ENV_VAR(new ConfigKey(null, "APPOPTICS_PROFILER_ENABLED", "profiler"), ConfigGroup.PROFILER, Boolean.class),
+    PROFILER_ENABLED_ENV_VAR(new ConfigKey(null, "APPOPTICS_PROFILER_ENABLED"), ConfigGroup.PROFILER, Boolean.class),
     PROFILER_INTERVAL_ENV_VAR(new ConfigKey(null, "APPOPTICS_PROFILER_INTERVAL"), ConfigGroup.PROFILER, Integer.class);
 
     private static final Logger logger = LoggerFactory.getLogger();

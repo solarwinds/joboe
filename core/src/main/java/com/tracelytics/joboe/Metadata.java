@@ -188,15 +188,7 @@ public class Metadata {
 
     public void setOpID(Metadata md) {
         this.opLen = md.opLen;
-        setOpID(md.opID);
-    }
-
-    public void setOpID(String opId) throws OboeException {
-        setOpID(hexToBytes(opId));
-    }
-
-    public void setOpID(byte[] opId) {
-        System.arraycopy(opId, 0, this.opID, 0, MAX_OP_ID_LEN);
+        System.arraycopy(md.opID, 0, this.opID, 0, MAX_OP_ID_LEN);
     }
     
     /**
@@ -364,14 +356,6 @@ public class Metadata {
      */
     public String toHexString(int versionOverride) {
         return bytesToHex(getPackedMetadata(versionOverride));
-    }
-
-    public byte[] getOpID() {
-        return opID;
-    }
-
-    public byte[] getTaskID() {
-        return taskID;
     }
 
     public String opHexString() {
