@@ -57,6 +57,7 @@ public class AppOpticsSampler implements Sampler {
             builder.put("RequestType", aoTraceDecision.getRequestType().name());
             builder.put("ao.detailedTracing", aoTraceDecision.isSampled());
             builder.put("ao.metrics", aoTraceDecision.isReportMetrics());
+            builder.put("ao.sampler", true); //mark that it has been sampled by us
             Attributes attributes = builder.build();
             return SamplingResult.create(samplingDecision, attributes);
         } else {
