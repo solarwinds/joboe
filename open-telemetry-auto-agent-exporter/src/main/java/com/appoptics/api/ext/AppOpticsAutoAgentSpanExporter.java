@@ -20,6 +20,8 @@ import java.util.concurrent.TimeUnit;
  * Span exporter to be used with the OpenTelemetry auto agent
  */
 public class AppOpticsAutoAgentSpanExporter implements SpanExporter {
+    private static final AttributeKey<Boolean> AO_SAMPLER_KEY = AttributeKey.booleanKey("ao.sampler");
+
     private AppOpticsAutoAgentSpanExporter(String serviceKey) {
         try {
             Agent.initConfig(null, serviceKey);
@@ -37,7 +39,7 @@ public class AppOpticsAutoAgentSpanExporter implements SpanExporter {
     @Override
     public CompletableResultCode export(Collection<SpanData> collection) {
         for (SpanData spanData : collection) {
-            if (spanData.hasEnded()) {
+            if (spanData.hasEnded() && Boolean.TRUE == spanData.getAttributes().get(AO_SAMPLER_KEY)) {
                 try {
                     Metadata parentMetadata = null;
                     if (spanData.getParentSpanContext().isValid()) {

@@ -19,8 +19,12 @@ import java.util.List;
 
 @AutoService(Sampler.class)
 public class AppOpticsSampler implements Sampler {
-    private SamplingResult PARENT_SAMPLED = SamplingResult.create(SamplingDecision.RECORD_AND_SAMPLE, Attributes.of(AttributeKey.booleanKey("ao.detailedTracing"), true, AttributeKey.booleanKey("ao.metrics"), true));
-    private SamplingResult PARENT_NOT_SAMPLED = SamplingResult.create(SamplingDecision.DROP);
+    private SamplingResult PARENT_SAMPLED = SamplingResult.create(SamplingDecision.RECORD_AND_SAMPLE,
+            Attributes.of(
+                    AttributeKey.booleanKey("ao.detailedTracing"), true,
+                    AttributeKey.booleanKey("ao.metrics"), true,
+                    AttributeKey.booleanKey("ao.sampler"), true));
+    private SamplingResult PARENT_NOT_SAMPLED = SamplingResult.create(SamplingDecision.DROP, Attributes.of(AttributeKey.booleanKey("ao.sampler"), true));
     private SamplingResult METRICS_ONLY = SamplingResult.create(SamplingDecision.RECORD_ONLY);
     private SamplingResult NOT_TRACED = SamplingResult.create(SamplingDecision.DROP);
 
