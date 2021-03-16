@@ -34,14 +34,14 @@ jobs:
     - name: checksum
       run: |
           mv api/target/appoptics-sdk.jar api/target/appoptics-sdk.jar.unsigned
-          SHA=$(sha256sum agent/target/appoptics-agent.jar api/target/appoptics-sdk.jar.unsigned)
-          echo "$SHA" | sed 's/\([0-9a-f]\+\)  \(.\+\)/\2=\1/g' > checksums
+          sha256sum agent/target/appoptics-agent.jar | awk '{ print $1 }' > appoptics-agent.jar.sha256
+          sha256sum api/target/appoptics-sdk.jar.unsigned | awk '{ print $1 }' > appoptics-sdk.jar.unsigned.sha256
     - name: upload artifact
       uses: actions/upload-artifact@v2
       with:
         path: |
           commit
-          checksums
+          *.sha256
           agent/target/appoptics-agent.jar
           api/target/appoptics-sdk.jar.unsigned      
           

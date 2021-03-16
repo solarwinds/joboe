@@ -106,7 +106,7 @@ public class ConfigContainer {
 
         if (!override && configMap.containsKey(propertyKey)) { // the key was already inserted before, do NOT overwrite
             if (!configMap.get(propertyKey).equals(value)) {
-                logger.debug("key [" + propertyKey + "] is already defined. Ignoring new value");
+                logger.debug("key [" + propertyKey + "] is already defined with value [" + configMap.get(propertyKey) + "]. Ignoring new value [" + value + "]");
             }
         } else {
             if (value == null) { // Do not allow null via put by string value
