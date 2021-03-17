@@ -84,6 +84,7 @@
     <modules>
         <module>dependencies</module>
         <module>core</module>
+		<module>metrics</module>
         <module>instrumentation</module>
         <module>instrumentation/kafka</module>
         <module>instrumentation/reactor</module>

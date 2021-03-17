@@ -25,6 +25,11 @@
       <artifactId>core</artifactId>
       <version>${agent.version}</version>
     </dependency>
+    <dependency>
+      <groupId>com.appoptics.agent.java</groupId>
+      <artifactId>metrics</artifactId>
+      <version>${agent.version}</version>
+    </dependency>
 	<dependency>
       <groupId>com.appoptics.agent.java</groupId>
       <artifactId>instrumentation</artifactId>

@@ -17,6 +17,7 @@ import com.tracelytics.util.BackTraceCache;
 import com.tracelytics.util.DaemonThreadFactory;
 import com.tracelytics.util.HostInfoUtils;
 import com.tracelytics.util.HostInfoUtils.NetworkAddressInfo;
+import com.tracelytics.util.ServerHostInfoReader;
 
 import java.util.Collections;
 import java.util.List;
@@ -113,7 +114,7 @@ public class StartupManager {
                     // trigger init on the Settings reader
                     CountDownLatch settingsLatch = null;
 
-                    HostInfoUtils.init(AgentHostInfoReader.INSTANCE);
+                    HostInfoUtils.init(ServerHostInfoReader.INSTANCE);
                     try {
                         NetworkAddressInfo networkAddressInfo = HostInfoUtils.getNetworkAddressInfo();
                         List<String> ipAddresses = networkAddressInfo != null ? networkAddressInfo.getIpAddresses() : Collections.<String>emptyList();
@@ -172,7 +173,7 @@ public class StartupManager {
             public TestingEnv call() {
                 TestSettingsReader reader = new TestSettingsReader();
                 SettingsManager.initializeFetcher(new SimpleSettingsFetcher(reader));
-                HostInfoUtils.init(AgentHostInfoReader.INSTANCE);
+                HostInfoUtils.init(ServerHostInfoReader.INSTANCE);
                 //replace event reporter with the testing one
                 try {
                     TestReporter testTracingReporter = ReporterFactory.getInstance().buildTestReporter();

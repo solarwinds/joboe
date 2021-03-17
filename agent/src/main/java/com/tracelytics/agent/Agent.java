@@ -132,7 +132,7 @@ public class Agent implements ClassFileTransformer {
 
                     if (getStatus() == AgentStatus.INITIALIZED_SUCCESSFUL) {
                         // try to start up the system monitor here, if possible
-                        SystemMonitorController.conditionalStart();
+                        SystemMonitorController.conditionalStart(AppEnvironment.getAppServerName());
                     }
                 }
             } catch (Throwable t) {

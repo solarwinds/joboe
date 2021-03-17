@@ -8,17 +8,17 @@
 	<version>1.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>core</artifactId>
+  <artifactId>metrics</artifactId>
   <version>${agent.version}</version>
   <packaging>jar</packaging>
   
-  <name>core</name>
+  <name>Agent Metrics</name>
   <url>http://maven.apache.org</url>
 
   <dependencies>
     <dependency>
       <groupId>com.appoptics.agent.java</groupId>
-      <artifactId>dependencies</artifactId>
+      <artifactId>core</artifactId>
       <version>${agent.version}</version>
     </dependency>
     <dependency>
