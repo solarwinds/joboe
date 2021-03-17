@@ -1,12 +1,10 @@
 package com.appoptics.api.ext;
 
 import com.tracelytics.agent.Agent;
-import com.tracelytics.ext.google.common.base.Strings;
 import com.tracelytics.joboe.*;
 import com.tracelytics.joboe.config.InvalidConfigException;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
-import io.opentelemetry.api.trace.SpanContext;
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
@@ -23,13 +21,7 @@ public class AppOpticsAutoAgentSpanExporter implements SpanExporter {
     private static final AttributeKey<Boolean> AO_SAMPLER_KEY = AttributeKey.booleanKey("ao.sampler");
 
     private AppOpticsAutoAgentSpanExporter(String serviceKey) {
-        try {
-            Agent.initConfig(null, serviceKey);
-            AgentChecker.waitUntilAgentReady(10, TimeUnit.SECONDS);
-            StartupManager.flagSystemStartupCompleted();
-        } catch (InvalidConfigException e) {
-            e.printStackTrace();
-        }
+
     }
 
     static Builder newBuilder(String serviceKey) {
@@ -43,7 +35,7 @@ public class AppOpticsAutoAgentSpanExporter implements SpanExporter {
                 try {
                     Metadata parentMetadata = null;
                     if (spanData.getParentSpanContext().isValid()) {
-                        parentMetadata = new Metadata(Util.buildXTraceId(spanData.getParentSpanContext()));
+                        parentMetadata = Util.buildMetadata(spanData.getParentSpanContext());
                     }
 
                     String entryXTraceId = Util.buildXTraceId(spanData.getSpanContext());
@@ -72,6 +64,7 @@ public class AppOpticsAutoAgentSpanExporter implements SpanExporter {
                     exitEvent.addInfo(
                             "Label", "exit",
                             "Layer", spanName);
+
                     exitEvent.setTimestamp(spanData.getEndEpochNanos() / 1000);
                     exitEvent.report(spanMetadata);
                 } catch (OboeException e) {
@@ -79,6 +72,7 @@ public class AppOpticsAutoAgentSpanExporter implements SpanExporter {
                 }
             }
         }
+
         return CompletableResultCode.ofSuccess();
     }
 
