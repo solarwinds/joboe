@@ -24,9 +24,9 @@ public class MetricsMonitor extends SystemMonitorWithFrequency<MetricsCategory, 
     
     static final int DEFAULT_FREQUENCY = 1;
     static final TimeUnit DEFAULT_TIME_UNIT = TimeUnit.PER_MINUTE;
-    
-    public MetricsMonitor(ConfigContainer configs) throws InvalidConfigException, ClientException {
-        super(DEFAULT_TIME_UNIT, DEFAULT_FREQUENCY, new MetricsCollector(configs), new MetricsReporter(RpcClientManager.getClient(OperationType.METRICS)));
+
+    public MetricsMonitor(ConfigContainer configs, MetricsCollector metricsCollector) throws InvalidConfigException, ClientException {
+        super(DEFAULT_TIME_UNIT, DEFAULT_FREQUENCY, metricsCollector, new MetricsReporter(RpcClientManager.getClient(OperationType.METRICS)));
         
         if (configs.containsProperty(ConfigProperty.MONITOR_METRICS_FLUSH_INTERVAL)) {
             setInterval((Integer) configs.get(ConfigProperty.MONITOR_METRICS_FLUSH_INTERVAL) * 1000);
@@ -48,10 +48,13 @@ public class MetricsMonitor extends SystemMonitorWithFrequency<MetricsCategory, 
             }
         });
     }
-    
+
     public static synchronized MetricsMonitor buildInstance(ConfigContainer configs) throws InvalidConfigException, ClientException {
+        return buildInstance(configs, null);
+    }
+    public static synchronized MetricsMonitor buildInstance(ConfigContainer configs, MetricsCollector explicitCollector) throws InvalidConfigException, ClientException {
         if (singleton == null) {
-            singleton = new MetricsMonitor(configs);
+            singleton = new MetricsMonitor(configs, explicitCollector != null ? explicitCollector : new MetricsCollector(configs));
         }
         return singleton;
     }

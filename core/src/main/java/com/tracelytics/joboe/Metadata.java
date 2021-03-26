@@ -362,6 +362,14 @@ public class Metadata {
         return bytesToHex(getPackedMetadata(versionOverride));
     }
 
+    public byte[] getOpID() {
+        return opID;
+    }
+
+    public byte[] getTaskID() {
+        return taskID;
+    }
+
     public String opHexString() {
         return bytesToHex(opID, opLen);
     }

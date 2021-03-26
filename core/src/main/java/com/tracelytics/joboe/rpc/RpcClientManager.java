@@ -128,6 +128,14 @@ public abstract class RpcClientManager {
         return getClient(clientType, operationType, serviceKey);
     }
 
+    public static void closeAllManagers() {
+        for (RpcClientManager clientManager : registeredManagers.values()) {
+            clientManager.close();
+        }
+    }
+
+    abstract protected void close();
+
     /**
      * https://github.com/grpc/grpc-java/blob/v1.34.1/netty/src/main/java/io/grpc/netty/JettyTlsUtil.java#L39
      * @return

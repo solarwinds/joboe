@@ -1,9 +1,6 @@
 package com.tracelytics.monitor.metrics;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import com.tracelytics.joboe.span.impl.InboundMetricMeasurementSpanReporter;
 import com.tracelytics.joboe.span.impl.MetricHistogramSpanReporter;
@@ -19,15 +16,20 @@ import com.tracelytics.metrics.TopLevelMetricsEntry;
  */
 public class SpanMetricsCollector extends AbstractMetricsEntryCollector {
     public static final String TRANSACTION_NAME_OVERFLOW_LABEL = "TransactionNameOverflow"; 
-    private static Set<MetricSpanReporter> registeredReporters = new HashSet<MetricSpanReporter>();
+    private Set<MetricSpanReporter> registeredReporters = new HashSet<MetricSpanReporter>();
 
+    private static final Set<MetricSpanReporter> DEFAULT_REPORTERS = new HashSet<MetricSpanReporter>();
     static {
-        registeredReporters.add(InboundMetricMeasurementSpanReporter.REPORTER);
-        registeredReporters.add(MetricHistogramSpanReporter.REPORTER);
+        DEFAULT_REPORTERS.add(InboundMetricMeasurementSpanReporter.REPORTER);
+        DEFAULT_REPORTERS.add(MetricHistogramSpanReporter.REPORTER);
     }
     
-    SpanMetricsCollector() {
-
+    public SpanMetricsCollector(MetricSpanReporter... reporters) {
+        if (reporters.length == 0) {
+            registeredReporters = DEFAULT_REPORTERS;
+        } else {
+            registeredReporters.addAll(Arrays.asList(reporters));
+        }
     }
     
     @Override

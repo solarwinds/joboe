@@ -22,18 +22,26 @@ import com.tracelytics.util.DaemonThreadFactory;
  * @author pluk
  *
  */
-class MetricsCollector extends SystemCollector<MetricsCategory, List<? extends MetricsEntry<?>>> {
+public class MetricsCollector extends SystemCollector<MetricsCategory, List<? extends MetricsEntry<?>>> {
     private Map<MetricsCategory, AbstractMetricsEntryCollector> collectors = new HashMap<MetricsCategory, AbstractMetricsEntryCollector>();
     private ExecutorService executorService; 
     private static final int MAX_WAIT_TIME = 10; //max wait time for a collection task, in terms of second
-    
-    
+
+
     public MetricsCollector(ConfigContainer configs) throws InvalidConfigException {
+        this(configs, null);
+    }
+
+    public MetricsCollector(ConfigContainer configs, SpanMetricsCollector spanMetricsCollector) throws InvalidConfigException {
         collectors.put(MetricsCategory.SYSTEM, new SystemMetricsCollector());
         collectors.put(MetricsCategory.TRACING_REPORTER, new TracingReporterMetricsCollector());
         
         if (configs.get(ConfigProperty.MONITOR_SPAN_METRICS_ENABLE) == null || (Boolean)configs.get(ConfigProperty.MONITOR_SPAN_METRICS_ENABLE)) { //default as true
-        	collectors.put(MetricsCategory.SPAN_METRICS, new SpanMetricsCollector());
+            if (spanMetricsCollector == null) {
+                collectors.put(MetricsCategory.SPAN_METRICS, new SpanMetricsCollector());
+            } else {
+                collectors.put(MetricsCategory.SPAN_METRICS, spanMetricsCollector);
+            }
         }
         collectors.put(MetricsCategory.LAYER_COUNT, new TraceDecisionMetricsCollector());
         

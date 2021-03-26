@@ -51,8 +51,9 @@ public class ThriftClientManager extends RpcClientManager {
             logger.warn("Failed to initialize rpc non-tracing client: " + e.getMessage(), e);
         }
     }
-    
-    public static void closeAll() {
+
+    @Override
+    public void close() {
         if (tracingRpcClient != null) {
             tracingRpcClient.close();
         }

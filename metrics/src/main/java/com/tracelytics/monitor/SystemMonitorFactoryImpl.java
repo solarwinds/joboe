@@ -21,7 +21,7 @@ import java.util.List;
 public class SystemMonitorFactoryImpl implements SystemMonitorFactory {
     protected static final Logger logger = LoggerFactory.getLogger();
         
-    private ConfigContainer configs;
+    protected ConfigContainer configs;
     
     public SystemMonitorFactoryImpl(ConfigContainer configs) {
         this.configs = configs;
@@ -60,7 +60,7 @@ public class SystemMonitorFactoryImpl implements SystemMonitorFactory {
         }
     }
     
-    private MetricsMonitor buildMetricsMonitor() {
+    protected MetricsMonitor buildMetricsMonitor() {
         try {
             return MetricsMonitor.buildInstance(configs);
         } catch (Exception e) {

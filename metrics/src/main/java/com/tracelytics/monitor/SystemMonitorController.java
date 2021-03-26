@@ -64,24 +64,36 @@ public class SystemMonitorController {
      * Starts the System monitoring. Should only be called once. If more than once has been called, the other calls would be ignored
      */
     public static synchronized void start() {
+        startWithBuilder(new SystemMonitorBuilder() {
+            @Override
+            public List<SystemMonitor<?, ?>> build() {
+                if (configs == null) {
+                    logger.error("Cannot start the System Monitors! The property/config is not found!");
+                    return null;
+                }
+                return new SystemMonitorFactoryImpl(configs).buildMonitors();
+            }
+        });
+    }
+
+    public static synchronized void startWithBuilder(SystemMonitorBuilder builder) {
         if (executor == null) {
-            if (configs == null) {
-                logger.error("Cannot start the System Monitors! The property/config is not found!");
+            logger.debug("Start creating metrics collectors");
+
+            List<SystemMonitor<?, ?>> monitors = builder.build();
+            if (monitors == null) {
+                logger.warn("Failed to build monitors. System monitors are not starting");
                 return;
             }
-            
-            logger.debug("Start creating metrics collectors");
-            
-            List<SystemMonitor<?, ?>> monitors = new SystemMonitorFactoryImpl(configs).buildMonitors();
-            
+
             executor = Executors.newCachedThreadPool(DaemonThreadFactory.newInstance("system-monitor"));
-            
+
             for (SystemMonitor<?, ?> monitor : monitors) {
                 executor.execute(monitor);
             }
-            
+
             SystemMonitorController.monitors.addAll(monitors);
-            
+
             logger.debug("Finished creating System monitors");
         } else {
             logger.debug("System Monitor has already been started!");
