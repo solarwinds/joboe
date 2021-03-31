@@ -188,11 +188,15 @@ public class Metadata {
 
     public void setOpID(Metadata md) {
         this.opLen = md.opLen;
-        System.arraycopy(md.opID, 0, this.opID, 0, MAX_OP_ID_LEN);
+        setOpID(md.opID);
     }
 
     public void setOpID(String opId) throws OboeException {
-        System.arraycopy(hexToBytes(opId), 0, this.opID, 0, MAX_OP_ID_LEN);
+        setOpID(hexToBytes(opId));
+    }
+
+    public void setOpID(byte[] opId) {
+        System.arraycopy(opId, 0, this.opID, 0, MAX_OP_ID_LEN);
     }
     
     /**
