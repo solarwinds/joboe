@@ -85,7 +85,7 @@
                         </goals>
                         <configuration>
                             <keyname>appoptics-agent</keyname>
-                            <passphrase>labrat~1214</passphrase>
+                            <passphrase>${gpg.passphrase}</passphrase>
                             <repositoryId>${serverId}</repositoryId>
                             <groupId>com.appoptics.agent.java</groupId>
                             <artifactId>appoptics-sdk</artifactId>
