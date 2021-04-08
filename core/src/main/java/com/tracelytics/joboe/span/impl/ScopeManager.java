@@ -62,7 +62,7 @@ public class ScopeManager implements com.tracelytics.joboe.span.ScopeManager {
         Scope removedScope = scopeContext.removeScope();
         if (removedScope != null && Context.getMetadata() == removedScope.span().context().getMetadata()) { //only reset if current context is the same instance as this span's metadata
             //reset the metadata to previous value
-            Metadata previousMetadata = removedScope.span().context().getPreviousMetadata();
+            Metadata previousMetadata = removedScope.getPreviousMetadata();
             if (previousMetadata != null) {
                 Context.setMetadata(previousMetadata);
             } else {

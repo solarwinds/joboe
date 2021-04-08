@@ -1,5 +1,7 @@
 package com.tracelytics.joboe.span.impl;
 
+import com.tracelytics.joboe.Context;
+import com.tracelytics.joboe.Metadata;
 import com.tracelytics.logging.Logger;
 import com.tracelytics.logging.LoggerFactory;
 
@@ -9,6 +11,7 @@ public class Scope implements com.tracelytics.joboe.span.Scope  {
     private Logger logger = LoggerFactory.getLogger();
     private final boolean finishOnClose;
     private final boolean isAsyncPropagation;
+    private final Metadata previousMetadata;
     
     private static final ScopeManager scopeManager = ScopeManager.INSTANCE;
 
@@ -16,6 +19,12 @@ public class Scope implements com.tracelytics.joboe.span.Scope  {
         this.wrapped = wrapped;
         this.finishOnClose = finishOnClose;
         this.isAsyncPropagation = isAsyncPropagation;
+        if (!isAsyncPropagation) {
+            //keep trace of current metadata so when scope is removed, it can revert to existing metadata
+            this.previousMetadata = Context.getMetadata();
+        } else {
+            this.previousMetadata = null;
+        }
         
         scopeManager.addScope(this);
     }
@@ -34,7 +43,11 @@ public class Scope implements com.tracelytics.joboe.span.Scope  {
             wrapped.finish();
         }
     }
-    
+
+    public Metadata getPreviousMetadata() {
+        return previousMetadata;
+    }
+
     @Override
     public com.tracelytics.joboe.span.impl.Span span() {
         return wrapped;
