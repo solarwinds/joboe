@@ -107,6 +107,7 @@
                             <sources>../empty-sources.jar</sources>
                             <javadoc>${agent.javadoc.location}</javadoc>
                             <file>${agent.jar.location}</file>
+                            <files>${agent.jar.location}.asc</files>
                             <url>${repository.url}</url>
                         </configuration>
                     </execution>
