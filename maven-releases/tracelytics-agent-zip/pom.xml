@@ -131,6 +131,7 @@
                 <version>3.0.0-M1</version>
 
                 <configuration>
+                    <skip>false</skip>
                     <repositoryId>${serverId}</repositoryId>
                     <groupId>com.appoptics.agent.java</groupId>
                     <artifactId>appoptics-agent</artifactId>
