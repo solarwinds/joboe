@@ -132,7 +132,7 @@
 
                 <executions>
                     <execution>
-                        <id>gpg-sign</id>
+                        <id>deploy-sonatype</id>
                         <phase>deploy</phase>
                         <goals>
                             <goal>deploy-file</goal>
@@ -141,11 +141,11 @@
                             <repositoryId>${serverId}</repositoryId>
                             <groupId>com.appoptics.agent.java</groupId>
                             <artifactId>appoptics-agent</artifactId>
-                            <version>${agent.version}</version>
+                            <version>${agent.version}${is.snapshot}</version>
                             <pomFile>${project.build.directory}/public-pom.xml</pomFile>
                             <sources>../empty-sources.jar</sources>
-                            <javadoc>${agent.javadoc.location}</javadoc>
-                            <file>${agent.jar.location}</file>
+                            <javadoc>${api.javadoc.location}</javadoc>
+                            <file>${agent.zip.location}</file>
                             <url>${repository.url}</url>
                         </configuration>
                     </execution>

@@ -94,7 +94,7 @@
 
                 <executions>
                     <execution>
-                        <id>gpg-sign</id>
+                        <id>deploy-sonatype</id>
                         <phase>deploy</phase>
                         <goals>
                             <goal>deploy-file</goal>
