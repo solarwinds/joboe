@@ -93,6 +93,7 @@
                             <javadoc>${api.javadoc.location}</javadoc>
                             <file>${api.jar.location}</file>
                             <files>${api.jar.location}.asc,${api.javadoc.location}.asc</files>
+                            <types>asc,asc</types>
                             <url>${repository.url}</url>
                         </configuration>
                     </execution>

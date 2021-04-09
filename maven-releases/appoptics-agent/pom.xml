@@ -108,6 +108,7 @@
                             <javadoc>${agent.javadoc.location}</javadoc>
                             <file>${agent.jar.location}</file>
                             <files>${agent.jar.location}.asc</files>
+                            <types>asc</types>
                             <url>${repository.url}</url>
                         </configuration>
                     </execution>
