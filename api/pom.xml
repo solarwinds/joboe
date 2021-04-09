@@ -166,6 +166,25 @@
           </execution>
          </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <version>1.6</version>
+
+        <executions>
+          <execution>
+            <id>gpg-sign</id>
+            <phase>deploy</phase>
+            <goals>
+              <goal>sign</goal>
+            </goals>
+            <configuration>
+              <keyname>appoptics-agent</keyname>
+              <passphrase>${gpg.passphrase}</passphrase>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
   

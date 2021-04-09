@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -78,7 +78,8 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <skip>true</skip> <!-- Skipping this for now, see https://github.com/librato/joboe/pull/1197 -->
+                            <skip>true
+                            </skip> <!-- Skipping this for now, see https://github.com/librato/joboe/pull/1197 -->
                             <executable>${signpathScript.location}</executable>
                             <commandlineArgs>${agent.jar.location}</commandlineArgs>
                         </configuration>
@@ -88,19 +89,17 @@
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <version>1.6</version>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>3.0.0-M1</version>
 
                 <executions>
                     <execution>
-                        <id>deploy-features-xml</id>
-                        <phase>package</phase>
+                        <id>gpg-sign</id>
+                        <phase>deploy</phase>
                         <goals>
-                            <goal>sign-and-deploy-file</goal>
+                            <goal>deploy-file</goal>
                         </goals>
                         <configuration>
-                            <keyname>appoptics-agent</keyname>
-                            <passphrase>labrat~1214</passphrase>
                             <repositoryId>${serverId}</repositoryId>
                             <groupId>com.appoptics.agent.java</groupId>
                             <artifactId>appoptics-agent</artifactId>

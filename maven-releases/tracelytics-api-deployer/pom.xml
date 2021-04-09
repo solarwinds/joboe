@@ -73,33 +73,26 @@
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <version>1.6</version>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>3.0.0-M1</version>
 
                 <executions>
                     <execution>
-                        <id>deploy-features-xml</id>
-                        <phase>package</phase>
+                        <id>gpg-sign</id>
+                        <phase>deploy</phase>
                         <goals>
-                            <goal>sign-and-deploy-file</goal>
+                            <goal>deploy-file</goal>
                         </goals>
                         <configuration>
-                            <keyname>appoptics-agent</keyname>
-                            <passphrase>labrat~1214</passphrase>
                             <repositoryId>${serverId}</repositoryId>
                             <groupId>com.appoptics.agent.java</groupId>
-                            <artifactId>appoptics-sdk</artifactId>
-                            <version>${api.version}${is.snapshot}</version>
+                            <artifactId>appoptics-agent</artifactId>
+                            <version>${agent.version}</version>
                             <pomFile>${project.build.directory}/public-pom.xml</pomFile>
                             <sources>../empty-sources.jar</sources>
-                            <javadoc>${api.javadoc.location}</javadoc>
-                            <file>${api.jar.location}</file>
+                            <javadoc>${agent.javadoc.location}</javadoc>
+                            <file>${agent.jar.location}</file>
                             <url>${repository.url}</url>
-                            <!-- Prevent gpg from using pinentry programs -->
-                            <gpgArguments>
-                                <arg>--pinentry-mode</arg>
-                                <arg>loopback</arg>
-                            </gpgArguments>
                         </configuration>
                     </execution>
                 </executions>
