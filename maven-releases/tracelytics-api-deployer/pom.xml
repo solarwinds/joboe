@@ -76,18 +76,26 @@
                 <artifactId>maven-deploy-plugin</artifactId>
                 <version>3.0.0-M1</version>
 
-                <configuration>
-                    <skip>false</skip>
-                    <repositoryId>${serverId}</repositoryId>
-                    <groupId>com.appoptics.agent.java</groupId>
-                    <artifactId>appoptics-sdk</artifactId>
-                    <version>${api.version}${is.snapshot}</version>
-                    <pomFile>${project.build.directory}/public-pom.xml</pomFile>
-                    <sources>../empty-sources.jar</sources>
-                    <javadoc>${api.javadoc.location}</javadoc>
-                    <file>${api.jar.location}</file>
-                    <url>${repository.url}</url>
-                </configuration>
+                <executions>
+                    <execution>
+                        <id>deploy-file</id>
+                        <phase>deploy</phase>
+                        <goals>
+                            <goal>deploy-file</goal>
+                        </goals>
+                        <configuration>
+                            <repositoryId>${serverId}</repositoryId>
+                            <groupId>com.appoptics.agent.java</groupId>
+                            <artifactId>appoptics-sdk</artifactId>
+                            <version>${api.version}${is.snapshot}</version>
+                            <pomFile>${project.build.directory}/public-pom.xml</pomFile>
+                            <sources>../empty-sources.jar</sources>
+                            <javadoc>${api.javadoc.location}</javadoc>
+                            <file>${api.jar.location}</file>
+                            <url>${repository.url}</url>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
