@@ -91,27 +91,17 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
                 <version>3.0.0-M1</version>
-
-                <executions>
-                    <execution>
-                        <id>deploy-sonatype</id>
-                        <phase>deploy</phase>
-                        <goals>
-                            <goal>deploy-file</goal>
-                        </goals>
-                        <configuration>
-                            <repositoryId>${serverId}</repositoryId>
-                            <groupId>com.appoptics.agent.java</groupId>
-                            <artifactId>appoptics-agent</artifactId>
-                            <version>${agent.version}</version>
-                            <pomFile>${project.build.directory}/public-pom.xml</pomFile>
-                            <sources>../empty-sources.jar</sources>
-                            <javadoc>${agent.javadoc.location}</javadoc>
-                            <file>${agent.jar.location}</file>
-                            <url>${repository.url}</url>
-                        </configuration>
-                    </execution>
-                </executions>
+                <configuration>
+                    <repositoryId>${serverId}</repositoryId>
+                    <groupId>com.appoptics.agent.java</groupId>
+                    <artifactId>appoptics-agent</artifactId>
+                    <version>${agent.version}</version>
+                    <pomFile>${project.build.directory}/public-pom.xml</pomFile>
+                    <sources>../empty-sources.jar</sources>
+                    <javadoc>${agent.javadoc.location}</javadoc>
+                    <file>${agent.jar.location}</file>
+                    <url>${repository.url}</url>
+                </configuration>
             </plugin>
         </plugins>
     </build>
