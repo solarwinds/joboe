@@ -425,6 +425,11 @@ Rename class files in com.appoptics.apploader from extension .class to .classbyt
                     <configuration>
                         <keyname>appoptics-agent</keyname>
                         <passphrase>${gpg.passphrase}</passphrase>
+                        <!-- Prevent gpg from using pinentry programs -->
+                        <gpgArguments>
+                            <arg>--pinentry-mode</arg>
+                            <arg>loopback</arg>
+                        </gpgArguments>
                     </configuration>
                 </execution>
             </executions>
