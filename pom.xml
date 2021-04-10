@@ -20,6 +20,13 @@
         <project.build.outputTimestamp>${git.commit.time}</project.build.outputTimestamp>
     </properties>
 
+    <distributionManagement>
+        <repository>
+            <id>${serverId}</id>
+            <url>${repository.url}</url>
+        </repository>
+    </distributionManagement>
+
     <build>
         <pluginManagement>
             <plugins>

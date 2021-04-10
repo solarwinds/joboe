@@ -423,14 +423,15 @@
                 <version>2.8.2</version>
                 <configuration>
                     <skip>false</skip>
-                    <repositoryId>${serverId}</repositoryId>
                     <pomFile>${basedir}/public-pom.xml</pomFile>
                     <sources>../empty-sources.jar</sources>
-                    <url>${repository.url}</url>
                 </configuration>
             </plugin>
         </plugins>
     </build>
+
+
+
     <profiles>
         <profile>
             <id>sign-artifacts</id>
