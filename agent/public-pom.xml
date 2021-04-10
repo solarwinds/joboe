@@ -1,0 +1,36 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.appoptics.agent.java</groupId>
+  <artifactId>appoptics-agent</artifactId>
+  <version>${agent.version}</version>
+  <packaging>jar</packaging>
+
+  <name>AppOptics Java Agent Jar</name>
+  <description>The AppOptics Java instrumentation agent jar file. This artifact provides a convenient way to download the agent jar from public Maven repository. Please take note that this should NOT be included as a part of the project dependencies. Rather, this artifact should be integrated into the build process by using extra step such as the "copy" goal of "maven-dependency-plugin". For more information, please refer to https://docs.appoptics.com/kb/apm_tracing/java/install/#getting-the-agent-jar</description>
+  <url>https://www.appoptics.com/</url>
+  
+  <licenses>
+    <license>
+      <name>AppOptics Java Agent License</name>
+      <url>http://docs.appoptics.com/kb/apm_tracing/java/license/</url>
+    </license>
+  </licenses>
+  
+  <scm>
+    <connection>scm:git:git@github.com:librato/joboe.git</connection>
+    <url>git@github.librato/joboe.git</url>
+  </scm>
+  
+  <developers>
+    <developer>
+      <name>Patson Luk</name>
+      <email>patson@librato.com</email>
+      <organization>AppOptics</organization>
+      <organizationUrl>https://www.appoptics.com/</organizationUrl>
+    </developer>
+  </developers>
+
+</project>
+ 
