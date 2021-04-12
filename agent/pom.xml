@@ -426,7 +426,7 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <id>deploy-file</id>
+                        <id>default-deploy</id>
                         <phase>deploy</phase>
                         <goals>
                             <goal>deploy-file</goal>
@@ -435,6 +435,9 @@
                             <file>${project.build.directory}/${project.build.finalName}.${project.packaging}</file>
                             <repositoryId>${serverId}</repositoryId>
                             <url>${repository.url}</url>
+                            <groupId>com.appoptics.agent.java</groupId>
+                            <artifactId>appoptics-agent</artifactId>
+                            <version>${agent.version}</version>
                             <pomFile>${basedir}/public-pom.xml</pomFile>
                             <sources>${basedir}/empty-sources.jar</sources>
                             <javadoc>${agent.javadoc.location}</javadoc>
