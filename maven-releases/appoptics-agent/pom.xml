@@ -78,8 +78,7 @@
                             <goal>exec</goal>
                         </goals>
                         <configuration>
-                            <skip>true
-                            </skip> <!-- Skipping this for now, see https://github.com/librato/joboe/pull/1197 -->
+                            <skip>true</skip> <!-- Skipping this for now, see https://github.com/librato/joboe/pull/1197 -->
                             <executable>${signpathScript.location}</executable>
                             <commandlineArgs>${agent.jar.location}</commandlineArgs>
                         </configuration>
@@ -89,16 +88,19 @@
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-deploy-plugin</artifactId>
-                <version>2.8.2</version>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.6</version>
+
                 <executions>
                     <execution>
-                        <id>deploy-file</id>
+                        <id>deploy-features-xml</id>
                         <phase>deploy</phase>
                         <goals>
-                            <goal>deploy-file</goal>
+                            <goal>sign-and-deploy-file</goal>
                         </goals>
                         <configuration>
+                            <keyname>appoptics-agent</keyname>
+                            <passphrase>${gpg.passphrase}</passphrase>
                             <repositoryId>${serverId}</repositoryId>
                             <groupId>com.appoptics.agent.java</groupId>
                             <artifactId>appoptics-agent</artifactId>
