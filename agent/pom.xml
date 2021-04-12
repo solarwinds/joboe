@@ -432,9 +432,7 @@
                         </goals>
                         <configuration>
                             <repositoryId>${serverId}</repositoryId>
-                            <groupId>com.appoptics.agent.java</groupId>
-                            <artifactId>appoptics-agent</artifactId>
-                            <version>${agent.version}</version>
+                            <file>${project.build.outputDirectory}/${project.build.finalName}.${project.packaging}</file>
                             <pomFile>${basedir}/public-pom.xml</pomFile>
                             <sources>${basedir}/empty-sources.jar</sources>
                             <javadoc>${agent.javadoc.location}</javadoc>
