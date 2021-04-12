@@ -421,24 +421,21 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
                 <version>2.8.2</version>
-                <configuration>
-                    <skip>false</skip>
-                </configuration>
                 <executions>
                     <execution>
-                        <id>deploy-jar</id>
-                        <goals>
-                            <goal>deploy</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>deploy-pom</id>
+                        <id>deploy-public-pom-and-empty-source</id>
                         <goals>
                             <goal>deploy-file</goal>
                         </goals>
                         <configuration>
+                            <repositoryId>${serverId}</repositoryId>
+                            <groupId>com.appoptics.agent.java</groupId>
+                            <artifactId>appoptics-agent</artifactId>
+                            <version>${agent.version}</version>
                             <pomFile>${basedir}/public-pom.xml</pomFile>
                             <sources>${basedir}/empty-sources.jar</sources>
+                            <javadoc>${agent.javadoc.location}</javadoc>
+                            <url>${repository.url}</url>
                         </configuration>
                     </execution>
                 </executions>
