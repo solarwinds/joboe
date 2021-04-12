@@ -436,7 +436,7 @@
                             <goal>deploy-file</goal>
                         </goals>
                         <configuration>
-                            <file>${project.build.directory}/${project.build.finalName}.${project.packaging}</file>
+                            <file>${project.build.directory}/appoptics-agent.jar</file>
                             <repositoryId>${serverId}</repositoryId>
                             <url>${repository.url}</url>
                             <groupId>com.appoptics.agent.java</groupId>
