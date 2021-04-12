@@ -79,7 +79,7 @@
                 <executions>
                     <execution>
                         <id>deploy-features-xml</id>
-                        <phase>package</phase>
+                        <phase>deploy</phase>
                         <goals>
                             <goal>sign-and-deploy-file</goal>
                         </goals>
