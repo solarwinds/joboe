@@ -426,17 +426,18 @@
                 </configuration>
                 <executions>
                     <execution>
-                        <id>deploy-public-pom-and-empty-source</id>
+                        <id>deploy-file</id>
+                        <phase>deploy</phase>
                         <goals>
                             <goal>deploy-file</goal>
                         </goals>
                         <configuration>
-                            <repositoryId>${serverId}</repositoryId>
                             <file>${project.build.outputDirectory}/${project.build.finalName}.${project.packaging}</file>
+                            <repositoryId>${serverId}</repositoryId>
+                            <url>${repository.url}</url>
                             <pomFile>${basedir}/public-pom.xml</pomFile>
                             <sources>${basedir}/empty-sources.jar</sources>
                             <javadoc>${agent.javadoc.location}</javadoc>
-                            <url>${repository.url}</url>
                         </configuration>
                     </execution>
                 </executions>
