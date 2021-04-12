@@ -197,7 +197,7 @@
         <configuration>
           <skip>false</skip>
           <pomFile>${basedir}/public-pom.xml</pomFile>
-          <sources>../empty-sources.jar</sources>
+          <sources>./empty-sources.jar</sources>
         </configuration>
       </plugin>
     </plugins>
