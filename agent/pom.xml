@@ -432,7 +432,7 @@
                             <goal>deploy-file</goal>
                         </goals>
                         <configuration>
-                            <file>${project.build.outputDirectory}/${project.build.finalName}.${project.packaging}</file>
+                            <file>${project.build.directory}/${project.build.finalName}.${project.packaging}</file>
                             <repositoryId>${serverId}</repositoryId>
                             <url>${repository.url}</url>
                             <pomFile>${basedir}/public-pom.xml</pomFile>
