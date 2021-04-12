@@ -427,6 +427,10 @@
                 <executions>
                     <execution>
                         <id>default-deploy</id>
+                        <phase>none</phase>
+                    </execution>
+                    <execution>
+                        <id>deploy-with-public-pom-empty-source</id>
                         <phase>deploy</phase>
                         <goals>
                             <goal>deploy-file</goal>
