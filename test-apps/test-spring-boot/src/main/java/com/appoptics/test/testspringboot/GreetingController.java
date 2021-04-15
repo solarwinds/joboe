@@ -5,7 +5,6 @@ import com.appoptics.api.ext.ProfileMethod;
 import com.appoptics.api.ext.Trace;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.extension.annotations.WithSpan;
-import net.bytebuddy.implementation.bytecode.Throw;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
