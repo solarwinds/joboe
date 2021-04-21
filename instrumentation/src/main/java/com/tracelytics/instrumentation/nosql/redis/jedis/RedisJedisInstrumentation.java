@@ -342,7 +342,7 @@ public class RedisJedisInstrumentation extends ClassInstrumentation {
             Event event = Context.createEvent();
             event.addInfo("Layer", LAYER_NAME,
                           "Label", "entry",
-                          "Method", methodName);
+                          "MethodName", methodName);
             
             String formattedKey = toStringKey(key); //format the param key, it could be byte[] or String
             if (formattedKey != null) {

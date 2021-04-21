@@ -23,14 +23,16 @@ import com.tracelytics.joboe.Event;
 public class RedisJedisConnectionInstrumentation extends ClassInstrumentation {
     private static final String CLASS_NAME = RedisJedisConnectionInstrumentation.class.getName();
     private static final String LAYER_NAME = "redis-jedis";
-    private enum OpType { COMMAND_OBJECT, COMMAND_STRING }
+    private enum OpType { COMMAND_OBJECT, COMMAND_STRING, COMMAND_OBJECT_V3 }
     
     @SuppressWarnings("unchecked")
     private static List<MethodMatcher<OpType>> methodMatchers = Arrays.asList(
-        new MethodMatcher<OpType>("sendCommand", new String[]{ "redis.clients.jedis.Protocol$Command" }, "redis.clients.jedis.Connection", OpType.COMMAND_OBJECT, true), //newer version
-        new MethodMatcher<OpType>("sendCommand", new String[]{ "redis.clients.jedis.Protocol$Command", "byte[][]" }, "redis.clients.jedis.Connection", OpType.COMMAND_OBJECT, true), //newer version
+        new MethodMatcher<OpType>("sendCommand", new String[]{ "redis.clients.jedis.commands.ProtocolCommand", "byte[][]" }, "void", OpType.COMMAND_OBJECT_V3, true), //version 3.x
+        new MethodMatcher<OpType>("sendCommand", new String[]{ "redis.clients.jedis.Protocol$Command" }, "redis.clients.jedis.Connection", OpType.COMMAND_OBJECT, true), //version 2.x
+        new MethodMatcher<OpType>("sendCommand", new String[]{ "redis.clients.jedis.Protocol$Command", "byte[][]" }, "redis.clients.jedis.Connection", OpType.COMMAND_OBJECT, true), //version 2.x
         new MethodMatcher<OpType>("sendCommand", new String[]{ "java.lang.String" }, "redis.clients.jedis.Connection", OpType.COMMAND_STRING) //older version
     );
+
 
     public boolean applyInstrumentation(CtClass cc, String className, byte[] classBytes)
             throws Exception {
@@ -44,6 +46,9 @@ public class RedisJedisConnectionInstrumentation extends ClassInstrumentation {
                 insertBefore(method, CLASS_NAME + ".reportCommand($1 != null ? $1.name() : null, getHost(), getPort());");
             } else if (opType == OpType.COMMAND_STRING) {
                 insertBefore(method, CLASS_NAME + ".reportCommand($1, getHost(), getPort());");
+            } else if (opType == OpType.COMMAND_OBJECT_V3) {
+                //do a instanceof change just to be safe
+                insertBefore(method, CLASS_NAME + ".reportCommand($1 instanceof redis.clients.jedis.Protocol$Command ? ((redis.clients.jedis.Protocol$Command) $1).name() : null, getHost(), getPort());");
             }
         }
         
