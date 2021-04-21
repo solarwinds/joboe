@@ -7,10 +7,16 @@ import org.springframework.web.servlet.ModelAndView;
 import redis.clients.jedis.*;
 import redis.clients.jedis.exceptions.JedisException;
 
+import java.util.AbstractMap;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 public class TestAll extends AbstractJedisController {
+
+    public static final String CONSUMER_GROUP = "consumer-group";
+    public static final String PENDING_GROUP = "pending-group";
 
     @GetMapping("/test-all")
     public ModelAndView testAll(Model model) throws InterruptedException {
@@ -468,6 +474,36 @@ public class TestAll extends AbstractJedisController {
             jedis.zunionstore(SET_STRING_KEY, SET_STRING_KEY, SET_STRING_KEY);
             jedis.zunionstore(SET_BYTE_KEY, new ZParams(), SET_BYTE_KEY);
             jedis.zunionstore(SET_STRING_KEY, new ZParams(), SET_STRING_KEY, SET_STRING_KEY);
+
+
+            //stream
+            Map<String,String> map = new HashMap<>();
+            map.put("f1", "v1");
+            StreamEntryID streamEntryID = jedis.xadd(STREAM_KEY, null, map);
+            jedis.xack(STREAM_KEY, CONSUMER_GROUP, streamEntryID);
+            jedis.xgroupCreate(STREAM_KEY, CONSUMER_GROUP, null, false);
+            jedis.xclaim(STREAM_KEY, CONSUMER_GROUP, CONSUMER_GROUP, 500, 0 ,0, false, streamEntryID);
+            jedis.xgroupSetID(STREAM_KEY, CONSUMER_GROUP, streamEntryID);
+            jedis.xgroupDelConsumer(STREAM_KEY, CONSUMER_GROUP, "consumer");
+            jedis.xinfoConsumers(STREAM_KEY, CONSUMER_GROUP);
+            jedis.xinfoGroup(STREAM_KEY);
+            jedis.xgroupDestroy(STREAM_KEY, CONSUMER_GROUP);
+
+            jedis.xinfoStream(STREAM_KEY);
+            jedis.xlen(STREAM_KEY);
+            jedis.xgroupCreate(STREAM_KEY, PENDING_GROUP, null, false);
+            jedis.xpending(STREAM_KEY, PENDING_GROUP, null, null, 1,"consumer");
+            jedis.xrange(STREAM_KEY, null, null, 1);
+
+            Map.Entry<String, StreamEntryID> streamQuery = new AbstractMap.SimpleImmutableEntry<>(
+                    STREAM_KEY, new StreamEntryID());
+            jedis.xread(1, 1L, streamQuery);
+            jedis.xrevrange(STREAM_KEY, null, null, 1);
+            jedis.xgroupCreate(STREAM_KEY, "xreadGroup-group", null, false);
+            jedis.xreadGroup("xreadGroup-group","xreadGroup-consumer", 1, 0, true, streamQuery);
+            jedis.xtrim(STREAM_KEY, 100, false);
+
+            jedis.xdel(STREAM_KEY, streamEntryID);
 
             jedis.del(BYTE_KEY);
             jedis.del(BYTE_KEY, BYTE_KEY);
