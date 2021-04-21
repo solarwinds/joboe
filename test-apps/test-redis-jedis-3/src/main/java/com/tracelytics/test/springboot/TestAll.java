@@ -14,10 +14,6 @@ import java.util.Map;
 
 @Controller
 public class TestAll extends AbstractJedisController {
-
-    public static final String CONSUMER_GROUP = "consumer-group";
-    public static final String PENDING_GROUP = "pending-group";
-
     @GetMapping("/test-all")
     public ModelAndView testAll(Model model) throws InterruptedException {
         initialize();

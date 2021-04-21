@@ -6,7 +6,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.ModelAndView;
 import redis.clients.jedis.*;
 
+import java.util.AbstractMap;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 public class TestMulti extends AbstractJedisController {
@@ -356,6 +359,35 @@ public class TestMulti extends AbstractJedisController {
             transaction.zunionstore(SET_STRING_KEY, SET_STRING_KEY, SET_STRING_KEY);
             transaction.zunionstore(SET_BYTE_KEY, new ZParams(), SET_BYTE_KEY);
             transaction.zunionstore(SET_STRING_KEY, new ZParams(), SET_STRING_KEY, SET_STRING_KEY);
+
+            //stream
+            Map<String,String> map = new HashMap<>();
+            map.put("f1", "v1");
+
+            Response<StreamEntryID> streamEntryIDResponse = transaction.xadd(STREAM_KEY, null, map);
+            transaction.exec();
+            transaction.close();
+            StreamEntryID streamEntryID = streamEntryIDResponse.get();
+            transaction = jedis.multi();
+            transaction.xack(STREAM_KEY, CONSUMER_GROUP, streamEntryID);
+            transaction.xgroupCreate(STREAM_KEY, CONSUMER_GROUP, null, false);
+            transaction.xclaim(STREAM_KEY, CONSUMER_GROUP, CONSUMER_GROUP, 500, 0 ,0, false, streamEntryID);
+            transaction.xgroupSetID(STREAM_KEY, CONSUMER_GROUP, streamEntryID);
+            transaction.xgroupDelConsumer(STREAM_KEY, CONSUMER_GROUP, "consumer");
+            transaction.xgroupDestroy(STREAM_KEY, CONSUMER_GROUP);
+
+            transaction.xlen(STREAM_KEY);
+            transaction.xgroupCreate(STREAM_KEY, PENDING_GROUP, null, false);
+            transaction.xpending(STREAM_KEY, PENDING_GROUP, null, null, 1,"consumer");
+            transaction.xrange(STREAM_KEY, null, null, 1);
+
+            Map.Entry<String, StreamEntryID> streamQuery = new AbstractMap.SimpleImmutableEntry<>(
+                    STREAM_KEY, new StreamEntryID());
+            transaction.xrevrange(STREAM_KEY, null, null, 1);
+            transaction.xgroupCreate(STREAM_KEY, "xreadGroup-group", null, false);
+            transaction.xtrim(STREAM_KEY, 100, false);
+
+            transaction.xdel(STREAM_KEY, streamEntryID);
 
             transaction.del(BYTE_KEY);
             transaction.del(BYTE_KEY, BYTE_KEY);

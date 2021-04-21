@@ -39,6 +39,8 @@ public abstract class AbstractJedisController {
     protected static final byte[] HASH_FIELD_BYTE_KEY = "test-hash-field-byte-key".getBytes();
 
     protected static final String STREAM_KEY = "test-stream-key";
+    protected static final String CONSUMER_GROUP = "consumer-group";
+    protected static final String PENDING_GROUP = "pending-group";
 
     protected static final int TIMEOUT = 100;
     protected static final int EXPIRY = 100;

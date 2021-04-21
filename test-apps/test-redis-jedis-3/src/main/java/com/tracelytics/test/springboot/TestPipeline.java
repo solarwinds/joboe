@@ -6,7 +6,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.ModelAndView;
 import redis.clients.jedis.*;
 
+import java.util.AbstractMap;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 public class TestPipeline extends AbstractJedisController {
@@ -354,6 +357,36 @@ public class TestPipeline extends AbstractJedisController {
             pipeline.zunionstore(SET_STRING_KEY, SET_STRING_KEY, SET_STRING_KEY);
             pipeline.zunionstore(SET_BYTE_KEY, new ZParams(), SET_BYTE_KEY);
             pipeline.zunionstore(SET_STRING_KEY, new ZParams(), SET_STRING_KEY, SET_STRING_KEY);
+
+
+            //stream
+            Map<String,String> map = new HashMap<>();
+            map.put("f1", "v1");
+            Response<StreamEntryID> streamEntryIDResponse = pipeline.xadd(STREAM_KEY, null, map);
+            pipeline.sync();
+            pipeline.close();
+
+            StreamEntryID streamEntryID = streamEntryIDResponse.get();
+            pipeline = jedis.pipelined();
+            pipeline.xack(STREAM_KEY, CONSUMER_GROUP, streamEntryID);
+            pipeline.xgroupCreate(STREAM_KEY, CONSUMER_GROUP, null, false);
+            pipeline.xclaim(STREAM_KEY, CONSUMER_GROUP, CONSUMER_GROUP, 500, 0 ,0, false, streamEntryID);
+            pipeline.xgroupSetID(STREAM_KEY, CONSUMER_GROUP, streamEntryID);
+            pipeline.xgroupDelConsumer(STREAM_KEY, CONSUMER_GROUP, "consumer");
+            pipeline.xgroupDestroy(STREAM_KEY, CONSUMER_GROUP);
+
+            pipeline.xlen(STREAM_KEY);
+            pipeline.xgroupCreate(STREAM_KEY, PENDING_GROUP, null, false);
+            pipeline.xpending(STREAM_KEY, PENDING_GROUP, null, null, 1,"consumer");
+            pipeline.xrange(STREAM_KEY, null, null, 1);
+
+            Map.Entry<String, StreamEntryID> streamQuery = new AbstractMap.SimpleImmutableEntry<>(
+                    STREAM_KEY, new StreamEntryID());
+            pipeline.xrevrange(STREAM_KEY, null, null, 1);
+            pipeline.xgroupCreate(STREAM_KEY, "xreadGroup-group", null, false);
+            pipeline.xtrim(STREAM_KEY, 100, false);
+
+            pipeline.xdel(STREAM_KEY, streamEntryID);
 
             pipeline.del(BYTE_KEY);
             pipeline.del(BYTE_KEY, BYTE_KEY);
