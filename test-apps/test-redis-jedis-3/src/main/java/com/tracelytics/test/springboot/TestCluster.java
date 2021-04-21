@@ -41,8 +41,6 @@ public class TestCluster extends AbstractJedisController {
 
 
         printToOutput("Finished testing cluster");
-        clearExtendedOutput();
-
         return getModelAndView("index");
     }
 

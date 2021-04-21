@@ -48,12 +48,15 @@
             <form action="#" th:action="@{/test-set}">
                 <input type="submit" value="test SET" class="button"/>
             </form>
-            <form action="#" th:action="@{/test-shard}">
-                <input type="submit" value="test sharded Jedis" class="button"/>
-            </form>
+
         </div>
 
         <div class="section">
+            <div class="title">Shard test</div>
+            <form action="#" th:action="@{/test-shard}">
+                Host(s):<input type="text" size="50" name="shardString" th:value="${session.shardString}"/><br/>
+                <input type="submit" value="test sharded Jedis" class="button"/>
+            </form>
             <div class="title">Cluster test</div>
             <form action="#" th:action="@{/test-cluster}">
                 Host(s):<input type="text" size="50" name="hostsString" th:value="${session.hostsString}"/><br/>
@@ -61,6 +64,7 @@
             </form>
             <div class="title">Sentinel test</div>
             <form action="#" th:action="@{/test-sentinel}">
+                Sentinel host:port:<input type="text" size="50" name="sentinel" th:value="${session.sentinel}"/><br/>
                 <input type="submit" value="test sentinel configuration" class="button"/>
             </form>
         </div>

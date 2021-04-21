@@ -1,28 +1,33 @@
 package com.tracelytics.test.springboot;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import redis.clients.jedis.*;
 
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 
 @Controller
 public class TestShard extends AbstractJedisController {
     @GetMapping("/test-shard")
-    public ModelAndView test(Model model) {
-        List<JedisShardInfo> shards = new ArrayList<JedisShardInfo>();
-        JedisShardInfo si = new JedisShardInfo(host, port);
-        shards.add(si);
-        si = new JedisShardInfo(host, 6380);
-        shards.add(si);
+    public ModelAndView test(@RequestParam("shardString")String hostsString, HttpSession session) {
+        String[] hosts = hostsString.split("\\s");
+        session.setAttribute("shardString", hostsString);
 
+        List<JedisShardInfo> shards = new ArrayList<JedisShardInfo>();
+        for (String host : hosts) {
+            JedisShardInfo si = new JedisShardInfo(HostAndPort.from(host));
+            shards.add(si);
+        }
         ShardedJedisPool pool = new ShardedJedisPool(new JedisPoolConfig(), shards);
 
         try (ShardedJedis jedis = pool.getResource()) {
-            jedis.set(STRING_KEY, "testing");
+            for (int i = 0; i < 10; i++) {
+                jedis.set(STRING_KEY + i, "testing");
+            }
         }
 
         printToOutput("Finished testing shard");
