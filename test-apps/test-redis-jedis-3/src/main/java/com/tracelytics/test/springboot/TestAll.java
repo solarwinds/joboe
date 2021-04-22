@@ -5,7 +5,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.ModelAndView;
 import redis.clients.jedis.*;
+import redis.clients.jedis.args.ListDirection;
+import redis.clients.jedis.args.UnblockType;
 import redis.clients.jedis.exceptions.JedisException;
+import redis.clients.jedis.params.GetExParams;
 
 import java.util.AbstractMap;
 import java.util.Collections;
@@ -35,6 +38,8 @@ public class TestAll extends AbstractJedisController {
             jedis.bitcount(STRING_KEY);
             jedis.bitcount(BYTE_KEY, 0, 1);
             jedis.bitcount(STRING_KEY, 0, 1);
+            jedis.bitfieldReadonly(STRING_KEY, "GET", "i5", "100");
+            jedis.bitfield(STRING_KEY, "INCRBY", "i5", "100", "1", "GET", "u4", "0");
             jedis.bitop(BitOP.AND, BYTE_KEY_2, BYTE_KEY, BYTE_KEY);
             jedis.bitop(BitOP.AND, STRING_KEY_2, STRING_KEY, STRING_KEY);
             jedis.bitpos(BYTE_KEY, true);
@@ -47,6 +52,9 @@ public class TestAll extends AbstractJedisController {
             //jedis.blpop(LIST_BYTE_KEY, LIST_BYTE_KEY);
             //jedis.blpop(LIST_STRING_KEY);
             //        jedis.blpop(LIST_STRING_KEY, LIST_STRING_KEY);
+
+//            jedis.blmove(STRING_KEY, STRING_KEY_2, ListDirection.LEFT, ListDirection.RIGHT, 0);
+//            jedis.blmove(BYTE_KEY, BYTE_KEY_2, ListDirection.LEFT, ListDirection.RIGHT, 0);
 
             fillList(jedis, LIST_BYTE_KEY, 1); //so the pop will not be blocking due to empty list below
             fillList(jedis, LIST_STRING_KEY, 2); //so the pop will not be blocking due to empty list below
@@ -90,6 +98,8 @@ public class TestAll extends AbstractJedisController {
             //        jedis.clusterSetSlotStable(1);
             //        jedis.clusterSlaves("1");
             //        jedis.clusterSlots();
+            jedis.copy(STRING_KEY, STRING_KEY_2, true);
+            jedis.copy(BYTE_KEY, BYTE_KEY_2, true);
             jedis.configGet("*".getBytes());
             jedis.configResetStat();
             jedis.configSet("tcp-keepalive".getBytes(), jedis.configGet("tcp-keepalive".getBytes()).get(1));
@@ -97,6 +107,8 @@ public class TestAll extends AbstractJedisController {
 
             jedis.dbSize();
             jedis.debug(DebugParams.RELOAD());
+            jedis.set(BYTE_KEY, BYTE_VALUE);
+            jedis.set(STRING_KEY, STRING_VALUE);
             jedis.decr(BYTE_KEY);
             jedis.decr(STRING_KEY);
             jedis.decrBy(BYTE_KEY, 2);
@@ -138,6 +150,10 @@ public class TestAll extends AbstractJedisController {
             jedis.get("BLAH");
             jedis.getbit(BYTE_KEY, 0);
             jedis.getbit(STRING_KEY, 0);
+            jedis.getDel(STRING_KEY);
+            jedis.getDel(BYTE_KEY);
+            jedis.getEx(STRING_KEY, GetExParams.getExParams());
+            jedis.getEx(BYTE_KEY, GetExParams.getExParams());
             jedis.getrange(BYTE_KEY, 0, 1);
             jedis.getrange(STRING_KEY, 0, 1);
             jedis.getSet(BYTE_KEY, BYTE_VALUE);
@@ -163,6 +179,13 @@ public class TestAll extends AbstractJedisController {
             jedis.hmget(HASH_STRING_KEY, HASH_FIELD_STRING_KEY);
             jedis.hmset(HASH_BYTE_KEY, Collections.singletonMap(HASH_FIELD_BYTE_KEY, BYTE_VALUE));
             jedis.hmset(HASH_STRING_KEY, Collections.singletonMap(HASH_FIELD_STRING_KEY, STRING_VALUE));
+            jedis.hrandfield(HASH_STRING_KEY);
+            jedis.hrandfield(HASH_STRING_KEY, 1);
+            jedis.hrandfield(HASH_BYTE_KEY);
+            jedis.hrandfield(HASH_BYTE_KEY, 1);
+            jedis.hrandfieldWithValues(HASH_STRING_KEY, 1);
+            jedis.hrandfieldWithValues(HASH_BYTE_KEY, 1);
+
             jedis.hscan(HASH_BYTE_KEY, ScanParams.SCAN_POINTER_START_BINARY);
             jedis.hscan(HASH_STRING_KEY, ScanParams.SCAN_POINTER_START);
             jedis.hset(HASH_BYTE_KEY, HASH_FIELD_BYTE_KEY, BYTE_VALUE);
@@ -191,6 +214,9 @@ public class TestAll extends AbstractJedisController {
             jedis.linsert(LIST_STRING_KEY, ListPosition.BEFORE, STRING_VALUE, STRING_VALUE);
             jedis.llen(LIST_BYTE_KEY);
             jedis.llen(LIST_STRING_KEY);
+            jedis.lmove(LIST_STRING_KEY, LIST_STRING_KEY, ListDirection.LEFT, ListDirection.RIGHT);
+            jedis.lmove(LIST_BYTE_KEY, LIST_BYTE_KEY, ListDirection.LEFT, ListDirection.RIGHT);
+            jedis.lpos(LIST_STRING_KEY, STRING_VALUE);
             jedis.lpop(LIST_BYTE_KEY);
             jedis.lpop(LIST_STRING_KEY);
             jedis.lpush(LIST_BYTE_KEY, BYTE_VALUE);
@@ -339,6 +365,7 @@ public class TestAll extends AbstractJedisController {
             jedis.slowlogReset();
             jedis.smembers(SET_BYTE_KEY);
             jedis.smembers(SET_STRING_KEY);
+            jedis.smismember(SET_STRING_KEY, STRING_VALUE);
             jedis.smove(SET_BYTE_KEY, SET_BYTE_KEY, BYTE_VALUE);
             jedis.smove(SET_STRING_KEY, SET_STRING_KEY, STRING_VALUE);
             jedis.sort(SET_BYTE_KEY);
@@ -384,6 +411,8 @@ public class TestAll extends AbstractJedisController {
             jedis.watch(STRING_KEY);
             jedis.unwatch();
 
+            jedis.clientUnblock(jedis.clientId(), UnblockType.TIMEOUT);
+
             jedis.zadd(ZSET_BYTE_KEY, Collections.singletonMap(BYTE_VALUE, (double) 1));
             jedis.zadd(ZSET_STRING_KEY, Collections.singletonMap(STRING_VALUE, (double) 1));
             jedis.zadd(ZSET_BYTE_KEY, 1, BYTE_VALUE);
@@ -394,14 +423,41 @@ public class TestAll extends AbstractJedisController {
             jedis.zcount(ZSET_STRING_KEY, STRING_VALUE, STRING_VALUE);
             jedis.zcount(ZSET_BYTE_KEY, 0, 1);
             jedis.zcount(ZSET_STRING_KEY, 0, 1);
+            jedis.zdiff(ZSET_STRING_KEY);
+            jedis.zdiff(ZSET_BYTE_KEY);
+            jedis.zdiffStore(ZSET_STRING_KEY, ZSET_STRING_KEY);
+            jedis.zdiffStore(ZSET_BYTE_KEY, ZSET_BYTE_KEY);
+            jedis.zdiffWithScores(ZSET_STRING_KEY);
+            jedis.zdiffWithScores(ZSET_BYTE_KEY);
+
             jedis.zincrby(ZSET_BYTE_KEY, 1, BYTE_VALUE);
             jedis.zincrby(ZSET_STRING_KEY, 1, STRING_VALUE);
+            jedis.zinter(new ZParams(), ZSET_STRING_KEY);
+            jedis.zinter(new ZParams(), ZSET_BYTE_KEY);
             jedis.zinterstore(ZSET_BYTE_KEY, ZSET_BYTE_KEY, ZSET_BYTE_KEY);
             jedis.zinterstore(ZSET_STRING_KEY, ZSET_STRING_KEY, ZSET_STRING_KEY);
             jedis.zinterstore(ZSET_BYTE_KEY, new ZParams(), ZSET_BYTE_KEY, ZSET_BYTE_KEY);
             jedis.zinterstore(ZSET_STRING_KEY, new ZParams(), ZSET_STRING_KEY, ZSET_STRING_KEY);
+            jedis.zrandmember(ZSET_STRING_KEY);
+            jedis.zrandmember(ZSET_STRING_KEY, 1);
+            jedis.zrandmember(ZSET_BYTE_KEY);
+            jedis.zrandmember(ZSET_BYTE_KEY, 1);
+            jedis.zrandmemberWithScores(ZSET_STRING_KEY, 1);
+            jedis.zrandmemberWithScores(ZSET_BYTE_KEY, 1);
+
             jedis.zlexcount(ZSET_BYTE_KEY, "-".getBytes(), "+".getBytes());
             jedis.zlexcount(ZSET_STRING_KEY, "-", "+");
+
+            jedis.zpopmax(ZSET_STRING_KEY);
+            jedis.zpopmax(ZSET_STRING_KEY, 1);
+            jedis.zpopmax(ZSET_BYTE_KEY);
+            jedis.zpopmax(ZSET_BYTE_KEY, 1);
+            jedis.zpopmin(ZSET_STRING_KEY);
+            jedis.zpopmin(ZSET_STRING_KEY, 1);
+            jedis.zpopmin(ZSET_BYTE_KEY);
+            jedis.zpopmin(ZSET_BYTE_KEY, 1);
+
+
             jedis.zrange(ZSET_BYTE_KEY, 0, 1);
             jedis.zrange(ZSET_STRING_KEY, 0, 1);
             jedis.zrangeByLex(ZSET_BYTE_KEY, "-".getBytes(), "+".getBytes());
@@ -458,6 +514,8 @@ public class TestAll extends AbstractJedisController {
             jedis.zrevrangeWithScores(ZSET_STRING_KEY, 0, 1);
             jedis.zrevrank(ZSET_BYTE_KEY, BYTE_VALUE);
             jedis.zrevrank(ZSET_STRING_KEY, STRING_VALUE);
+            jedis.zmscore(ZSET_BYTE_KEY, BYTE_VALUE);
+            jedis.zmscore(ZSET_STRING_KEY, STRING_VALUE);
             jedis.zscan(ZSET_BYTE_KEY, ScanParams.SCAN_POINTER_START_BINARY);
             jedis.zscan(ZSET_STRING_KEY, ScanParams.SCAN_POINTER_START);
             jedis.zscan(ZSET_BYTE_KEY, ScanParams.SCAN_POINTER_START_BINARY, new ScanParams());
@@ -466,6 +524,8 @@ public class TestAll extends AbstractJedisController {
             jedis.zscore(ZSET_BYTE_KEY, BYTE_VALUE);
             jedis.zscore(ZSET_STRING_KEY, STRING_VALUE);
 
+            jedis.zunion(new ZParams(), SET_STRING_KEY);
+            jedis.zunion(new ZParams(), SET_BYTE_KEY);
             jedis.zunionstore(SET_BYTE_KEY, SET_BYTE_KEY, SET_BYTE_KEY);
             jedis.zunionstore(SET_STRING_KEY, SET_STRING_KEY, SET_STRING_KEY);
             jedis.zunionstore(SET_BYTE_KEY, new ZParams(), SET_BYTE_KEY);

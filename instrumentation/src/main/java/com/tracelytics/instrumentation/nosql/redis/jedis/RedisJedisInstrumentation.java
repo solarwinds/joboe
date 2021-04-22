@@ -33,7 +33,7 @@ public class RedisJedisInstrumentation extends ClassInstrumentation {
         }
     };
     
-    private enum OpType { GET , EVAL, AUTH, MULTI, EXEC, DISCARD, SYNC, POP_TIMEOUT, BITOP, STREAM }
+    private enum OpType { GET , EVAL, AUTH, MULTI, EXEC, DISCARD, SYNC, POP_TIMEOUT, BITOP }
     // List of method matchers that declare method with signature patterns that we want to instrument
     @SuppressWarnings("unchecked")
     private static List<MethodMatcher<OpType>> methodMatchers = Arrays.asList(
@@ -271,28 +271,52 @@ public class RedisJedisInstrumentation extends ClassInstrumentation {
         new MethodMatcher<OpType>("syncAndReturnAll" , new String[] {}, "java.util.List", OpType.SYNC),
 
         //Stream
-        new MethodMatcher<OpType>("xadd" , new String[] {}, "java.lang.Object", OpType.STREAM),
-        new MethodMatcher<OpType>("xlen" , new String[] {}, "java.lang.Object", OpType.STREAM),
-        new MethodMatcher<OpType>("xrange" , new String[] {}, "java.lang.Object", OpType.STREAM),
-        new MethodMatcher<OpType>("xrevrange" , new String[] {}, "java.lang.Object", OpType.STREAM),
-        new MethodMatcher<OpType>("xread" , new String[] {}, "java.lang.Object", OpType.STREAM),
-        new MethodMatcher<OpType>("xack" , new String[] {}, "long", OpType.STREAM),
-        new MethodMatcher<OpType>("xack" , new String[] {}, "java.lang.Object", OpType.STREAM),
-        new MethodMatcher<OpType>("xgroupCreate" , new String[] {}, "java.lang.Object", OpType.STREAM),
-        new MethodMatcher<OpType>("xgroupSetID" , new String[] {}, "java.lang.Object", OpType.STREAM),
-        new MethodMatcher<OpType>("xgroupDestroy" , new String[] {}, "long", OpType.STREAM),
-        new MethodMatcher<OpType>("xgroupDestroy" , new String[] {}, "java.lang.Object", OpType.STREAM),
-        new MethodMatcher<OpType>("xgroupDelConsumer" , new String[] {}, "java.lang.Object", OpType.STREAM),
-        new MethodMatcher<OpType>("xinfoConsumers" , new String[] {}, "java.lang.Object", OpType.STREAM),
-        new MethodMatcher<OpType>("xdel" , new String[] {}, "long", OpType.STREAM),
-        new MethodMatcher<OpType>("xdel" , new String[] {}, "java.lang.Object", OpType.STREAM),
-        new MethodMatcher<OpType>("xtrim" , new String[] {}, "long", OpType.STREAM),
-        new MethodMatcher<OpType>("xtrim" , new String[] {}, "java.lang.Object", OpType.STREAM),
-        new MethodMatcher<OpType>("xreadGroup" , new String[] {}, "java.lang.Object", OpType.STREAM),
-        new MethodMatcher<OpType>("xpending" , new String[] {}, "java.lang.Object", OpType.STREAM),
-        new MethodMatcher<OpType>("xclaim" , new String[] {}, "java.lang.Object", OpType.STREAM),
-        new MethodMatcher<OpType>("xinfoStream" , new String[] {}, "java.lang.Object", OpType.STREAM),
-        new MethodMatcher<OpType>("xinfoGroup" , new String[] {}, "java.lang.Object", OpType.STREAM)
+        new MethodMatcher<OpType>("xadd" , new String[] {}, "java.lang.Object"),
+        new MethodMatcher<OpType>("xlen" , new String[] {}, "java.lang.Object"),
+        new MethodMatcher<OpType>("xrange" , new String[] {}, "java.lang.Object"),
+        new MethodMatcher<OpType>("xrevrange" , new String[] {}, "java.lang.Object"),
+        new MethodMatcher<OpType>("xread" , new String[] {}, "java.lang.Object"),
+        new MethodMatcher<OpType>("xack" , new String[] {}, "long"),
+        new MethodMatcher<OpType>("xack" , new String[] {}, "java.lang.Object"),
+        new MethodMatcher<OpType>("xgroupCreate" , new String[] {}, "java.lang.Object"),
+        new MethodMatcher<OpType>("xgroupSetID" , new String[] {}, "java.lang.Object"),
+        new MethodMatcher<OpType>("xgroupDestroy" , new String[] {}, "long"),
+        new MethodMatcher<OpType>("xgroupDestroy" , new String[] {}, "java.lang.Object"),
+        new MethodMatcher<OpType>("xgroupDelConsumer" , new String[] {}, "java.lang.Object"),
+        new MethodMatcher<OpType>("xinfoConsumers" , new String[] {}, "java.lang.Object"),
+        new MethodMatcher<OpType>("xdel" , new String[] {}, "long"),
+        new MethodMatcher<OpType>("xdel" , new String[] {}, "java.lang.Object"),
+        new MethodMatcher<OpType>("xtrim" , new String[] {}, "long"),
+        new MethodMatcher<OpType>("xtrim" , new String[] {}, "java.lang.Object"),
+        new MethodMatcher<OpType>("xreadGroup" , new String[] {}, "java.lang.Object"),
+        new MethodMatcher<OpType>("xpending" , new String[] {}, "java.lang.Object"),
+        new MethodMatcher<OpType>("xclaim" , new String[] {}, "java.lang.Object"),
+        new MethodMatcher<OpType>("xinfoStream" , new String[] {}, "java.lang.Object"),
+        new MethodMatcher<OpType>("xinfoGroup" , new String[] {}, "java.lang.Object"),
+
+        //3.x methods
+        new MethodMatcher<OpType>("bitfieldReadonly" , new String[] {}, "java.lang.Object"),
+        new MethodMatcher<OpType>("bitfield" , new String[] {}, "java.lang.Object"),
+        new MethodMatcher<OpType>("blmove" , new String[] {}, "java.lang.Object"),
+        new MethodMatcher<OpType>("clientUnblock" , new String[] {}, "java.lang.Object"),
+        new MethodMatcher<OpType>("copy" , new String[] {}, "java.lang.Object"),
+        new MethodMatcher<OpType>("getDel" , new String[] {}, "java.lang.Object"),
+        new MethodMatcher<OpType>("getEx" , new String[] {}, "java.lang.Object"),
+        new MethodMatcher<OpType>("hrandfield" , new String[] {}, "java.lang.Object"),
+        new MethodMatcher<OpType>("hrandfieldWithValues" , new String[] {}, "java.lang.Object"),
+        new MethodMatcher<OpType>("lmove" , new String[] {}, "java.lang.Object"),
+        new MethodMatcher<OpType>("lpos" , new String[] {}, "java.lang.Object"),
+        new MethodMatcher<OpType>("smismember" , new String[] {}, "java.lang.Object"),
+        new MethodMatcher<OpType>("zdiff" , new String[] {}, "java.lang.Object"),
+        new MethodMatcher<OpType>("zdiffStore" , new String[] {}, "java.lang.Object"),
+        new MethodMatcher<OpType>("zdiffWithScores" , new String[] {}, "java.lang.Object"),
+        new MethodMatcher<OpType>("zinter" , new String[] {}, "java.lang.Object"),
+        new MethodMatcher<OpType>("zrandmember" , new String[] {}, "java.lang.Object"),
+        new MethodMatcher<OpType>("zrandmemberWithScores" , new String[] {}, "java.lang.Object"),
+        new MethodMatcher<OpType>("zmscore" , new String[] {}, "java.lang.Object"),
+        new MethodMatcher<OpType>("zpopmax" , new String[] {}, "java.lang.Object"),
+        new MethodMatcher<OpType>("zpopmin" , new String[] {}, "java.lang.Object"),
+        new MethodMatcher<OpType>("zunion" , new String[] {}, "java.lang.Object")
     );
 
     public boolean applyInstrumentation(CtClass cc, String className, byte[] classBytes)

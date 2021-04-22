@@ -5,6 +5,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.ModelAndView;
 import redis.clients.jedis.*;
+import redis.clients.jedis.args.ListDirection;
+import redis.clients.jedis.params.GetExParams;
 
 import java.util.AbstractMap;
 import java.util.Collections;
@@ -27,6 +29,8 @@ public class TestPipeline extends AbstractJedisController {
             pipeline.bitcount(STRING_KEY);
             pipeline.bitcount(BYTE_KEY, 0, 1);
             pipeline.bitcount(STRING_KEY, 0, 1);
+            pipeline.bitfieldReadonly(STRING_KEY, STRING_VALUE, "GET", "u4", "0");
+            pipeline.bitfield(STRING_KEY, STRING_VALUE, "INCRBY", "i5", "100", "1", "GET", "u4", "0");
             pipeline.bitop(BitOP.AND, BYTE_KEY_2, BYTE_KEY, BYTE_KEY);
             pipeline.bitop(BitOP.AND, STRING_KEY_2, STRING_KEY, STRING_KEY);
             pipeline.bitpos(BYTE_KEY, true);
@@ -34,6 +38,8 @@ public class TestPipeline extends AbstractJedisController {
             pipeline.bitpos(BYTE_KEY, true, new BitPosParams(0));
             pipeline.bitpos(STRING_KEY, true, new BitPosParams(0));
 
+            pipeline.blmove(LIST_STRING_KEY, LIST_STRING_KEY, ListDirection.LEFT, ListDirection.RIGHT, 0);
+            pipeline.blmove(LIST_BYTE_KEY, LIST_BYTE_KEY, ListDirection.LEFT, ListDirection.RIGHT, 0);
             //blpop
             fillList(pipeline, LIST_BYTE_KEY, 1); //so the pop will not be blocking due to empty list below
             fillList(pipeline, LIST_STRING_KEY, 2); //so the pop will not be blocking due to empty list below
@@ -50,6 +56,8 @@ public class TestPipeline extends AbstractJedisController {
 
 //        transaction.configGet("*");
             pipeline.configResetStat();
+            pipeline.copy(STRING_KEY, STRING_KEY_2, true);
+            pipeline.copy(BYTE_KEY, BYTE_KEY_2, true);
 
             pipeline.dbSize();
             pipeline.decr(BYTE_KEY);
@@ -81,6 +89,10 @@ public class TestPipeline extends AbstractJedisController {
             pipeline.getbit(STRING_KEY, 0);
 //        transaction.getrange(BYTE_KEY, 0, 1);
 //        transaction.getrange(STRING_KEY, 0, 1);
+            pipeline.getDel(STRING_KEY);
+            pipeline.getDel(BYTE_KEY);
+            pipeline.getEx(STRING_KEY, GetExParams.getExParams());
+            pipeline.getEx(BYTE_KEY, GetExParams.getExParams());
             pipeline.getSet(BYTE_KEY, BYTE_VALUE);
             pipeline.getSet(STRING_KEY, STRING_VALUE);
 
@@ -104,6 +116,12 @@ public class TestPipeline extends AbstractJedisController {
             pipeline.hmget(HASH_STRING_KEY, HASH_FIELD_STRING_KEY);
             pipeline.hmset(HASH_BYTE_KEY, Collections.singletonMap(HASH_FIELD_BYTE_KEY, BYTE_VALUE));
             pipeline.hmset(HASH_STRING_KEY, Collections.singletonMap(HASH_FIELD_STRING_KEY, STRING_VALUE));
+            pipeline.hrandfield(HASH_STRING_KEY);
+            pipeline.hrandfield(HASH_STRING_KEY, 1);
+            pipeline.hrandfield(HASH_BYTE_KEY);
+            pipeline.hrandfield(HASH_BYTE_KEY, 1);
+            pipeline.hrandfieldWithValues(HASH_STRING_KEY, 1);
+            pipeline.hrandfieldWithValues(HASH_BYTE_KEY, 1);
             pipeline.hset(HASH_BYTE_KEY, HASH_FIELD_BYTE_KEY, BYTE_VALUE);
             pipeline.hset(HASH_STRING_KEY, HASH_FIELD_STRING_KEY, STRING_VALUE);
             pipeline.hsetnx(HASH_BYTE_KEY, HASH_FIELD_BYTE_KEY, BYTE_VALUE);
@@ -129,6 +147,9 @@ public class TestPipeline extends AbstractJedisController {
             pipeline.linsert(LIST_STRING_KEY, ListPosition.BEFORE, STRING_VALUE, STRING_VALUE);
             pipeline.llen(LIST_BYTE_KEY);
             pipeline.llen(LIST_STRING_KEY);
+            pipeline.lmove(LIST_STRING_KEY, LIST_STRING_KEY, ListDirection.LEFT, ListDirection.RIGHT);
+            pipeline.lmove(LIST_BYTE_KEY, LIST_BYTE_KEY, ListDirection.LEFT, ListDirection.RIGHT);
+            pipeline.lpos(LIST_STRING_KEY, STRING_VALUE);
             pipeline.lpop(LIST_BYTE_KEY);
             pipeline.lpop(LIST_STRING_KEY);
             pipeline.lpush(LIST_BYTE_KEY, BYTE_VALUE);
@@ -238,6 +259,7 @@ public class TestPipeline extends AbstractJedisController {
             pipeline.sismember(SET_STRING_KEY, STRING_VALUE);
             pipeline.smembers(SET_BYTE_KEY);
             pipeline.smembers(SET_STRING_KEY);
+            pipeline.smismember(SET_STRING_KEY, STRING_VALUE);
             pipeline.smove(SET_BYTE_KEY, SET_BYTE_KEY, BYTE_VALUE);
             pipeline.smove(SET_STRING_KEY, SET_STRING_KEY, STRING_VALUE);
             pipeline.sort(SET_BYTE_KEY);
@@ -285,14 +307,38 @@ public class TestPipeline extends AbstractJedisController {
             pipeline.zcount(ZSET_STRING_KEY, STRING_VALUE, STRING_VALUE);
             pipeline.zcount(ZSET_BYTE_KEY, 0, 1);
             pipeline.zcount(ZSET_STRING_KEY, 0, 1);
+            pipeline.zdiff(ZSET_STRING_KEY);
+            pipeline.zdiff(ZSET_BYTE_KEY);
+            pipeline.zdiffStore(ZSET_STRING_KEY, ZSET_STRING_KEY);
+            pipeline.zdiffStore(ZSET_BYTE_KEY, ZSET_BYTE_KEY);
+            pipeline.zdiffWithScores(ZSET_STRING_KEY);
+            pipeline.zdiffWithScores(ZSET_BYTE_KEY);
             pipeline.zincrby(ZSET_BYTE_KEY, 1, BYTE_VALUE);
             pipeline.zincrby(ZSET_STRING_KEY, 1, STRING_VALUE);
+            pipeline.zinter(new ZParams(), ZSET_STRING_KEY);
+            pipeline.zinter(new ZParams(), ZSET_BYTE_KEY);
             pipeline.zinterstore(ZSET_BYTE_KEY, ZSET_BYTE_KEY, ZSET_BYTE_KEY);
             pipeline.zinterstore(ZSET_STRING_KEY, ZSET_STRING_KEY, ZSET_STRING_KEY);
             pipeline.zinterstore(ZSET_BYTE_KEY, new ZParams(), ZSET_BYTE_KEY, ZSET_BYTE_KEY);
             pipeline.zinterstore(ZSET_STRING_KEY, new ZParams(), ZSET_STRING_KEY, ZSET_STRING_KEY);
             pipeline.zlexcount(ZSET_BYTE_KEY, "-".getBytes(), "+".getBytes());
             pipeline.zlexcount(ZSET_STRING_KEY, "-", "+");
+            pipeline.zmscore(ZSET_BYTE_KEY, BYTE_VALUE);
+            pipeline.zmscore(ZSET_STRING_KEY, STRING_VALUE);
+            pipeline.zpopmax(ZSET_STRING_KEY);
+            pipeline.zpopmax(ZSET_STRING_KEY, 1);
+            pipeline.zpopmax(ZSET_BYTE_KEY);
+            pipeline.zpopmax(ZSET_BYTE_KEY, 1);
+            pipeline.zpopmin(ZSET_STRING_KEY);
+            pipeline.zpopmin(ZSET_STRING_KEY, 1);
+            pipeline.zpopmin(ZSET_BYTE_KEY);
+            pipeline.zpopmin(ZSET_BYTE_KEY, 1);
+            pipeline.zrandmember(ZSET_STRING_KEY);
+            pipeline.zrandmember(ZSET_STRING_KEY, 1);
+            pipeline.zrandmember(ZSET_BYTE_KEY);
+            pipeline.zrandmember(ZSET_BYTE_KEY, 1);
+            pipeline.zrandmemberWithScores(ZSET_STRING_KEY, 1);
+            pipeline.zrandmemberWithScores(ZSET_BYTE_KEY, 1);
             pipeline.zrange(ZSET_BYTE_KEY, 0, 1);
             pipeline.zrange(ZSET_STRING_KEY, 0, 1);
             pipeline.zrangeByLex(ZSET_BYTE_KEY, "-".getBytes(), "+".getBytes());
@@ -353,6 +399,8 @@ public class TestPipeline extends AbstractJedisController {
             pipeline.zscore(ZSET_BYTE_KEY, BYTE_VALUE);
             pipeline.zscore(ZSET_STRING_KEY, STRING_VALUE);
 
+            pipeline.zunion(new ZParams(), SET_STRING_KEY);
+            pipeline.zunion(new ZParams(), SET_BYTE_KEY);
             pipeline.zunionstore(SET_BYTE_KEY, SET_BYTE_KEY, SET_BYTE_KEY);
             pipeline.zunionstore(SET_STRING_KEY, SET_STRING_KEY, SET_STRING_KEY);
             pipeline.zunionstore(SET_BYTE_KEY, new ZParams(), SET_BYTE_KEY);

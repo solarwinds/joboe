@@ -1,5 +1,6 @@
 package com.tracelytics.test.springboot;
 
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,7 +23,7 @@ public class TestShard extends AbstractJedisController {
             JedisShardInfo si = new JedisShardInfo(HostAndPort.from(host));
             shards.add(si);
         }
-        ShardedJedisPool pool = new ShardedJedisPool(new JedisPoolConfig(), shards);
+        ShardedJedisPool pool = new ShardedJedisPool(new GenericObjectPoolConfig<ShardedJedis>(), shards);
 
         try (ShardedJedis jedis = pool.getResource()) {
             for (int i = 0; i < 10; i++) {

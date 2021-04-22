@@ -5,6 +5,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.ModelAndView;
 import redis.clients.jedis.*;
+import redis.clients.jedis.args.ListDirection;
+import redis.clients.jedis.params.GetExParams;
 
 import java.util.AbstractMap;
 import java.util.Collections;
@@ -24,6 +26,8 @@ public class TestMulti extends AbstractJedisController {
             transaction.bitcount(STRING_KEY);
             transaction.bitcount(BYTE_KEY, 0, 1);
             transaction.bitcount(STRING_KEY, 0, 1);
+            transaction.bitfieldReadonly(STRING_KEY, "GET", "u4", "0");
+            transaction.bitfield(STRING_KEY, "INCRBY", "i5", "100", "1", "GET", "u4", "0");
             transaction.bitop(BitOP.AND, BYTE_KEY_2, BYTE_KEY, BYTE_KEY);
             transaction.bitop(BitOP.AND, STRING_KEY_2, STRING_KEY, STRING_KEY);
             transaction.bitpos(BYTE_KEY, true);
@@ -31,6 +35,8 @@ public class TestMulti extends AbstractJedisController {
             transaction.bitpos(BYTE_KEY, true, new BitPosParams(0));
             transaction.bitpos(STRING_KEY, true, new BitPosParams(0));
 
+            transaction.blmove(LIST_STRING_KEY, LIST_STRING_KEY, ListDirection.LEFT, ListDirection.RIGHT, 0);
+            transaction.blmove(LIST_BYTE_KEY, LIST_BYTE_KEY, ListDirection.LEFT, ListDirection.RIGHT, 0);
             //blpop
             fillList(transaction, LIST_BYTE_KEY, 1); //so the pop will not be blocking due to empty list below
             fillList(transaction, LIST_STRING_KEY, 2); //so the pop will not be blocking due to empty list below
@@ -46,6 +52,8 @@ public class TestMulti extends AbstractJedisController {
             transaction.brpop(TIMEOUT, LIST_STRING_KEY, LIST_STRING_KEY);
 
     //        transaction.configGet("*");
+            transaction.copy(STRING_KEY, STRING_KEY_2, true);
+            transaction.copy(BYTE_KEY, BYTE_KEY_2, true);
             transaction.configResetStat();
 
             transaction.dbSize();
@@ -80,6 +88,10 @@ public class TestMulti extends AbstractJedisController {
     //        transaction.getrange("string-byte-key".getBytes(), 0, 1);
     //        transaction.set("string-string-key", "this is a string");
     //        transaction.getrange("string-string-key", 0, 1);
+            transaction.getDel(STRING_KEY);
+            transaction.getDel(BYTE_KEY);
+            transaction.getEx(STRING_KEY, GetExParams.getExParams());
+            transaction.getEx(BYTE_KEY, GetExParams.getExParams());
             transaction.getSet(BYTE_KEY, BYTE_VALUE);
             transaction.getSet(STRING_KEY, STRING_VALUE);
 
@@ -103,6 +115,12 @@ public class TestMulti extends AbstractJedisController {
             transaction.hmget(HASH_STRING_KEY, HASH_FIELD_STRING_KEY);
             transaction.hmset(HASH_BYTE_KEY, Collections.singletonMap(HASH_FIELD_BYTE_KEY, BYTE_VALUE));
             transaction.hmset(HASH_STRING_KEY, Collections.singletonMap(HASH_FIELD_STRING_KEY, STRING_VALUE));
+            transaction.hrandfield(HASH_STRING_KEY);
+            transaction.hrandfield(HASH_STRING_KEY, 1);
+            transaction.hrandfield(HASH_BYTE_KEY);
+            transaction.hrandfield(HASH_BYTE_KEY, 1);
+            transaction.hrandfieldWithValues(HASH_STRING_KEY, 1);
+            transaction.hrandfieldWithValues(HASH_BYTE_KEY, 1);
             transaction.hset(HASH_BYTE_KEY, HASH_FIELD_BYTE_KEY, BYTE_VALUE);
             transaction.hset(HASH_STRING_KEY, HASH_FIELD_STRING_KEY, STRING_VALUE);
             transaction.hsetnx(HASH_BYTE_KEY, HASH_FIELD_BYTE_KEY, BYTE_VALUE);
@@ -128,6 +146,9 @@ public class TestMulti extends AbstractJedisController {
             transaction.linsert(LIST_STRING_KEY, ListPosition.BEFORE, STRING_VALUE, STRING_VALUE);
             transaction.llen(LIST_BYTE_KEY);
             transaction.llen(LIST_STRING_KEY);
+            transaction.lmove(LIST_STRING_KEY, LIST_STRING_KEY, ListDirection.LEFT, ListDirection.RIGHT);
+            transaction.lmove(LIST_BYTE_KEY, LIST_BYTE_KEY, ListDirection.LEFT, ListDirection.RIGHT);
+            transaction.lpos(LIST_STRING_KEY, STRING_VALUE);
             transaction.lpop(LIST_BYTE_KEY);
             transaction.lpop(LIST_STRING_KEY);
             transaction.lpush(LIST_BYTE_KEY, BYTE_VALUE);
@@ -237,6 +258,7 @@ public class TestMulti extends AbstractJedisController {
             transaction.sismember(SET_STRING_KEY, STRING_VALUE);
             transaction.smembers(SET_BYTE_KEY);
             transaction.smembers(SET_STRING_KEY);
+            transaction.smismember(SET_STRING_KEY, STRING_VALUE);
             transaction.smove(SET_BYTE_KEY, SET_BYTE_KEY, BYTE_VALUE);
             transaction.smove(SET_STRING_KEY, SET_STRING_KEY, STRING_VALUE);
             transaction.sort(SET_BYTE_KEY);
@@ -272,8 +294,8 @@ public class TestMulti extends AbstractJedisController {
             transaction.type(BYTE_KEY);
             transaction.type(STRING_KEY);
 
-            transaction.watch(BYTE_KEY);
-            transaction.watch(STRING_KEY);
+//            transaction.watch(BYTE_KEY);
+//            transaction.watch(STRING_KEY);
 
             transaction.exec();
 
@@ -287,14 +309,38 @@ public class TestMulti extends AbstractJedisController {
             transaction.zcount(ZSET_STRING_KEY, STRING_VALUE, STRING_VALUE);
             transaction.zcount(ZSET_BYTE_KEY, 0, 1);
             transaction.zcount(ZSET_STRING_KEY, 0, 1);
+            transaction.zdiff(ZSET_STRING_KEY);
+            transaction.zdiff(ZSET_BYTE_KEY);
+            transaction.zdiffStore(ZSET_STRING_KEY, ZSET_STRING_KEY);
+            transaction.zdiffStore(ZSET_BYTE_KEY, ZSET_BYTE_KEY);
+            transaction.zdiffWithScores(ZSET_STRING_KEY);
+            transaction.zdiffWithScores(ZSET_BYTE_KEY);
             transaction.zincrby(ZSET_BYTE_KEY, 1, BYTE_VALUE);
             transaction.zincrby(ZSET_STRING_KEY, 1, STRING_VALUE);
+            transaction.zinter(new ZParams(), ZSET_STRING_KEY);
+            transaction.zinter(new ZParams(), ZSET_BYTE_KEY);
             transaction.zinterstore(ZSET_BYTE_KEY, ZSET_BYTE_KEY, ZSET_BYTE_KEY);
             transaction.zinterstore(ZSET_STRING_KEY, ZSET_STRING_KEY, ZSET_STRING_KEY);
             transaction.zinterstore(ZSET_BYTE_KEY, new ZParams(), ZSET_BYTE_KEY, ZSET_BYTE_KEY);
             transaction.zinterstore(ZSET_STRING_KEY, new ZParams(), ZSET_STRING_KEY, ZSET_STRING_KEY);
             transaction.zlexcount(ZSET_BYTE_KEY, "-".getBytes(), "+".getBytes());
             transaction.zlexcount(ZSET_STRING_KEY, "-", "+");
+            transaction.zmscore(ZSET_BYTE_KEY, BYTE_VALUE);
+            transaction.zmscore(ZSET_STRING_KEY, STRING_VALUE);
+            transaction.zpopmax(ZSET_STRING_KEY);
+            transaction.zpopmax(ZSET_STRING_KEY, 1);
+            transaction.zpopmax(ZSET_BYTE_KEY);
+            transaction.zpopmax(ZSET_BYTE_KEY, 1);
+            transaction.zpopmin(ZSET_STRING_KEY);
+            transaction.zpopmin(ZSET_STRING_KEY, 1);
+            transaction.zpopmin(ZSET_BYTE_KEY);
+            transaction.zpopmin(ZSET_BYTE_KEY, 1);
+            transaction.zrandmember(ZSET_STRING_KEY);
+            transaction.zrandmember(ZSET_STRING_KEY, 1);
+            transaction.zrandmember(ZSET_BYTE_KEY);
+            transaction.zrandmember(ZSET_BYTE_KEY, 1);
+            transaction.zrandmemberWithScores(ZSET_STRING_KEY, 1);
+            transaction.zrandmemberWithScores(ZSET_BYTE_KEY, 1);
             transaction.zrange(ZSET_BYTE_KEY, 0, 1);
             transaction.zrange(ZSET_STRING_KEY, 0, 1);
             transaction.zrangeByLex(ZSET_BYTE_KEY, "-".getBytes(), "+".getBytes());
@@ -355,6 +401,8 @@ public class TestMulti extends AbstractJedisController {
             transaction.zscore(ZSET_BYTE_KEY, BYTE_VALUE);
             transaction.zscore(ZSET_STRING_KEY, STRING_VALUE);
 
+            transaction.zunion(new ZParams(), SET_STRING_KEY);
+            transaction.zunion(new ZParams(), SET_BYTE_KEY);
             transaction.zunionstore(SET_BYTE_KEY, SET_BYTE_KEY, SET_BYTE_KEY);
             transaction.zunionstore(SET_STRING_KEY, SET_STRING_KEY, SET_STRING_KEY);
             transaction.zunionstore(SET_BYTE_KEY, new ZParams(), SET_BYTE_KEY);
