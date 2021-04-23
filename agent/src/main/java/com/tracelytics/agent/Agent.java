@@ -9,13 +9,16 @@ import static com.tracelytics.agent.config.ConfigConstants.*;
 import com.tracelytics.agent.config.*;
 import com.tracelytics.agent.config.ProxyConfigParser;
 import com.tracelytics.ext.javassist.bytecode.ClassFile;
+import com.tracelytics.joboe.AgentHostInfoReader;
 import com.tracelytics.joboe.config.*;
 import com.tracelytics.joboe.config.InvalidConfigException;
 import com.tracelytics.joboe.rpc.*;
 import com.tracelytics.joboe.rpc.RpcClientManager.OperationType;
+
 import com.tracelytics.logging.Logger;
 import com.tracelytics.logging.LoggerFactory;
 import com.tracelytics.monitor.SystemMonitorController;
+import com.tracelytics.util.HostInfoUtils;
 import com.tracelytics.util.JavaProcessUtils;
 import com.tracelytics.util.ServiceKeyUtils;
 import com.tracelytics.util.TimeUtils;
@@ -503,6 +506,7 @@ public class Agent implements ClassFileTransformer {
      */
     private static void reportInit(boolean blockUntilFinish) {
         if (!reportedAgentInit.getAndSet(true)) {
+            HostInfoUtils.init(AgentHostInfoReader.INSTANCE);
             Future<Result> future;
             try {
                 String layerName = (String) ConfigManager.getConfig(ConfigProperty.AGENT_LAYER);
