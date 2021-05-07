@@ -275,17 +275,20 @@ class AgentClassFileTransformer implements ClassFileTransformer {
 
                     Class<?> internalUnsafeType = Class.forName("jdk.internal.misc.Unsafe");
                     Field theUnsafeInternalField = internalUnsafeType.getDeclaredField("theUnsafe");
-                    putBoolean.invoke(unsafeInstance, theUnsafeInternalField, offset, true);
-                    Method defineClassMethod = internalUnsafeType.getMethod("defineClass",
+                    putBoolean.invoke(unsafeInstance, theUnsafeInternalField, offset, true); //need to set this, otherwise theUnsafeInternalField.get(null) throws exception below
+                    //cannot access class jdk.internal.misc.Unsafe (in module java.base) because module java.base does not export jdk.internal.misc to unnamed module @4883b407
+                    //	at java.base/jdk.internal.reflect.Reflection.newIllegalAccessException(Reflection.java:385)
+                    internalUnsafeInstance = theUnsafeInternalField.get(null);
+
+                    defineClassMethod = internalUnsafeType.getMethod("defineClass",
                             String.class,
                             byte[].class,
                             int.class,
                             int.class,
                             ClassLoader.class,
                             ProtectionDomain.class);
+                    //Set this so we can call Unsafe.defineClassMethod
                     putBoolean.invoke(unsafeInstance, defineClassMethod, offset, true);
-                    internalUnsafeInstance = theUnsafeInternalField.get(null);
-
 
                     //Method defineClassMethod = unsafeInstance.getClass().getDeclaredMethod("defineClass", String.class, byte[].class, int.class, int.class, ClassLoader.class, ProtectionDomain.class);
 //                    tempCtClass = classPool.makeClass(ClassLoader.class.getName() + "$AppOptics");
@@ -321,7 +324,7 @@ class AgentClassFileTransformer implements ClassFileTransformer {
                             for (Entry<String, byte[]> classEntry : appLoaderClassLoader.getPackageClasses(appLoaderPackage).entrySet()) {
                                 String appLoaderClass = classEntry.getKey();
                                 byte[] classBytes = classEntry.getValue();
-                                defineClassMethod.invoke(internalUnsafeInstance, appLoaderClass, classBytes, 0, classBytes.length);
+                                defineClassMethod.invoke(internalUnsafeInstance, appLoaderClass, classBytes, 0, classBytes.length, loader, null);
 //                                defineClassMethod.invoke(unsafeInstance, appLoaderClass, classBytes, 0, classBytes.length, loader, null);
                             }
                         } catch (Throwable e) {
