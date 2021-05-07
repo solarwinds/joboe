@@ -16,7 +16,10 @@ import java.io.File;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.lang.instrument.Instrumentation;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.security.ProtectionDomain;
 import java.util.*;
 import java.util.Map.Entry;
@@ -210,6 +213,29 @@ class AgentClassFileTransformer implements ClassFileTransformer {
         return null;
     }
 
+
+    public static class ByteClassLoader extends URLClassLoader {
+        private final byte[] bytecode;
+        private final String name;
+
+        public ByteClassLoader(String name, byte[] bytecode) {
+            super(new URL[0]);
+            this.name = name;
+            this.bytecode = bytecode;
+        }
+
+        @Override
+        protected Class<?> findClass(final String name) throws ClassNotFoundException {
+            if (this.name.equals(name)) {
+                return defineClass(name, bytecode, 0, bytecode.length);
+            }
+            return super.findClass(name);
+        }
+
+    }
+
+    private Method defineClassMethod;
+    private Object internalUnsafeInstance;
     /**
      * 1. Inject the appLoaderClasses into the provided loader, so that the loader can loads those classes
      * 2. Append to the classPool the extra class path that can loads the appLoaderClasses
@@ -220,10 +246,68 @@ class AgentClassFileTransformer implements ClassFileTransformer {
      */
     private void registerLoaderClass(ClassPool classPool, ClassLoader loader, String[] appLoaderPackages) {
         if (loader != null && appLoaderPackages.length > 0) {
-
             try {
-                Method defineClassMethod = ClassLoader.class.getDeclaredMethod("defineClass", String.class, byte[].class, int.class, int.class);
-                defineClassMethod.setAccessible(true);
+//                Method defineClassMethod = ClassLoader.class.getDeclaredMethod("defineClass", String.class, byte[].class, int.class, int.class);
+//                defineClassMethod.setAccessible(true);
+                //CtClass tempCtClass = classPool.getOrNull(ClassLoader.class.getName() + "$AppOptics");
+
+                if (defineClassMethod == null) {
+                    Class<?> unsafeType = Class.forName("sun.misc.Unsafe");
+                    Field theUnsafe = unsafeType.getDeclaredField("theUnsafe");
+                    theUnsafe.setAccessible(true);
+                    Object unsafeInstance = theUnsafe.get(null);
+
+
+                    CtClass mirrorCtClass = classPool.get("java.lang.reflect.AccessibleObject");
+                    mirrorCtClass.setName("com.appoptics.MirrorClass");
+                    byte[] b = mirrorCtClass.toBytecode();
+//                    mirrorCtClass = classPool.makeClass(new ByteArrayInputStream(b));
+//                    Class mirrorClass = mirrorCtClass.toClass();
+
+                    Class mirrorClass = new ByteClassLoader("com.appoptics.MirrorClass", b).loadClass("com.appoptics.MirrorClass");
+                    Field overrideField = mirrorClass.getDeclaredField("override");
+
+                    long offset = (Long) unsafeType
+                            .getMethod("objectFieldOffset", Field.class)
+                            .invoke(unsafeInstance, overrideField);
+
+                    Method putBoolean = unsafeType.getMethod("putBoolean", Object.class, long.class, boolean.class);
+
+                    Class<?> internalUnsafeType = Class.forName("jdk.internal.misc.Unsafe");
+                    Field theUnsafeInternalField = internalUnsafeType.getDeclaredField("theUnsafe");
+                    putBoolean.invoke(unsafeInstance, theUnsafeInternalField, offset, true);
+                    Method defineClassMethod = internalUnsafeType.getMethod("defineClass",
+                            String.class,
+                            byte[].class,
+                            int.class,
+                            int.class,
+                            ClassLoader.class,
+                            ProtectionDomain.class);
+                    putBoolean.invoke(unsafeInstance, defineClassMethod, offset, true);
+                    internalUnsafeInstance = theUnsafeInternalField.get(null);
+
+
+                    //Method defineClassMethod = unsafeInstance.getClass().getDeclaredMethod("defineClass", String.class, byte[].class, int.class, int.class, ClassLoader.class, ProtectionDomain.class);
+//                    tempCtClass = classPool.makeClass(ClassLoader.class.getName() + "$AppOptics");
+//                    CtMethod tempMethod = CtNewMethod.make(
+//                            "public Class tempMethod(ClassLoader classLoader, String name, byte[] bytecode, int offset, int length) {" +
+//                            "   return classLoader.defineClass(name, bytecode, offset, length);" +
+//                            "}", tempCtClass);
+//                    tempCtClass.addMethod(tempMethod);
+//
+//                    byte[] bytes = tempCtClass.toBytecode();
+//                    tempClass = (Class) defineClassMethod.invoke(internalUnsafeInstance, tempCtClass.getName(), bytes, 0, 0, null, null);
+                }
+
+
+
+                //Method defineClassMethod = tempClass.getDeclaredMethod("tempMethod", ClassLoader.class, String.class, byte[].class, int.class, int.class);
+
+
+//                for (Method method : unsafeInstance.getClass().getDeclaredMethods()) {
+//                    System.out.println(method);
+//                }
+//
 
 
                 if (!injectedLoaderMap.containsKey(loader)) {
@@ -237,7 +321,8 @@ class AgentClassFileTransformer implements ClassFileTransformer {
                             for (Entry<String, byte[]> classEntry : appLoaderClassLoader.getPackageClasses(appLoaderPackage).entrySet()) {
                                 String appLoaderClass = classEntry.getKey();
                                 byte[] classBytes = classEntry.getValue();
-                                defineClassMethod.invoke(loader, appLoaderClass, classBytes, 0, classBytes.length);
+                                defineClassMethod.invoke(internalUnsafeInstance, appLoaderClass, classBytes, 0, classBytes.length);
+//                                defineClassMethod.invoke(unsafeInstance, appLoaderClass, classBytes, 0, classBytes.length, loader, null);
                             }
                         } catch (Throwable e) {
                             logger.warn("Failed to register app loader package " + appLoaderPackage + " : " + e.getMessage(), e);
@@ -247,7 +332,7 @@ class AgentClassFileTransformer implements ClassFileTransformer {
                 }
 
                 classPool.appendClassPath(new LoaderClassPath(appLoaderClassLoader)); //append the resource to classpool too so code injection can reference these classes
-            } catch (NoSuchMethodException e) {
+            } catch (Exception e) {
                 logger.warn("Failed to register app loader packages : " + e.getMessage(), e);
             }
         }
