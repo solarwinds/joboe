@@ -17,6 +17,8 @@ import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.lang.instrument.Instrumentation;
 import java.lang.reflect.Field;
+import java.lang.reflect.InaccessibleObjectException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -234,8 +236,17 @@ class AgentClassFileTransformer implements ClassFileTransformer {
 
     }
 
-    private Method defineClassMethod;
-    private Object unsafeObject;
+    private final ClassInjector classInjector = buildClassInjector();
+
+    private ClassInjector buildClassInjector() {
+        try {
+            return new ReflectionClassInjector();
+        } catch (ClassInjectorException e) {
+            logger.warn("Cannot create class injector", e);
+            return null;
+        }
+    }
+
     /**
      * 1. Inject the appLoaderClasses into the provided loader, so that the loader can loads those classes
      * 2. Append to the classPool the extra class path that can loads the appLoaderClasses
@@ -245,64 +256,8 @@ class AgentClassFileTransformer implements ClassFileTransformer {
      * @param appLoaderPackages
      */
     private void registerLoaderClass(ClassPool classPool, ClassLoader loader, String[] appLoaderPackages) {
-        if (loader != null && appLoaderPackages.length > 0) {
+        if (loader != null && classInjector != null && appLoaderPackages.length > 0) {
             try {
-//                Method defineClassMethod = ClassLoader.class.getDeclaredMethod("defineClass", String.class, byte[].class, int.class, int.class);
-//                defineClassMethod.setAccessible(true);
-                //CtClass tempCtClass = classPool.getOrNull(ClassLoader.class.getName() + "$AppOptics");
-
-                if (defineClassMethod == null) {
-                    Class<?> unsafeType = Class.forName("sun.misc.Unsafe");
-                    Field theUnsafe = unsafeType.getDeclaredField("theUnsafe");
-                    theUnsafe.setAccessible(true);
-                    Object unsafeInstance = theUnsafe.get(null);
-
-                    try {
-                        defineClassMethod = unsafeType.getMethod("defineClass",
-                                String.class,
-                                byte[].class,
-                                int.class,
-                                int.class,
-                                ClassLoader.class,
-                                ProtectionDomain.class);
-                        defineClassMethod.setAccessible(true);
-                        //ok to use sun.misc.Unsafe
-                        unsafeObject = unsafeInstance;
-                    } catch (Exception exception) {
-                        CtClass mirrorCtClass = classPool.get("java.lang.reflect.AccessibleObject");
-                        mirrorCtClass.setName("com.appoptics.MirrorClass");
-                        byte[] b = mirrorCtClass.toBytecode();
-                        //                    mirrorCtClass = classPool.makeClass(new ByteArrayInputStream(b));
-                        //                    Class mirrorClass = mirrorCtClass.toClass();
-
-                        Class mirrorClass = new ByteClassLoader("com.appoptics.MirrorClass", b).loadClass("com.appoptics.MirrorClass");
-                        Field overrideField = mirrorClass.getDeclaredField("override");
-
-                        long offset = (Long) unsafeType
-                                .getMethod("objectFieldOffset", Field.class)
-                                .invoke(unsafeInstance, overrideField);
-
-                        Method putBoolean = unsafeType.getMethod("putBoolean", Object.class, long.class, boolean.class);
-
-                        Class<?> internalUnsafeType = Class.forName("jdk.internal.misc.Unsafe");
-                        Field theUnsafeInternalField = internalUnsafeType.getDeclaredField("theUnsafe");
-                        putBoolean.invoke(unsafeInstance, theUnsafeInternalField, offset, true); //need to set this, otherwise theUnsafeInternalField.get(null) throws exception below
-                        //cannot access class jdk.internal.misc.Unsafe (in module java.base) because module java.base does not export jdk.internal.misc to unnamed module @4883b407
-                        //	at java.base/jdk.internal.reflect.Reflection.newIllegalAccessException(Reflection.java:385)
-                        unsafeObject = theUnsafeInternalField.get(null); //use `jdk.internal.misc.Unsafe` instead of `sun.misc.Unsafe`
-
-                        defineClassMethod = internalUnsafeType.getMethod("defineClass",
-                                String.class,
-                                byte[].class,
-                                int.class,
-                                int.class,
-                                ClassLoader.class,
-                                ProtectionDomain.class);
-                        //Set this so we can call Unsafe.defineClassMethod
-                        putBoolean.invoke(unsafeInstance, defineClassMethod, offset, true);
-                    }
-                }
-
                 if (!injectedLoaderMap.containsKey(loader)) {
                     injectedLoaderMap.put(loader, new HashSet<String>());
                 }
@@ -314,8 +269,11 @@ class AgentClassFileTransformer implements ClassFileTransformer {
                             for (Entry<String, byte[]> classEntry : appLoaderClassLoader.getPackageClasses(appLoaderPackage).entrySet()) {
                                 String appLoaderClass = classEntry.getKey();
                                 byte[] classBytes = classEntry.getValue();
-                                defineClassMethod.invoke(unsafeObject, appLoaderClass, classBytes, 0, classBytes.length, loader, null);
+                                //((Unsafe) unsafeObject).defineClass(appLoaderClass, classBytes, 0, classBytes.length, loader, null);
+                                //defineClassMethod.invoke(unsafeObject, appLoaderClass, classBytes, 0, classBytes.length, loader, null);
 //                                defineClassMethod.invoke(unsafeInstance, appLoaderClass, classBytes, 0, classBytes.length, loader, null);
+                                classInjector.inject(appLoaderClass, classBytes, 0, classBytes.length, loader, null);
+
                             }
                         } catch (Throwable e) {
                             logger.warn("Failed to register app loader package " + appLoaderPackage + " : " + e.getMessage(), e);
@@ -330,6 +288,78 @@ class AgentClassFileTransformer implements ClassFileTransformer {
             }
         }
     }
+
+    private interface ClassInjector {
+        void inject(String className, byte[] classBytes, int offset, int length, ClassLoader classLoader, ProtectionDomain protectionDomain);
+    }
+
+    private static class ClassInjectorException extends Exception {
+        ClassInjectorException(Exception e) {
+            super(e);
+        }
+    }
+
+    private static class ReflectionClassInjector implements ClassInjector {
+        private final Method defineClassMethod;
+        private static final String MIRROR_CLASS_NAME = ReflectionClassInjector.class.getName() + "$MirroClass";
+
+        ReflectionClassInjector() throws ClassInjectorException {
+            try {
+                defineClassMethod = ClassLoader.class.getDeclaredMethod("defineClass", String.class, byte[].class, int.class, int.class, ProtectionDomain.class);
+                try {
+                    defineClassMethod.setAccessible(true);
+                } catch (InaccessibleObjectException e) { //policy not allow reflective access (default for java 16+)
+                    try {
+                        Class<?> unsafeType = Class.forName("sun.misc.Unsafe");
+                        Field theUnsafe = unsafeType.getDeclaredField("theUnsafe");
+                        theUnsafe.setAccessible(true);
+                        Object unsafeInstance = theUnsafe.get(null);
+
+                        CtClass mirrorCtClass = ClassPool.getDefault().get("java.lang.reflect.AccessibleObject");
+                        mirrorCtClass.setName(MIRROR_CLASS_NAME);
+                        byte[] b = mirrorCtClass.toBytecode();
+
+                        Class mirrorClass = new ByteClassLoader(MIRROR_CLASS_NAME, b).loadClass(MIRROR_CLASS_NAME);
+                        Field overrideField = mirrorClass.getDeclaredField("override");
+
+                        long offset = (Long) unsafeType.getMethod("objectFieldOffset", Field.class).invoke(unsafeInstance, overrideField);
+
+                        Method putBoolean = unsafeType.getMethod("putBoolean", Object.class, long.class, boolean.class);
+
+                        Class<?> internalUnsafeType = Class.forName("jdk.internal.misc.Unsafe");
+                        Field theUnsafeInternalField = internalUnsafeType.getDeclaredField("theUnsafe");
+                        putBoolean.invoke(unsafeInstance, theUnsafeInternalField, offset, true); //need to set this, otherwise theUnsafeInternalField.get(null) throws exception below
+                        //cannot access class jdk.internal.misc.Unsafe (in module java.base) because module java.base does not export jdk.internal.misc to unnamed module @4883b407
+                        //	at java.base/jdk.internal.reflect.Reflection.newIllegalAccessException(Reflection.java:385)
+                        Object unsafeObject = theUnsafeInternalField.get(null); //use `jdk.internal.misc.Unsafe` instead of `sun.misc.Unsafe`
+
+                        //Set this so we can call ClassLoader.defineClassMethod
+                        putBoolean.invoke(unsafeInstance, defineClassMethod, offset, true);
+
+                    } catch (Exception e2){
+                       throw new ClassInjectorException(e2);
+                    }
+                }
+            } catch (NoSuchMethodException e) {
+                throw new ClassInjectorException(e);
+            }
+
+        }
+
+        @Override
+        public void inject(String className, byte[] classBytes, int offset, int length, ClassLoader classLoader, ProtectionDomain protectionDomain) {
+            try {
+                defineClassMethod.invoke(classLoader, className, classBytes, offset, length, protectionDomain);
+            } catch (IllegalAccessException e) {
+                logger.warn("Failed to inject class " + className + " : " + e.getMessage(), e);
+            } catch (InvocationTargetException e) {
+                logger.warn("Failed to inject class " + className + " : " + e.getMessage(), e);
+            }
+        }
+    }
+
+
+
 
     private void checkClassLoadingTriggers(String className) {
         AgentTrigger trigger = classLoadingTriggers.get(className);
