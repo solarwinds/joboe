@@ -156,7 +156,7 @@ class AgentClassFileTransformer implements ClassFileTransformer {
                             Instrument annotation = instrumentation.getClass().getAnnotation(Instrument.class);
                             if (annotation != null && annotation.appLoaderPackage() != null) {
                                 if (appLoaderClassLoader != null) {
-                                    registerLoaderClass(appClassPool, loader, annotation.appLoaderPackage());
+                                    registerLoaderClass(appClassPool, loader, annotation.appLoaderPackage(), protectionDomain);
                                 } else {
                                     logger.warn("Failed to register instrumenter package " + annotation.appLoaderPackage() + " as class loader is not initialized properly");
                                 }
@@ -216,7 +216,7 @@ class AgentClassFileTransformer implements ClassFileTransformer {
     }
 
 
-    public static class ByteClassLoader extends URLClassLoader {
+    private static class ByteClassLoader extends URLClassLoader {
         private final byte[] bytecode;
         private final String name;
 
@@ -255,7 +255,7 @@ class AgentClassFileTransformer implements ClassFileTransformer {
      * @param loader
      * @param appLoaderPackages
      */
-    private void registerLoaderClass(ClassPool classPool, ClassLoader loader, String[] appLoaderPackages) {
+    private void registerLoaderClass(ClassPool classPool, ClassLoader loader, String[] appLoaderPackages, ProtectionDomain protectionDomain) {
         if (loader != null && classInjector != null && appLoaderPackages.length > 0) {
             try {
                 if (!injectedLoaderMap.containsKey(loader)) {
@@ -272,7 +272,7 @@ class AgentClassFileTransformer implements ClassFileTransformer {
                                 //((Unsafe) unsafeObject).defineClass(appLoaderClass, classBytes, 0, classBytes.length, loader, null);
                                 //defineClassMethod.invoke(unsafeObject, appLoaderClass, classBytes, 0, classBytes.length, loader, null);
 //                                defineClassMethod.invoke(unsafeInstance, appLoaderClass, classBytes, 0, classBytes.length, loader, null);
-                                classInjector.inject(appLoaderClass, classBytes, 0, classBytes.length, loader, null);
+                                classInjector.inject(appLoaderClass, classBytes, 0, classBytes.length, loader, protectionDomain);
 
                             }
                         } catch (Throwable e) {
@@ -317,21 +317,13 @@ class AgentClassFileTransformer implements ClassFileTransformer {
 
                         CtClass mirrorCtClass = ClassPool.getDefault().get("java.lang.reflect.AccessibleObject");
                         mirrorCtClass.setName(MIRROR_CLASS_NAME);
-                        byte[] b = mirrorCtClass.toBytecode();
-
-                        Class mirrorClass = new ByteClassLoader(MIRROR_CLASS_NAME, b).loadClass(MIRROR_CLASS_NAME);
+                        //cannot call mirrorCtClass.toClass() directly as it triggers access exception
+                        Class mirrorClass = new ByteClassLoader(MIRROR_CLASS_NAME, mirrorCtClass.toBytecode()).loadClass(MIRROR_CLASS_NAME);
                         Field overrideField = mirrorClass.getDeclaredField("override");
 
                         long offset = (Long) unsafeType.getMethod("objectFieldOffset", Field.class).invoke(unsafeInstance, overrideField);
 
                         Method putBoolean = unsafeType.getMethod("putBoolean", Object.class, long.class, boolean.class);
-
-                        Class<?> internalUnsafeType = Class.forName("jdk.internal.misc.Unsafe");
-                        Field theUnsafeInternalField = internalUnsafeType.getDeclaredField("theUnsafe");
-                        putBoolean.invoke(unsafeInstance, theUnsafeInternalField, offset, true); //need to set this, otherwise theUnsafeInternalField.get(null) throws exception below
-                        //cannot access class jdk.internal.misc.Unsafe (in module java.base) because module java.base does not export jdk.internal.misc to unnamed module @4883b407
-                        //	at java.base/jdk.internal.reflect.Reflection.newIllegalAccessException(Reflection.java:385)
-                        Object unsafeObject = theUnsafeInternalField.get(null); //use `jdk.internal.misc.Unsafe` instead of `sun.misc.Unsafe`
 
                         //Set this so we can call ClassLoader.defineClassMethod
                         putBoolean.invoke(unsafeInstance, defineClassMethod, offset, true);
