@@ -299,8 +299,9 @@ class AgentClassFileTransformer implements ClassFileTransformer {
             } else {
                 return true; //nothing to perform, still considered successful
             }
+        } else { //classInjector is null, error at initialization
+            return false;
         }
-        return false;
     }
 
     private interface ClassInjector {
