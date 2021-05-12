@@ -284,6 +284,7 @@ class AgentClassFileTransformer implements ClassFileTransformer {
                                 }
                             } catch (Throwable e) {
                                 logger.warn("Failed to register app loader package " + appLoaderPackage + " : " + e.getMessage(), e);
+                                return false;
                             }
                             injectedPackages.add(appLoaderPackage);
                         }
