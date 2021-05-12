@@ -8,6 +8,8 @@ import com.tracelytics.ext.javassist.*;
 import com.tracelytics.ext.javassist.bytecode.ClassFile;
 import com.tracelytics.instrumentation.ClassMap;
 import com.tracelytics.instrumentation.*;
+import com.tracelytics.joboe.config.ConfigManager;
+import com.tracelytics.joboe.config.ConfigProperty;
 import com.tracelytics.joboe.StartupManager;
 import com.tracelytics.logging.Logger;
 import com.tracelytics.logging.LoggerFactory;
@@ -150,20 +152,27 @@ class AgentClassFileTransformer implements ClassFileTransformer {
 
                     try {
                         ClassInstrumentation instrumentation = instrumentationBuilder.build();
-
+                        boolean injectionFailure = false;
                         //Check if the instrumentation requires access to app loader classes - classes that access 3rd party framework code directly
                         if (APP_LOADER_AVAILABLE) {
                             Instrument annotation = instrumentation.getClass().getAnnotation(Instrument.class);
                             if (annotation != null && annotation.appLoaderPackage() != null) {
                                 if (appLoaderClassLoader != null) {
-                                    registerLoaderClass(appClassPool, loader, annotation.appLoaderPackage(), protectionDomain);
+                                    if (!registerLoaderClass(appClassPool, loader, annotation.appLoaderPackage(), protectionDomain)) {
+                                        injectionFailure = true;
+                                    }
                                 } else {
                                     logger.warn("Failed to register instrumenter package " + annotation.appLoaderPackage() + " as class loader is not initialized properly");
+                                    injectionFailure = true;
                                 }
                             }
                         }
 
-                        modified |= instrumentation.apply(cc, appClassPool, className, classBytes);
+                        if (!injectionFailure) {
+                            modified |= instrumentation.apply(cc, appClassPool, className, classBytes);
+                        } else {
+                            logger.warn("Instrumentation " + className + " skipped as class injection failed");
+                        }
                     } catch (NotFoundException e) {
                         logger.warn("Error loading class/method while applying instrumentation [" + instrumentationBuilder + "] to class [" + className + "] : " + e.getMessage());
                     } catch(Exception ex) {
@@ -255,38 +264,42 @@ class AgentClassFileTransformer implements ClassFileTransformer {
      * @param loader
      * @param appLoaderPackages
      */
-    private void registerLoaderClass(ClassPool classPool, ClassLoader loader, String[] appLoaderPackages, ProtectionDomain protectionDomain) {
-        if (loader != null && classInjector != null && appLoaderPackages.length > 0) {
-            try {
-                if (!injectedLoaderMap.containsKey(loader)) {
-                    injectedLoaderMap.put(loader, new HashSet<String>());
-                }
-                Set<String> injectedPackages = injectedLoaderMap.get(loader);
-
-                for (String appLoaderPackage : appLoaderPackages) {
-                    if (!injectedPackages.contains(appLoaderPackage)) {
-                        try {
-                            for (Entry<String, byte[]> classEntry : appLoaderClassLoader.getPackageClasses(appLoaderPackage).entrySet()) {
-                                String appLoaderClass = classEntry.getKey();
-                                byte[] classBytes = classEntry.getValue();
-                                //((Unsafe) unsafeObject).defineClass(appLoaderClass, classBytes, 0, classBytes.length, loader, null);
-                                //defineClassMethod.invoke(unsafeObject, appLoaderClass, classBytes, 0, classBytes.length, loader, null);
-//                                defineClassMethod.invoke(unsafeInstance, appLoaderClass, classBytes, 0, classBytes.length, loader, null);
-                                classInjector.inject(appLoaderClass, classBytes, 0, classBytes.length, loader, protectionDomain);
-
-                            }
-                        } catch (Throwable e) {
-                            logger.warn("Failed to register app loader package " + appLoaderPackage + " : " + e.getMessage(), e);
-                        }
-                        injectedPackages.add(appLoaderPackage);
+    private boolean registerLoaderClass(ClassPool classPool, ClassLoader loader, String[] appLoaderPackages, ProtectionDomain protectionDomain) {
+        if (classInjector != null) {
+            if (loader != null && appLoaderPackages.length > 0) {
+                try {
+                    if (!injectedLoaderMap.containsKey(loader)) {
+                        injectedLoaderMap.put(loader, new HashSet<String>());
                     }
-                }
+                    Set<String> injectedPackages = injectedLoaderMap.get(loader);
 
-                classPool.appendClassPath(new LoaderClassPath(appLoaderClassLoader)); //append the resource to classpool too so code injection can reference these classes
-            } catch (Exception e) {
-                logger.warn("Failed to register app loader packages : " + e.getMessage(), e);
+                    for (String appLoaderPackage : appLoaderPackages) {
+                        if (!injectedPackages.contains(appLoaderPackage)) {
+                            try {
+                                for (Entry<String, byte[]> classEntry : appLoaderClassLoader.getPackageClasses(appLoaderPackage).entrySet()) {
+                                    String appLoaderClass = classEntry.getKey();
+                                    byte[] classBytes = classEntry.getValue();
+                                    classInjector.inject(appLoaderClass, classBytes, 0, classBytes.length, loader, protectionDomain);
+
+                                }
+                            } catch (Throwable e) {
+                                logger.warn("Failed to register app loader package " + appLoaderPackage + " : " + e.getMessage(), e);
+                            }
+                            injectedPackages.add(appLoaderPackage);
+                        }
+                    }
+
+                    classPool.appendClassPath(new LoaderClassPath(appLoaderClassLoader)); //append the resource to classpool too so code injection can reference these classes
+                    return true;
+                } catch (Exception e) {
+                    logger.warn("Failed to register app loader packages : " + e.getMessage(), e);
+                    return false;
+                }
+            } else {
+                return true; //nothing to perform, still considered successful
             }
         }
+        return false;
     }
 
     private interface ClassInjector {
@@ -296,6 +309,9 @@ class AgentClassFileTransformer implements ClassFileTransformer {
     private static class ClassInjectorException extends Exception {
         ClassInjectorException(Exception e) {
             super(e);
+        }
+        ClassInjectorException(String message) {
+            super(message);
         }
     }
 
@@ -308,28 +324,40 @@ class AgentClassFileTransformer implements ClassFileTransformer {
                 defineClassMethod = ClassLoader.class.getDeclaredMethod("defineClass", String.class, byte[].class, int.class, int.class, ProtectionDomain.class);
                 try {
                     defineClassMethod.setAccessible(true);
-                } catch (InaccessibleObjectException e) { //policy not allow reflective access (default for java 16+)
-                    try {
-                        Class<?> unsafeType = Class.forName("sun.misc.Unsafe");
-                        Field theUnsafe = unsafeType.getDeclaredField("theUnsafe");
-                        theUnsafe.setAccessible(true);
-                        Object unsafeInstance = theUnsafe.get(null);
+                } catch (InaccessibleObjectException e) { //policy disallow reflective access (default for java 16+)
+                    if (!ConfigManager.getConfigOptional(ConfigProperty.AGENT_DISALLOW_UNSAFE, false)) {
+                        try {
+                            //We are using a trick similar to ByteBuddy here https://github.com/raphw/byte-buddy/blob/byte-buddy-1.11.0/byte-buddy-dep/src/main/java/net/bytebuddy/dynamic/loading/ClassInjector.java#L1993
+                            //The idea is to set the `override` field in `AccessibleObject` to `true` so we can make reflection call bypassing permission checks
+                            //https://github.com/openjdk/jdk/blob/jdk-16+36/src/java.base/share/classes/java/lang/reflect/Method.java#L557
+                            //More details discussed in https://github.com/librato/joboe/pull/1476
 
-                        CtClass mirrorCtClass = ClassPool.getDefault().get("java.lang.reflect.AccessibleObject");
-                        mirrorCtClass.setName(MIRROR_CLASS_NAME);
-                        //cannot call mirrorCtClass.toClass() directly as it triggers access exception
-                        Class mirrorClass = new ByteClassLoader(MIRROR_CLASS_NAME, mirrorCtClass.toBytecode()).loadClass(MIRROR_CLASS_NAME);
-                        Field overrideField = mirrorClass.getDeclaredField("override");
+                            //Get the Unsafe instance here, so we can call `Unsafe.putBoolean` method to modify field value using offset
+                            //We cannot directly modify `AccessibleObject.override` as such a field is hidden from the Java reflection API
+                            Class<?> unsafeType = Class.forName("sun.misc.Unsafe");
+                            Field theUnsafe = unsafeType.getDeclaredField("theUnsafe");
+                            theUnsafe.setAccessible(true);
+                            Object unsafeInstance = theUnsafe.get(null);
 
-                        long offset = (Long) unsafeType.getMethod("objectFieldOffset", Field.class).invoke(unsafeInstance, overrideField);
+                            //Similar to ByteBuddy, we create a dummy "mirror" class to get the offset to the `override` field
+                            CtClass mirrorCtClass = ClassPool.getDefault().get("java.lang.reflect.AccessibleObject");
+                            mirrorCtClass.setName(MIRROR_CLASS_NAME);
+                            //cannot call mirrorCtClass.toClass() directly as it triggers access exception
+                            Class mirrorClass = new ByteClassLoader(MIRROR_CLASS_NAME, mirrorCtClass.toBytecode()).loadClass(MIRROR_CLASS_NAME);
+                            Field overrideField = mirrorClass.getDeclaredField("override");
 
-                        Method putBoolean = unsafeType.getMethod("putBoolean", Object.class, long.class, boolean.class);
+                            long offset = (Long) unsafeType.getMethod("objectFieldOffset", Field.class).invoke(unsafeInstance, overrideField);
 
-                        //Set this so we can call ClassLoader.defineClassMethod
-                        putBoolean.invoke(unsafeInstance, defineClassMethod, offset, true);
+                            Method putBoolean = unsafeType.getMethod("putBoolean", Object.class, long.class, boolean.class);
 
-                    } catch (Exception e2){
-                       throw new ClassInjectorException(e2);
+                            //Set this so we can call ClassLoader.defineClassMethod bypassing permission check
+                            putBoolean.invoke(unsafeInstance, defineClassMethod, offset, true);
+
+                        } catch (Exception e2) {
+                            throw new ClassInjectorException(e2);
+                        }
+                    } else {
+                        throw new ClassInjectorException("Unsafe injection disabled. Cannot build injector as --add-opens=java.base/java.lang=ALL-UNNAMED is not found in JVM options!");
                     }
                 }
             } catch (NoSuchMethodException e) {
