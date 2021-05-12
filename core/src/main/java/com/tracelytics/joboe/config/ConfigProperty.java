@@ -62,6 +62,7 @@ public enum ConfigProperty {
     AGENT_PROXY(new ConfigKey("agent.proxy","APPOPTICS_PROXY", "proxy"), ConfigGroup.AGENT, String.class),
     AGENT_RPC_CLIENT_TYPE(new ConfigKey("agent.rpcType", "APPOPTICS_RPC_TYPE", "rpc_type"), ConfigGroup.AGENT, String.class), //not advertised
     AGENT_GRPC_COMPRESSION(new ConfigKey(null, "APPOPTICS_GRPC_COMPRESSION", "grpc_compression"), ConfigGroup.AGENT, String.class), //not advertised
+    AGENT_DISALLOW_UNSAFE(new ConfigKey("agent.disallowUnsafe"), ConfigGroup.AGENT, Boolean.class),
 
     MONITOR_JMX_SCOPES (new ConfigKey("monitor.jmx.scopes"), ConfigGroup.MONITOR, String.class),
     MONITOR_JMX_ENABLE (new ConfigKey("monitor.jmx.enable"), ConfigGroup.MONITOR, Boolean.class),
