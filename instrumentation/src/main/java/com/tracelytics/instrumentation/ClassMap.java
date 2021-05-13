@@ -124,6 +124,7 @@ public class ClassMap {
         registerInstrumentation("javax.servlet.http.HttpServletResponse", ServletResponseInstrumentation.class, Module.SERVLET);
         registerInstrumentation("javax.servlet.http.HttpServletRequest", ServletRequestInstrumentation.class, Module.SERVLET);
         registerInstrumentation("javax.servlet.AsyncContext", ServletAsyncContextInstrumentation.class, Module.SERVLET);
+        registerInstrumentation("javax.servlet.http.PushBuilder", ServletPushBuilderInstrumentation.class, Module.SERVLET);
 
         registerInstrumentation("javax.servlet.Filter", FilterInstrumentation.class, Module.SERVLET);
         
