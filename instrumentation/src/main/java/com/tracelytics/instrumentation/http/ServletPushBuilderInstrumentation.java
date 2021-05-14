@@ -3,12 +3,9 @@ package com.tracelytics.instrumentation.http;
 import com.tracelytics.ext.javassist.CtClass;
 import com.tracelytics.ext.javassist.CtMethod;
 import com.tracelytics.instrumentation.ClassInstrumentation;
-import com.tracelytics.instrumentation.HeaderConstants;
 import com.tracelytics.instrumentation.MethodMatcher;
-import com.tracelytics.joboe.Context;
 import com.tracelytics.joboe.span.impl.Scope;
 import com.tracelytics.joboe.span.impl.ScopeManager;
-import com.tracelytics.joboe.span.impl.Span;
 import com.tracelytics.joboe.span.impl.Tracer;
 
 import java.util.Arrays;
@@ -52,7 +49,7 @@ public class ServletPushBuilderInstrumentation extends ClassInstrumentation {
     
     public static void pushEntry(String path) {
         Tracer.SpanBuilder spanBuilder = buildTraceEventSpan(SPAN_NAME);
-        spanBuilder.withTag("PushPath", path).withSpanProperty(Span.SpanProperty.IS_ASYNC, true);
+        spanBuilder.withTag("PushPath", path);
         spanBuilder.startActive();
     }
 
