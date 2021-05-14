@@ -5,6 +5,7 @@ import com.tracelytics.ext.javassist.CtClass;
 import com.tracelytics.ext.javassist.CtMethod;
 import com.tracelytics.ext.javassist.NotFoundException;
 import com.tracelytics.instrumentation.ClassInstrumentation;
+import com.tracelytics.instrumentation.MethodMatcher;
 import com.tracelytics.instrumentation.Module;
 import com.tracelytics.instrumentation.config.HideParamsConfig;
 import com.tracelytics.instrumentation.solr.SolrFilterInstrumentation;
@@ -53,14 +54,20 @@ public class ServletInstrumentation extends ClassInstrumentation {
             return false;
         }
     };
+
+    @SuppressWarnings("unchecked")
+    private static List<MethodMatcher<OpType>> methodMatchers = Arrays.asList(
+            new MethodMatcher<OpType>("service", new String[] { "javax.servlet.ServletRequest", "javax.servlet.ServletResponse"}, "void", OpType.SERVICE, true),
+            new MethodMatcher<OpType>("service", new String[] { "jakarta.servlet.ServletRequest", "jakarta.servlet.ServletResponse"}, "void", OpType.SERVICE, true)
+    );
+
+    private enum OpType { SERVICE }
  
     public boolean applyInstrumentation(CtClass cc, String className, byte[] classBytes)
         throws Exception {
 
         // All requests go through the 'service' method. We need to specify the full signature to find it (use method.getSignature() to dump it out.)
-        CtMethod serviceMethod = cc.getMethod("service", "(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;)V");
-        
-        if (serviceMethod.getDeclaringClass() == cc) {
+        for (CtMethod serviceMethod : findMatchingMethods(cc, methodMatchers).keySet()) {
             modifyService(serviceMethod);
         }
 
@@ -447,7 +454,7 @@ public class ServletInstrumentation extends ClassInstrumentation {
             return StrutsActionProxyInstrumentation.LAYER_NAME;
         } else if (className.startsWith("org.springframework.")) {
             return SpringHandlerAdapterInstrumentation.LAYER_NAME;
-        } else if (className.startsWith("javax.faces.webapp.")) {
+        } else if (className.startsWith("javax.faces.webapp.") || className.startsWith("jakarta.faces.webapp.")) {
             return JSFActionListenerInstrumentation.LAYER_NAME;
         } else if (className.startsWith("org.apache.solr.")) {
             return SolrFilterInstrumentation.LAYER_NAME;

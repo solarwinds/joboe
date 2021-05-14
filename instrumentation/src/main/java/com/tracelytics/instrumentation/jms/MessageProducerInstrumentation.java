@@ -10,7 +10,7 @@ import com.tracelytics.joboe.span.impl.Span;
 
 import java.util.*;
 
-public class MessageProducerInstrumentation extends ClassInstrumentation {
+public abstract class MessageProducerInstrumentation extends ClassInstrumentation {
     private static final String CLASS_NAME = MessageProducerInstrumentation.class.getName();
 
     private static ThreadLocal<Integer> callDepth = new ThreadLocal<Integer>() {
@@ -19,23 +19,16 @@ public class MessageProducerInstrumentation extends ClassInstrumentation {
         }
     };
 
-    private static final List<MethodMatcher<Object>> methodMatchers = new ArrayList<MethodMatcher<Object>>();
     enum Type {SEND, SEND_WITH_DEST}
-    static {
-        methodMatchers.add(new MethodMatcher<Object>(
-                "send",
-                new String[]{"javax.jms.Message"},
-                "void", Type.SEND, false));
-        methodMatchers.add(new MethodMatcher<Object>(
-                "send",
-                new String[]{"javax.jms.Destination", "javax.jms.Message"},
-                "void", Type.SEND_WITH_DEST, false));
-    }
+
+    protected abstract String getPackagePrefix();
+    protected abstract List<MethodMatcher<Type>> getMethodMatchers();
+
     public boolean applyInstrumentation(CtClass cc, String className, byte[] classBytes)
             throws Exception {
-        Map<CtMethod, Object> methodsMap = findMatchingMethods(cc, methodMatchers);
+        Map<CtMethod, Type> methodsMap = findMatchingMethods(cc, getMethodMatchers());
 
-        for (Map.Entry<CtMethod, Object> sendMethod : methodsMap.entrySet()) {
+        for (Map.Entry<CtMethod, Type> sendMethod : methodsMap.entrySet()) {
             Type type = (Type)sendMethod.getValue();
             String offset;
             if (type == Type.SEND) {
@@ -55,16 +48,16 @@ public class MessageProducerInstrumentation extends ClassInstrumentation {
             vendorName = "";
         }
         String patchCode = "String queueName = null;" +
-                        "javax.jms.Destination dest = $0.getDestination();" +
-                        "if (dest == null && $1 instanceof javax.jms.Destination) {" +
+                        getPackagePrefix() + ".jms.Destination dest = $0.getDestination();" +
+                        "if (dest == null && $1 instanceof " + getPackagePrefix() + ".jms.Destination) {" +
                             "dest = $1;" +
                         "}" +
-                        "if (dest instanceof javax.jms.Queue) {" +
-                        "    queueName = ((javax.jms.Queue)dest).getQueueName();" +
+                        "if (dest instanceof " + getPackagePrefix() + ".jms.Queue) {" +
+                        "    queueName = ((" + getPackagePrefix() + ".jms.Queue)dest).getQueueName();" +
                         "}" +
                         "String topicName = null;" +
-                        "if (dest instanceof javax.jms.Topic) {" +
-                            "topicName = ((javax.jms.Topic)dest).getTopicName();" +
+                        "if (dest instanceof " + getPackagePrefix() + ".jms.Topic) {" +
+                            "topicName = ((" + getPackagePrefix() + ".jms.Topic)dest).getTopicName();" +
                         "}" +
                         "String xid = " + CLASS_NAME + ".layerEntry(\"" + vendorName + "\", queueName, topicName);" +
                         "if (xid != null) {" +

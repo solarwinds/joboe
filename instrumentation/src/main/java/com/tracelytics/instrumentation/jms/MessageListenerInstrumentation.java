@@ -19,19 +19,14 @@ import java.util.*;
  * consumed by MessageConsumer (2 separate traces created - one for message consumption from the queue and another one
  * for listener processing)
  */
-public class MessageListenerInstrumentation extends ClassInstrumentation {
+public abstract class MessageListenerInstrumentation extends ClassInstrumentation {
     private static final String CLASS_NAME = MessageListenerInstrumentation.class.getName();
-    private static final List<MethodMatcher<Object>> methodMatchers = new ArrayList<MethodMatcher<Object>>();
+    protected abstract String getPackagePrefix();
+    protected abstract List<MethodMatcher<Object>> getMethodMatchers();
 
-    static {
-        methodMatchers.add(new MethodMatcher<Object>(
-                "onMessage",
-                new String[]{"javax.jms.Message"},
-                "void"));
-    }
     public boolean applyInstrumentation(CtClass cc, String className, byte[] classBytes)
             throws Exception {
-        Set<CtMethod> onMessageMethods = findMatchingMethods(cc, methodMatchers).keySet();
+        Set<CtMethod> onMessageMethods = findMatchingMethods(cc, getMethodMatchers()).keySet();
 
         for (CtMethod onMessageMethod : onMessageMethods) {
             modifyOnMessage(className, onMessageMethod);
@@ -50,13 +45,13 @@ public class MessageListenerInstrumentation extends ClassInstrumentation {
         insertBefore(method,
                 "if ($1 != null) { " +
                         "String queueName = null;" +
-                        "javax.jms.Destination dest = $1.getJMSDestination();" +
-                        "if (dest instanceof javax.jms.Queue) {" +
-                        "queueName = ((javax.jms.Queue)dest).getQueueName();" +
+                        getPackagePrefix() + ".jms.Destination dest = $1.getJMSDestination();" +
+                        "if (dest instanceof " + getPackagePrefix() + ".jms.Queue) {" +
+                        "queueName = ((" + getPackagePrefix() + ".jms.Queue)dest).getQueueName();" +
                         "}" +
                         "String topicName = null;" +
-                        "if (dest instanceof javax.jms.Topic) {" +
-                        "topicName = ((javax.jms.Topic)dest).getTopicName();" +
+                        "if (dest instanceof " + getPackagePrefix() + ".jms.Topic) {" +
+                        "topicName = ((" + getPackagePrefix() + ".jms.Topic)dest).getTopicName();" +
                         "}" +
                         CLASS_NAME + ".layerEntry(\"" + vendorName + "\", \"" + className + "\", \"" + methodName + "\", $1.getStringProperty(\"XTraceId\"), queueName, topicName);"+
                         "}",

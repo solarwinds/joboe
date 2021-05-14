@@ -5,7 +5,7 @@ import java.util.Stack;
 
 /**
  * These methods are accessed from ServletInstrumentation
- * Subset of javax.servlet.http.HttpServletResponse, with added methods for storing extra data
+ * Subset of javax.servlet.http.HttpServletResponse/jakarta.servlet.http.HttpServletResponse, with added methods for storing extra data
  *
  */
 public interface HttpServletResponse {

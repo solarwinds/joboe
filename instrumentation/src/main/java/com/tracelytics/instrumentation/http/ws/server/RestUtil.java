@@ -158,7 +158,8 @@ public class RestUtil {
 
     private static final String getPathAnnotationValue(AnnotatedElement element) {
         for (Annotation annotation : element.getDeclaredAnnotations()) {
-            if ("javax.ws.rs.Path".equals(annotation.annotationType().getName())) {
+            String annotationType = annotation.annotationType().getName();
+            if ("javax.ws.rs.Path".equals(annotationType) ||  "jakarta.ws.rs.Path".equals(annotationType)) {
                 Object pathObject = element.getAnnotation(annotation.annotationType());
                 try {
                     return (String) pathObject.getClass().getMethod("value").invoke(pathObject);

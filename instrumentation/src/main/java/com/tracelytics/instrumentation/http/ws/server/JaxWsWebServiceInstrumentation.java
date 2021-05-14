@@ -26,7 +26,7 @@ public class JaxWsWebServiceInstrumentation extends ClassInstrumentation {
         for (CtMethod method : cc.getDeclaredMethods()) {
             if (shouldModify(cc, method)) {
                 for (Annotation annotation : AnnotationUtils.getAnnotationsFromBehavior(method, true)) {
-                    if (annotation.getTypeName().equals("javax.jws.WebMethod")) {
+                    if (annotation.getTypeName().equals("javax.jws.WebMethod") || annotation.getTypeName().equals("jakarta.jws.WebMethod")) {
                         logger.debug("Instrumenting jax-ws web method " + method);
                         modifyWebMethod(method);
                         modified = true;

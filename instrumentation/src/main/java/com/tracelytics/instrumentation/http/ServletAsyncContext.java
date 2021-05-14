@@ -5,7 +5,7 @@ import com.tracelytics.joboe.span.impl.Span;
 import java.util.List;
 
 /**
- * Tags the {@link javax.servlet.AsyncContext}, adds extra method to flag whether the <code>AsyncContext</code> is active.
+ * Tags the <code>javax.servlet.AsyncContext</code> and <code>jakarta.servlet.AsyncContext</code>, adds extra method to flag whether the <code>AsyncContext</code> is active.
  * 
  * An AsyncContext is considered active after <code>javax.servlet.ServletRequest#startAsync()</code> and before <code>javax.servlet.AsyncContext#complete()</code> 
  * 

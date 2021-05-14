@@ -1,11 +1,15 @@
 package com.tracelytics.instrumentation.http.ws;
 
+import com.tracelytics.instrumentation.MethodMatcher;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import com.tracelytics.ext.javassist.CtClass;
 import com.tracelytics.ext.javassist.CtMethod;
 import com.tracelytics.instrumentation.http.ServletInstrumentation;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Instrumentation on plain SOAP requests made using the java.xml.soap package
@@ -19,11 +23,18 @@ public class SOAPConnectionInstrumentation extends BaseWsClientInstrumentation {
     private static String LAYER_NAME = "soap_client";
     private static String CLASS_NAME = SOAPConnectionInstrumentation.class.getName();
 
+    @SuppressWarnings("unchecked")
+    private static List<MethodMatcher<OpType>> methodMatchers = Arrays.asList(
+            new MethodMatcher<OpType>("call", new String[] { "javax.xml.soap.SOAPMessage", "java.lang.Object" }, "javax.xml.soap.SOAPMessage", OpType.CALL, true),
+            new MethodMatcher<OpType>("call", new String[] { "jakarta.xml.soap.SOAPMessage", "java.lang.Object" }, "jakarta.xml.soap.SOAPMessage", OpType.CALL, true)
+    );
+
+    private enum OpType {CALL}
+
     public boolean applyInstrumentation(CtClass cc, String className, byte[] classBytes)
         throws Exception {
 
-        CtMethod callMethod = cc.getMethod("call", "(Ljavax/xml/soap/SOAPMessage;Ljava/lang/Object;)Ljavax/xml/soap/SOAPMessage;");
-        if (shouldModify(cc, callMethod)) {
+        for (CtMethod callMethod : findMatchingMethods(cc, methodMatchers).keySet()) {
             insertBefore(callMethod, CLASS_NAME + ".beforeCall($2, $1 != null ? $1.getSOAPBody() : null);");
             insertAfter(callMethod, CLASS_NAME + ".afterCall(($_ != null && $_.getMimeHeaders() != null) ? $_.getMimeHeaders().getHeader(\"" + ServletInstrumentation.XTRACE_HEADER + "\") : (String[]) null, $_, this);", true);
         }

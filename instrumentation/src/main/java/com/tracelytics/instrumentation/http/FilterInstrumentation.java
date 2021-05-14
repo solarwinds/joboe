@@ -9,15 +9,24 @@ import com.tracelytics.ext.javassist.CtClass;
 import com.tracelytics.ext.javassist.CtMethod;
 import com.tracelytics.ext.javassist.NotFoundException;
 import com.tracelytics.instrumentation.ClassInstrumentation;
+import com.tracelytics.instrumentation.MethodMatcher;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class FilterInstrumentation extends ClassInstrumentation {
+    @SuppressWarnings("unchecked")
+    private static List<MethodMatcher<OpType>> methodMatchers = Arrays.asList(
+            new MethodMatcher<OpType>("doFilter", new String[] { "javax.servlet.ServletRequest", "javax.servlet.ServletResponse", "javax.servlet.FilterChain"}, "void", OpType.DO_FILTER, true),
+            new MethodMatcher<OpType>("doFilter", new String[] { "jakarta.servlet.ServletRequest", "jakarta.servlet.ServletResponse", "jakarta.servlet.FilterChain"}, "void", OpType.DO_FILTER, true)
+    );
+
+    private enum OpType { DO_FILTER }
 
     public boolean applyInstrumentation(CtClass cc, String className, byte[] classBytes)
         throws Exception {
-        CtMethod filterMethod = cc.getMethod("doFilter", "(Ljavax/servlet/ServletRequest;Ljavax/servlet/ServletResponse;Ljavax/servlet/FilterChain;)V");
-        
-        if (filterMethod.getDeclaringClass() == cc) {
-            modifyFilter(filterMethod);
+        for (CtMethod method : findMatchingMethods(cc, methodMatchers).keySet()) {
+            modifyFilter(method);
         }
         
         return true;

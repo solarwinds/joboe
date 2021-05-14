@@ -24,34 +24,22 @@ import java.util.*;
  * producer side to build a distributed trace. This is not the case now as the SourceTrace KV is used instead,
  * - it doesn't hurt even we choose `SourceTrace` and I'd keep it for the ease of any future change.
  */
-public class MessageConsumerInstrumentation extends ClassInstrumentation {
+public abstract class MessageConsumerInstrumentation extends ClassInstrumentation {
     private static final String CLASS_NAME = MessageConsumerInstrumentation.class.getName();
-    private static final List<MethodMatcher<Object>> methodMatchers = new ArrayList<MethodMatcher<Object>>();
     enum Type { RECEIVE, RECEIVE_NOWAIT, DEQUEUE}
-    static {
-        methodMatchers.add(new MethodMatcher<Object>(
-                "receive",
-                new String[]{},
-                "javax.jms.Message", Type.RECEIVE));
-        methodMatchers.add(new MethodMatcher<Object>(
-                "receiveNoWait",
-                new String[]{},
-                "javax.jms.Message", Type.RECEIVE_NOWAIT));
-        methodMatchers.add(new MethodMatcher<Object>(
-                "dequeue",
-                new String[]{"long"},
-                "org.apache.activemq.command.MessageDispatch", Type.DEQUEUE));
-    }
+
+    protected abstract String getPackagePrefix();
+    protected abstract List<MethodMatcher<Type>> getMethodMatchers();
 
     public boolean applyInstrumentation(CtClass cc, String className, byte[] classBytes)
             throws Exception {
-        Map<CtMethod, Object> receiveMethods = findMatchingMethods(cc, methodMatchers);
+        Map<CtMethod, Type> receiveMethods = findMatchingMethods(cc, getMethodMatchers());
         cc.addField(CtField.make("private ThreadLocal tvSpanStartTimestamp = new ThreadLocal();", cc));
         cc.addMethod(CtNewMethod.make("public void tvSetSpanStartTimestamp(Long ts) { if (ts != null) { tvSpanStartTimestamp.set(ts);} else {tvSpanStartTimestamp.remove();} }", cc));
         cc.addMethod(CtNewMethod.make("public Long tvGetSpanStartTimestamp() { return (Long)tvSpanStartTimestamp.get(); }", cc));
 
 
-        for (Map.Entry<CtMethod, Object> receiveMethod : receiveMethods.entrySet()) {
+        for (Map.Entry<CtMethod, Type> receiveMethod : receiveMethods.entrySet()) {
             if (receiveMethod.getValue() == Type.DEQUEUE) {
                 modifyDequeue(className, receiveMethod.getKey());
             } else {
@@ -67,7 +55,7 @@ public class MessageConsumerInstrumentation extends ClassInstrumentation {
 
     private void modifyReceive(String className, CtMethod method)
             throws CannotCompileException, NotFoundException {
-        addErrorReporting(method, "javax.jms.JMSException", null, classPool);
+        addErrorReporting(method, getPackagePrefix() + ".jms.JMSException", null, classPool);
         String methodName = method.getName();
         String vendorName = JmsUtils.getVendorName(className);
         if (vendorName == null) {
@@ -76,13 +64,13 @@ public class MessageConsumerInstrumentation extends ClassInstrumentation {
         insertAfter(method,
                 "if ($_ != null) { " +
                     "String queueName = null;" +
-                    "javax.jms.Destination dest = $_.getJMSDestination();" +
-                    "if (dest instanceof javax.jms.Queue) {" +
-                        "queueName = ((javax.jms.Queue)dest).getQueueName();" +
+                    getPackagePrefix() + ".jms.Destination dest = $_.getJMSDestination();" +
+                    "if (dest instanceof " + getPackagePrefix() + ".jms.Queue) {" +
+                        "queueName = ((" + getPackagePrefix() + ".jms.Queue)dest).getQueueName();" +
                     "}" +
                     "String topicName = null;" +
-                    "if (dest instanceof javax.jms.Topic) {" +
-                        "topicName = ((javax.jms.Topic)dest).getTopicName();" +
+                    "if (dest instanceof " + getPackagePrefix() + ".jms.Topic) {" +
+                        "topicName = ((" + getPackagePrefix() + ".jms.Topic)dest).getTopicName();" +
                     "}" +
                     CLASS_NAME + ".layerExit(\"" + vendorName + "\", \"" + className + "\", \"" + methodName + "\", tvGetSpanStartTimestamp(), $_.getStringProperty(\"XTraceId\"), queueName, topicName);"+
                 "}" +

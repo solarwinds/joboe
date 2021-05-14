@@ -1,16 +1,20 @@
 package com.tracelytics.instrumentation.http;
+
 import com.tracelytics.ext.javassist.CannotCompileException;
 import com.tracelytics.ext.javassist.CtClass;
 import com.tracelytics.ext.javassist.CtMethod;
-import com.tracelytics.ext.javassist.NotFoundException;
 import com.tracelytics.ext.javassist.expr.ExprEditor;
 import com.tracelytics.ext.javassist.expr.MethodCall;
 import com.tracelytics.instrumentation.ClassInstrumentation;
+import com.tracelytics.instrumentation.MethodMatcher;
 import com.tracelytics.joboe.Context;
 import com.tracelytics.joboe.Event;
 import com.tracelytics.joboe.span.impl.ScopeManager;
 import com.tracelytics.joboe.span.impl.Span;
 import com.tracelytics.joboe.span.impl.Span.TraceProperty;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Instruments JSF Action Listener to extract controller/action.  The object's
@@ -23,17 +27,21 @@ import com.tracelytics.joboe.span.impl.Span.TraceProperty;
  *
  */
 public class JSFActionListenerInstrumentation extends ClassInstrumentation {
+    @SuppressWarnings("unchecked")
+    private static List<MethodMatcher<OpType>> methodMatchers = Arrays.asList(
+            new MethodMatcher<OpType>("processAction", new String[] { "javax.faces.event.ActionEvent" }, "void", OpType.PROCESS, true),
+            new MethodMatcher<OpType>("processAction", new String[] { "jakarta.faces.event.ActionEvent" }, "void", OpType.PROCESS, true)
+    );
+
+    private enum OpType { PROCESS }
+
 
     public boolean applyInstrumentation(CtClass cc, String className, byte[] classBytes)
             throws Exception {
 
-        try {
-            CtMethod method = cc.getMethod("processAction","(Ljavax/faces/event/ActionEvent;)V");
+        for (CtMethod method : findMatchingMethods(cc, methodMatchers).keySet()) {
             modifyProcessActionMethod(method);
-        } catch(NotFoundException ex) {
-            logger.debug("processAction method not found in " + cc.getName(), ex);
         }
-
        return true;
     }
 
@@ -46,7 +54,7 @@ public class JSFActionListenerInstrumentation extends ClassInstrumentation {
             public void edit(MethodCall m) throws CannotCompileException {
                 boolean addedInfo= false;
 
-                if (m.getClassName().equals("javax.faces.el.MethodBinding")) {
+                if (m.getClassName().equals("javax.faces.el.MethodBinding") || m.getClassName().equals("jakarta.faces.el.MethodBinding")) {
                     if (m.getMethodName().equals("invoke") && !addedInfo) {
                         // Before request is sent:
                         insertBeforeMethodCall(m, CLASS_NAME + ".doInvokeInfo($0.getExpressionString()); ", false);

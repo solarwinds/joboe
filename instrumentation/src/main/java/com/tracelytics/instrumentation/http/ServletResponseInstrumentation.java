@@ -15,6 +15,7 @@ import com.tracelytics.ext.javassist.Modifier;
 import com.tracelytics.ext.javassist.NotFoundException;
 import com.tracelytics.instrumentation.ClassInstrumentation;
 
+import java.sql.Wrapper;
 import java.util.Arrays;
 import java.util.List;
 
@@ -22,6 +23,8 @@ public class ServletResponseInstrumentation extends ClassInstrumentation {
     //List of wrapper that should NOT be considered as wrapper for instrumentation
     //For example the Atmosphere one might return itself as `getResponse` which triggers infinite recursive call
     private static final List<String> excludedWrappers = Arrays.asList("org.atmosphere.cpr.AtmosphereResponse", "org.atmosphere.cpr.AtmosphereResponseImpl");
+
+    private enum WrapperType { JAVAX, JAKARTA }
 
     public boolean applyInstrumentation(CtClass cc, String className, byte[] classBytes)
             throws Exception {
@@ -35,9 +38,10 @@ public class ServletResponseInstrumentation extends ClassInstrumentation {
         }
         
         // HttpServletResponseWrappers are a special case: delegate to the wrapped HTTPServletResponse.
-        if (isWrapper(cc)) {
+        WrapperType wrapperType = getWrapperType(cc);
+        if (wrapperType != null) {
             logger.debug("Class " + className + " is a HttpServletResponseWrapper: instrumenting");
-            applyWrapperInstrumentation(cc, className, classBytes);
+            applyWrapperInstrumentation(cc, className, classBytes, wrapperType);
             return true;
         }
         
@@ -184,35 +188,40 @@ public class ServletResponseInstrumentation extends ClassInstrumentation {
         }
     }
     
-    private boolean isWrapper(CtClass cc)
+    private WrapperType getWrapperType(CtClass cc)
         throws NotFoundException {
         CtClass cls = cc;
 
         while (cls != null) {
             if (excludedWrappers.contains(cls.getName())) {
-                return false;
+                return null;
             }
             if (cls.getName().equals("javax.servlet.http.HttpServletResponseWrapper") || 
                 cls.getName().equals("javax.servlet.http.NoBodyResponse")) { //NoBodyResponse does not implement HttpServletResponseWrapper in Servlet 2.5- see https://github.com/librato/joboe/pull/597
-                return true;
+                return WrapperType.JAVAX;
+            } else if (cls.getName().equals("jakarta.servlet.http.HttpServletResponseWrapper") ||
+                cls.getName().equals("jakarta.servlet.http.NoBodyResponse")) {
+                return WrapperType.JAKARTA;
             }
             cls = cls.getSuperclass();
         }
 
-        return false;
+        return null;
     }
 
-    private void applyWrapperInstrumentation(CtClass cc, String className, byte[] classBytes)
+    private void applyWrapperInstrumentation(CtClass cc, String className, byte[] classBytes, WrapperType wrapperType)
             throws Exception {
+        String packagePrefix = wrapperType.name().toLowerCase();
+
         try {
-            cc.getMethod("getResponse", "()Ljavax/servlet/ServletResponse;"); //check if there's a getResponse method
+            cc.getMethod("getResponse", "()L" + packagePrefix + "/servlet/ServletResponse;"); //check if there's a getResponse method
         } catch (NotFoundException e) { //if not, then add a getResponse method
             //make sure it has a 1 argument ctor
             try {
-                CtConstructor constructor = cc.getDeclaredConstructor(new CtClass[] { classPool.getCtClass("javax.servlet.http.HttpServletResponse") }); //expect to have a 1 argument ctor
-                cc.addField(CtField.make("private javax.servlet.http.HttpServletResponse tvResponse;", cc));
+                CtConstructor constructor = cc.getDeclaredConstructor(new CtClass[] { classPool.getCtClass(packagePrefix + ".servlet.http.HttpServletResponse") }); //expect to have a 1 argument ctor
+                cc.addField(CtField.make("private " + packagePrefix + ".servlet.http.HttpServletResponse tvResponse;", cc));
                 insertAfter(constructor, "this.tvResponse = $1;", true, false);
-                cc.addMethod(CtNewMethod.make("public javax.servlet.ServletResponse getResponse() { return tvResponse; }", cc)); 
+                cc.addMethod(CtNewMethod.make("public " + packagePrefix + ".servlet.ServletResponse getResponse() { return tvResponse; }", cc));
             } catch (NotFoundException e1) {
                 logger.warn("Expect a 1 argument ctor for " + className + " but failed to locate one");
                 throw e1;

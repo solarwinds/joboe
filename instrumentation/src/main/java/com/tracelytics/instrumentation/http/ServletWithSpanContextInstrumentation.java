@@ -28,8 +28,9 @@ public class ServletWithSpanContextInstrumentation extends ServletInstrumentatio
     // List of method matchers that declare method with signature patterns that we want to instrument
     @SuppressWarnings("unchecked")
     private static List<MethodMatcher<Object>> methodMatchers = Arrays.asList(
-        new MethodMatcher<Object>("service", new String[] { "javax.servlet.ServletRequest", "javax.servlet.ServletResponse"}, "void")
-            );
+        new MethodMatcher<Object>("service", new String[] { "javax.servlet.ServletRequest", "javax.servlet.ServletResponse"}, "void"),
+        new MethodMatcher<Object>("service", new String[] { "jakarta.servlet.ServletRequest", "jakarta.servlet.ServletResponse"}, "void")
+    );
     
     @Override
     public boolean applyInstrumentation(CtClass cc, String className, byte[] classBytes)

@@ -16,7 +16,7 @@ import com.tracelytics.joboe.span.impl.Scope;
 import com.tracelytics.joboe.span.impl.Span;
 
 /**
- *  Modifies the methods of {@link javax.servlet.http.HttpServletRequest}:
+ *  Modifies the methods of <code>javax.servlet.http.HttpServletRequest</code>
  *  <ol>
  *   <li>Header methods such that extra headers can be added to the ServletRequest even if the headers itself is immutable</li>
  *   <li>Async context method introduced in Servlet 3.0, such that asynchronous mode will get traced properly</li>
@@ -38,7 +38,9 @@ public class ServletRequestInstrumentation extends ClassInstrumentation {
     //List of async context related methods to be modified for asynchronous mode tracing
     @SuppressWarnings("unchecked")
     private static List<MethodMatcher<OpType>> asyncContextMethodMatchers = Arrays.asList(
-         new MethodMatcher<OpType>("startAsync", new String[] { }, "javax.servlet.AsyncContext", OpType.START_ASYNC));
+         new MethodMatcher<OpType>("startAsync", new String[] { }, "javax.servlet.AsyncContext", OpType.START_ASYNC),
+         new MethodMatcher<OpType>("startAsync", new String[] { }, "jakarta.servlet.AsyncContext", OpType.START_ASYNC)
+    );
 
     
     public boolean applyInstrumentation(CtClass cc, String className, byte[] classBytes)
@@ -128,22 +130,29 @@ public class ServletRequestInstrumentation extends ClassInstrumentation {
     
     private void addMethods(CtClass cc) throws CannotCompileException {
         // Add AsyncContext getter/setter if it is supported
-        
-    	/* 
-    	 * indicate whether there are concrete getAsyncContext and getDispatcherType to invoke, 
-    	 * take note that sometimes a framework that does not support servlet 3.0 might be deployed in an app server with servlet 3.0. 
-    	 * In such case, getMethod might return 3.0 interface abstract method, but during method invocation, AbstractMethodError will be thrown
-    	 */
-    	boolean hasConcreteMethodsToInvoke = false; 
-    	
+
+        /*
+         * indicate whether there are concrete getAsyncContext and getDispatcherType to invoke,
+         * take note that sometimes a framework that does not support servlet 3.0 might be deployed in an app server with servlet 3.0.
+         * In such case, getMethod might return 3.0 interface abstract method, but during method invocation, AbstractMethodError will be thrown
+         */
+        boolean hasConcreteJavaxMethodsToInvoke = false;
+        boolean hasConcreteJakartaMethodsToInvoke = false;
+
         try {
-            hasConcreteMethodsToInvoke = !Modifier.isAbstract(cc.getMethod("getDispatcherType", "()Ljavax/servlet/DispatcherType;").getModifiers());
-        } catch (NotFoundException e) {
-        	logger.debug("Cannot find getDispatcherType, probably running on servlet spec older than 3.0");
+            hasConcreteJavaxMethodsToInvoke = !Modifier.isAbstract(cc.getMethod("getDispatcherType", "()Ljavax/servlet/DispatcherType;").getModifiers());
+        } catch (NotFoundException e1) {
+            try {
+                hasConcreteJakartaMethodsToInvoke = !Modifier.isAbstract(cc.getMethod("getDispatcherType", "()Ljakarta/servlet/DispatcherType;").getModifiers());
+            } catch (NotFoundException e2) {
+                logger.debug("Cannot find getDispatcherType, probably running on servlet spec older than 3.0");
+            }
         }
-        
-        if (hasConcreteMethodsToInvoke) {
-        	cc.addMethod(CtNewMethod.make("public boolean tvIsAsyncDispatch() { return getDispatcherType() == javax.servlet.DispatcherType.ASYNC; }", cc));
+
+        if (hasConcreteJavaxMethodsToInvoke) {
+            cc.addMethod(CtNewMethod.make("public boolean tvIsAsyncDispatch() { return getDispatcherType() == javax.servlet.DispatcherType.ASYNC; }", cc));
+        } else if (hasConcreteJakartaMethodsToInvoke) {
+            cc.addMethod(CtNewMethod.make("public boolean tvIsAsyncDispatch() { return getDispatcherType() == jakarta.servlet.DispatcherType.ASYNC; }", cc));
         } else {
 	        cc.addMethod(CtNewMethod.make("public boolean tvIsAsyncDispatch() { return false; }", cc));
         }
@@ -174,7 +183,8 @@ public class ServletRequestInstrumentation extends ClassInstrumentation {
     
     /**
      * Returns a enumeration of 1 value if getting from extra header
-     * @param context
+     * @param extraHeaders
+     * @param key
      * @return
      */
     public static Enumeration<String> getExtraHeaderEnumeration(Map<String, String> extraHeaders, String key) {
@@ -185,7 +195,7 @@ public class ServletRequestInstrumentation extends ClassInstrumentation {
      * When startAsync is called, we want to flag the AsyncContext as active, set the context object
      * 
      * @param asyncContextObject
-     * @param responseObject
+     * @param requestObject
      */
     public static void traceStartAsync(Object asyncContextObject, Object requestObject) {
         if (asyncContextObject instanceof ServletAsyncContext && ((ServletAsyncContext)asyncContextObject).tvGetSpanStack() == null) { //only capture if it has not been captured yet

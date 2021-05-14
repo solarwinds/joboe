@@ -1,7 +1,7 @@
 package com.tracelytics.instrumentation.http;
 
 /**
- * Subsets of the javax.servlet.http.HttpServletRequest
+ * Subsets of the javax.servlet.http.HttpServletRequest/jakarta.servlet.http.HttpServletRequest
  * See http://docs.oracle.com/javaee/6/api/javax/servlet/http/HttpServletRequest.html
  * We don't use the actual interfaces because we don't know what version to use, and if we included one, it would probably conflict
  * with the app server's class loader.

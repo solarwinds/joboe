@@ -56,10 +56,11 @@ import com.tracelytics.instrumentation.http.ws.server.JaxWsWebServiceInstrumenta
 import com.tracelytics.instrumentation.http.ws.server.SunJerseyMethodDispatcherInstrumentation;
 import com.tracelytics.instrumentation.jcr.JcrQueryInstrumentation;
 import com.tracelytics.instrumentation.jcr.JcrSessionInstrumentation;
-import com.tracelytics.instrumentation.jdbc.*;
-import com.tracelytics.instrumentation.jms.MessageConsumerInstrumentation;
-import com.tracelytics.instrumentation.jms.MessageListenerInstrumentation;
-import com.tracelytics.instrumentation.jms.MessageProducerInstrumentation;
+import com.tracelytics.instrumentation.jdbc.ConnectionInstrumentation;
+import com.tracelytics.instrumentation.jdbc.OracleNetOutputStreamInstrumentation;
+import com.tracelytics.instrumentation.jdbc.PreparedStatementInstrumentation;
+import com.tracelytics.instrumentation.jdbc.StatementInstrumentation;
+import com.tracelytics.instrumentation.jms.*;
 import com.tracelytics.instrumentation.job.quartz.QuartzJobInstrumentation;
 import com.tracelytics.instrumentation.job.springbatch.SpringBatchJobInstrumentation;
 import com.tracelytics.instrumentation.job.springbatch.SpringBatchStepExecutionInstrumentation;
@@ -119,15 +120,23 @@ public class ClassMap {
         }
         
         registerInstrumentation("org.springframework.http.server.reactive.ServletHttpHandlerAdapter", ServletWithSpanContextInstrumentation.class, Module.SERVLET);
-        
+
+        //Servlet up to 4.x
         registerInstrumentation("javax.servlet.http.HttpServlet", ServletInstrumentation.class, Module.SERVLET);
         registerInstrumentation("javax.servlet.http.HttpServletResponse", ServletResponseInstrumentation.class, Module.SERVLET);
         registerInstrumentation("javax.servlet.http.HttpServletRequest", ServletRequestInstrumentation.class, Module.SERVLET);
         registerInstrumentation("javax.servlet.AsyncContext", ServletAsyncContextInstrumentation.class, Module.SERVLET);
+        registerInstrumentation("javax.servlet.Filter", FilterInstrumentation.class, Module.SERVLET);
         registerInstrumentation("javax.servlet.http.PushBuilder", ServletPushBuilderInstrumentation.class, Module.SERVLET);
 
-        registerInstrumentation("javax.servlet.Filter", FilterInstrumentation.class, Module.SERVLET);
-        
+        //Servlet 5.x+
+        registerInstrumentation("jakarta.servlet.http.HttpServlet", ServletInstrumentation.class, Module.SERVLET);
+        registerInstrumentation("jakarta.servlet.http.HttpServletResponse", ServletResponseInstrumentation.class, Module.SERVLET);
+        registerInstrumentation("jakarta.servlet.http.HttpServletRequest", ServletRequestInstrumentation.class, Module.SERVLET);
+        registerInstrumentation("jakarta.servlet.AsyncContext", ServletAsyncContextInstrumentation.class, Module.SERVLET);
+        registerInstrumentation("jakarta.servlet.Filter", FilterInstrumentation.class, Module.SERVLET);
+        registerInstrumentation("jakarta.servlet.http.PushBuilder", ServletPushBuilderInstrumentation.class, Module.SERVLET);
+
         // WebLogic
         registerInstrumentation("weblogic.servlet.internal.WebAppServletContext", WebLogicServletContextInstrumentation.class, Module.SERVLET);
         // Websphere        
@@ -217,6 +226,7 @@ public class ClassMap {
         // FacesServlet implements javax.servlet.Servlet not HttpServlet, so our HttpServlet instrumentation doesn't find
         // XXX: may want to consider instrumenting all Servlets, not just HttpServlets.
         registerInstrumentation("javax.faces.webapp.FacesServlet", ServletInstrumentation.class, Module.JSF);
+        registerInstrumentation("jakarta.faces.webapp.FacesServlet", ServletInstrumentation.class, Module.JSF);
 
         // Apache Commons HttpClient 3.x
         registerInstrumentation("org.apache.commons.httpclient.HttpClient", ApacheHttpClientInstrumentation.class, Module.APACHE_HTTP);
@@ -271,6 +281,7 @@ public class ClassMap {
         registerInstrumentation("com.sun.xml.ws.client.sei.SEIStub", JaxWsClientInstrumentation.class, Module.WEB_SERVICE); //Glassfish SOAP
         registerInstrumentation("com.sun.xml.ws.api.pipe.Fiber$CompletionCallback", JaxWsCompletionCallbackInstrumentation.class, Module.WEB_SERVICE); //Glassfish SOAP
         registerInstrumentation("javax.xml.soap.SOAPConnection", SOAPConnectionInstrumentation.class, Module.WEB_SERVICE); //javax.xml.soap
+        registerInstrumentation("jakarta.xml.soap.SOAPConnection", SOAPConnectionInstrumentation.class, Module.WEB_SERVICE); //jakarta.xml.soap
         registerInstrumentation("com.sun.jersey.api.client.Client", SunJerseyClientInstrumentation.class, Module.WEB_SERVICE); //Sun Jersey 1.x REST
         registerInstrumentation("com.sun.jersey.api.client.ClientRequest", SunJerseyClientRequestInstrumentation.class, Module.WEB_SERVICE); //Sun Jersey 1.x REST 
         registerInstrumentation("com.sun.jersey.api.client.AsyncWebResource", SunJerseyAsyncWebResourceInstrumentation.class, Module.WEB_SERVICE); //Sun Jersey 1.x REST
@@ -507,9 +518,12 @@ public class ClassMap {
         registerInstrumentation("org.eclipse.jetty.client.api.Response$CompleteListener", JettyHttpResponseListenerInstrumentation.class, Module.JETTY_HTTP_CLIENT);
 
         // JMS
-        registerInstrumentation("javax.jms.MessageProducer", MessageProducerInstrumentation.class, Module.JMS);
-        registerInstrumentation("javax.jms.MessageListener", MessageListenerInstrumentation.class, Module.JMS);
-        registerInstrumentation("javax.jms.MessageConsumer", MessageConsumerInstrumentation.class, Module.JMS);
+        registerInstrumentation("javax.jms.MessageProducer", JavaxMessageProducerInstrumentation.class, Module.JMS);
+        registerInstrumentation("javax.jms.MessageListener", JavaxMessageListenerInstrumentation.class, Module.JMS);
+        registerInstrumentation("javax.jms.MessageConsumer", JavaxMessageConsumerInstrumentation.class, Module.JMS);
+        registerInstrumentation("jakarta.jms.MessageProducer", JakartaMessageProducerInstrumentation.class, Module.JMS);
+        registerInstrumentation("jakarta.jms.MessageListener", JakartaMessageListenerInstrumentation.class, Module.JMS);
+        registerInstrumentation("jakarta.jms.MessageConsumer", JakartaMessageConsumerInstrumentation.class, Module.JMS);
       
         //Quartz Job
         registerInstrumentation("org.quartz.Job", QuartzJobInstrumentation.class, Module.QUARTZ_JOB);
@@ -528,6 +542,8 @@ public class ClassMap {
         //JAX-WS annotations
         registerAnnotatedClassInstrumentation("javax.jws.WebService", JaxWsWebServiceInstrumentation.class, Module.WEB_SERVICE);
         registerAnnotatedClassInstrumentation("javax.jws.WebServiceProvider", JaxWsWebServiceInstrumentation.class, Module.WEB_SERVICE);
+        registerAnnotatedClassInstrumentation("jakarta.jws.WebService", JaxWsWebServiceInstrumentation.class, Module.WEB_SERVICE);
+        registerAnnotatedClassInstrumentation("jakarta.jws.WebServiceProvider", JaxWsWebServiceInstrumentation.class, Module.WEB_SERVICE);
 
         registerByServiceLoader();
 
@@ -564,6 +580,7 @@ public class ClassMap {
         annotationExcluded.add("com.sun.");
         annotationExcluded.add("java.");
         annotationExcluded.add("javax.");
+        annotationExcluded.add("jakarta.");
     }
 
     private static void registerByServiceLoader() {
