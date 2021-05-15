@@ -17,8 +17,8 @@ import java.util.List;
 public class FilterInstrumentation extends ClassInstrumentation {
     @SuppressWarnings("unchecked")
     private static List<MethodMatcher<OpType>> methodMatchers = Arrays.asList(
-            new MethodMatcher<OpType>("doFilter", new String[] { "javax.servlet.ServletRequest", "javax.servlet.ServletResponse", "javax.servlet.FilterChain"}, "void", OpType.DO_FILTER, true),
-            new MethodMatcher<OpType>("doFilter", new String[] { "jakarta.servlet.ServletRequest", "jakarta.servlet.ServletResponse", "jakarta.servlet.FilterChain"}, "void", OpType.DO_FILTER, true)
+            new MethodMatcher<OpType>("doFilter", new String[] { "javax.servlet.ServletRequest", "javax.servlet.ServletResponse", "javax.servlet.FilterChain"}, "void", OpType.DO_FILTER, MethodMatcher.Strategy.STRICT),
+            new MethodMatcher<OpType>("doFilter", new String[] { "jakarta.servlet.ServletRequest", "jakarta.servlet.ServletResponse", "jakarta.servlet.FilterChain"}, "void", OpType.DO_FILTER, MethodMatcher.Strategy.STRICT)
     );
 
     private enum OpType { DO_FILTER }

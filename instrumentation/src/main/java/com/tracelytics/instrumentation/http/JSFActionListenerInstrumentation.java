@@ -29,8 +29,8 @@ import java.util.List;
 public class JSFActionListenerInstrumentation extends ClassInstrumentation {
     @SuppressWarnings("unchecked")
     private static List<MethodMatcher<OpType>> methodMatchers = Arrays.asList(
-            new MethodMatcher<OpType>("processAction", new String[] { "javax.faces.event.ActionEvent" }, "void", OpType.PROCESS, true),
-            new MethodMatcher<OpType>("processAction", new String[] { "jakarta.faces.event.ActionEvent" }, "void", OpType.PROCESS, true)
+            new MethodMatcher<OpType>("processAction", new String[] { "javax.faces.event.ActionEvent" }, "void", OpType.PROCESS, MethodMatcher.Strategy.STRICT),
+            new MethodMatcher<OpType>("processAction", new String[] { "jakarta.faces.event.ActionEvent" }, "void", OpType.PROCESS, MethodMatcher.Strategy.STRICT)
     );
 
     private enum OpType { PROCESS }

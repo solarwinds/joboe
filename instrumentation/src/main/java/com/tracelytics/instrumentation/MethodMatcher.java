@@ -48,7 +48,7 @@ public class MethodMatcher<T> {
     
     private T instType;
     
-    private boolean matchParamCount;
+    private final Strategy strategy;
     
     /**
      * 
@@ -68,7 +68,7 @@ public class MethodMatcher<T> {
      * @param instType      a type to be associated with this matcher, usually is the user defined category that needs to tagged to the method matched
      */
     public MethodMatcher(String methodName, String[] paramTypes, String returnType, T instType) {
-        this(methodName, paramTypes, returnType, instType, false);
+        this(methodName, paramTypes, returnType, instType, Strategy.LOOSE);
     }
     
     /**
@@ -80,11 +80,32 @@ public class MethodMatcher<T> {
      * @param matchParamCount   whether method has to match exactly the number of params defined in paramTypes
      */
     public MethodMatcher(String methodName, String[] paramTypes, String returnType, T instType, boolean matchParamCount) {
+        this(methodName, paramTypes, returnType, instType, matchParamCount ? Strategy.MATCH_PARAM_COUNT : Strategy.LOOSE);
+    }
+
+    public MethodMatcher(String methodName, String[] paramTypes, String returnType, T instType, Strategy strategy) {
         this.methodName = methodName;
         this.paramTypes = paramTypes;
         this.returnType = returnType;
         this.instType = instType;
-        this.matchParamCount = matchParamCount;
+        this.strategy = strategy;
+    }
+
+    public enum Strategy {
+        LOOSE(false, false), //parameters/return types are considered a match if p.isAssignableFrom(t), which p is the declared type in the matcher, and t is the type in method signature being matched against/
+        //It is considered a match as far as all paramTypes are matched. Ie, if the target method has more params, it's still considered a match
+        //For example for method match of parameter types { "java.lang.Object" }, any method with 1+ parameters will be considered a match
+        MATCH_PARAM_COUNT(true, false), // similar to LOOSE, but the param count has to be an exact match
+        //For example for method match of parameter types { "java.lang.Object" }, any method with exactly 1 parameter will be considered a match
+        STRICT(true, true); //Both type (parameters/return type) and count has to be an exact match
+        //For example for method match of parameter types { "java.lang.Object" }, only the method with exactly 1 parameter of `java.lang.Object` will be considered a match
+
+        private final boolean matchParamCount;
+        private final boolean exactTypeMatch;
+        Strategy(boolean matchParamCount, boolean exactTypeMatch) {
+            this.matchParamCount = matchParamCount;
+            this.exactTypeMatch = exactTypeMatch;
+        }
     }
     
     /**
@@ -125,8 +146,16 @@ public class MethodMatcher<T> {
             
         try {
             //compare return type only on methods (not constructors)
-            if (method instanceof CtMethod && !((CtMethod)method).getReturnType().subtypeOf(returnTypeCtClass)) {
-                return false; 
+            if (method instanceof CtMethod) {
+                if (strategy.exactTypeMatch) {
+                    if (!((CtMethod)method).getReturnType().equals(returnTypeCtClass)) {
+                        return false;
+                    }
+                } else {
+                    if (!((CtMethod) method).getReturnType().subtypeOf(returnTypeCtClass)) {
+                        return false;
+                    }
+                }
             }
         } catch (NotFoundException e) {
             logger.warn("Error loading return type: " + e.getMessage(), e);
@@ -139,7 +168,7 @@ public class MethodMatcher<T> {
             inputMethodParamTypes = method.getParameterTypes();
             
             
-            if (matchParamCount) { //has to exactly match the param list defined
+            if (strategy.matchParamCount) { //has to exactly match the param list defined
                 if (paramTypeCtClasses.size() != inputMethodParamTypes.length) {
                     return false;
                 }
@@ -158,9 +187,14 @@ public class MethodMatcher<T> {
           //compare param type 
             for (int i = 0 ; i < paramTypeCtClasses.size(); i++) {
                 CtClass paramTypeCtClass = paramTypeCtClasses.get(i);
-                
-                if (!inputMethodParamTypes[i].subtypeOf(paramTypeCtClass)) {
-                    return false;
+                if (strategy.exactTypeMatch) {
+                    if (!inputMethodParamTypes[i].equals(paramTypeCtClass)) {
+                        return false;
+                    }
+                } else {
+                    if (!inputMethodParamTypes[i].subtypeOf(paramTypeCtClass)) {
+                        return false;
+                    }
                 }
             }
         } catch (NotFoundException e) {

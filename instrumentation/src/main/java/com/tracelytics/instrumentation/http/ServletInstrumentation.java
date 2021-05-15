@@ -57,8 +57,8 @@ public class ServletInstrumentation extends ClassInstrumentation {
 
     @SuppressWarnings("unchecked")
     private static List<MethodMatcher<OpType>> methodMatchers = Arrays.asList(
-            new MethodMatcher<OpType>("service", new String[] { "javax.servlet.ServletRequest", "javax.servlet.ServletResponse"}, "void", OpType.SERVICE, true),
-            new MethodMatcher<OpType>("service", new String[] { "jakarta.servlet.ServletRequest", "jakarta.servlet.ServletResponse"}, "void", OpType.SERVICE, true)
+            new MethodMatcher<OpType>("service", new String[] { "javax.servlet.ServletRequest", "javax.servlet.ServletResponse"}, "void", OpType.SERVICE, MethodMatcher.Strategy.STRICT),
+            new MethodMatcher<OpType>("service", new String[] { "jakarta.servlet.ServletRequest", "jakarta.servlet.ServletResponse"}, "void", OpType.SERVICE, MethodMatcher.Strategy.STRICT)
     );
 
     private enum OpType { SERVICE }

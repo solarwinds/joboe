@@ -25,8 +25,8 @@ public class SOAPConnectionInstrumentation extends BaseWsClientInstrumentation {
 
     @SuppressWarnings("unchecked")
     private static List<MethodMatcher<OpType>> methodMatchers = Arrays.asList(
-            new MethodMatcher<OpType>("call", new String[] { "javax.xml.soap.SOAPMessage", "java.lang.Object" }, "javax.xml.soap.SOAPMessage", OpType.CALL, true),
-            new MethodMatcher<OpType>("call", new String[] { "jakarta.xml.soap.SOAPMessage", "java.lang.Object" }, "jakarta.xml.soap.SOAPMessage", OpType.CALL, true)
+            new MethodMatcher<OpType>("call", new String[] { "javax.xml.soap.SOAPMessage", "java.lang.Object" }, "javax.xml.soap.SOAPMessage", OpType.CALL, MethodMatcher.Strategy.STRICT),
+            new MethodMatcher<OpType>("call", new String[] { "jakarta.xml.soap.SOAPMessage", "java.lang.Object" }, "jakarta.xml.soap.SOAPMessage", OpType.CALL, MethodMatcher.Strategy.STRICT)
     );
 
     private enum OpType {CALL}
