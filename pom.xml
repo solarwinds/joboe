@@ -10,8 +10,8 @@
     <name>appoptics-parent</name>
 
     <properties>
-        <agent.version>6.23.0</agent.version>
-        <api.version>6.23.0</api.version>
+        <agent.version>6.24.0</agent.version>
+        <api.version>6.24.0</api.version>
         <maven.plugin.version>1.0.0</maven.plugin.version>
         <is.snapshot></is.snapshot>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
