@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-@WebServlet(urlPatterns={"/test-servlet", "/async-runnable-filter-servlet"}, asyncSupported=true)
+@WebServlet(urlPatterns={"/test-servlet", "/async-runnable-filter-servlet", "/*"}, asyncSupported=true)
 public class TestServlet extends HttpServlet {
     @Override
     protected void doGet(final HttpServletRequest req, final HttpServletResponse resp)
