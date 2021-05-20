@@ -65,6 +65,8 @@ import com.tracelytics.instrumentation.job.quartz.QuartzJobInstrumentation;
 import com.tracelytics.instrumentation.job.springbatch.SpringBatchJobInstrumentation;
 import com.tracelytics.instrumentation.job.springbatch.SpringBatchStepExecutionInstrumentation;
 import com.tracelytics.instrumentation.job.springbatch.SpringBatchStepInstrumentation;
+import com.tracelytics.instrumentation.job.springscheduling.SpringScheduledMethodRunnablePatcher;
+import com.tracelytics.instrumentation.job.springscheduling.SpringSchedulingTaskInstrumentation;
 import com.tracelytics.instrumentation.kotlin.CoroutineContinuationPatcher;
 import com.tracelytics.instrumentation.logging.*;
 import com.tracelytics.instrumentation.nosql.*;
@@ -532,6 +534,10 @@ public class ClassMap {
         registerInstrumentation("org.springframework.batch.core.Job", SpringBatchJobInstrumentation.class, Module.SPRING_BATCH);
         registerInstrumentation("org.springframework.batch.core.Step", SpringBatchStepInstrumentation.class, Module.SPRING_BATCH);
         registerInstrumentation("org.springframework.batch.core.StepExecution", SpringBatchStepExecutionInstrumentation.class, Module.SPRING_BATCH);
+
+        //Spring Scheduling
+        registerInstrumentation("org.springframework.scheduling.config.Task", SpringSchedulingTaskInstrumentation.class, Module.SPRING_SCHEDULING);
+        registerInstrumentation("org.springframework.scheduling.support.ScheduledMethodRunnable", SpringScheduledMethodRunnablePatcher.class, Module.SPRING_SCHEDULING);
 
         //SDK annotations
         registerAnnotatedMethodInstrumentation("com.tracelytics.api.ext.LogMethod", SdkAnnotationInstrumentation.class, Module.SDK);

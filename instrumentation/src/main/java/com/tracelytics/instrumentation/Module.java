@@ -9,6 +9,7 @@ public enum Module {
     STRUTS, 
     SPRING,
     SPRING_BATCH,
+    SPRING_SCHEDULING,
     WEBFLUX,
     CLASSLOADER,
     JAVA_THREAD,
