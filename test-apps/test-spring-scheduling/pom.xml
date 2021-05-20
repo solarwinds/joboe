@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	
-	<groupId>com.appoptics.agent</groupId>
+	<groupId>com.appoptics.agent.java</groupId>
 	<artifactId>test-spring-scheduling</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>test-spring-scheduling</name>
@@ -29,6 +29,12 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.appoptics.agent.java</groupId>
+			<artifactId>appoptics-sdk</artifactId>
+			<version>6.23.0</version>
 		</dependency>
 	</dependencies>
 

@@ -3,6 +3,7 @@ package com.appoptics.test;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import com.appoptics.api.ext.Trace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -17,7 +18,9 @@ public class ScheduledTasks {
 
     @Scheduled(fixedRate = 10000)
     public void reportCurrentTime() {
+        Trace.createEntryEvent("test-context").report();
         log.info("The time is now {}", dateFormat.format(new Date()));
+        Trace.createExitEvent("test-context").report();
     }
 
     @Scheduled(cron = "0 * * * * *")
