@@ -75,7 +75,7 @@ public class SdkAnnotationInstrumentation extends AnnotatedMethodsInstrumentatio
 
     public static void logMethodEntry(String layer, String className, String methodName, boolean backTrace) {
         Event event = Context.createEvent();
-        event.addInfo("Layer", layer, "Class", className, "Method", methodName, "Label", "entry");
+        event.addInfo("Layer", layer, "Class", className, "MethodName", methodName, "Label", "entry");
 
         if (backTrace) {
             ClassInstrumentation.addBackTrace(event, 1, null);
