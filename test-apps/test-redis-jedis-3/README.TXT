@@ -29,7 +29,7 @@ In the testing app, under "Cluster Test", use space separated host string such a
 
 
 **To test on sentinel:**
-Test sentinel is available at TBD (sentinel at 52.7.124.5:1253, point at the cluster 52.7.124.5:17000)
+Test sentinel is available at (sentinel at 52.7.124.5:1253, point at the cluster 52.7.124.5:17000)
 
 To set up sentinel manually, it requires as least 1 master and 1 slave, to set up slave server, simply create a new redis config with a line
 replicaof <master host> <master port>
