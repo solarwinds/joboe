@@ -19,13 +19,11 @@ public class Scope implements com.tracelytics.joboe.span.Scope  {
         this.wrapped = wrapped;
         this.finishOnClose = finishOnClose;
         this.isAsyncPropagation = isAsyncPropagation;
-        if (!isAsyncPropagation) {
-            //keep trace of current metadata so when scope is removed, it can revert to existing metadata
-            this.previousMetadata = Context.getMetadata();
-        } else {
-            this.previousMetadata = null;
-        }
-        
+        //keep track of current metadata so when scope is removed, it can revert to existing metadata
+        //take note that we should not use wrapped.context().getPreviousMetadata() as that one could be
+        //parent span's metadata, which the parent span is not necessary the active span
+        this.previousMetadata = Context.getMetadata();
+
         scopeManager.addScope(this);
     }
     
