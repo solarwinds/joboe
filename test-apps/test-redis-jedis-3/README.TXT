@@ -11,7 +11,7 @@ To setup Redis server, please follow instruction in:
 http://redis.io/topics/quickstart
 
 **To test on sharding/partition (client side):**
-Another Redis instance for client side sharding test is available TBD (52.7.124.5:1250 and 52.7.124.5:1252)
+Another Redis instance for client side sharding test is available (52.7.124.5:1250 and 52.7.124.5:1252)
 
 Take note that this tests on client side sharding https://redis.io/topics/partitioning#clients-supporting-consistent-hashing, which the extra instance here is simple redis instance (w/o knowing that it's a partition/shard)
 
