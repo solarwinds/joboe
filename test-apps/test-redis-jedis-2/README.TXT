@@ -20,14 +20,13 @@ port 6380
 Start both then original Redis server instance and another alternate Redis server instance using the new config file
 
 **To test on cluster:**
-Please follow instruction in http://redis.io/topics/cluster-tutorial
-There should be one master node with port 7000 (as in the tutorial as the port number is hardcoded in com.tracelytics.test.action.TestCluster)
+The code by default points at cluster on ec2-52-7-124-5.compute-1.amazonaws.com, which is a shared testing service deployed on EC2. See https://github.com/librato/trace/blob/master/docs/testing/Supporting-Services-for-Testing.md#docker-services for details
 
 **To test on sentinel:**
-It requires as least 1 master and 1 slave, to set up slave sever, simply create a new redis config with a line
-slaveof 127.0.0.1 6379
+Similar to cluster, it by default points at sentinel setup on ec2-52-7-124-5.compute-1.amazonaws.com
+
 More details in http://redis.io/topics/replication
-To setup sentinel, please follow instruction in http://redis.io/topics/sentinel
+To setup sentinel locally, please follow instruction in http://redis.io/topics/sentinel
 The should just one sentinel with port 26379 (as in the tutorial as the port number is hardcoded in com.tracelytics.test.action.TestSentinel)
 Also in the sentinel config, make sure the quorom (the last param) is 1 (as there is only 1 sentinel) as below:
 sentinel monitor mymaster 127.0.0.1 6379 1
