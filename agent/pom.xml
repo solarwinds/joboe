@@ -1,417 +1,460 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  
-  <parent>
-	<groupId>com.appoptics.agent.java</groupId>
-	<artifactId>appoptics-parent</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
-  </parent>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>agent</artifactId>
-  <version>${agent.version}</version>
-  <packaging>jar</packaging>
-  
-  <url>http://maven.apache.org</url>
+    <parent>
+        <groupId>com.appoptics.agent.java</groupId>
+        <artifactId>appoptics-parent</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
 
-  <dependencies>
-    <dependency>
-      <groupId>com.appoptics.agent.java</groupId>
-      <artifactId>dependencies</artifactId>
-      <version>${agent.version}</version>
-    </dependency>
-	<dependency>
-      <groupId>com.appoptics.agent.java</groupId>
-      <artifactId>core</artifactId>
-      <version>${agent.version}</version>
-    </dependency>
-	<dependency>
-      <groupId>com.appoptics.agent.java</groupId>
-      <artifactId>instrumentation</artifactId>
-      <version>${agent.version}</version>
-    </dependency>
+    <artifactId>agent</artifactId>
+    <version>${agent.version}</version>
+    <packaging>jar</packaging>
 
-    <dependency>
-      <groupId>com.appoptics.agent.java</groupId>
-      <artifactId>instrumentation-kafka</artifactId>
-      <version>${agent.version}</version>
-    </dependency>
+    <url>http://maven.apache.org</url>
 
-    <dependency>
-      <groupId>com.appoptics.agent.java</groupId>
-      <artifactId>instrumentation-rabbit-mq</artifactId>
-      <version>${agent.version}</version>
-    </dependency>
+    <dependencies>
+        <dependency>
+            <groupId>com.appoptics.agent.java</groupId>
+            <artifactId>dependencies</artifactId>
+            <version>${agent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.appoptics.agent.java</groupId>
+            <artifactId>core</artifactId>
+            <version>${agent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.appoptics.agent.java</groupId>
+            <artifactId>instrumentation</artifactId>
+            <version>${agent.version}</version>
+        </dependency>
 
-    <dependency>
-      <groupId>com.appoptics.agent.java</groupId>
-      <artifactId>instrumentation-reactor</artifactId>
-      <version>${agent.version}</version>
-    </dependency>
+        <dependency>
+            <groupId>com.appoptics.agent.java</groupId>
+            <artifactId>instrumentation-kafka</artifactId>
+            <version>${agent.version}</version>
+        </dependency>
 
-    <dependency>
-      <groupId>com.appoptics.agent.java</groupId>
-      <artifactId>instrumentation-mongo-2</artifactId>
-      <version>${agent.version}</version>
-    </dependency>
+        <dependency>
+            <groupId>com.appoptics.agent.java</groupId>
+            <artifactId>instrumentation-rabbit-mq</artifactId>
+            <version>${agent.version}</version>
+        </dependency>
 
-    <dependency>
-      <groupId>com.appoptics.agent.java</groupId>
-      <artifactId>instrumentation-mongo-3</artifactId>
-      <version>${agent.version}</version>
-    </dependency>
+        <dependency>
+            <groupId>com.appoptics.agent.java</groupId>
+            <artifactId>instrumentation-reactor</artifactId>
+            <version>${agent.version}</version>
+        </dependency>
 
-    <dependency>
-      <groupId>com.appoptics.agent.java</groupId>
-      <artifactId>instrumentation-mongo-4</artifactId>
-      <version>${agent.version}</version>
-    </dependency>
+        <dependency>
+            <groupId>com.appoptics.agent.java</groupId>
+            <artifactId>instrumentation-mongo-2</artifactId>
+            <version>${agent.version}</version>
+        </dependency>
 
-    <dependency>
-      <groupId>com.appoptics.agent.java</groupId>
-      <artifactId>instrumentation-redisson-2</artifactId>
-      <version>${agent.version}</version>
-    </dependency>
+        <dependency>
+            <groupId>com.appoptics.agent.java</groupId>
+            <artifactId>instrumentation-mongo-3</artifactId>
+            <version>${agent.version}</version>
+        </dependency>
 
-      <dependency>
-          <groupId>com.appoptics.agent.java</groupId>
-          <artifactId>instrumentation-redisson-3</artifactId>
-          <version>${agent.version}</version>
-      </dependency>
+        <dependency>
+            <groupId>com.appoptics.agent.java</groupId>
+            <artifactId>instrumentation-mongo-4</artifactId>
+            <version>${agent.version}</version>
+        </dependency>
 
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.10</version>
-      <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>com.appoptics.agent.java</groupId>
+            <artifactId>instrumentation-redisson-2</artifactId>
+            <version>${agent.version}</version>
+        </dependency>
 
-   	<dependency>
-		<groupId>org.springframework.webflow</groupId>
-		<artifactId>spring-webflow</artifactId>
-		<version>2.3.1.RELEASE</version>
-		<scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>com.appoptics.agent.java</groupId>
+            <artifactId>instrumentation-redisson-3</artifactId>
+            <version>${agent.version}</version>
+        </dependency>
 
-    <dependency>
-		<groupId>org.springframework</groupId>
-		<artifactId>spring-test</artifactId>
-		<version>3.1.1.RELEASE</version>
-		<scope>test</scope>
-	</dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
+        </dependency>
 
-   	<dependency>
-   		<groupId>javax.servlet</groupId>
-   		<artifactId>javax.servlet-api</artifactId>
-   		<version>3.1.0</version>
-   		<scope>test</scope>
-   	</dependency>
-   	<dependency>
-	    <groupId>org.scalatest</groupId>
-	    <artifactId>scalatest_2.11</artifactId>
-	    <version>2.2.4</version>
-	    <scope>test</scope>
-	</dependency>
-   	<dependency>
-        <groupId>org.scala-lang</groupId>
-        <artifactId>scala-library</artifactId>
-        <version>2.11.12</version>
-        <scope>test</scope>
-    </dependency>
-    <dependency>
-	    <groupId>com.typesafe.akka</groupId>
-	    <artifactId>akka-actor_2.11</artifactId>
-	    <version>2.4.0</version>
-	    <scope>test</scope>
-	</dependency>
-      <!-- JAXWS for Java 11 -->
-      <dependency>
-          <groupId>com.sun.xml.ws</groupId>
-          <artifactId>jaxws-rt</artifactId>
-          <version>2.3.1</version>
-          <scope>test</scope>
-      </dependency>
-  </dependencies>
+        <dependency>
+            <groupId>org.springframework.webflow</groupId>
+            <artifactId>spring-webflow</artifactId>
+            <version>2.3.1.RELEASE</version>
+            <scope>test</scope>
+        </dependency>
 
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <version>3.1.1.RELEASE</version>
+            <scope>test</scope>
+        </dependency>
 
-  <build>
-
-    <resources>
-      <resource>
-        <directory>${basedir}</directory>
-        <targetPath>${project.build.outputDirectory}/META-INF</targetPath>
-        <filtering>false</filtering>
-        <includes>
-          <include>LICENSE.txt</include>
-          <include>Apache-2.0.txt</include>
-        </includes>
-      </resource>
-      <resource>
-        <directory>${basedir}/src/main/resources/META-INF</directory>
-        <targetPath>${project.build.outputDirectory}/META-INF</targetPath>
-        <filtering>true</filtering>
-        <includes>
-          <include>MANIFEST.MF</include>
-        </includes>
-      </resource>
-      <resource>
-        <directory>${basedir}/src/main/resources</directory>
-        <targetPath>${project.build.outputDirectory}</targetPath>
-        <filtering>true</filtering>
-        <includes>
-          <include>versions.properties</include>
-          <include>collector-ca.crt</include>
-        </includes>
-      </resource>
-      <resource>
-        <directory>${basedir}/conf</directory>
-        <targetPath>${project.build.outputDirectory}</targetPath>
-      </resource>
-    </resources>
-    
-    <testResources>
-      <testResource>
-        <directory>${basedir}/src/test/java</directory>
-        <filtering>false</filtering>
-        <includes>
-          <include>**/*.xml</include>
-        </includes>
-      </testResource>
-    </testResources>
- 
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.3.2</version>
-        <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
-          <testSource>8</testSource>
-          <testTarget>8</testTarget>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <configuration>
-          <archive>
-            <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile> 
-          </archive>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>single</goal>
-            </goals>
-            <phase>package</phase>
-          </execution>
-        </executions>
-        <configuration>
-          <appendAssemblyId>false</appendAssemblyId>
-          <finalName>appoptics-agent</finalName>
-          <descriptors>
-            <descriptor>src/main/assembly/package.xml</descriptor>
-          </descriptors>
-          <archive>
-            <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
-          </archive>
-        </configuration>
-      </plugin>
-
-        <!--
-
-Rename class files in com.appoptics.apploader from extension .class to .classbytes, this is required as
-1. To avoid those classes from being loaded by bootstrap class loader even though the agent jar is appended to it
-2. To avoid proguard from removing the class while shrinking. The first attempt was using the assembly plugin to move
-   the class files to a different folder. But proguard removes those class file during shrinking even with -keep on com.appoptics.apploader.
-   Therefore we will just rename the extension so proguard will no longer treat those as class file and would leave them alone
--->
-        <plugin>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <version>1.8</version>
-            <executions>
-                <execution>
-                    <phase>package</phase>
-                    <configuration>
-                        <tasks>
-                            <echo message="Unzipping jar file"/>
-                            <unzip src="${project.build.directory}/appoptics-agent.jar"
-                                   dest="${project.build.directory}/appoptics-agent-exploded"/>
-                            <echo message="Moving apploader files"/>
-
-                            <move todir="${project.build.directory}/appoptics-agent-exploded/com/appoptics/apploader"
-                                  includeemptydirs="false">
-                                <fileset
-                                        dir="${project.build.directory}/appoptics-agent-exploded/com/appoptics/apploader"/>
-                                <mapper type="glob" from="*.class" to="*.classbytes"/>
-                            </move>
-                            <echo message="Packaging moved files back into jar"/>
-                            <zip basedir="${project.build.directory}/appoptics-agent-exploded"
-                                 destfile="${project.build.directory}/appoptics-agent.jar"/>
-                        </tasks>
-                    </configuration>
-                    <goals>
-                        <goal>run</goal>
-                    </goals>
-                </execution>
-            </executions>
-        </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.12</version>
-        <configuration>
-            <argLine>--add-opens java.base/jdk.internal.loader=ALL-UNNAMED</argLine>
-        	<excludes>
-<!--         	delay the test of Instrumentation till the 'package' phase -->
-                <exclude>com/tracelytics/instrumentation/**/*InstrumentationTest*.java</exclude>
-        		<exclude>com/tracelytics/instrumentation/**/*PatcherTest*.java</exclude>
-        		<exclude>com/tracelytics/**/*IntegrationTest*.java</exclude>
-        	</excludes>
-       	</configuration>
-       	
-<!--        	an extra run for Instrumentation testcases, use -javaagent with the built tracelytics.jar -->
-        <executions>
-        	<execution>
-        		<id>instrumentation-test</id>
-        		<phase>package</phase>
-        		<goals>
-        			<goal>test</goal>
-        		</goals>
-        		<configuration>
-        			<excludes>
-<!--         			skip inner classes -->
-        				<exclude>**/*$*</exclude> 
-        			</excludes>
-        			<includes>
-		              <include>com/tracelytics/instrumentation/**/*InstrumentationTest*.java</include>
-		              <include>com/tracelytics/instrumentation/**/*PatcherTest*.java</include>
-		              <include>com/tracelytics/**/*IntegrationTest*.java</include>
-		            </includes>
-        			<argLine>-javaagent:${basedir}/target/appoptics-agent.jar=config=${basedir}/src/test/java/javaagent.json</argLine>
-                    <classpathDependencyExcludes>
-<!--                        avoid dependency back to any instrumentation artifact, it should just run on appoptics-agent.jar-->
-                        <classpathDependencyExclude>com.appoptics.agent.java:instrumentation*</classpathDependencyExclude>
-                    </classpathDependencyExcludes>
-
-<!--  ensure fresh javaagent (JVM) every single run       			 -->
-				    <forkMode>always</forkMode>
-  	        	</configuration>
-        	</execution>
-        </executions>
-      </plugin>
-
-      <!-- enable scalatest -->
-      <plugin>
-        <groupId>net.alchim31.maven</groupId>
-        <artifactId>scala-maven-plugin</artifactId>
-        <version>3.4.6</version>
-        <executions>
-          <execution>
-            <id>scala-test-compile</id>
-            <phase>process-test-resources</phase>
-            <goals>
-              <goal>testCompile</goal>
-            </goals>
-              <configuration>
-                  <args>
-                      <arg>-nobootcp</arg>
-                  </args>
-              </configuration>
-          </execution>
-        </executions>
-      </plugin>
-	  <plugin>
-	    <groupId>org.scalatest</groupId>
-   	    <artifactId>scalatest-maven-plugin</artifactId>
-	    <version>1.0</version>
-	    <configuration>
-	      <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
-	      <suites>com.tracelytics.instrumentation.actor.akka.AkkaActorSuites</suites>
- 	      <stdout>W</stdout>
-	      <argLine>-javaagent:${basedir}/target/appoptics-agent.jar=config=${basedir}/src/test/scala/scalaagent.json</argLine>
-          <environmentVariables>
-	        <PATH>${java.home}/bin</PATH>
-	      </environmentVariables>
-	      <parallel>false</parallel>
-	    </configuration>
-	    <executions>
-	      <execution>
-	        <id>scala-instrumentation-test</id>
-	        <phase>package</phase>
-	        <goals>
-	          <goal>test</goal>
-	        </goals>
-	      </execution>
-	    </executions>
-      </plugin>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.1.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.scalatest</groupId>
+            <artifactId>scalatest_2.11</artifactId>
+            <version>2.2.4</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>2.11.12</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.typesafe.akka</groupId>
+            <artifactId>akka-actor_2.11</artifactId>
+            <version>2.4.0</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- JAXWS for Java 11 -->
+        <dependency>
+            <groupId>com.sun.xml.ws</groupId>
+            <artifactId>jaxws-rt</artifactId>
+            <version>2.3.4</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
 
-      <plugin>
-        <groupId>com.github.wvengen</groupId>
-        <artifactId>proguard-maven-plugin</artifactId>
-        <version>2.0.5</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals><goal>proguard</goal></goals>
-          </execution>
-        </executions>
-        <configuration>
-          <proguardVersion>6.2.2</proguardVersion>
-          <obfuscate>true</obfuscate>
-          <injar>appoptics-agent.jar</injar>
-          <includeDependency>false</includeDependency>
-          <outputDirectory>${project.build.directory}</outputDirectory>
-          <proguardInclude>${basedir}/proguard.conf</proguardInclude>
-          <libs>
-            <!--<lib>${java.home}/lib/rt.jar</lib>-->
-            <!--<lib>${java.home}/lib/jsse.jar</lib>-->
-            <!--<lib>${java.home}/lib/jce.jar</lib>-->
-            <!--<lib>${java.home}/../lib/tools.jar</lib>-->
-          </libs>
-        </configuration>
-        <dependencies>
-          <dependency>
-            <groupId>net.sf.proguard</groupId>
-            <artifactId>proguard-base</artifactId>
-            <version>6.2.2</version>
-            <scope>runtime</scope>
-          </dependency>
-        </dependencies>
-      </plugin>
+    <build>
 
-<!--        using below plugin to ensure producible build as https://maven.apache.org/guides/mini/guide-reproducible-builds.html-->
-<!--        does not work when we use ant task to extract and repack classes, proguard also seems to give different checksum from each run -->
-        <plugin>
-            <groupId>io.github.zlika</groupId>
-            <artifactId>reproducible-build-maven-plugin</artifactId>
-            <executions>
-                <execution>
-                    <id>strip-jar</id>
-                    <phase>package</phase>
-                    <goals>
-                        <goal>strip-jar</goal>
-                    </goals>
-                    <configuration>
-                        <zipDateTime>${git.commit.time}</zipDateTime>
-                        <!-- Set custom date/time format pattern, "yyyyMMddHHmmss" by default -->
-                         <zipDateTimeFormatPattern>yyyy-MM-dd'T'HH:mm:ss'Z'</zipDateTimeFormatPattern>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>
+        <resources>
+            <resource>
+                <directory>${basedir}</directory>
+                <targetPath>${project.build.outputDirectory}/META-INF</targetPath>
+                <filtering>false</filtering>
+                <includes>
+                    <include>LICENSE.txt</include>
+                    <include>Apache-2.0.txt</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>${basedir}/src/main/resources/META-INF</directory>
+                <targetPath>${project.build.outputDirectory}/META-INF</targetPath>
+                <filtering>true</filtering>
+                <includes>
+                    <include>MANIFEST.MF</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+                <targetPath>${project.build.outputDirectory}</targetPath>
+                <filtering>true</filtering>
+                <includes>
+                    <include>versions.properties</include>
+                    <include>collector-ca.crt</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>${basedir}/conf</directory>
+                <targetPath>${project.build.outputDirectory}</targetPath>
+            </resource>
+        </resources>
+
+        <testResources>
+            <testResource>
+                <directory>${basedir}/src/test/java</directory>
+                <filtering>false</filtering>
+                <includes>
+                    <include>**/*.xml</include>
+                </includes>
+            </testResource>
+        </testResources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                    <testSource>8</testSource>
+                    <testTarget>8</testTarget>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <phase>package</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <appendAssemblyId>false</appendAssemblyId>
+                    <finalName>appoptics-agent</finalName>
+                    <descriptors>
+                        <descriptor>src/main/assembly/package.xml</descriptor>
+                    </descriptors>
+                    <archive>
+                        <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <!--
+
+    Rename class files in com.appoptics.apploader from extension .class to .classbytes, this is required as
+    1. To avoid those classes from being loaded by bootstrap class loader even though the agent jar is appended to it
+    2. To avoid proguard from removing the class while shrinking. The first attempt was using the assembly plugin to move
+       the class files to a different folder. But proguard removes those class file during shrinking even with -keep on com.appoptics.apploader.
+       Therefore we will just rename the extension so proguard will no longer treat those as class file and would leave them alone
+    -->
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <configuration>
+                            <tasks>
+                                <echo message="Unzipping jar file"/>
+                                <unzip src="${project.build.directory}/appoptics-agent.jar"
+                                       dest="${project.build.directory}/appoptics-agent-exploded"/>
+                                <echo message="Moving apploader files"/>
+
+                                <move todir="${project.build.directory}/appoptics-agent-exploded/com/appoptics/apploader"
+                                      includeemptydirs="false">
+                                    <fileset
+                                            dir="${project.build.directory}/appoptics-agent-exploded/com/appoptics/apploader"/>
+                                    <mapper type="glob" from="*.class" to="*.classbytes"/>
+                                </move>
+                                <echo message="Packaging moved files back into jar"/>
+                                <zip basedir="${project.build.directory}/appoptics-agent-exploded"
+                                     destfile="${project.build.directory}/appoptics-agent.jar"/>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.12</version>
+                <configuration>
+                    <argLine>--add-opens java.base/jdk.internal.loader=ALL-UNNAMED</argLine>
+                    <excludes>
+                        <!--         	delay the test of Instrumentation till the 'package' phase -->
+                        <exclude>com/tracelytics/instrumentation/**/*InstrumentationTest*.java</exclude>
+                        <exclude>com/tracelytics/instrumentation/**/*PatcherTest*.java</exclude>
+                        <exclude>com/tracelytics/**/*IntegrationTest*.java</exclude>
+                    </excludes>
+                </configuration>
+
+                <!--        	an extra run for Instrumentation testcases, use -javaagent with the built tracelytics.jar -->
+                <executions>
+                    <execution>
+                        <id>instrumentation-test</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <excludes>
+                                <!--         			skip inner classes -->
+                                <exclude>**/*$*</exclude>
+                            </excludes>
+                            <includes>
+                                <include>com/tracelytics/instrumentation/**/*InstrumentationTest*.java</include>
+                                <include>com/tracelytics/instrumentation/**/*PatcherTest*.java</include>
+                                <include>com/tracelytics/**/*IntegrationTest*.java</include>
+                            </includes>
+                            <argLine>
+                                -javaagent:${basedir}/target/appoptics-agent.jar=config=${basedir}/src/test/java/javaagent.json
+                            </argLine>
+                            <classpathDependencyExcludes>
+                                <!--                        avoid dependency back to any instrumentation artifact, it should just run on appoptics-agent.jar-->
+                                <classpathDependencyExclude>com.appoptics.agent.java:instrumentation*
+                                </classpathDependencyExclude>
+                            </classpathDependencyExcludes>
+
+                            <!--  ensure fresh javaagent (JVM) every single run       			 -->
+                            <forkMode>always</forkMode>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- enable scalatest -->
+            <plugin>
+                <groupId>net.alchim31.maven</groupId>
+                <artifactId>scala-maven-plugin</artifactId>
+                <version>3.4.6</version>
+                <executions>
+                    <execution>
+                        <id>scala-test-compile</id>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                            <goal>testCompile</goal>
+                        </goals>
+                        <configuration>
+                            <args>
+                                <arg>-nobootcp</arg>
+                            </args>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.scalatest</groupId>
+                <artifactId>scalatest-maven-plugin</artifactId>
+                <version>1.0</version>
+                <configuration>
+                    <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+                    <suites>com.tracelytics.instrumentation.actor.akka.AkkaActorSuites</suites>
+                    <stdout>W</stdout>
+                    <argLine>
+                        -javaagent:${basedir}/target/appoptics-agent.jar=config=${basedir}/src/test/scala/scalaagent.json
+                    </argLine>
+                    <environmentVariables>
+                        <PATH>${java.home}/bin</PATH>
+                    </environmentVariables>
+                    <parallel>false</parallel>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>scala-instrumentation-test</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
 
-    </plugins>
-  </build>
+            <plugin>
+                <groupId>com.github.wvengen</groupId>
+                <artifactId>proguard-maven-plugin</artifactId>
+                <version>2.0.5</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>proguard</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <proguardVersion>6.2.2</proguardVersion>
+                    <obfuscate>true</obfuscate>
+                    <injar>appoptics-agent.jar</injar>
+                    <includeDependency>false</includeDependency>
+                    <outputDirectory>${project.build.directory}</outputDirectory>
+                    <proguardInclude>${basedir}/proguard.conf</proguardInclude>
+                    <libs>
+                        <!--<lib>${java.home}/lib/rt.jar</lib>-->
+                        <!--<lib>${java.home}/lib/jsse.jar</lib>-->
+                        <!--<lib>${java.home}/lib/jce.jar</lib>-->
+                        <!--<lib>${java.home}/../lib/tools.jar</lib>-->
+                    </libs>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>net.sf.proguard</groupId>
+                        <artifactId>proguard-base</artifactId>
+                        <version>6.2.2</version>
+                        <scope>runtime</scope>
+                    </dependency>
+                </dependencies>
+            </plugin>
 
+            <!--        using below plugin to ensure producible build as https://maven.apache.org/guides/mini/guide-reproducible-builds.html-->
+            <!--        does not work when we use ant task to extract and repack classes, proguard also seems to give different checksum from each run -->
+            <plugin>
+                <groupId>io.github.zlika</groupId>
+                <artifactId>reproducible-build-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>strip-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>strip-jar</goal>
+                        </goals>
+                        <configuration>
+                            <zipDateTime>${git.commit.time}</zipDateTime>
+                            <!-- Set custom date/time format pattern, "yyyyMMddHHmmss" by default -->
+                            <zipDateTimeFormatPattern>yyyy-MM-dd'T'HH:mm:ss'Z'</zipDateTimeFormatPattern>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+
+    <profiles>
+        <profile>
+            <id>gpg-sign-artifacts</id>
+            <activation>
+                <property>
+                    <name>gpg-sign</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                                <configuration>
+                                    <keyname>appoptics-agent</keyname>
+                                    <passphrase>${gpg.passphrase}</passphrase>
+                                    <!-- Prevent gpg from using pinentry programs -->
+                                    <gpgArguments>
+                                        <arg>--pinentry-mode</arg>
+                                        <arg>loopback</arg>
+                                    </gpgArguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
