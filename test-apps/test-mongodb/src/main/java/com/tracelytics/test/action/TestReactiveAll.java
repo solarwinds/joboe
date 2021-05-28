@@ -312,12 +312,5 @@ public class TestReactiveAll extends AbstractMongoDbReactiveAction {
 
 		return SUCCESS;
 	}
-
-	private <T> T blockingExecute(Publisher<T> publisher) {
-		LineNumberSubscriber<T> subscriber = getSubscriber();
-		publisher.subscribe(subscriber);
-
-		return subscriber.waitUntilThisFinishes();
-	}
 }
    
