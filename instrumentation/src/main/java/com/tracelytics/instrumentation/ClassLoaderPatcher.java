@@ -60,7 +60,7 @@ public class ClassLoaderPatcher extends ClassInstrumentation {
             throws CannotCompileException {
         insertBefore(m, "try {" +
         		        "if ($1 != null && " +
-                        "    $1.startsWith(\"com.tracelytics.\") && " +
+                        "    ($1.startsWith(\"com.tracelytics.\") || $1.startsWith(\"com.appoptics.\")) && " +
                         "    !$1.startsWith(\"com.tracelytics.test\") && " +
                         "    !$1.startsWith(\"com.tracelytics.api.ext\")  && " +
                         "    !$1.startsWith(\"com.appoptics.api.ext\")  && " +
