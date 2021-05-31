@@ -27,7 +27,7 @@ public abstract class SpringScheduledRunnableInstrumentation extends ClassInstru
         for (CtMethod method : findMatchingMethods(cc, methodMatchers).keySet()) {
             insertBefore(method, INSTRUMENTER + ".runEntry(" + getMethodInvocationExpression() + ");", false);
             addErrorReporting(method, RuntimeException.class.getName(), null, classPool, true);
-            insertAfter(method, INSTRUMENTER + ".runExit();", true);
+            insertAfter(method, INSTRUMENTER + ".runExit();", true, false);
         }
         return true;
     }
