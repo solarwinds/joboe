@@ -1,0 +1,28 @@
+<web-app id="WebApp_9" version="2.4" 
+	xmlns="http://java.sun.com/xml/ns/j2ee" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+	<!-- this enforce SSL is used -->
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>test-servlet-4</web-resource-name>
+			<url-pattern>/*</url-pattern>
+			<http-method>GET</http-method>
+		</web-resource-collection>
+
+		<user-data-constraint>
+			<transport-guarantee>CONFIDENTIAL</transport-guarantee>
+		</user-data-constraint>
+
+	</security-constraint>
+<!--     <servlet>-->
+<!--	   <display-name>Servlet1</display-name>-->
+<!--	   <servlet-name>servlet1</servlet-name>-->
+<!--	   <servlet-class>com.tracelytics.test.TestServlet</servlet-class>-->
+<!--	 </servlet>-->
+<!--	 -->
+<!--	 <servlet-mapping>-->
+<!--	   <servlet-name>servlet1</servlet-name>-->
+<!--	   <url-pattern>/</url-pattern>-->
+<!--	 </servlet-mapping>-->
+</web-app>
