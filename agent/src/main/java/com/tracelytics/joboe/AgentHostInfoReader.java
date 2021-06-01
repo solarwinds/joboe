@@ -657,6 +657,7 @@ public class AgentHostInfoReader implements HostInfoReader {
                 URI uri = new URI(getMetadataHost() + "/" + relativePath);
                 connection = (HttpURLConnection) uri.toURL().openConnection(Proxy.NO_PROXY);
                 connection.setConnectTimeout(CONNECT_TIMEOUT);
+                connection.setReadTimeout(CONNECT_TIMEOUT);
 
                 int statusCode = connection.getResponseCode();
 
