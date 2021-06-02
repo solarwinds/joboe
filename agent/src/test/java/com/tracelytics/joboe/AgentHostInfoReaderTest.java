@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class AgentHostInfoReaderTest extends TestCase {
     private static final String TEST_FILE_FOLDER = "src/test/java/com/tracelytics/joboe/"; //using a rather static path. Using Class.getResourceAsStream does not work in test (vs main)
-    private AgentHostInfoReader reader = AgentHostInfoReader.INSTANCE;
+    private AgentHostInfoReader reader = new AgentHostInfoReader();
 
     public void testGetDistroParsing() throws IOException {
         assertEquals("Red Hat Enterprise Linux Server release 6.5 (Santiago)", AgentHostInfoReader.getRedHatBasedDistro(getFileReader(AgentHostInfoReader.DistroType.REDHAT_BASED)));

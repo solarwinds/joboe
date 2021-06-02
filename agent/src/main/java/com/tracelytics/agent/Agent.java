@@ -506,7 +506,6 @@ public class Agent implements ClassFileTransformer {
      */
     private static void reportInit(boolean blockUntilFinish) {
         if (!reportedAgentInit.getAndSet(true)) {
-            HostInfoUtils.init(AgentHostInfoReader.INSTANCE);
             Future<Result> future;
             try {
                 String layerName = (String) ConfigManager.getConfig(ConfigProperty.AGENT_LAYER);

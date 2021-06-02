@@ -6,6 +6,7 @@ import com.tracelytics.logging.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 
 /**
  * Helper to extract information on the host this JVM runs on
@@ -14,7 +15,18 @@ import java.util.Map;
  */
 public class HostInfoUtils {
     private static Logger logger = LoggerFactory.getLogger();
-    private static HostInfoReader reader = new DummyHostInfoReader();
+    private static HostInfoReader reader;
+
+    static {
+        for (HostInfoReader reader : ServiceLoader.load(HostInfoReader.class)) {
+            logger.debug("Use HostInfoReader implementation " + reader.getClass().getName());
+            HostInfoUtils.reader = reader;
+            break; // use the first implementation found in the path
+        }
+        if (HostInfoUtils.reader == null) {
+            reader = new DummyHostInfoReader();
+        }
+    }
 
     public static String getAzureInstanceId() {
         return reader.getAzureInstanceId();

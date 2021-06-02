@@ -18,14 +18,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import com.google.auto.service.AutoService;
 
 /**
  * Helper to extract information on the host this JVM runs on
  * @author pluk
  *
  */
+@AutoService(HostInfoReader.class)
 public class AgentHostInfoReader implements HostInfoReader {
-    public static final AgentHostInfoReader INSTANCE = new AgentHostInfoReader();
     private static Logger logger = LoggerFactory.getLogger();
     
     private static final int HOST_ID_CHECK_INTERVAL = 60;
@@ -54,10 +55,8 @@ public class AgentHostInfoReader implements HostInfoReader {
         DISTRO_FILE_NAMES.put(DistroType.GENTOO, "/etc/gentoo-release");
     }
 
-    private AgentHostInfoReader() {
-        //prevent instantiations
-    }
-    
+    public AgentHostInfoReader() { }
+
     public String getAwsInstanceId() {
         return Ec2InstanceReader.getInstanceId();
     }
@@ -74,6 +73,7 @@ public class AgentHostInfoReader implements HostInfoReader {
         return HerokuDynoReader.getDynoId();
     }
 
+    @Override
     public String getAzureInstanceId() {
         return AzureReader.getInstanceId();
     }
@@ -152,6 +152,7 @@ public class AgentHostInfoReader implements HostInfoReader {
      * Extracts network interface info from the system. Take note that loop back, point-to-point and non-physical addresses are excluded
      * @return
      */
+    @Override
     public NetworkAddressInfo getNetworkAddressInfo() {
         try {
             List<String> ips = new ArrayList<String>();
@@ -778,7 +779,8 @@ public class AgentHostInfoReader implements HostInfoReader {
             try {
                 String getContainerTypeResult = ExecUtils.exec("powershell Get-ItemProperty -Path HKLM:\\SYSTEM\\CurrentControlSet\\Control\\ -Name \"ContainerType\"");
                 if (getContainerTypeResult != null && !"".equals(getContainerTypeResult)) {
-                    dockerId = AgentHostInfoReader.INSTANCE.getHostName();
+                    dockerId = HostInfoUtils.getHostName();
+
                 }
             } catch (Exception e) {
                 logger.info("Failed to identify whether this windows system is a docker container: " + e.getMessage());
