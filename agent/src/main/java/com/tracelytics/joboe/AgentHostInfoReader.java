@@ -591,22 +591,22 @@ public class AgentHostInfoReader implements HostInfoReader {
     }
     
     public static class Ec2InstanceReader {
-        private static final int CONNECT_TIMEOUT_DEFAULT = 1000;
-        private static final int CONNECT_TIMEOUT_MIN = 0; //do not wait at all, disable retrieval
-        private static final int CONNECT_TIMEOUT_MAX = 3000;
+        private static final int TIMEOUT_DEFAULT = 1000;
+        private static final int TIMEOUT_MIN = 0; //do not wait at all, disable retrieval
+        private static final int TIMEOUT_MAX = 3000;
 
-        private static final int CONNECT_TIMEOUT = getTimeout();
+        private static final int TIMEOUT = getTimeout();
 
         private static int getTimeout() {
             Integer configValue = (Integer) ConfigManager.getConfig(ConfigProperty.AGENT_EC2_METADATA_TIMEOUT);
             if (configValue == null) {
-                return CONNECT_TIMEOUT_DEFAULT;
-            } else if (configValue > CONNECT_TIMEOUT_MAX) {
-                logger.warn("EC2 metadata read timeout cannot be greater than " + CONNECT_TIMEOUT_MAX + " millisec but found [" + configValue + "]. Using " + CONNECT_TIMEOUT_MAX + " instead.");
-                return CONNECT_TIMEOUT_MAX;
-            } else if (configValue < CONNECT_TIMEOUT_MIN) {
-                logger.warn("EC2 metadata read timeout cannot be smaller than " + CONNECT_TIMEOUT_MIN + " millisec but found [" + configValue + "]. Using " + CONNECT_TIMEOUT_MIN + " instead, which essentially disable reading EC2 metadata");
-                return CONNECT_TIMEOUT_MIN;
+                return TIMEOUT_DEFAULT;
+            } else if (configValue > TIMEOUT_MAX) {
+                logger.warn("EC2 metadata read timeout cannot be greater than " + TIMEOUT_MAX + " millisec but found [" + configValue + "]. Using " + TIMEOUT_MAX + " instead.");
+                return TIMEOUT_MAX;
+            } else if (configValue < TIMEOUT_MIN) {
+                logger.warn("EC2 metadata read timeout cannot be smaller than " + TIMEOUT_MIN + " millisec but found [" + configValue + "]. Using " + TIMEOUT_MIN + " instead, which essentially disable reading EC2 metadata");
+                return TIMEOUT_MIN;
             } else {
                 return configValue;
             }
@@ -640,7 +640,7 @@ public class AgentHostInfoReader implements HostInfoReader {
         }
         
         private void initialize() {
-            if (CONNECT_TIMEOUT == CONNECT_TIMEOUT_MIN) { //disable reader
+            if (TIMEOUT == TIMEOUT_MIN) { //disable reader
                 return;
             }
             instanceId = getResourceOnEndpoint(INSTANCE_ID_PATH);
@@ -656,8 +656,8 @@ public class AgentHostInfoReader implements HostInfoReader {
             try {
                 URI uri = new URI(getMetadataHost() + "/" + relativePath);
                 connection = (HttpURLConnection) uri.toURL().openConnection(Proxy.NO_PROXY);
-                connection.setConnectTimeout(CONNECT_TIMEOUT);
-                connection.setReadTimeout(CONNECT_TIMEOUT);
+                connection.setConnectTimeout(TIMEOUT);
+                connection.setReadTimeout(TIMEOUT);
 
                 int statusCode = connection.getResponseCode();
 
@@ -668,7 +668,7 @@ public class AgentHostInfoReader implements HostInfoReader {
                     return null;
                 } 
             } catch (IOException e) { 
-                logger.debug("Timeout on reading EC2 metadata after waiting for [" + CONNECT_TIMEOUT + "] milliseconds. Probably not an EC2 instance");
+                logger.debug("Timeout on reading EC2 metadata after waiting for [" + TIMEOUT + "] milliseconds. Probably not an EC2 instance");
                 return null; 
             } catch (URISyntaxException e) {
                 logger.warn(e.getMessage(), e);
