@@ -18,9 +18,9 @@ public class HostInfoUtils {
     private static HostInfoReader reader;
 
     static {
-        for (HostInfoReader reader : ServiceLoader.load(HostInfoReader.class)) {
-            logger.debug("Use HostInfoReader implementation " + reader.getClass().getName());
-            HostInfoUtils.reader = reader;
+        for (HostInfoReaderProvider provider : ServiceLoader.load(HostInfoReaderProvider.class)) {
+            logger.debug("Use HostInfoReaderProvider implementation " + provider.getClass().getName());
+            HostInfoUtils.reader = provider.getHostInfoReader();
             break; // use the first implementation found in the path
         }
         if (HostInfoUtils.reader == null) {

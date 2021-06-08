@@ -25,8 +25,8 @@ import com.google.auto.service.AutoService;
  * @author pluk
  *
  */
-@AutoService(HostInfoReader.class)
 public class AgentHostInfoReader implements HostInfoReader {
+    public static final AgentHostInfoReader INSTANCE = new AgentHostInfoReader();
     private static Logger logger = LoggerFactory.getLogger();
     
     private static final int HOST_ID_CHECK_INTERVAL = 60;
@@ -55,7 +55,9 @@ public class AgentHostInfoReader implements HostInfoReader {
         DISTRO_FILE_NAMES.put(DistroType.GENTOO, "/etc/gentoo-release");
     }
 
-    public AgentHostInfoReader() { }
+    private AgentHostInfoReader() {
+        //prevent instantiations
+    }
 
     public String getAwsInstanceId() {
         return Ec2InstanceReader.getInstanceId();
@@ -779,7 +781,7 @@ public class AgentHostInfoReader implements HostInfoReader {
             try {
                 String getContainerTypeResult = ExecUtils.exec("powershell Get-ItemProperty -Path HKLM:\\SYSTEM\\CurrentControlSet\\Control\\ -Name \"ContainerType\"");
                 if (getContainerTypeResult != null && !"".equals(getContainerTypeResult)) {
-                    dockerId = HostInfoUtils.getHostName();
+                    dockerId = AgentHostInfoReader.INSTANCE.getHostName();
 
                 }
             } catch (Exception e) {
