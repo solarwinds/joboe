@@ -29,7 +29,18 @@ import javax.net.ssl.SSLEngine;
 public abstract class RpcClientManager {
     private static final Logger logger = LoggerFactory.getLogger();
     private static final Map<ClientType, RpcClientManager> registeredManagers = new HashMap<ClientType, RpcClientManager>();
-    static final URL DEFAULT_COLLECTER_CERT_LOCATION = RpcClientManager.class.getResource("/collector-ca.crt"); //cert by default included in the resource folder or root folder in jar
+    static final URL DEFAULT_COLLECTER_CERT_LOCATION = getCertURL();
+
+    private static URL getCertURL() {
+        URL url = RpcClientManager.class.getResource("collector-ca.crt"); //cert by default included in the resource folder or root folder in jar
+        if (url == null) {
+            ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+            if (contextClassLoader != null) {
+                url = contextClassLoader.getResource("collector-ca.crt");
+            }
+        }
+        return url;
+    }
 
     static final String DEFAULT_HOST = "collector.appoptics.com"; //default collector host
     static final int DEFAULT_PORT = 443; //default collector port
