@@ -15,7 +15,7 @@ public class BackTraceUtil {
         int startPosition = 2 + skipElements; // Starts with 2: To exclude the getStackTrace() and addBackTrace calls themselves. Also adds the number of skipElements provided in the argument to skip elements
 
         if (startPosition >= stackTrace.length) {
-            logger.warn("Attempt to skip [" + skipElements + "] elements in addBackTrace is valid, no stack trace element is left!");
+            logger.warn("Attempt to skip [" + skipElements + "] elements in addBackTrace is invalid, no stack trace element is left!");
             return new StackTraceElement[0];
         }
 
