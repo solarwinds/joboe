@@ -16,7 +16,7 @@ public class BackTraceUtil {
 
         if (startPosition >= stackTrace.length) {
             logger.warn("Attempt to skip [" + skipElements + "] elements in addBackTrace is valid, no stack trace element is left!");
-            return null;
+            return new StackTraceElement[0];
         }
 
         int targetStackTraceLength = stackTrace.length - startPosition;
