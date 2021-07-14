@@ -4,7 +4,7 @@
 
   <groupId>com.appoptics.agent.java</groupId>
   <artifactId>appoptics-agent</artifactId>
-  <version>${agent.version}${is.snapshot}</version>
+  <version>${revision}${is.snapshot}</version>
   <packaging>zip</packaging>
 
   <name>AppOptics Java Agent</name>

@@ -17,65 +17,54 @@
         <dependency>
             <groupId>com.appoptics.agent.java</groupId>
             <artifactId>dependencies</artifactId>
-            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>com.appoptics.agent.java</groupId>
             <artifactId>core</artifactId>
-            <version>${revision}</version>
         </dependency>
         <dependency>
             <groupId>com.appoptics.agent.java</groupId>
             <artifactId>instrumentation</artifactId>
-            <version>${revision}</version>
         </dependency>
 
         <dependency>
             <groupId>com.appoptics.agent.java</groupId>
             <artifactId>instrumentation-kafka</artifactId>
-            <version>${revision}</version>
         </dependency>
 
         <dependency>
             <groupId>com.appoptics.agent.java</groupId>
             <artifactId>instrumentation-rabbit-mq</artifactId>
-            <version>${revision}</version>
         </dependency>
 
         <dependency>
             <groupId>com.appoptics.agent.java</groupId>
             <artifactId>instrumentation-reactor</artifactId>
-            <version>${revision}</version>
         </dependency>
 
         <dependency>
             <groupId>com.appoptics.agent.java</groupId>
             <artifactId>instrumentation-mongo-2</artifactId>
-            <version>${revision}</version>
         </dependency>
 
         <dependency>
             <groupId>com.appoptics.agent.java</groupId>
             <artifactId>instrumentation-mongo-3</artifactId>
-            <version>${revision}</version>
         </dependency>
 
         <dependency>
             <groupId>com.appoptics.agent.java</groupId>
             <artifactId>instrumentation-mongo-4</artifactId>
-            <version>${revision}</version>
         </dependency>
 
         <dependency>
             <groupId>com.appoptics.agent.java</groupId>
             <artifactId>instrumentation-redisson-2</artifactId>
-            <version>${revision}</version>
         </dependency>
 
         <dependency>
             <groupId>com.appoptics.agent.java</groupId>
             <artifactId>instrumentation-redisson-3</artifactId>
-            <version>${revision}</version>
         </dependency>
 
         <dependency>

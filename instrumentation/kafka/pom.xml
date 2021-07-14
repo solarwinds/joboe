@@ -22,7 +22,6 @@
     <dependency>
       <groupId>com.appoptics.agent.java</groupId>
       <artifactId>instrumentation</artifactId>
-      <version>${revision}</version>
     </dependency>
 
     <dependency>

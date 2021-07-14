@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.appoptics.agent.java</groupId>
@@ -14,10 +14,86 @@
         <maven.plugin.version>1.0.0</maven.plugin.version>
         <is.snapshot></is.snapshot>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<repository.url>https://oss.sonatype.org/service/local/staging/deploy/maven2</repository.url>
+        <repository.url>https://oss.sonatype.org/service/local/staging/deploy/maven2</repository.url>
         <serverId>sonatype_staging</serverId>
         <project.build.outputTimestamp>${git.commit.time}</project.build.outputTimestamp>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.appoptics.agent.java</groupId>
+                <artifactId>dependencies</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.appoptics.agent.java</groupId>
+                <artifactId>core</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.appoptics.agent.java</groupId>
+                <artifactId>instrumentation</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.appoptics.agent.java</groupId>
+                <artifactId>agent</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.appoptics.agent.java</groupId>
+                <artifactId>instrumentation-kafka</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.appoptics.agent.java</groupId>
+                <artifactId>instrumentation-rabbit-mq</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.appoptics.agent.java</groupId>
+                <artifactId>instrumentation-reactor</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.appoptics.agent.java</groupId>
+                <artifactId>instrumentation-mongo-2</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.appoptics.agent.java</groupId>
+                <artifactId>instrumentation-mongo-3</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.appoptics.agent.java</groupId>
+                <artifactId>instrumentation-mongo-4</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.appoptics.agent.java</groupId>
+                <artifactId>instrumentation-redisson-2</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.appoptics.agent.java</groupId>
+                <artifactId>instrumentation-redisson-3</artifactId>
+                <version>${revision}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <build>
         <pluginManagement>
@@ -44,7 +120,7 @@
                     <artifactId>maven-assembly-plugin</artifactId>
                     <version>3.2.0</version>
                 </plugin>
-				<plugin>
+                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>3.2.0</version>
@@ -59,7 +135,7 @@
             <plugin>
                 <groupId>pl.project13.maven</groupId>
                 <artifactId>git-commit-id-plugin</artifactId>
-		<version>4.0.5</version>
+                <version>4.0.5</version>
                 <executions>
                     <execution>
                         <id>retrieve-git-info</id>

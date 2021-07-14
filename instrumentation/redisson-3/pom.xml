@@ -5,11 +5,11 @@
   <parent>
 	<groupId>com.appoptics.agent.java</groupId>
 	<artifactId>appoptics-parent</artifactId>
+    <version>${revision}</version>
 	<relativePath>../..</relativePath>
   </parent>
 
   <artifactId>instrumentation-redisson-3</artifactId>
-  <version>${revision}</version>
   <packaging>jar</packaging>
   
   <url>http://maven.apache.org</url>
@@ -18,7 +18,6 @@
     <dependency>
       <groupId>com.appoptics.agent.java</groupId>
       <artifactId>instrumentation-redisson-2</artifactId>
-      <version>${revision}</version>
     </dependency>
 
     <dependency>

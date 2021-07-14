@@ -4,7 +4,7 @@
 
   <groupId>com.appoptics.agent.java</groupId>
   <artifactId>appoptics-sdk</artifactId>
-  <version>${api.version}${is.snapshot}</version>
+  <version>${revision}${is.snapshot}</version>
   <packaging>jar</packaging>
 
   <name>AppOptics Java Instrumentation SDK</name>

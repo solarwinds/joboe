@@ -18,13 +18,11 @@
     <dependency>
       <groupId>com.appoptics.agent.java</groupId>
       <artifactId>instrumentation</artifactId>
-      <version>${revision}</version>
     </dependency>
 
     <dependency>
       <groupId>com.appoptics.agent.java</groupId>
       <artifactId>instrumentation-mongo-3</artifactId>
-      <version>${revision}</version>
     </dependency>
 
     <dependency>
