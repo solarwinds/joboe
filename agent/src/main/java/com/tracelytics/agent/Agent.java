@@ -4,21 +4,14 @@
 
 package com.tracelytics.agent;
 
-import static com.tracelytics.agent.config.ConfigConstants.*;
-
 import com.tracelytics.agent.config.*;
-import com.tracelytics.agent.config.ProxyConfigParser;
 import com.tracelytics.ext.javassist.bytecode.ClassFile;
-import com.tracelytics.joboe.AgentHostInfoReader;
 import com.tracelytics.joboe.config.*;
-import com.tracelytics.joboe.config.InvalidConfigException;
 import com.tracelytics.joboe.rpc.*;
 import com.tracelytics.joboe.rpc.RpcClientManager.OperationType;
-
 import com.tracelytics.logging.Logger;
 import com.tracelytics.logging.LoggerFactory;
 import com.tracelytics.monitor.SystemMonitorController;
-import com.tracelytics.util.HostInfoUtils;
 import com.tracelytics.util.JavaProcessUtils;
 import com.tracelytics.util.ServiceKeyUtils;
 import com.tracelytics.util.TimeUtils;
@@ -34,6 +27,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static com.tracelytics.agent.config.ConfigConstants.MAX_SQL_QUERY_LENGTH_LOWER_LIMIT;
+import static com.tracelytics.agent.config.ConfigConstants.MAX_SQL_QUERY_LENGTH_UPPER_LIMIT;
 
 public class Agent implements ClassFileTransformer {
 

@@ -24,6 +24,10 @@
         </dependency>
         <dependency>
             <groupId>com.appoptics.agent.java</groupId>
+            <artifactId>metrics</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.appoptics.agent.java</groupId>
             <artifactId>instrumentation</artifactId>
         </dependency>
 
