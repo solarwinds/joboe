@@ -26,6 +26,7 @@ import java.util.concurrent.TimeUnit;
  * @author pluk
  *
  */
+@AutoService(HostInfoReader.class)
 public class ServerHostInfoReader implements HostInfoReader {
     public static final ServerHostInfoReader INSTANCE = new ServerHostInfoReader();
     private static Logger logger = LoggerFactory.getLogger();
