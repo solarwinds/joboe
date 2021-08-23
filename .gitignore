@@ -13,3 +13,4 @@ test-apps/*/target-eclipse
 .DS_Store
 dependencies/dependency-reduced-pom.xml
 out/
+.flattened-pom.xml

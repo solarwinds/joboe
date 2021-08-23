@@ -35,6 +35,12 @@
 
             <dependency>
                 <groupId>com.appoptics.agent.java</groupId>
+                <artifactId>metrics</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.appoptics.agent.java</groupId>
                 <artifactId>instrumentation</artifactId>
                 <version>${revision}</version>
             </dependency>
