@@ -1,11 +1,9 @@
 package com.tracelytics.joboe;
 
-import static com.tracelytics.joboe.Constants.MASK_OP_ID_LEN;
-import static com.tracelytics.joboe.Constants.MASK_TASK_ID_LEN;
 import static com.tracelytics.joboe.Constants.MASK_VERSION;
 import static com.tracelytics.joboe.Constants.MAX_METADATA_PACK_LEN;
-import static com.tracelytics.joboe.Constants.MAX_OP_ID_LEN;
-import static com.tracelytics.joboe.Constants.MAX_TASK_ID_LEN;
+import static com.tracelytics.joboe.Constants.OP_ID_LEN;
+import static com.tracelytics.joboe.Constants.TASK_ID_LEN;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -24,6 +22,7 @@ import com.tracelytics.logging.LoggerFactory;
 
 /**
  * Oboe Metadata: Task and Op IDs
+ * Note that this is migrated from AO's X-Trace ID and it complies with the W3C trace context spec: https://www.w3.org/TR/trace-context
 
  */
 public class Metadata {
@@ -32,16 +31,16 @@ public class Metadata {
     private byte taskID[];
     private byte opID[];
     
-    private int taskLen;
-    private int opLen;
+    private int taskLen = TASK_ID_LEN;
+    private int opLen = OP_ID_LEN;
     
     private byte flags;
     
     private boolean isAsync;
 
-    public static final char[] hexTable = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
-    public static final byte[] unsetTaskID = new byte[MAX_TASK_ID_LEN]; // initialized to zero
-    public static final byte[] unsetOpID = new byte[MAX_OP_ID_LEN]; // initialized to zero
+    public static final char[] hexTable = {'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
+    public static final byte[] unsetTaskID = new byte[TASK_ID_LEN]; // initialized to zero
+    public static final byte[] unsetOpID = new byte[OP_ID_LEN]; // initialized to zero
     
     private static int ttl; //in millisec
     public static final int DEFAULT_TTL = 20 * 60 * 1000; //20 mins by default, in unit of millisec
@@ -50,7 +49,7 @@ public class Metadata {
     public static final int DEFAULT_MAX_EVENTS = 100000; // max 100k events per trace by default
     public static final int DEFAULT_MAX_BACKTRACES = 1000; // max 1000 backtraces per trace by default
     
-    public static final int CURRENT_VERSION = 2;
+    public static final int CURRENT_VERSION = 0; // current W3C trace context version as of 2021
     
     private long creationTimestamp; //creation timestamp in millisec
     private Long traceId;
@@ -94,8 +93,8 @@ public class Metadata {
         this.creationTimestamp = toClone.creationTimestamp;
         this.numEvents = toClone.numEvents; //use the same instance of numEvent as we want to keep a centralized counter for all clones
         this.numBacktraces = toClone.numBacktraces; //use the same instance of numBacktraces as we want to keep a centralized counter for all clones
-        System.arraycopy(toClone.taskID, 0, this.taskID, 0, MAX_TASK_ID_LEN);
-        System.arraycopy(toClone.opID, 0, this.opID, 0, MAX_OP_ID_LEN);
+        System.arraycopy(toClone.taskID, 0, this.taskID, 0, TASK_ID_LEN);
+        System.arraycopy(toClone.opID, 0, this.opID, 0, OP_ID_LEN);
         this.flags = toClone.flags;
         this.traceId = toClone.traceId;
         this.reportMetrics = toClone.reportMetrics;
@@ -138,10 +137,10 @@ public class Metadata {
     
     /** Clears Task and Op IDs */
     public void initialize() {
-        taskID = new byte[MAX_TASK_ID_LEN];
-        taskLen = MAX_TASK_ID_LEN;
-        opID = new byte[MAX_OP_ID_LEN];
-        opLen = MAX_OP_ID_LEN;
+        taskID = new byte[TASK_ID_LEN];
+        taskLen = TASK_ID_LEN;
+        opID = new byte[OP_ID_LEN];
+        opLen = OP_ID_LEN;
         flags = 0x0;
         isAsync = false;
         traceId = null;
@@ -188,7 +187,15 @@ public class Metadata {
 
     public void setOpID(Metadata md) {
         this.opLen = md.opLen;
-        System.arraycopy(md.opID, 0, this.opID, 0, MAX_OP_ID_LEN);
+        setOpID(md.opID);
+    }
+
+    public void setOpID(String opId) throws OboeException {
+        setOpID(hexToBytes(opId));
+    }
+
+    public void setOpID(byte[] opId) {
+        System.arraycopy(opId, 0, this.opID, 0, OP_ID_LEN);
     }
     
     /**
@@ -281,6 +288,7 @@ public class Metadata {
     }
 
     /**  Packs metadata into byte buffer */
+    // TODO: check pack
     public byte[] getPackedMetadata(int version) {
         int bufSize = 1 + taskLen + opLen + 1; //header byte, task ID, op ID, flags
         byte buf[] = new byte[bufSize];
@@ -294,16 +302,25 @@ public class Metadata {
 
         // Task and Op ID data:
         int writeMarker = 1;
+        buf[writeMarker++] = '-';
+
         System.arraycopy(taskID, 0, buf, writeMarker, taskLen);
         writeMarker += taskLen;
+
+        buf[writeMarker++] = '-';
+
         System.arraycopy(opID, 0, buf, writeMarker, opLen);
         writeMarker += opLen;
+
+        buf[writeMarker++] = '-';
+
         buf[writeMarker] = flags;        
 
         return buf;
     }
 
     /** Populates this object from packed metadata contained in the byte buffer */
+    // TODO: check unpack
     public void unpackMetadata(byte buf[])
         throws OboeException {
 
@@ -317,23 +334,18 @@ public class Metadata {
             throw new OboeException("Unexpected version. Found " + version + " but expected " + CURRENT_VERSION);
         }
 
-        int taskLen = ((header & MASK_TASK_ID_LEN) + 1) << 2;
-        taskLen = (taskLen == 16 ? 20 : taskLen);
-        int opLen = (((header & MASK_OP_ID_LEN ) >> 3) + 1) << 2;
-
-        int expectedLen = 1 + taskLen + opLen + 1; //header + task id + op id + flags
+        int expectedLen = 1 + TASK_ID_LEN + OP_ID_LEN + 1 + 3; //header + task id + op id + flags + delimiters
         if (buf.length < expectedLen ) {
             throw new OboeException("Invalid buffer length: expected " + expectedLen);
         }
 
-        this.taskLen = taskLen;
-        this.opLen = opLen;
-
-        int readMarker = 1;
+        int readMarker = 2; // the version and the delimiter
         System.arraycopy(buf, readMarker, taskID, 0, taskLen);
         readMarker += taskLen;
+        readMarker++; // the '-' delimiter
         System.arraycopy(buf, readMarker, opID, 0, opLen);
         readMarker += opLen;
+        readMarker++; // the '-' delimiter
         this.flags = buf[readMarker];
         
         this.creationTimestamp =  System.currentTimeMillis(); //a new task id, consider this a new metadata
@@ -356,6 +368,14 @@ public class Metadata {
      */
     public String toHexString(int versionOverride) {
         return bytesToHex(getPackedMetadata(versionOverride));
+    }
+
+    public byte[] getOpID() {
+        return opID;
+    }
+
+    public byte[] getTaskID() {
+        return taskID;
     }
 
     public String opHexString() {
@@ -413,17 +433,24 @@ public class Metadata {
         return bytesToHex(bytes, bytes.length);
     }
 
+    // TODO:
     private String bytesToHex(byte[] bytes, int len) {
         char[] hexChars = new char[len * 2];
         int v;
         for (int j = 0; j < len; j++) {
             v = bytes[j] & 0xFF;
+
+            if (v == '-') {
+                hexChars[j++] = '-';
+                continue;
+            }
             hexChars[j*2] = hexTable[v/16];
             hexChars[j*2 + 1] = hexTable[v%16];
         }
         return new String(hexChars);
     }
 
+    // TODO
     private byte[] hexToBytes(String s)
             throws OboeException {
         int len = s.length();
@@ -433,9 +460,15 @@ public class Metadata {
         }
 
         byte[] buf = new byte[len / 2];
-        for (int i = 0; i < len; i += 2) {
-            buf[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
+        for (int i = 0, j = 0; i < len; j++) {
+            if (s.charAt(i) == '-') {
+                buf[j] = '-';
+                i++;
+                continue;
+            }
+            buf[j] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
                     + Character.digit(s.charAt(i+1), 16));
+            i += 2;
         }
         return buf;
     }

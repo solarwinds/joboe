@@ -6,8 +6,8 @@ package com.tracelytics.joboe;
 public class Constants {
     
     public static final int
-            MAX_TASK_ID_LEN = 20,
-            MAX_OP_ID_LEN = 8,
+            TASK_ID_LEN = 16,
+            OP_ID_LEN = 8,
             MAX_METADATA_PACK_LEN = 512,
             
             MASK_TASK_ID_LEN = 0x03,
