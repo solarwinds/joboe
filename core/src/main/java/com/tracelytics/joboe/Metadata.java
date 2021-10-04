@@ -33,7 +33,9 @@ public class Metadata {
     
     private int taskLen = TASK_ID_LEN;
     private int opLen = OP_ID_LEN;
-    
+    public static final int METADATA_BUF_SIZE = 1 + TASK_ID_LEN + OP_ID_LEN + 1 + 3;
+    public static final int METADATA_HEX_STRING_SIZE = (1 + TASK_ID_LEN + OP_ID_LEN + 1) * 2 + 3;
+
     private byte flags;
     
     private boolean isAsync;
@@ -50,7 +52,7 @@ public class Metadata {
     public static final int DEFAULT_MAX_BACKTRACES = 1000; // max 1000 backtraces per trace by default
     
     public static final int CURRENT_VERSION = 0; // current W3C trace context version as of 2021
-    
+
     private long creationTimestamp; //creation timestamp in millisec
     private Long traceId;
     private AtomicInteger numEvents = new AtomicInteger();
@@ -288,17 +290,11 @@ public class Metadata {
     }
 
     /**  Packs metadata into byte buffer */
-    // TODO: check pack
     public byte[] getPackedMetadata(int version) {
-        int bufSize = 1 + taskLen + opLen + 1; //header byte, task ID, op ID, flags
-        byte buf[] = new byte[bufSize];
-
-        int taskBits = (taskLen >> 2) - 1;
+        byte[] buf = new byte[METADATA_BUF_SIZE];
 
         // Header with version and lengths:
-        buf[0] = (byte) (version << 4);
-        buf[0] |= (taskBits == 4) ? 3 : taskBits;
-        buf[0] |= ((opLen >> 2) - 1) << 3;
+        buf[0]  = CURRENT_VERSION;
 
         // Task and Op ID data:
         int writeMarker = 1;
@@ -321,7 +317,7 @@ public class Metadata {
 
     /** Populates this object from packed metadata contained in the byte buffer */
     // TODO: check unpack
-    public void unpackMetadata(byte buf[])
+    public void unpackMetadata(byte[] buf)
         throws OboeException {
 
         if (buf == null || buf.length < 1) {
@@ -435,17 +431,18 @@ public class Metadata {
 
     // TODO:
     private String bytesToHex(byte[] bytes, int len) {
-        char[] hexChars = new char[len * 2];
+        char[] hexChars = new char[len * 2 - 3];
         int v;
-        for (int j = 0; j < len; j++) {
-            v = bytes[j] & 0xFF;
+        for (int i = 0, j = 0; i < len; i++) {
+            v = bytes[i] & 0xFF;
 
             if (v == '-') {
                 hexChars[j++] = '-';
                 continue;
             }
-            hexChars[j*2] = hexTable[v/16];
-            hexChars[j*2 + 1] = hexTable[v%16];
+            hexChars[j] = hexTable[v >>> 4];
+            hexChars[j + 1] = hexTable[v & 0x0F];
+            j += 2;
         }
         return new String(hexChars);
     }
@@ -455,11 +452,11 @@ public class Metadata {
             throws OboeException {
         int len = s.length();
 
-        if ((len % 2) != 0 || len > MAX_METADATA_PACK_LEN) {
+        if ((len % 2) == 0 || len > METADATA_HEX_STRING_SIZE) {
             throw new OboeException("Invalid string length");
         }
 
-        byte[] buf = new byte[len / 2];
+        byte[] buf = new byte[METADATA_BUF_SIZE];
         for (int i = 0, j = 0; i < len; j++) {
             if (s.charAt(i) == '-') {
                 buf[j] = '-';

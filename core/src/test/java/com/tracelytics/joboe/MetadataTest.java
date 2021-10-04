@@ -58,20 +58,16 @@ public class MetadataTest extends TestCase {
     
     public void testCompatibility() {
         //should not accept trace id from different version
-        String v1Id = "1BB756176FF90D0B1AB7CDB563427CB7072B1F4AAABE5C8FA55EC67FE9";
-        String v2Id = "2BB756176FF90D0B1AB7CDB563427CB7072B1F4AAABE5C8FA55EC67FE901";
-        String v2IdOptsEnabled = "2FB756176FF90D0B1AB7CDB563427CB7072B1F4AAABE5C8FA55EC67FE901FFFF"; //assuming we have a v2 with opts enabled, should be okay
-        String v3Id = "3FB756176FF90D0B1AB7CDB563427CB7072B1F4AAABE5C8FA55EC67FE901FFFF";
-        
+        String v1Id = "01-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01";
+        String v2Id = "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01";
+
         assertFalse(Metadata.isCompatible(v1Id));
         assertTrue(Metadata.isCompatible(v2Id));
-        assertTrue(Metadata.isCompatible(v2IdOptsEnabled));
-        assertFalse(Metadata.isCompatible(v3Id));
     }
     
     public void testSampled() throws OboeException {
-        String sampledId = "2BB756176FF90D0B1AB7CDB563427CB7072B1F4AAABE5C8FA55EC67FE901";
-        String notSampledId = "2BB756176FF90D0B1AB7CDB563427CB7072B1F4AAABE5C8FA55EC67FE900";
+        String sampledId = "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01";
+        String notSampledId = "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-00";
         
         assertTrue(new Metadata(sampledId).isSampled());
         assertFalse(new Metadata(notSampledId).isSampled());
