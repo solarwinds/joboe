@@ -52,6 +52,8 @@ public class Metadata {
     public static final int DEFAULT_MAX_BACKTRACES = 1000; // max 1000 backtraces per trace by default
     
     public static final int CURRENT_VERSION = 0; // current W3C trace context version as of 2021
+    public static final String CURRENT_VERSION_HEXSTRING = "" + hexTable[CURRENT_VERSION >>> 4] + hexTable[CURRENT_VERSION & 0x0F];
+    public static final String HEXSTRING_DELIMETER = "-";
 
     private long creationTimestamp; //creation timestamp in millisec
     private Long traceId;
@@ -213,11 +215,15 @@ public class Metadata {
      * @return
      */
     public boolean isSampled() {
-        return getFlag(Flag.SAMPLED); 
+        return getFlag(Flag.SAMPLED);
     }
     
     public boolean getFlag(Flag flag) {
-        return (flags & flag.mask) == flag.mask; 
+        return (flags & flag.mask) == flag.mask;
+    }
+
+    public byte getFlags() {
+        return flags;
     }
 
     public void setSampled(boolean sampled) {
