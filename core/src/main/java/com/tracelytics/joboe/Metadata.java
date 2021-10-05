@@ -437,20 +437,19 @@ public class Metadata {
 
     // TODO:
     private String bytesToHex(byte[] bytes, int len) {
-        char[] hexChars = new char[len * 2 - 3];
+        StringBuilder sb = new StringBuilder();
         int v;
-        for (int i = 0, j = 0; i < len; i++) {
+        for (int i = 0; i < len; i++) {
             v = bytes[i] & 0xFF;
 
             if (v == '-') {
-                hexChars[j++] = '-';
+                sb.append('-');
                 continue;
             }
-            hexChars[j] = hexTable[v >>> 4];
-            hexChars[j + 1] = hexTable[v & 0x0F];
-            j += 2;
+            sb.append(hexTable[v >>> 4]);
+            sb.append(hexTable[v & 0x0F]);
         }
-        return new String(hexChars);
+        return sb.toString();
     }
 
     // TODO
