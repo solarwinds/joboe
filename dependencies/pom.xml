@@ -7,9 +7,9 @@
       <artifactId>appoptics-parent</artifactId>
 	  <version>${revision}</version>
   </parent>
-  
+
   <artifactId>dependencies</artifactId>
-<!--  <version>${agent.version}</version>-->
+  <version>7.0.0</version>
   <packaging>jar</packaging>
 
   <name>dependencies</name>
