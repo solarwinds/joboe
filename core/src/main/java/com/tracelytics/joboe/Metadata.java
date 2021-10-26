@@ -461,7 +461,7 @@ public class Metadata {
             throws OboeException {
         int len = s.length();
 
-        if ((len % 2) == 0 || len > METADATA_HEX_STRING_SIZE) {
+        if (len > METADATA_HEX_STRING_SIZE) {
             throw new OboeException("Invalid string length");
         }
 
@@ -473,7 +473,7 @@ public class Metadata {
                 continue;
             }
             buf[j] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
-                    + Character.digit(s.charAt(i+1), 16));
+                    + i+1 < len ? Character.digit(s.charAt(i+1), 16) : 0);
             i += 2;
         }
         return buf;
