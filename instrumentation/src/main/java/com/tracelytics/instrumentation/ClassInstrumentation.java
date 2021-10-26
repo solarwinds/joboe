@@ -33,7 +33,7 @@ public abstract class ClassInstrumentation {
     
     public static final String X_SPAN_KEY = "x-tv-span";
     protected static final String X_TRACE_OPTIONS_KEY = "X-Trace-Options";
-    public static final String XTRACE_HEADER = HeaderConstants.XTRACE_HEADER;
+    public static final String XTRACE_HEADER = HeaderConstants.W3C_TRACE_CONTEXT_HEADER;
     public static final String X_TRACE_OPTIONS_RESPONSE_KEY = "X-Trace-Options-Response";
     private static final String X_TRACE_OPTIONS_SIGNATURE_KEY = "X-Trace-Options-Signature";
     protected static final Tracer tracer = Tracer.INSTANCE;

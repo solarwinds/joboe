@@ -39,7 +39,7 @@ public class Tracer implements com.tracelytics.joboe.span.Tracer {
         injectors.put(Format.Builtin.HTTP_HEADERS, new Injector<TextMap>() {
             public void inject(com.tracelytics.joboe.span.SpanContext spanContext, TextMap carrier) {
                 if (spanContext instanceof SpanContext && ((SpanContext) spanContext).getMetadata().isValid()) {
-                    carrier.put(HeaderConstants.XTRACE_HEADER, ((SpanContext) spanContext).getMetadata().toHexString());
+                    carrier.put(HeaderConstants.W3C_TRACE_CONTEXT_HEADER, ((SpanContext) spanContext).getMetadata().toHexString());
                 }
             }
         });
