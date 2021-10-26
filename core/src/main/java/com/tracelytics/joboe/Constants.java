@@ -13,7 +13,6 @@ public class Constants {
             MASK_TASK_ID_LEN = 0x03,
             MASK_OP_ID_LEN  = 0x08,
             MASK_HAS_OPTIONS = 0x04,  // unused?
-            MASK_VERSION = 0xF0,
 
 //            MAX_UDP_PKT_SZ = 65507, // (65535 max IP packet size - 20 IPv4 header - 8 UDP header)
             MAX_EVENT_BUFFER_SIZE = 512 * 1024, //512kB. This should not be bound by UDP size anymore with SSL reporting, though we still want to have some limit

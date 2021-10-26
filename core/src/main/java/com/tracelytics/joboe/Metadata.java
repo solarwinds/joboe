@@ -1,7 +1,5 @@
 package com.tracelytics.joboe;
 
-import static com.tracelytics.joboe.Constants.MASK_VERSION;
-import static com.tracelytics.joboe.Constants.MAX_METADATA_PACK_LEN;
 import static com.tracelytics.joboe.Constants.OP_ID_LEN;
 import static com.tracelytics.joboe.Constants.TASK_ID_LEN;
 
@@ -330,8 +328,7 @@ public class Metadata {
             throw new OboeException("Byte buffer is not valid");
         }
 
-        byte header = buf[0];
-        int version = (header & MASK_VERSION) >> 4; 
+        int version = buf[0];
         if (version  != CURRENT_VERSION) {
             throw new OboeException("Unexpected version. Found " + version + " but expected " + CURRENT_VERSION);
         }
