@@ -473,7 +473,7 @@ public class Metadata {
                 continue;
             }
             buf[j] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
-                    + i+1 < len ? Character.digit(s.charAt(i+1), 16) : 0);
+                    + (i+1 < len ? Character.digit(s.charAt(i+1), 16) : 0));
             i += 2;
         }
         return buf;
