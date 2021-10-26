@@ -293,12 +293,17 @@ public class Metadata {
         return Arrays.equals(opID, md.opID);
     }
 
-    /**  Packs metadata into byte buffer */
+    /**  Packs metadata into byte buffer. Note that it should be used for test purpose only. The CURRENT_VERSION
+     * should always be used in non-test code.
+     *
+     * @param version
+     * @return
+     */
     public byte[] getPackedMetadata(int version) {
         byte[] buf = new byte[METADATA_BUF_SIZE];
 
         // Header with version and lengths:
-        buf[0]  = CURRENT_VERSION;
+        buf[0]  = (byte)version;
 
         // Task and Op ID data:
         int writeMarker = 1;
