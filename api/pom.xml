@@ -167,6 +167,55 @@
       </plugin>
     </plugins>
   </build>
+  <profiles>
+    <profile>
+      <id>sign-artifacts</id>
+      <activation>
+        <property>
+          <name>gpg-sign</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+                <configuration>
+                  <keyname>appoptics-agent</keyname>
+                  <passphrase>${gpg.passphrase}</passphrase>
+                  <!-- Prevent gpg from using pinentry programs -->
+                  <gpgArguments>
+                    <arg>--pinentry-mode</arg>
+                    <arg>loopback</arg>
+                  </gpgArguments>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <!-- skip tests of the api module in this branch because the core is for Otel custom distro only
+     the Joboe agent is no longer compatible with it.-->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>2.4.2</version>
+            <configuration>
+              <skipTests>true</skipTests>
+            </configuration>
+          </plugin>
+
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
   
   
   

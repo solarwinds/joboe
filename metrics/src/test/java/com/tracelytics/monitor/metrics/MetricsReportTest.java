@@ -287,7 +287,10 @@ public class MetricsReportTest extends TestCase {
         assertTrue(postedMetrics.containsKey("Timestamp_u"));
         assertTrue(postedMetrics.containsKey("UnameSysName"));
         assertTrue(postedMetrics.containsKey("UnameVersion"));
-        assertTrue(postedMetrics.containsKey("Distro"));
+        HostInfoUtils.OsType osType = HostInfoUtils.getOsType();
+        if (osType == HostInfoUtils.OsType.WINDOWS || osType == HostInfoUtils.OsType.LINUX) {
+            assertTrue(postedMetrics.containsKey("Distro"));
+        }
         NetworkAddressInfo networkInfo = HostInfoUtils.getNetworkAddressInfo();
         if (networkInfo != null) {
             if (!networkInfo.getIpAddresses().isEmpty()) {

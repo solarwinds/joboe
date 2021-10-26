@@ -56,6 +56,18 @@
                     <testTarget>8</testTarget>
                 </configuration>
             </plugin>
+
+            <!-- skip tests of the instrumentation module in this branch because the core is for Otel custom distro only
+the Joboe agent is no longer compatible with it.-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.4.2</version>
+                <configuration>
+                    <skipTests>true</skipTests>
+                </configuration>
+            </plugin>
+
         </plugins>
     </build>
 </project>

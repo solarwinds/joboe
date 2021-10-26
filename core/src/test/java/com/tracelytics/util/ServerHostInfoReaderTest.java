@@ -33,7 +33,10 @@ public class ServerHostInfoReaderTest extends TestCase {
         
         assert(hostMetadata.containsKey("UnameSysName"));
         assert(hostMetadata.containsKey("UnameVersion"));
-        assert(hostMetadata.containsKey("Distro"));
+        HostInfoUtils.OsType osType = HostInfoUtils.getOsType();
+        if (osType == HostInfoUtils.OsType.LINUX || osType == HostInfoUtils.OsType.WINDOWS) {
+            assert (hostMetadata.containsKey("Distro"));
+        }
         NetworkAddressInfo networkInfo = reader.getNetworkAddressInfo();
         if (networkInfo != null) {
             if (!networkInfo.getIpAddresses().isEmpty()) {
