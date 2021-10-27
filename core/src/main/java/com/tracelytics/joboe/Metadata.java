@@ -293,20 +293,19 @@ public class Metadata {
         return Arrays.equals(opID, md.opID);
     }
 
-    /**  Packs metadata into byte buffer. Note that it should be used for test purpose only. The CURRENT_VERSION
-     * should always be used in non-test code.
+    /**  Packs metadata into byte buffer. Note that the parameter `version` is currently used for testing only.
      *
      * @param version
      * @return
      */
     public byte[] getPackedMetadata(int version) {
         byte[] buf = new byte[METADATA_BUF_SIZE];
+        int writeMarker = 0;
 
         // Header with version and lengths:
-        buf[0]  = (byte)version;
+        buf[writeMarker++]  = (byte)version;
 
         // Task and Op ID data:
-        int writeMarker = 1;
         buf[writeMarker++] = '-';
 
         System.arraycopy(taskID, 0, buf, writeMarker, taskLen);
@@ -325,7 +324,6 @@ public class Metadata {
     }
 
     /** Populates this object from packed metadata contained in the byte buffer */
-    // TODO: check unpack
     public void unpackMetadata(byte[] buf)
         throws OboeException {
 
@@ -437,6 +435,12 @@ public class Metadata {
         return bytesToHex(bytes, bytes.length);
     }
 
+    /**
+     * This method checks if the position is one of the delimiter positions in a W3C trace context.
+     * @param len
+     * @param index
+     * @return
+     */
     private boolean isW3CDelimiterPos(int len, int index) {
         if (len != METADATA_BUF_SIZE) {
             return false;
@@ -444,7 +448,6 @@ public class Metadata {
         return index == 1 || index == 18 || index == 27;
     }
 
-    // TODO:
     private String bytesToHex(byte[] bytes, int len) {
         StringBuilder sb = new StringBuilder();
         int v;

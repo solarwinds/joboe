@@ -59,10 +59,10 @@ public class MetadataTest extends TestCase {
     public void testCompatibility() {
         //should not accept trace id from different version
         String v1Id = "01-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01";
-        String v2Id = "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01";
+        String v0Id = "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01";
 
         assertFalse(Metadata.isCompatible(v1Id));
-        assertTrue(Metadata.isCompatible(v2Id));
+        assertTrue(Metadata.isCompatible(v0Id));
     }
     
     public void testSampled() throws OboeException {
