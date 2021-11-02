@@ -18,7 +18,7 @@ import java.util.*;
  *
  */
 public enum ConfigProperty {
-    AGENT_CONFIG (new ConfigKey(null, null, "config"), ConfigGroup.AGENT, String.class),
+    AGENT_CONFIG (new ConfigKey(null, "APPOPTICS_CONFIG_FILE", "config"), ConfigGroup.AGENT, String.class),
     AGENT_DEBUG (new ConfigKey(null, null, "debug"), ConfigGroup.AGENT, Boolean.class),
     AGENT_LOGGING (new ConfigKey("agent.logging", null, "logging"), ConfigGroup.AGENT, String.class),
     AGENT_LOGGING_TRACE_ID (new ConfigKey("agent.logging.traceId"), ConfigGroup.AGENT, String.class),
