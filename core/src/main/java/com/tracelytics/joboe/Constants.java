@@ -26,7 +26,7 @@ public class Constants {
     public static final String
             SW_W3C_KEY_PREFIX = "sw.",
             XTR_ASYNC_KEY = "Async",
-            XTR_EDGE_KEY = "Edge",
+            XTR_EDGE_KEY = SW_W3C_KEY_PREFIX + "parent_span_id",
             XTR_THREAD_ID_KEY = "TID",
             XTR_HOSTNAME_KEY = "Hostname",
             XTR_METADATA_KEY = SW_W3C_KEY_PREFIX + "trace_context",
