@@ -39,65 +39,65 @@
                 <version>${revision}</version>
             </dependency>
 
-            <dependency>
-                <groupId>com.appoptics.agent.java</groupId>
-                <artifactId>instrumentation</artifactId>
-                <version>${revision}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>com.appoptics.agent.java</groupId>-->
+<!--                <artifactId>instrumentation</artifactId>-->
+<!--                <version>${revision}</version>-->
+<!--            </dependency>-->
 
-            <dependency>
-                <groupId>com.appoptics.agent.java</groupId>
-                <artifactId>agent</artifactId>
-                <version>${revision}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>com.appoptics.agent.java</groupId>-->
+<!--                <artifactId>agent</artifactId>-->
+<!--                <version>${revision}</version>-->
+<!--            </dependency>-->
 
-            <dependency>
-                <groupId>com.appoptics.agent.java</groupId>
-                <artifactId>instrumentation-kafka</artifactId>
-                <version>${revision}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>com.appoptics.agent.java</groupId>-->
+<!--                <artifactId>instrumentation-kafka</artifactId>-->
+<!--                <version>${revision}</version>-->
+<!--            </dependency>-->
 
-            <dependency>
-                <groupId>com.appoptics.agent.java</groupId>
-                <artifactId>instrumentation-rabbit-mq</artifactId>
-                <version>${revision}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>com.appoptics.agent.java</groupId>-->
+<!--                <artifactId>instrumentation-rabbit-mq</artifactId>-->
+<!--                <version>${revision}</version>-->
+<!--            </dependency>-->
 
-            <dependency>
-                <groupId>com.appoptics.agent.java</groupId>
-                <artifactId>instrumentation-reactor</artifactId>
-                <version>${revision}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>com.appoptics.agent.java</groupId>-->
+<!--                <artifactId>instrumentation-reactor</artifactId>-->
+<!--                <version>${revision}</version>-->
+<!--            </dependency>-->
 
-            <dependency>
-                <groupId>com.appoptics.agent.java</groupId>
-                <artifactId>instrumentation-mongo-2</artifactId>
-                <version>${revision}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>com.appoptics.agent.java</groupId>-->
+<!--                <artifactId>instrumentation-mongo-2</artifactId>-->
+<!--                <version>${revision}</version>-->
+<!--            </dependency>-->
 
-            <dependency>
-                <groupId>com.appoptics.agent.java</groupId>
-                <artifactId>instrumentation-mongo-3</artifactId>
-                <version>${revision}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>com.appoptics.agent.java</groupId>-->
+<!--                <artifactId>instrumentation-mongo-3</artifactId>-->
+<!--                <version>${revision}</version>-->
+<!--            </dependency>-->
 
-            <dependency>
-                <groupId>com.appoptics.agent.java</groupId>
-                <artifactId>instrumentation-mongo-4</artifactId>
-                <version>${revision}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>com.appoptics.agent.java</groupId>-->
+<!--                <artifactId>instrumentation-mongo-4</artifactId>-->
+<!--                <version>${revision}</version>-->
+<!--            </dependency>-->
 
-            <dependency>
-                <groupId>com.appoptics.agent.java</groupId>
-                <artifactId>instrumentation-redisson-2</artifactId>
-                <version>${revision}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>com.appoptics.agent.java</groupId>-->
+<!--                <artifactId>instrumentation-redisson-2</artifactId>-->
+<!--                <version>${revision}</version>-->
+<!--            </dependency>-->
 
-            <dependency>
-                <groupId>com.appoptics.agent.java</groupId>
-                <artifactId>instrumentation-redisson-3</artifactId>
-                <version>${revision}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>com.appoptics.agent.java</groupId>-->
+<!--                <artifactId>instrumentation-redisson-3</artifactId>-->
+<!--                <version>${revision}</version>-->
+<!--            </dependency>-->
         </dependencies>
     </dependencyManagement>
 
@@ -192,17 +192,18 @@
     <modules>
         <module>dependencies</module>
         <module>core</module>
-        <module>instrumentation</module>
-        <module>instrumentation/kafka</module>
-        <module>instrumentation/reactor</module>
-        <module>instrumentation/mongo-2</module>
-        <module>instrumentation/mongo-3</module>
-        <module>instrumentation/mongo-4</module>
-        <module>instrumentation/rabbit-mq</module>
-        <module>instrumentation/redisson-2</module>
-        <module>instrumentation/redisson-3</module>
-        <module>agent</module>
-        <module>api</module>
+		<module>metrics</module>
+<!--        <module>instrumentation</module>-->
+<!--        <module>instrumentation/kafka</module>-->
+<!--        <module>instrumentation/reactor</module>-->
+<!--        <module>instrumentation/mongo-2</module>-->
+<!--        <module>instrumentation/mongo-3</module>-->
+<!--        <module>instrumentation/mongo-4</module>-->
+<!--        <module>instrumentation/rabbit-mq</module>-->
+<!--        <module>instrumentation/redisson-2</module>-->
+<!--        <module>instrumentation/redisson-3</module>-->
+<!--        <module>agent</module>-->
+<!--        <module>api</module>-->
     </modules>
 
 </project>
