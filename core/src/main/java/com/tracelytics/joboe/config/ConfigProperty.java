@@ -20,7 +20,7 @@ import java.util.*;
 public enum ConfigProperty {
     AGENT_CONFIG (new ConfigKey(null, "APPOPTICS_CONFIG_FILE", "config"), ConfigGroup.AGENT, String.class),
     AGENT_DEBUG (new ConfigKey(null, null, "debug"), ConfigGroup.AGENT, Boolean.class),
-    AGENT_LOGGING (new ConfigKey("agent.logging", null, "logging"), ConfigGroup.AGENT, String.class),
+    AGENT_LOGGING (new ConfigKey("agent.logging", "APPOPTICS_LOGGING_LEVEL", "logging"), ConfigGroup.AGENT, String.class),
     AGENT_LOGGING_TRACE_ID (new ConfigKey("agent.logging.traceId"), ConfigGroup.AGENT, String.class),
     AGENT_TRACING_MODE (new ConfigKey("agent.tracingMode", null, "tracing_mode"), ConfigGroup.AGENT, String.class),
     AGENT_SAMPLE_RATE (new ConfigKey("agent.sampleRate", null, "sampling_rate", "sample_rate"), ConfigGroup.AGENT, Integer.class),
