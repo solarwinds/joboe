@@ -10,7 +10,7 @@
     <name>appoptics-parent</name>
 
     <properties>
-        <revision>6.24.1</revision>
+        <revision>7.0.0</revision>
         <maven.plugin.version>1.0.0</maven.plugin.version>
         <is.snapshot></is.snapshot>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -19,25 +19,25 @@
         <project.build.outputTimestamp>${git.commit.time}</project.build.outputTimestamp>
     </properties>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>com.appoptics.agent.java</groupId>
-                <artifactId>dependencies</artifactId>
-                <version>${revision}</version>
-            </dependency>
+<!--    <dependencyManagement>-->
+<!--        <dependencies>-->
+<!--            <dependency>-->
+<!--                <groupId>com.appoptics.agent.java</groupId>-->
+<!--                <artifactId>dependencies</artifactId>-->
+<!--                <version>${revision}</version>-->
+<!--            </dependency>-->
 
-            <dependency>
-                <groupId>com.appoptics.agent.java</groupId>
-                <artifactId>core</artifactId>
-                <version>${revision}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>com.appoptics.agent.java</groupId>-->
+<!--                <artifactId>core</artifactId>-->
+<!--                <version>${revision}</version>-->
+<!--            </dependency>-->
 
-            <dependency>
-                <groupId>com.appoptics.agent.java</groupId>
-                <artifactId>metrics</artifactId>
-                <version>${revision}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>com.appoptics.agent.java</groupId>-->
+<!--                <artifactId>metrics</artifactId>-->
+<!--                <version>${revision}</version>-->
+<!--            </dependency>-->
 
 <!--            <dependency>-->
 <!--                <groupId>com.appoptics.agent.java</groupId>-->
@@ -98,8 +98,8 @@
 <!--                <artifactId>instrumentation-redisson-3</artifactId>-->
 <!--                <version>${revision}</version>-->
 <!--            </dependency>-->
-        </dependencies>
-    </dependencyManagement>
+<!--        </dependencies>-->
+<!--    </dependencyManagement>-->
 
     <build>
         <pluginManagement>
