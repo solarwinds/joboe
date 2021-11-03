@@ -117,6 +117,6 @@ public class GreetingController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return "=======\n\n" + response.toString() + "\n\n======";
+        return "=======\n\n" + response.toString() + "\n\n======\n";
     }
 }
