@@ -431,7 +431,7 @@ public class Metadata {
         return true;
     }
 
-    private String bytesToHex(byte[] bytes) {
+    public static String bytesToHex(byte[] bytes) {
         return bytesToHex(bytes, bytes.length);
     }
 
@@ -441,14 +441,14 @@ public class Metadata {
      * @param index
      * @return
      */
-    private boolean isW3CDelimiterPos(int len, int index) {
+    private static boolean isW3CDelimiterPos(int len, int index) {
         if (len != METADATA_BUF_SIZE) {
             return false;
         }
         return index == 1 || index == 18 || index == 27;
     }
 
-    private String bytesToHex(byte[] bytes, int len) {
+    private static String bytesToHex(byte[] bytes, int len) {
         StringBuilder sb = new StringBuilder();
         int v;
         for (int i = 0; i < len; i++) {

@@ -25,7 +25,7 @@ import java.util.concurrent.*;
  *
  */
 public class Profiler {
-    private static ConcurrentMap<Long, Profile> profileByTraceId = new ConcurrentHashMap<Long, Profiler.Profile>(); //for quicker lookup
+    private static ConcurrentMap<String, Profile> profileByTraceId = new ConcurrentHashMap<String, Profiler.Profile>(); //for quicker lookup
     private static final String APPOPTICS_THREAD_PREFIX = "AppOptics-";
     
     private static Logger logger = LoggerFactory.getLogger();
@@ -217,7 +217,7 @@ public class Profiler {
      * @param traceId
      * @return
      */
-    public static boolean addProfiledThread(Thread thread, Metadata metadata, long traceId) {
+    public static boolean addProfiledThread(Thread thread, Metadata metadata, String traceId) {
         if (thread.getName() != null && thread.getName().startsWith(APPOPTICS_THREAD_PREFIX)) { //do not instrument our own threads
             return false;
         }
@@ -262,7 +262,7 @@ public class Profiler {
      * @param profiledThread
      * @param traceId
      */
-    public static void removeProfiledThread(Thread profiledThread, long traceId) {
+    public static void removeProfiledThread(Thread profiledThread, String traceId) {
         Profile profile = profileByTraceId.get(traceId);
         if (profile != null) {
             if (profile.stopProfilingOnThread(profiledThread)) {

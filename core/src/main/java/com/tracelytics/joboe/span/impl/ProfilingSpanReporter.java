@@ -1,5 +1,6 @@
 package com.tracelytics.joboe.span.impl;
 
+import com.tracelytics.joboe.Metadata;
 import com.tracelytics.joboe.config.ConfigManager;
 import com.tracelytics.joboe.config.ConfigProperty;
 import com.tracelytics.logging.Logger;
@@ -30,7 +31,7 @@ public class ProfilingSpanReporter implements SpanReporter {
     @Override
     public void reportOnStart(Span span) {
         if (IS_ENABLED && span.context().getMetadata().isSampled()) {
-            boolean spanProfiled = Profiler.addProfiledThread(Thread.currentThread(), span.context().getMetadata(), span.context().getTraceId());
+            boolean spanProfiled = Profiler.addProfiledThread(Thread.currentThread(), span.context().getMetadata(), Metadata.bytesToHex(span.context().getMetadata().getTaskID()));
             span.setTag("ProfilerStatus", Profiler.getStatus().toString());
             if (spanProfiled) {
                 //increment the profile span count on the tracing span so it can report # of outstanding profiling span on exit
