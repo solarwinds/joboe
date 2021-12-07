@@ -46,7 +46,7 @@ public class ProfilingSpanReporter implements SpanReporter {
       //Cannot check for span.context().getMetadata().isSampled() unfortunately as TracingSpanReporter might have cleared the sampled flag already upon exit
       //which means such a check might actual prevent profiler from stopping properly on sampled requests  
         if (IS_ENABLED) {
-            Profiler.stopProfile(span.context().getTraceId());
+            Profiler.stopProfile(Metadata.bytesToHex(span.context().getMetadata().getTaskID()));
         }
     }
     

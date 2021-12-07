@@ -247,7 +247,7 @@ public class Profiler {
      * @param traceId
      * @return
      */
-    public static Profile stopProfile(long traceId) {
+    public static Profile stopProfile(String traceId) {
         Profile profile = profileByTraceId.remove(traceId);
         
         if (profile != null) {
