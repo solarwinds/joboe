@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 public class TestJob {
     private static io.opentelemetry.trace.Tracer tracer = io.opentelemetry.OpenTelemetry.getTracerProvider().get("test", "1.0");
-    private static final String SERVICE_KEY = System.getenv("APPOPTICS_SERVICE_KEY");
+    private static final String SERVICE_KEY = System.getenv("SOLARWINDS_SERVICE_KEY");
 
     public static void main(String[] args) throws InterruptedException {
         //Begin A La Carte mode (from artifact appoptics-opentelemetry-sdk-standalone)

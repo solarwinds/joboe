@@ -18,19 +18,19 @@ import java.util.*;
  *
  */
 public enum ConfigProperty {
-    AGENT_CONFIG (new ConfigKey(null, "APPOPTICS_CONFIG_FILE", "config"), ConfigGroup.AGENT, String.class),
+    AGENT_CONFIG (new ConfigKey(null, EnvPrefix.PRODUCT + "CONFIG_FILE", "config"), ConfigGroup.AGENT, String.class),
     AGENT_DEBUG (new ConfigKey(null, null, "debug"), ConfigGroup.AGENT, Boolean.class),
-    AGENT_LOGGING (new ConfigKey("agent.logging", "APPOPTICS_LOGGING_LEVEL", "logging"), ConfigGroup.AGENT, String.class),
+    AGENT_LOGGING (new ConfigKey("agent.logging", EnvPrefix.PRODUCT + "LOGGING_LEVEL", "logging"), ConfigGroup.AGENT, String.class),
     AGENT_LOGGING_TRACE_ID (new ConfigKey("agent.logging.traceId"), ConfigGroup.AGENT, String.class),
     AGENT_TRACING_MODE (new ConfigKey("agent.tracingMode", null, "tracing_mode"), ConfigGroup.AGENT, String.class),
     AGENT_SAMPLE_RATE (new ConfigKey("agent.sampleRate", null, "sampling_rate", "sample_rate"), ConfigGroup.AGENT, Integer.class),
-    AGENT_SERVICE_KEY (new ConfigKey("agent.serviceKey", "APPOPTICS_SERVICE_KEY", "service_key"), ConfigGroup.AGENT, String.class),
+    AGENT_SERVICE_KEY (new ConfigKey("agent.serviceKey", EnvPrefix.PRODUCT + "SERVICE_KEY", "service_key"), ConfigGroup.AGENT, String.class),
     AGENT_LAYER (new ConfigKey("agent.layer", null, "layer"), ConfigGroup.AGENT, String.class),
     AGENT_JDBC_INST_ALL (new ConfigKey("agent.jdbcInstAll", null, "jdbc_inst_all"), ConfigGroup.AGENT, Boolean.class),
-    AGENT_SQL_SANITIZE (new ConfigKey("agent.sqlSanitize", "APPOPTICS_SQL_SANITIZE", "sql_sanitize") , ConfigGroup.AGENT, Integer.class),
-    AGENT_SQL_QUERY_MAX_LENGTH(new ConfigKey("agent.sqlQueryMaxLength", "APPOPTICS_MAX_SQL_QUERY_LENGTH"), ConfigGroup.AGENT, Integer.class),
-    AGENT_MONGO_SANITIZE (new ConfigKey("agent.mongoSanitize", "APPOPTICS_MONGO_SANITIZE", "mongo_sanitize") , ConfigGroup.AGENT, Boolean.class),
-    AGENT_KAFKA_PROPAGATION(new ConfigKey("agent.kafkaPropagation", "APPOPTICS_KAFKA_PROPAGATION", "kafka_propagation"), ConfigGroup.AGENT, Boolean.class),
+    AGENT_SQL_SANITIZE (new ConfigKey("agent.sqlSanitize", EnvPrefix.PRODUCT + "SQL_SANITIZE", "sql_sanitize") , ConfigGroup.AGENT, Integer.class),
+    AGENT_SQL_QUERY_MAX_LENGTH(new ConfigKey("agent.sqlQueryMaxLength", EnvPrefix.PRODUCT + "MAX_SQL_QUERY_LENGTH"), ConfigGroup.AGENT, Integer.class),
+    AGENT_MONGO_SANITIZE (new ConfigKey("agent.mongoSanitize", EnvPrefix.PRODUCT + "MONGO_SANITIZE", "mongo_sanitize") , ConfigGroup.AGENT, Boolean.class),
+    AGENT_KAFKA_PROPAGATION(new ConfigKey("agent.kafkaPropagation", EnvPrefix.PRODUCT + "KAFKA_PROPAGATION", "kafka_propagation"), ConfigGroup.AGENT, Boolean.class),
     AGENT_EXCLUDE_CLASSES (new ConfigKey("agent.excludeClasses"), ConfigGroup.AGENT, String.class),
     AGENT_EXCLUDE_MODULES (new ConfigKey("agent.excludeModules"), ConfigGroup.AGENT, String.class),
     AGENT_URL_SAMPLE_RATE (new ConfigKey("agent.urlSampleRates"), ConfigGroup.AGENT, String.class),
@@ -45,41 +45,45 @@ public enum ConfigProperty {
     AGENT_CONTEXT_MAX_EVENTS(new ConfigKey("agent.contextMaxEvents"), ConfigGroup.AGENT, Integer.class),
     AGENT_CONTEXT_MAX_BACKTRACES(new ConfigKey("agent.contextMaxBacktraces"), ConfigGroup.AGENT, Integer.class),
     AGENT_HOSTNAME_ALIAS (new ConfigKey("agent.hostnameAlias", null, "hostname_alias"), ConfigGroup.AGENT, String.class),
-    AGENT_LOG_FILE(new ConfigKey(null, "APPOPTICS_JAVA_LOG_FILE", "log_file"), ConfigGroup.AGENT, String.class),
-    AGENT_COLLECTOR(new ConfigKey(null, "APPOPTICS_COLLECTOR"), ConfigGroup.AGENT, String.class),
-    AGENT_COLLECTOR_SERVER_CERT_LOCATION(new ConfigKey(null, "APPOPTICS_TRUSTEDPATH"), ConfigGroup.AGENT, String.class),
-    AGENT_EVENTS_FLUSH_INTERVAL(new ConfigKey(null, "APPOPTICS_EVENTS_FLUSH_INTERVAL"), ConfigGroup.AGENT, Integer.class),
+    AGENT_LOG_FILE(new ConfigKey(null, EnvPrefix.PRODUCT + "JAVA_LOG_FILE", "log_file"), ConfigGroup.AGENT, String.class),
+    AGENT_COLLECTOR(new ConfigKey(null, EnvPrefix.PRODUCT + "COLLECTOR"), ConfigGroup.AGENT, String.class),
+    AGENT_COLLECTOR_SERVER_CERT_LOCATION(new ConfigKey(null, EnvPrefix.PRODUCT + "TRUSTEDPATH"), ConfigGroup.AGENT, String.class),
+    AGENT_EVENTS_FLUSH_INTERVAL(new ConfigKey(null, EnvPrefix.PRODUCT + "EVENTS_FLUSH_INTERVAL"), ConfigGroup.AGENT, Integer.class),
     AGENT_TRANSACTION_NAME_PATTERN (new ConfigKey("transaction.namePattern"), ConfigGroup.AGENT, String.class),
     AGENT_DOMAIN_PREFIXED_TRANSACTION_NAME(new ConfigKey("transaction.prependDomain"), ConfigGroup.AGENT, Boolean.class),
-    AGENT_SYSMON_EARLY_START(new ConfigKey("agent.sysMonEarlyStart", "APPOPTICS_SYSMON_EARLY_START"), ConfigGroup.AGENT, Boolean.class),
-    AGENT_ENABLED(new ConfigKey("agent.enabled", "APPOPTICS_AGENT_ENABLED"), ConfigGroup.AGENT, Boolean.class),
-    AGENT_INIT_TIMEOUT(new ConfigKey("agent.initTimeout", "APPOPTICS_INIT_TIMEOUT"), ConfigGroup.AGENT, Integer.class),
+    AGENT_SYSMON_EARLY_START(new ConfigKey("agent.sysMonEarlyStart", EnvPrefix.PRODUCT + "SYSMON_EARLY_START"), ConfigGroup.AGENT, Boolean.class),
+    AGENT_ENABLED(new ConfigKey("agent.enabled", EnvPrefix.PRODUCT + "AGENT_ENABLED"), ConfigGroup.AGENT, Boolean.class),
+    AGENT_INIT_TIMEOUT(new ConfigKey("agent.initTimeout", EnvPrefix.PRODUCT + "INIT_TIMEOUT"), ConfigGroup.AGENT, Integer.class),
     AGENT_TRANSACTION_SETTINGS(new ConfigKey("agent.transactionSettings"), ConfigGroup.AGENT, String.class),
     //AGENT_INTERNAL_TRANSACTION_SETTINGS should NOT be specified directly in the json file. This is used to store the result after comparing AGENT_TRANSACTION_SETTINGS and AGENT_URL_SAMPLE_RATE - not an ideal solution as this is confusing
     AGENT_INTERNAL_TRANSACTION_SETTINGS(new ConfigKey("agent.internal.transactionSettings"), ConfigGroup.AGENT, String.class),
-    AGENT_EC2_METADATA_TIMEOUT(new ConfigKey("agent.ec2MetadataTimeout", "APPOPTICS_EC2_METADATA_TIMEOUT"), ConfigGroup.AGENT, Integer.class),
-    AGENT_TRIGGER_TRACE_ENABLED(new ConfigKey("agent.triggerTrace", "APPOPTICS_TRIGGER_TRACE"), ConfigGroup.AGENT, String.class),
-    AGENT_PROXY(new ConfigKey("agent.proxy","APPOPTICS_PROXY", "proxy"), ConfigGroup.AGENT, String.class),
-    AGENT_RPC_CLIENT_TYPE(new ConfigKey("agent.rpcType", "APPOPTICS_RPC_TYPE", "rpc_type"), ConfigGroup.AGENT, String.class), //not advertised
-    AGENT_GRPC_COMPRESSION(new ConfigKey(null, "APPOPTICS_GRPC_COMPRESSION", "grpc_compression"), ConfigGroup.AGENT, String.class), //not advertised
+    AGENT_EC2_METADATA_TIMEOUT(new ConfigKey("agent.ec2MetadataTimeout", EnvPrefix.PRODUCT + "EC2_METADATA_TIMEOUT"), ConfigGroup.AGENT, Integer.class),
+    AGENT_TRIGGER_TRACE_ENABLED(new ConfigKey("agent.triggerTrace", EnvPrefix.PRODUCT + "TRIGGER_TRACE"), ConfigGroup.AGENT, String.class),
+    AGENT_PROXY(new ConfigKey("agent.proxy",EnvPrefix.PRODUCT + "PROXY", "proxy"), ConfigGroup.AGENT, String.class),
+    AGENT_RPC_CLIENT_TYPE(new ConfigKey("agent.rpcType", EnvPrefix.PRODUCT + "RPC_TYPE", "rpc_type"), ConfigGroup.AGENT, String.class), //not advertised
+    AGENT_GRPC_COMPRESSION(new ConfigKey(null, EnvPrefix.PRODUCT + "GRPC_COMPRESSION", "grpc_compression"), ConfigGroup.AGENT, String.class), //not advertised
     AGENT_DISALLOW_UNSAFE(new ConfigKey("agent.disallowUnsafe"), ConfigGroup.AGENT, Boolean.class),
 
     MONITOR_JMX_SCOPES (new ConfigKey("monitor.jmx.scopes"), ConfigGroup.MONITOR, String.class),
     MONITOR_JMX_ENABLE (new ConfigKey("monitor.jmx.enable"), ConfigGroup.MONITOR, Boolean.class),
     MONITOR_JMX_MAX_ENTRY (new ConfigKey("monitor.jmx.maxEntry"), ConfigGroup.MONITOR, Integer.class),
-    MONITOR_METRICS_FLUSH_INTERVAL(new ConfigKey(null, "APPOPTICS_METRICS_FLUSH_INTERVAL"), ConfigGroup.MONITOR, Integer.class),
+    MONITOR_METRICS_FLUSH_INTERVAL(new ConfigKey(null, EnvPrefix.PRODUCT + "METRICS_FLUSH_INTERVAL"), ConfigGroup.MONITOR, Integer.class),
 
-    MONITOR_SPAN_METRICS_ENABLE (new ConfigKey("monitor.spanMetrics.enable", "APPOPTICS_SPAN_METRICS_ENABLE"), ConfigGroup.MONITOR, Boolean.class),
+    MONITOR_SPAN_METRICS_ENABLE (new ConfigKey("monitor.spanMetrics.enable", EnvPrefix.PRODUCT + "SPAN_METRICS_ENABLE"), ConfigGroup.MONITOR, Boolean.class),
 
     PROFILER(new ConfigKey("profiler"), ConfigGroup.PROFILER, String.class),
-    PROFILER_ENABLED_ENV_VAR(new ConfigKey(null, "APPOPTICS_PROFILER_ENABLED"), ConfigGroup.PROFILER, Boolean.class),
-    PROFILER_INTERVAL_ENV_VAR(new ConfigKey(null, "APPOPTICS_PROFILER_INTERVAL"), ConfigGroup.PROFILER, Integer.class);
+    PROFILER_ENABLED_ENV_VAR(new ConfigKey(null, EnvPrefix.PRODUCT + "PROFILER_ENABLED", "profiler"), ConfigGroup.PROFILER, Boolean.class),
+    PROFILER_INTERVAL_ENV_VAR(new ConfigKey(null, EnvPrefix.PRODUCT + "PROFILER_INTERVAL"), ConfigGroup.PROFILER, Integer.class);
 
     private static final Logger logger = LoggerFactory.getLogger();
     private final ConfigKey configKey;
     private Class<? extends Serializable> typeClass;
     private ConfigGroup group;
     private ConfigParser<?, ?> configParser;
+
+    private static class EnvPrefix {
+        private static final String PRODUCT = "SOLARWINDS_";
+    }
 
     private static class ConfigKey {
         private final String configFileKey;

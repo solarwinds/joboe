@@ -10,7 +10,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class TestSpringBootApplication {
-	private static final String SERVICE_KEY = System.getenv("APPOPTICS_SERVICE_KEY");
+	private static final String SERVICE_KEY = System.getenv("SOLARWINDS_SERVICE_KEY");
 
 	public static void main(String[] args) throws InterruptedException {
 		//Begin A La Carte mode (from artifact appoptics-opentelemetry-sdk-standalone)
