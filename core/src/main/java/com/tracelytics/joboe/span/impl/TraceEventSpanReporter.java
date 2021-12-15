@@ -85,9 +85,9 @@ public class TraceEventSpanReporter implements SpanReporter {
                             }
                         }
 
-                        String pdKeys = xTraceOptions.getOptionValue(XTraceOption.SW_KEYS);
-                        if (pdKeys != null) {
-                            entryEvent.addInfo("PDKeys", pdKeys);
+                        String swKeys = xTraceOptions.getOptionValue(XTraceOption.SW_KEYS);
+                        if (swKeys != null) {
+                            entryEvent.addInfo("SWKeys", swKeys);
                         }
                     }
                 }
