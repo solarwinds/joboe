@@ -57,11 +57,11 @@ public class XTraceOptionsResponseTest extends TestCase {
 
         XTraceOptionsResponse response;
         //unknown X-Trace-Options
-        response = XTraceOptionsResponse.computeResponse(XTraceOptions.getXTraceOptions("unknown1=1;unknown2;" + XTraceOption.PD_KEYS.getKey() + "=3", null), new TraceDecision(true, true, traceConfig, TraceDecisionUtil.RequestType.REGULAR), true);
+        response = XTraceOptionsResponse.computeResponse(XTraceOptions.getXTraceOptions("unknown1=1;unknown2;" + XTraceOption.SW_KEYS.getKey() + "=3", null), new TraceDecision(true, true, traceConfig, TraceDecisionUtil.RequestType.REGULAR), true);
         assertEquals("trigger-trace=not-requested;ignored=unknown1,unknown2", response.toString());
 
         //invalid trigger-trace (has value)
-        response = XTraceOptionsResponse.computeResponse(XTraceOptions.getXTraceOptions(XTraceOption.TRIGGER_TRACE.getKey() + "=0;" + XTraceOption.PD_KEYS.getKey() + "=3", null), new TraceDecision(true, true, traceConfig, TraceDecisionUtil.RequestType.REGULAR), true);
+        response = XTraceOptionsResponse.computeResponse(XTraceOptions.getXTraceOptions(XTraceOption.TRIGGER_TRACE.getKey() + "=0;" + XTraceOption.SW_KEYS.getKey() + "=3", null), new TraceDecision(true, true, traceConfig, TraceDecisionUtil.RequestType.REGULAR), true);
         assertEquals("trigger-trace=not-requested;ignored=trigger-trace", response.toString());
     }
 

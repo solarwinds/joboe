@@ -17,11 +17,11 @@ public class XTraceOption<V> {
     private static final Logger LOGGER = LoggerFactory.getLogger();
     private static final Map<String, XTraceOption<?>> keyLookup = new HashMap<String, XTraceOption<?>>();
     public static final XTraceOption<Boolean> TRIGGER_TRACE = new XTraceOption<Boolean>("trigger-trace", null, false);
-    public static final XTraceOption<String> PD_KEYS = new XTraceOption<String>("sw-keys", ValueParser.STRING_VALUE_PARSER);
+    public static final XTraceOption<String> SW_KEYS = new XTraceOption<String>("sw-keys", ValueParser.STRING_VALUE_PARSER);
     public static final XTraceOption<Long> TS = new XTraceOption<Long>("ts", ValueParser.LONG_VALUE_PARSER);
     public static final String CUSTOM_KV_PREFIX = "custom-";
-    
-    
+
+
     private V defaultValue;
     private String key;
     private ValueParser<V> parser;
@@ -39,12 +39,12 @@ public class XTraceOption<V> {
         this.key = key;
         this.defaultValue = defaultValue;
         this.parser = parser;
-        
+
         keyLookup.put(key, this);
     }
-    
-        
-    
+
+
+
     public static XTraceOption<?> fromKey(String key) {
         if (key.contains(" ")) { //invalid key if it contains any space. Not using regex here as it could be pretty slow
             return null;
@@ -88,7 +88,7 @@ public class XTraceOption<V> {
     public V getDefaultValue() {
         return defaultValue;
     }
-    
+
     public String getKey() {
         return key;
     }
@@ -113,7 +113,7 @@ public class XTraceOption<V> {
         StringValueParser STRING_VALUE_PARSER = new StringValueParser();
         LongValueParser LONG_VALUE_PARSER = new LongValueParser();
     }
-    
+
     public V parseValueFromString(String value) throws XTraceOptions.InvalidValueXTraceOptionException {
         try {
             return parser != null ? parser.parse(value) : null;
@@ -121,20 +121,20 @@ public class XTraceOption<V> {
             throw new XTraceOptions.InvalidValueXTraceOptionException(this, value);
         }
     }
-    
+
     private static class BooleanValueParser implements ValueParser<Boolean> {
         @Override
         public Boolean parse(String stringValue) {
             return "1".equals(stringValue) || Boolean.valueOf(stringValue);
         }
     }
-    
+
     private static class StringValueParser implements ValueParser<String> {
         @Override
         public String parse(String stringValue) {
             return stringValue;
         }
-        
+
     }
 
     private static class LongValueParser implements ValueParser<Long> {

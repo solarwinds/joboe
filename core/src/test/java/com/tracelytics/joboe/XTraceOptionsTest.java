@@ -10,14 +10,14 @@ import junit.framework.TestCase;
 
 public class XTraceOptionsTest extends TestCase {
 
-    
+
     public void testGetXTraceOptions() throws Exception {
         assertEquals(null, XTraceOptions.getXTraceOptions(null, null));
 
         String pdKeys = "lo:se";
         XTraceOptions options = XTraceOptions.getXTraceOptions(
                 XTraceOption.TRIGGER_TRACE.getKey() + XTraceOptions.ENTRY_SEPARATOR +
-                XTraceOption.PD_KEYS.getKey() + XTraceOptions.KEY_VALUE_SEPARATOR + pdKeys + XTraceOptions.ENTRY_SEPARATOR +
+                XTraceOption.SW_KEYS.getKey() + XTraceOptions.KEY_VALUE_SEPARATOR + pdKeys + XTraceOptions.ENTRY_SEPARATOR +
                 XTraceOption.CUSTOM_KV_PREFIX + "tag1" + XTraceOptions.KEY_VALUE_SEPARATOR + "v1" + XTraceOptions.ENTRY_SEPARATOR +
                 XTraceOption.CUSTOM_KV_PREFIX + "tag2" + XTraceOptions.KEY_VALUE_SEPARATOR + "v2",
                 null);
@@ -27,20 +27,20 @@ public class XTraceOptionsTest extends TestCase {
         expectedCustomKvs.put((XTraceOption<String>) XTraceOption.fromKey(XTraceOption.CUSTOM_KV_PREFIX + "tag1"), "v1");
         expectedCustomKvs.put((XTraceOption<String>) XTraceOption.fromKey(XTraceOption.CUSTOM_KV_PREFIX + "tag2"), "v2");
 
-        assertEquals(pdKeys, options.getOptionValue(XTraceOption.PD_KEYS));
+        assertEquals(pdKeys, options.getOptionValue(XTraceOption.SW_KEYS));
         assertEquals(Boolean.TRUE, options.getOptionValue(XTraceOption.TRIGGER_TRACE));
         assertEquals(expectedCustomKvs, options.getCustomKvs());
         assertEquals(Collections.EMPTY_LIST, options.getExceptions());
 
         //no trigger-trace option
         options = XTraceOptions.getXTraceOptions(
-                        XTraceOption.PD_KEYS.getKey() + XTraceOptions.KEY_VALUE_SEPARATOR + pdKeys + XTraceOptions.ENTRY_SEPARATOR +
+                        XTraceOption.SW_KEYS.getKey() + XTraceOptions.KEY_VALUE_SEPARATOR + pdKeys + XTraceOptions.ENTRY_SEPARATOR +
                         XTraceOption.CUSTOM_KV_PREFIX + "tag1" + XTraceOptions.KEY_VALUE_SEPARATOR + "v1" + XTraceOptions.ENTRY_SEPARATOR +
                         XTraceOption.CUSTOM_KV_PREFIX + "tag2" + XTraceOptions.KEY_VALUE_SEPARATOR + "v2",
                 null);
         assertEquals(XTraceOptions.AuthenticationStatus.NOT_AUTHENTICATED, options.getAuthenticationStatus());
         assertEquals(Collections.EMPTY_LIST, options.getExceptions());
-        assertEquals(pdKeys, options.getOptionValue(XTraceOption.PD_KEYS));
+        assertEquals(pdKeys, options.getOptionValue(XTraceOption.SW_KEYS));
         assertEquals(expectedCustomKvs, options.getCustomKvs());
     }
 
@@ -50,18 +50,18 @@ public class XTraceOptionsTest extends TestCase {
         //leading and trailing whitespace
         options = XTraceOptions.getXTraceOptions(
                 "      " + XTraceOption.TRIGGER_TRACE.getKey() + XTraceOptions.ENTRY_SEPARATOR +
-                        XTraceOption.PD_KEYS.getKey() + XTraceOptions.KEY_VALUE_SEPARATOR + pdKeys + "      ",
+                        XTraceOption.SW_KEYS.getKey() + XTraceOptions.KEY_VALUE_SEPARATOR + pdKeys + "      ",
                 null);
-        assertEquals(pdKeys, options.getOptionValue(XTraceOption.PD_KEYS));
+        assertEquals(pdKeys, options.getOptionValue(XTraceOption.SW_KEYS));
         assertEquals(Boolean.TRUE, options.getOptionValue(XTraceOption.TRIGGER_TRACE));
 
         //space in between kv pairs are trimmed
         //leading and trailing whitespace
         options = XTraceOptions.getXTraceOptions(
                 XTraceOption.TRIGGER_TRACE.getKey() + " " + XTraceOptions.ENTRY_SEPARATOR + " " +
-                        XTraceOption.PD_KEYS.getKey() + " " + XTraceOptions.KEY_VALUE_SEPARATOR + " " + pdKeys,
+                        XTraceOption.SW_KEYS.getKey() + " " + XTraceOptions.KEY_VALUE_SEPARATOR + " " + pdKeys,
                 null);
-        assertEquals(pdKeys, options.getOptionValue(XTraceOption.PD_KEYS));
+        assertEquals(pdKeys, options.getOptionValue(XTraceOption.SW_KEYS));
         assertEquals(Boolean.TRUE, options.getOptionValue(XTraceOption.TRIGGER_TRACE));
 
         //space in key is considered invalid
@@ -81,15 +81,15 @@ public class XTraceOptionsTest extends TestCase {
 
     public void testDuplicatedOption() {
         XTraceOptions options = XTraceOptions.getXTraceOptions(
-                XTraceOption.PD_KEYS.getKey() + XTraceOptions.KEY_VALUE_SEPARATOR + "p1" + XTraceOptions.ENTRY_SEPARATOR +
-                        XTraceOption.PD_KEYS.getKey() + XTraceOptions.KEY_VALUE_SEPARATOR + "p2" + XTraceOptions.ENTRY_SEPARATOR +
+                XTraceOption.SW_KEYS.getKey() + XTraceOptions.KEY_VALUE_SEPARATOR + "p1" + XTraceOptions.ENTRY_SEPARATOR +
+                        XTraceOption.SW_KEYS.getKey() + XTraceOptions.KEY_VALUE_SEPARATOR + "p2" + XTraceOptions.ENTRY_SEPARATOR +
                         XTraceOption.CUSTOM_KV_PREFIX + "tag1" + XTraceOptions.KEY_VALUE_SEPARATOR + "v1" + XTraceOptions.ENTRY_SEPARATOR +
                         XTraceOption.CUSTOM_KV_PREFIX + "tag1" + XTraceOptions.KEY_VALUE_SEPARATOR + "v2",
                 null);
         HashMap<XTraceOption<String>, String> expectedCustomKvs = new HashMap<XTraceOption<String>, String>();
         expectedCustomKvs.put((XTraceOption<String>) XTraceOption.fromKey(XTraceOption.CUSTOM_KV_PREFIX + "tag1"), "v1"); //take the first value only
 
-        assertEquals("p1", options.getOptionValue(XTraceOption.PD_KEYS));
+        assertEquals("p1", options.getOptionValue(XTraceOption.SW_KEYS));
         assertEquals(expectedCustomKvs, options.getCustomKvs());
     }
 
@@ -135,7 +135,7 @@ public class XTraceOptionsTest extends TestCase {
 
         options = XTraceOptions.getXTraceOptions(";trigger-trace;custom-something=value_thing;sw-keys=02973r70:9wqj21,0d9j1;1;2;=custom-key=val?;=", null);
         assertEquals(Boolean.TRUE, options.getOptionValue(XTraceOption.TRIGGER_TRACE));
-        assertEquals("02973r70:9wqj21,0d9j1", options.getOptionValue(XTraceOption.PD_KEYS));
+        assertEquals("02973r70:9wqj21,0d9j1", options.getOptionValue(XTraceOption.SW_KEYS));
         assertEquals(1, options.getCustomKvs().size());
         customKeyIterator = options.getCustomKvs().keySet().iterator();
         customValueIterator = options.getCustomKvs().values().iterator();
@@ -147,7 +147,7 @@ public class XTraceOptionsTest extends TestCase {
 
         //skip sequel ;
         options = XTraceOptions.getXTraceOptions("custom-something=value_thing;sw-keys=02973r70;;;;custom-key=val", null);
-        assertEquals("02973r70", options.getOptionValue(XTraceOption.PD_KEYS));
+        assertEquals("02973r70", options.getOptionValue(XTraceOption.SW_KEYS));
         assertEquals(2, options.getCustomKvs().size());
         customKeyIterator = options.getCustomKvs().keySet().iterator();
         customValueIterator = options.getCustomKvs().values().iterator();
@@ -168,14 +168,14 @@ public class XTraceOptionsTest extends TestCase {
         assertEquals(null, options);
 
     }
-    
+
     public void testHmacAuthenticator() throws Exception {
         HmacSignatureAuthenticator authenticator = new XTraceOptions.HmacSignatureAuthenticator("8mZ98ZnZhhggcsUmdMbS".getBytes(Charset.forName("US-ASCII")));
-        
+
         assertEquals(true, authenticator.authenticate("trigger-trace;sw-keys=lo:se,check-id:123;ts=1564597681", "2c1c398c3e6be898f47f74bf74f035903b48b59c"));
         assertEquals(false, authenticator.authenticate("trigger-trace;sw-keys=lo:se,check-id:123;ts=1564597681", "2c1c398c3e6be898f47f74bf74f035903b48baaa"));
     }
-    
+
     public void testAuthenticate() {
         HmacSignatureAuthenticator authenticator = new XTraceOptions.HmacSignatureAuthenticator("8mZ98ZnZhhggcsUmdMbS".getBytes(Charset.forName("US-ASCII")));
 
