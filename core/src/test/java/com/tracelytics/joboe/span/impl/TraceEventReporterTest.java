@@ -202,7 +202,7 @@ public class TraceEventReporterTest extends TestCase {
 
 	public void testTriggerTraceKvs() {
 		Context.clearMetadata(); //make this a new trace
-		Map<XTraceHeader, String> xTraceHeaders = Collections.singletonMap(XTraceHeader.TRACE_OPTIONS, "trigger-trace;pd-keys=lo:se;custom-key1=value1;custom-key2=value2");
+		Map<XTraceHeader, String> xTraceHeaders = Collections.singletonMap(XTraceHeader.TRACE_OPTIONS, "trigger-trace;sw-keys=lo:se;custom-key1=value1;custom-key2=value2");
 		TraceDecisionParameters traceDecisionParameters = new TraceDecisionParameters(xTraceHeaders, null);
 
 		List<DeserializedEvent> sentEvents;

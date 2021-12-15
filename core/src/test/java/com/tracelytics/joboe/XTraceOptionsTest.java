@@ -133,7 +133,7 @@ public class XTraceOptionsTest extends TestCase {
 
         assertEquals("bar'", ((XTraceOptions.UnknownXTraceOptionException)options.getExceptions().get(0)).getInvalidOptionKey());
 
-        options = XTraceOptions.getXTraceOptions(";trigger-trace;custom-something=value_thing;pd-keys=02973r70:9wqj21,0d9j1;1;2;=custom-key=val?;=", null);
+        options = XTraceOptions.getXTraceOptions(";trigger-trace;custom-something=value_thing;sw-keys=02973r70:9wqj21,0d9j1;1;2;=custom-key=val?;=", null);
         assertEquals(Boolean.TRUE, options.getOptionValue(XTraceOption.TRIGGER_TRACE));
         assertEquals("02973r70:9wqj21,0d9j1", options.getOptionValue(XTraceOption.PD_KEYS));
         assertEquals(1, options.getCustomKvs().size());
@@ -146,7 +146,7 @@ public class XTraceOptionsTest extends TestCase {
         assertEquals("2", ((XTraceOptions.UnknownXTraceOptionException) options.getExceptions().get(1)).getInvalidOptionKey());
 
         //skip sequel ;
-        options = XTraceOptions.getXTraceOptions("custom-something=value_thing;pd-keys=02973r70;;;;custom-key=val", null);
+        options = XTraceOptions.getXTraceOptions("custom-something=value_thing;sw-keys=02973r70;;;;custom-key=val", null);
         assertEquals("02973r70", options.getOptionValue(XTraceOption.PD_KEYS));
         assertEquals(2, options.getCustomKvs().size());
         customKeyIterator = options.getCustomKvs().keySet().iterator();
@@ -172,28 +172,28 @@ public class XTraceOptionsTest extends TestCase {
     public void testHmacAuthenticator() throws Exception {
         HmacSignatureAuthenticator authenticator = new XTraceOptions.HmacSignatureAuthenticator("8mZ98ZnZhhggcsUmdMbS".getBytes(Charset.forName("US-ASCII")));
         
-        assertEquals(true, authenticator.authenticate("trigger-trace;pd-keys=lo:se,check-id:123;ts=1564597681", "2c1c398c3e6be898f47f74bf74f035903b48b59c"));
-        assertEquals(false, authenticator.authenticate("trigger-trace;pd-keys=lo:se,check-id:123;ts=1564597681", "2c1c398c3e6be898f47f74bf74f035903b48baaa"));
+        assertEquals(true, authenticator.authenticate("trigger-trace;sw-keys=lo:se,check-id:123;ts=1564597681", "2c1c398c3e6be898f47f74bf74f035903b48b59c"));
+        assertEquals(false, authenticator.authenticate("trigger-trace;sw-keys=lo:se,check-id:123;ts=1564597681", "2c1c398c3e6be898f47f74bf74f035903b48baaa"));
     }
     
     public void testAuthenticate() {
         HmacSignatureAuthenticator authenticator = new XTraceOptions.HmacSignatureAuthenticator("8mZ98ZnZhhggcsUmdMbS".getBytes(Charset.forName("US-ASCII")));
 
         //missing ts
-        assertEquals(XTraceOptions.AuthenticationStatus.failure("bad-timestamp"), XTraceOptions.authenticate("trigger-trace;pd-keys=lo:se,check-id:123", null, "2c1c398c3e6be898f47f74bf74f035903b48b59c", authenticator));
+        assertEquals(XTraceOptions.AuthenticationStatus.failure("bad-timestamp"), XTraceOptions.authenticate("trigger-trace;sw-keys=lo:se,check-id:123", null, "2c1c398c3e6be898f47f74bf74f035903b48b59c", authenticator));
 
         long outOfRangeTimestamp = System.currentTimeMillis() / 1000 - (XTraceOptions.TIMESTAMP_MAX_DELTA + 1);
         //timestamp out of range
-        assertEquals(XTraceOptions.AuthenticationStatus.failure("bad-timestamp"), XTraceOptions.authenticate("trigger-trace;pd-keys=lo:se,check-id:123;ts=" + outOfRangeTimestamp, outOfRangeTimestamp, "2c1c398c3e6be898f47f74bf74f035903b48b59c", authenticator));
+        assertEquals(XTraceOptions.AuthenticationStatus.failure("bad-timestamp"), XTraceOptions.authenticate("trigger-trace;sw-keys=lo:se,check-id:123;ts=" + outOfRangeTimestamp, outOfRangeTimestamp, "2c1c398c3e6be898f47f74bf74f035903b48b59c", authenticator));
 
         //no signature
-        assertEquals(XTraceOptions.AuthenticationStatus.NOT_AUTHENTICATED, XTraceOptions.authenticate("trigger-trace;pd-keys=lo:se,check-id:123", null, null, authenticator));
+        assertEquals(XTraceOptions.AuthenticationStatus.NOT_AUTHENTICATED, XTraceOptions.authenticate("trigger-trace;sw-keys=lo:se,check-id:123", null, null, authenticator));
 
         //valid signature - using a mock up authenticator here to bypass the signature check - which is verify in testHmacAuthenticator
         long goodTimestamp = System.currentTimeMillis() / 1000;
-        assertEquals(XTraceOptions.AuthenticationStatus.OK, XTraceOptions.authenticate("trigger-trace;pd-keys=lo:se,check-id:123;ts=" + goodTimestamp, goodTimestamp, "2c1c398c3e6be898f47f74bf74f035903b48b59c", ((optionsString, signature) -> true)));
+        assertEquals(XTraceOptions.AuthenticationStatus.OK, XTraceOptions.authenticate("trigger-trace;sw-keys=lo:se,check-id:123;ts=" + goodTimestamp, goodTimestamp, "2c1c398c3e6be898f47f74bf74f035903b48b59c", ((optionsString, signature) -> true)));
 
         //authenticator not ready
-        assertEquals(XTraceOptions.AuthenticationStatus.failure("authenticator-unavailable"), XTraceOptions.authenticate("trigger-trace;pd-keys=lo:se,check-id:123;ts=" + goodTimestamp, goodTimestamp, "2c1c398c3e6be898f47f74bf74f035903b48b59c", null));
+        assertEquals(XTraceOptions.AuthenticationStatus.failure("authenticator-unavailable"), XTraceOptions.authenticate("trigger-trace;sw-keys=lo:se,check-id:123;ts=" + goodTimestamp, goodTimestamp, "2c1c398c3e6be898f47f74bf74f035903b48b59c", null));
     }
 }

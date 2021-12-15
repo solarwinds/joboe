@@ -17,7 +17,7 @@ public class XTraceOption<V> {
     private static final Logger LOGGER = LoggerFactory.getLogger();
     private static final Map<String, XTraceOption<?>> keyLookup = new HashMap<String, XTraceOption<?>>();
     public static final XTraceOption<Boolean> TRIGGER_TRACE = new XTraceOption<Boolean>("trigger-trace", null, false);
-    public static final XTraceOption<String> PD_KEYS = new XTraceOption<String>("pd-keys", ValueParser.STRING_VALUE_PARSER);
+    public static final XTraceOption<String> PD_KEYS = new XTraceOption<String>("sw-keys", ValueParser.STRING_VALUE_PARSER);
     public static final XTraceOption<Long> TS = new XTraceOption<Long>("ts", ValueParser.LONG_VALUE_PARSER);
     public static final String CUSTOM_KV_PREFIX = "custom-";
     
