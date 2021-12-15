@@ -172,7 +172,7 @@ public class XTraceOptionsTest extends TestCase {
     public void testHmacAuthenticator() throws Exception {
         HmacSignatureAuthenticator authenticator = new XTraceOptions.HmacSignatureAuthenticator("8mZ98ZnZhhggcsUmdMbS".getBytes(Charset.forName("US-ASCII")));
 
-        assertEquals(true, authenticator.authenticate("trigger-trace;sw-keys=lo:se,check-id:123;ts=1564597681", "2c1c398c3e6be898f47f74bf74f035903b48b59c"));
+        assertEquals(true, authenticator.authenticate("trigger-trace;sw-keys=lo:se,check-id:123;ts=1564597681", "26e33ce58c52afc507c5c1e9feff4ac5562c9e1c"));
         assertEquals(false, authenticator.authenticate("trigger-trace;sw-keys=lo:se,check-id:123;ts=1564597681", "2c1c398c3e6be898f47f74bf74f035903b48baaa"));
     }
 
