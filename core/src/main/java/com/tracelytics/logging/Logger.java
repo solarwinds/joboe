@@ -25,7 +25,7 @@ import java.util.concurrent.*;
  * @author Patson Luk
  */
 public class Logger {
-    public static final String APPOPTICS_TAG = "[AppOptics]";
+    public static final String SOLARWINDSS_TAG = "[Solarwinds]";
 
     private static final Level DEFAULT_LOGGING = Level.INFO;
     private static final ThreadLocal<DateFormat> DATE_FORMAT = new ThreadLocal<DateFormat>() {
@@ -157,7 +157,7 @@ public class Logger {
 
     private static String getFormattedMessage(Level level, String message) {
         String timestamp = DATE_FORMAT.get().format(Calendar.getInstance().getTime());
-        String label = timestamp + " " + level.toString() + " " + APPOPTICS_TAG + " ";
+        String label = timestamp + " " + level.toString() + " " + SOLARWINDSS_TAG + " ";
 
         return message != null ? label + message : label;
     }

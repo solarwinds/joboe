@@ -14,7 +14,7 @@ spec:
       - name: tomcat-agent
         image: testbeds/tomcat_9_agent
         env:
-        - name: APPOPTICS_SERVICE_KEY 
+        - name: SOLARWINDS_SERVICE_KEY 
           value: ec3d1519afe2f54474d3d3cc2c9af0aff9f6e939c0d6302d768d808378025468:kube-test
         ports:
         - containerPort: 8080

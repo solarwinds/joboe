@@ -18,28 +18,28 @@ import java.util.concurrent.*;
 
 /**
  * A Sampling Profiler that runs a single background thread to take stack trace snapshots of a list of "tracked threads" on a given interval
- * 
- * The list of "tracked threads" are set by other external logic and is not controlled by this profiler 
- *  
+ *
+ * The list of "tracked threads" are set by other external logic and is not controlled by this profiler
+ *
  * @author pluk
  *
  */
 public class Profiler {
     private static ConcurrentMap<String, Profile> profileByTraceId = new ConcurrentHashMap<String, Profiler.Profile>(); //for quicker lookup
-    private static final String APPOPTICS_THREAD_PREFIX = "AppOptics-";
-    
+    private static final String SOLARWINDS_THREAD_PREFIX = "Solarwinds-";
+
     private static Logger logger = LoggerFactory.getLogger();
-    
+
     public static EventReporter reporter;
-    
+
     private static Status status = Status.UNINITIALIZED;
-    
+
     public enum Status { UNINITIALIZED, PAUSED_CIRCUIT_BREAKER, RUNNING, STOPPING, STOPPED }
-    private static long interval; //current interval to take snapshots on, could be changed dynamically  
-    
+    private static long interval; //current interval to take snapshots on, could be changed dynamically
+
     private static ProfilerSetting localSetting; //profiler settings from local config
-    private static Future<?> samplerFuture; 
-    
+    private static Future<?> samplerFuture;
+
     static final int MAX_REPORTED_FRAME_DEPTH = 400;
 
     /**
@@ -57,14 +57,14 @@ public class Profiler {
                 }
 
                 logger.info("Updated profiling interval to : " + interval);
-                
+
                 if (interval <= 0) { //stop profiler if new value is negative
                     if (status != Status.STOPPED) { //only if profiler is not stopped yet
                         logger.info("Profiler stopping after interval update from remote collector, previous status: " + status);
                         stop();
                     }
                 } else { //otherwise start profiler if it was stopped
-                    if (status == Status.STOPPED) { 
+                    if (status == Status.STOPPED) {
                         logger.info("Profiler starting after interval update from remote collector");
                         start();
                     }
@@ -75,9 +75,9 @@ public class Profiler {
 
     /**
      * Initializes profiler by providing the ProfilerSetting. The Profiler will start listening for remote config changes
-     * 
+     *
      * The agent might be put into either standby mode (if `interval` is 0) or running mode if `interval` is valid
-     * 
+     *
      * Ignores calls if profiler is NOT in `UNINITIALIZED` state
      * @param setting
      * @param reporter  reporter used to export the captured data (in {@link Event} output format)
@@ -86,9 +86,9 @@ public class Profiler {
         if (status == Status.UNINITIALIZED) {
             localSetting = setting;
             interval = localSetting.getInterval();
-            
+
             status = Status.STOPPED; //switch to stopped as the profiler is going to be initialized but has not started profiling yet
-            
+
             Profiler.reporter = reporter;
 
             if (interval != 0) {
@@ -97,13 +97,13 @@ public class Profiler {
             } else {
                 logger.debug("No profiling started. Profiler is on standby, previous status: " + status);
             }
-            
+
             addIntervalChangeListener(); //add listener here to avoid race condition on starting the profiler
         } else {
             logger.info("Profiler is already initialized, ignoring initialize operation");
         }
     }
-    
+
     private static void start() {
         if (status == Status.STOPPED) {
             run();
@@ -111,15 +111,15 @@ public class Profiler {
             logger.warn("Cannot start a profiler when it's in status " + status);
         }
     }
-    
+
     /**
      * Starts the background thread that takes snapshots on `interval`
      */
     static void run() {
         status = Status.RUNNING;
-        
+
         final CircuitBreaker circuitBreaker = new CircuitBreaker(localSetting.getCircuitBreakerDurationThreshold(), localSetting.getCircuitBreakerCountThreshold());
-        
+
         ExecutorService service = Executors.newFixedThreadPool(1, DaemonThreadFactory.newInstance("profiling-sampler"));
         samplerFuture = service.submit(new Runnable() {
             public void run() {
@@ -152,7 +152,7 @@ public class Profiler {
         });
         service.shutdown();
     }
-    
+
     /**
      * Stops the background thread that takes snapshots on `interval`, blocks until the thread is dead
      */
@@ -164,7 +164,7 @@ public class Profiler {
         }
         logger.info("Profiler is stopped");
     }
-    
+
     /**
      * Takes and reports snapshots on the tracked threads
      * @return the duration of the checkThreads operation
@@ -173,7 +173,7 @@ public class Profiler {
         if (profileByTraceId.isEmpty()) {
             return new ProfilingDurationInfo(-1, Collections.EMPTY_LIST);
         }
-        
+
         long start = System.currentTimeMillis();
 
         List<String> taskIds = new ArrayList<String>();
@@ -218,7 +218,7 @@ public class Profiler {
      * @return
      */
     public static boolean addProfiledThread(Thread thread, Metadata metadata, String traceId) {
-        if (thread.getName() != null && thread.getName().startsWith(APPOPTICS_THREAD_PREFIX)) { //do not instrument our own threads
+        if (thread.getName() != null && thread.getName().startsWith(SOLARWINDS_THREAD_PREFIX)) { //do not instrument our own threads
             return false;
         }
 
@@ -226,14 +226,14 @@ public class Profiler {
             logger.debug("Add profile thread operation skipped as profiler is not running, status : " + status);
             return false;
         }
-        
+
         Profile profile;
         profile = profileByTraceId.get(traceId);
         if (profile == null) { //then this task is instrumented the first time, add profile
             profile = new Profile();
             profileByTraceId.put(traceId, profile);
         }
-        
+
         if (profile.startProfilingOnThread(thread, metadata)) {
             logger.debug("Started profiling on Thread id: " + thread.getId() + " name: " + thread.getName() + " for trace: " + traceId);
             return true;
@@ -241,7 +241,7 @@ public class Profiler {
             return false;
         }
     }
-    
+
     /**
      * Stops profiling on all threads triggered by this parent (tracing) span
      * @param traceId
@@ -249,14 +249,14 @@ public class Profiler {
      */
     public static Profile stopProfile(String traceId) {
         Profile profile = profileByTraceId.remove(traceId);
-        
+
         if (profile != null) {
             profile.stop();
         }
-        
+
         return profile;
     }
-    
+
     /**
      * Stops profiling on a particular thread
      * @param profiledThread
@@ -273,27 +273,27 @@ public class Profiler {
 
     /**
      * A Profile is created per trace that has profiling triggered. It keeps a map of threads being profiled.
-     * 
-     * For example if a servlet triggers profiling, a `Profile` instance would be created for that. 
-     * 
+     *
+     * For example if a servlet triggers profiling, a `Profile` instance would be created for that.
+     *
      * If later on more threads related to the same servlet call are tracked, they will be added to this same Profile instance.
-     * 
-     * 
+     *
+     *
      * @author pluk
      *
      */
     public static class Profile {
         private Map<Thread, SnapshotTracker> snapshotTrackersByThread = new ConcurrentHashMap<Thread, SnapshotTracker>();
-        private final ProfilerSetting setting; 
-        
+        private final ProfilerSetting setting;
+
         private Profile() {
             this(Profiler.localSetting);
         }
-        
+
         Profile(ProfilerSetting setting) {
             this.setting = setting;
         }
-        
+
         /**
          * Creates an "entry" event for the profiling span with a "SpanRef" pointing back to the parent "tracing" span that triggers/create this profile
          * @param parentMetadata
@@ -315,7 +315,7 @@ public class Profiler {
 
             return entryMetadata;
         }
-        
+
         public void stop() {
             for (SnapshotTracker tracker : snapshotTrackersByThread.values()) {
                 tracker.stop();
@@ -323,29 +323,29 @@ public class Profiler {
             }
             snapshotTrackersByThread.clear();
         }
-        
+
         /**
-         * Records and reports (if not omitted) the stack trace provided by in the parameters 
+         * Records and reports (if not omitted) the stack trace provided by in the parameters
          * @param thread
          * @param stack
          * @param collectionTime    time in microseconde when a snapshot was collected
          */
         public void record(Thread thread, StackTraceElement[] stack, long collectionTime) {
             long threadId = thread.getId();
-            SnapshotTracker tracker = snapshotTrackersByThread.get(thread);  
+            SnapshotTracker tracker = snapshotTrackersByThread.get(thread);
             int framesExited;
-            
+
             StackTraceElement[] newFrames;
-            
+
             int originalFramesCount = stack.length; //get the framesCount before trimming
             stack = trimStack(stack);
-            
+
             if (tracker != null && !tracker.stopped) {
                 if (tracker.stack == null) {
                     framesExited = 0;
                     newFrames = stack;
                 } else {
-                    //start matching previous stack with current stack, from the back of the list (bottom of calling stack frame) to front (top stack frame) 
+                    //start matching previous stack with current stack, from the back of the list (bottom of calling stack frame) to front (top stack frame)
                     int currentCallFrameWalker = stack.length - 1;
                     int previousCallFrameWalker = tracker.stack.length - 1;
                     while (previousCallFrameWalker >= 0 && currentCallFrameWalker >= 0) {
@@ -354,11 +354,11 @@ public class Profiler {
                         if (!previousCallFrame.equals(currentCallFrame)) { //diverges, exit here and count frames pop
                             break;
                         }
-                        
+
                         currentCallFrameWalker --;
                         previousCallFrameWalker --;
                     }
-                    
+
                     framesExited = previousCallFrameWalker + 1;
                     if (currentCallFrameWalker >= 0) {
                         newFrames = Arrays.copyOfRange(stack, 0, currentCallFrameWalker + 1);
@@ -366,7 +366,7 @@ public class Profiler {
                         newFrames = null;
                     }
                 }
-                
+
                 if (newFrames != null || framesExited > 0) { //only update and report if things have changed
                     synchronized(tracker) {
                         if (!tracker.stopped) {
@@ -380,9 +380,9 @@ public class Profiler {
                 }
             }
         }
-        
+
         /**
-         * Trim the stack by removing top frames that matches ProfilerSetting.getExcludePackages or if it's deeper than MAX_REPORTED_FRAME_DEPTH 
+         * Trim the stack by removing top frames that matches ProfilerSetting.getExcludePackages or if it's deeper than MAX_REPORTED_FRAME_DEPTH
          * @param stack
          * @return
          */
@@ -393,7 +393,7 @@ public class Profiler {
             } else {
                 trimmedStack = stack;
             }
-            
+
             if (setting.getExcludePackages().isEmpty()) { //no trimming required
                 return trimmedStack;
             }
@@ -408,7 +408,7 @@ public class Profiler {
                         break;
                     }
                 }
-                
+
                 if (!isExcludedFrame) { //this current frame does not match any of the exclude prefix, that means the rest of this stack should be reported
                     if (i == 0) {
                         return trimmedStack; //no change
@@ -417,9 +417,9 @@ public class Profiler {
                     }
                 }
             }
-            
+
             return new StackTraceElement[0]; //everything is excluded...
-            
+
         }
 
         /**
@@ -438,7 +438,7 @@ public class Profiler {
                 return false;
             }
         }
-        
+
         /**
          * Stops profiling on this particular thread
          * @param thread
@@ -452,20 +452,20 @@ public class Profiler {
             }
             return tracker != null;
         }
-        
+
         private void createProfileSpanExit(SnapshotTracker tracker) {
             Event snapshotExit = Context.createEventWithContext(tracker.metadata);
             snapshotExit.addInfo("Label", "exit",
                                  "Spec", "profiling",
                                  "SnapshotsOmitted", tracker.snapshotsOmitted);
-            
+
             synchronized(tracker) {
                 snapshotExit.addEdge(tracker.metadata);
                 snapshotExit.report(tracker.metadata, Profiler.reporter);
             }
-            
+
         }
-        
+
         /**
          * Get a list of threads currently tracked by this Profile
          * @return
@@ -473,19 +473,19 @@ public class Profiler {
         public Set<Thread> getActiveThreads() {
             return new HashSet<Thread>(snapshotTrackersByThread.keySet());
         }
-        
+
         private void reportSnapshot(Metadata metadata, int framesExited, List<Long> snapshotsOmitted, StackTraceElement[] newFrames, int framesCount, long threadId, long timestamp) {
             Event event;
-            
+
             event = Context.createEventWithContext(metadata);
             event.addInfo("Label", "info",
                           "Spec", "profiling",
                           "FramesExited", framesExited,
                           "SnapshotsOmitted", snapshotsOmitted,
-                          "FramesCount", framesCount);     
+                          "FramesCount", framesCount);
             event.setTimestamp(timestamp);
             event.setThreadId(threadId);
-            
+
             if (newFrames != null) {
                 List<Map<String, Object>> newFramesValue = new ArrayList<Map<String, Object>>();
                 for (StackTraceElement newFrame : newFrames) {
@@ -493,7 +493,7 @@ public class Profiler {
                     String className = newFrame.getClassName();
                     if (className != null) {
                         frameKeyValues.put("C", className);
-                    } 
+                    }
                     String fileName = newFrame.getFileName();
                     if (fileName != null) {
                         frameKeyValues.put("F", fileName);
@@ -508,19 +508,19 @@ public class Profiler {
                     }
                     newFramesValue.add(frameKeyValues);
                 }
-                
+
                 event.addInfo("NewFrames", newFramesValue);
-            }            
-            
+            }
+
             event.report(metadata, reporter);
-            
+
         }
     }
-    
+
     /**
      * Keeps the state of tracked thread to enable snapshot reporting on a thread.
-     * 
-     * State is important as: 
+     *
+     * State is important as:
      * 1. Enables the check if the current snapshot can be omitted if it's identical to the previously reported one
      * 2. Enables synchronization to avoid reporting snapshots if the thread (or it's parent span) is flagged to stop profiling
      * @author pluk
@@ -531,23 +531,23 @@ public class Profiler {
         private final Metadata metadata;
         private boolean stopped = false;
         private ArrayList<Long> snapshotsOmitted = new ArrayList<Long>();
-        
+
         public SnapshotTracker(Metadata metadata) {
             this.metadata = metadata;
         }
-        
+
         private void stop() {
             stopped  = true;
         }
     }
-    
+
     /**
      * A stateful circuit breaker that acts on consecutive calls to `getPause` when the duration parameter is a above or below the `durationThreshold`
-     * 
+     *
      * The goal of this stateful circuit breaker is to break when the operation is consistently slow and increase the pause time exponentially (up to a max) if the system remains slow
-     * 
+     *
      * However, if the system resumes back to normal, it should reset the pause time.
-     * 
+     *
      * @author pluk
      *
      */
@@ -560,27 +560,27 @@ public class Profiler {
         static final int MAX_CIRCUIT_BREAKER_PAUSE= 60 * 60;
         static final double PAUSE_MULTIPLIER = 1.5;
         private int nextPause = INITIAL_CIRCUIT_BREAKER_PAUSE;
-        
+
         CircuitBreaker(int durationThreshold, int countThreshold) {
             this.durationThreshold = durationThreshold;
             this.countThreshold = countThreshold;
         }
-        
+
         /**
-         * This might mutate the current circuit breaker states, depending on the current state and the duration parameters: 
-         * 
+         * This might mutate the current circuit breaker states, depending on the current state and the duration parameters:
+         *
          * At first the circuit breaker starts with a "Normal" state
          * When there are n (defined by `countThreshold`) consecutive `getPause` calls with param `duration` above the `durationThreshold`, the circuit breaker will go into the "Break" state
-         * "Break" state will be transitioned into a "Restored but broken recently" state when there's a new `getPause` call 
+         * "Break" state will be transitioned into a "Restored but broken recently" state when there's a new `getPause` call
          * "Restored but broken recently" state will be transitioned to "Normal" state if there are n consecutive `getPause` calls with param `duration` below or equal to the `durationThreshold`
-         * 
+         *
          * And below are the behaviors of this method in various states/transitions:
-         *  
+         *
          * When transition to "Normal" state, `nextPause` is set to INITIAL_CIRCUIT_BREAKER_PAUSE
          * When in "Normal" state, `getPause` returns 0
          * When transition to "Break" state, `getPause` returns `nextPause` then `nextPause` is multiplied by `PAUSE_MULTIPLIER`
-         * When transition to or in "Restored but broken recently" state, `getPause` returns 0 
-         * 
+         * When transition to or in "Restored but broken recently" state, `getPause` returns 0
+         *
          * @param duration
          * @return
          */
@@ -599,7 +599,7 @@ public class Profiler {
                     consecutiveBadCount ++;
                     if (consecutiveBadCount == countThreshold) { //trigger circuit breaker
                         pause = nextPause;
-                        
+
                         nextPause *= PAUSE_MULTIPLIER;
                         nextPause = Math.min(nextPause, MAX_CIRCUIT_BREAKER_PAUSE);
                         consecutiveBadCount = 0; //also reset the bad count, if we get more consecutive bad duration, we want to increase the threshold further
@@ -608,14 +608,14 @@ public class Profiler {
                 }
             }
             return pause;
-            
-            
+
+
         }
 
         public int getBreakDurationThreshold() {
             return durationThreshold;
         }
-        
+
         public int getBreakCountThreshold() {
             return countThreshold;
         }
