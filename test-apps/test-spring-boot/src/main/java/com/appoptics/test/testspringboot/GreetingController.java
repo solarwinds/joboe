@@ -24,6 +24,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.sql.*;
 import java.util.Map;
 import java.util.Random;
 
@@ -32,6 +33,41 @@ public class GreetingController {
     private static final String GET_URL = "http://localhost:8080/listHeaders";
 
     private Logger logger = LoggerFactory.getLogger(TestSpringBootApplication.class);
+
+    @GetMapping("/prepare-sql")
+    public String prepareSql(@RequestParam(defaultValue="World") String name) {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "newuser", "password");
+            PreparedStatement ps = con.prepareStatement("insert into mytable values(?)");
+            ps.setString(1, "hello " + name);
+            ps.execute();
+        } catch (SQLException | ClassNotFoundException e) {
+            return e.toString();
+        }
+        return "done";
+    }
+
+    @GetMapping("/sql")
+    public String sql(@RequestParam(defaultValue="World") String name) {
+        StringBuilder sb = new StringBuilder();
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "newuser", "password");
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery("select * from mytable");
+
+            while (rs.next()) {
+                String lastName = rs.getString("name");
+                sb.append(", ");
+                sb.append(lastName);
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            return e.toString();
+        }
+        return sb.toString();
+    }
+
     @GetMapping("/greeting")
     public String greeting(@RequestParam(name="name", required=false, defaultValue="World") String name, Model model) {
         logger.info("Received request with name " + name);
@@ -43,7 +79,7 @@ public class GreetingController {
         model.addAttribute("name", name);
         return "greeting";
     }
-    
+
     @GetMapping("/listHeaders")
     public ResponseEntity<String> listAllHeaders(
             @RequestHeader Map<String, String> headers) {
@@ -53,7 +89,7 @@ public class GreetingController {
             sb.append(String.format("---Header '%s' = %s", key, value));
             sb.append("\n");
         });
-        
+
         return new ResponseEntity<String>(
                 sb.toString(), HttpStatus.OK);
     }
