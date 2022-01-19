@@ -20,7 +20,7 @@ import java.util.*;
 public enum ConfigProperty {
     AGENT_CONFIG (new ConfigKey(null, EnvPrefix.PRODUCT + "CONFIG_FILE", "config"), ConfigGroup.AGENT, String.class),
     AGENT_DEBUG (new ConfigKey(null, null, "debug"), ConfigGroup.AGENT, Boolean.class),
-    AGENT_LOGGING (new ConfigKey("agent.logging", EnvPrefix.PRODUCT + "LOGGING_LEVEL", "logging"), ConfigGroup.AGENT, String.class),
+    AGENT_LOGGING (new ConfigKey("agent.logging", EnvPrefix.PRODUCT + "DEBUG_LEVEL", "logging"), ConfigGroup.AGENT, String.class),
     AGENT_LOGGING_TRACE_ID (new ConfigKey("agent.logging.traceId"), ConfigGroup.AGENT, String.class),
     AGENT_TRACING_MODE (new ConfigKey("agent.tracingMode", null, "tracing_mode"), ConfigGroup.AGENT, String.class),
     AGENT_SAMPLE_RATE (new ConfigKey("agent.sampleRate", null, "sampling_rate", "sample_rate"), ConfigGroup.AGENT, Integer.class),
@@ -44,7 +44,7 @@ public enum ConfigProperty {
     AGENT_CONTEXT_TTL(new ConfigKey("agent.contextTtl"), ConfigGroup.AGENT, Integer.class),
     AGENT_CONTEXT_MAX_EVENTS(new ConfigKey("agent.contextMaxEvents"), ConfigGroup.AGENT, Integer.class),
     AGENT_CONTEXT_MAX_BACKTRACES(new ConfigKey("agent.contextMaxBacktraces"), ConfigGroup.AGENT, Integer.class),
-    AGENT_HOSTNAME_ALIAS (new ConfigKey("agent.hostnameAlias", null, "hostname_alias"), ConfigGroup.AGENT, String.class),
+    AGENT_HOSTNAME_ALIAS (new ConfigKey("agent.hostnameAlias", EnvPrefix.PRODUCT + "HOSTNAME_ALIAS", "hostname_alias"), ConfigGroup.AGENT, String.class),
     AGENT_LOG_FILE(new ConfigKey(null, EnvPrefix.PRODUCT + "JAVA_LOG_FILE", "log_file"), ConfigGroup.AGENT, String.class),
     AGENT_COLLECTOR(new ConfigKey(null, EnvPrefix.PRODUCT + "COLLECTOR"), ConfigGroup.AGENT, String.class),
     AGENT_COLLECTOR_SERVER_CERT_LOCATION(new ConfigKey(null, EnvPrefix.PRODUCT + "TRUSTEDPATH"), ConfigGroup.AGENT, String.class),
