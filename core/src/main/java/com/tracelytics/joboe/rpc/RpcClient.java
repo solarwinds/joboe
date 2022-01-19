@@ -107,12 +107,12 @@ public class RpcClient implements com.tracelytics.joboe.rpc.Client {
         if (executor == null) {
             throw new RpcClientRejectedExecutionException("Cannot submit job of taskType [" + taskType + "] as this collector client only handles " + services.keySet());
         }
-        
+
         FutureTask<T> task = new FutureTask<T>(
             new Callable<T>() {
                 public T call() throws ClientException {
                     T result = null;
-                    
+
                     RetryParams retryParams = new RetryParams(taskType);
                     do {
                         result = handleClientCall(clientCall, retryParams);
@@ -129,7 +129,7 @@ public class RpcClient implements com.tracelytics.joboe.rpc.Client {
                  * Handles the actual collector call. This call blocks and modifies the underlying protocol client connection if either
                  * connection exception arises or if a "redirect" result is received. It is implemented this way as those conditions
                  * applies to the any tasks submitted to this RpcClient instance hence blocking is required
-                 *   
+                 *
                  * @param clientCall
                  * @param retryParams
                  * @return  the result of the rpc call, take note that this could be null if the protocol client is reconnected during a failed call
@@ -141,15 +141,15 @@ public class RpcClient implements com.tracelytics.joboe.rpc.Client {
                             if (!checkClient()) { //check/initialize the connection
                                 return null;
                             }
-                            
+
                             T result = clientCall.call(); //actual call to the underlying protocol client
-                            
+
                             if (reportedConnectError) { //successfully made a call, if this connection had error previously, we should report that connection is recovered
                                 logger.info("Protocol client [" + taskType + "] successfully recovered : " + host + ":" + port);
                                 reportedConnectError = false; //reset the flag
                             }
                             reportedRejectedExecutionError = false; //successfully made a call, if any subsequent call is rejected due to full queue, it should print a new warning
-                            
+
                             if (result.getResultCode() == ResultCode.TRY_LATER) {
                                 retryParams.flagRetry(RetryType.TRY_LATER);
                             } else if (result.getResultCode() == ResultCode.LIMIT_EXCEEDED) {
@@ -159,12 +159,12 @@ public class RpcClient implements com.tracelytics.joboe.rpc.Client {
                                     resetClient(result.getArg()); //reset the client based on the redirect params
                                 }
                             }
-                            
+
                             //update connection status
                             connectionStatus = result.getResultCode().isError() ? Status.FAILURE : Status.OK;
-                                                        
-                            keepAliveMonitor.updateKeepAlive(); //connection is healthy, update keep alive 
-                            
+
+                            keepAliveMonitor.updateKeepAlive(); //connection is healthy, update keep alive
+
                             return result;
                         } catch (Exception e) {
                             if (RpcClient.this.isClosing) {
@@ -189,7 +189,7 @@ public class RpcClient implements com.tracelytics.joboe.rpc.Client {
                 /**
                  * Blocks until a connection is successfully re-established or max retry attempt is reached
                  * @param retryParams
-                 * @return  whether the reconnect operation is successful 
+                 * @return  whether the reconnect operation is successful
                  */
                 private boolean reconnectClient(RetryParams retryParams) {
                     shutdownProtocolClient();
@@ -197,7 +197,7 @@ public class RpcClient implements com.tracelytics.joboe.rpc.Client {
                     return true;
                 }
             });
-        
+
         try {
             executor.execute(task);
         } catch (RejectedExecutionException e) {
@@ -206,13 +206,13 @@ public class RpcClient implements com.tracelytics.joboe.rpc.Client {
                 throw new RpcClientRejectedExecutionException(e);
             }
         }
-            
+
         return task;
     }
 
     /**
      * Checks if underlying protocol client is available. Initialize the underlying client if it's not yet available.
-     * 
+     *
      * This method blocks according to the defaultRetryParamConstants. By default, this should block indefinitely until connection is successfully initialized
      */
     private synchronized boolean checkClient() {
@@ -231,7 +231,7 @@ public class RpcClient implements com.tracelytics.joboe.rpc.Client {
         shutdownProtocolClient(); //shut down the current generated client
         if (arg != null && !"".equals(arg)) {
             String[] tokens = arg.split(":");
-            
+
             String newHost;
             Integer newPort = null;
             if (tokens.length == 1) {
@@ -245,19 +245,19 @@ public class RpcClient implements com.tracelytics.joboe.rpc.Client {
                     throw new ClientFatalException("Failed to perform collector Redirect. Invalid port number [" + tokens[1] + "] found in arg [" + arg + "]");
                 }
             }
-            
+
             this.host = newHost;
             if (newPort != null) {
                 this.port = newPort;
             }
             logger.info("Collector Redirect to " + this.host + ":" + this.port);
-            
+
             initClient();
         } else {
             throw new ClientFatalException("Failed to perform collector Redirect. Redirect args is empty");
         }
     }
-    
+
     @Override
     protected void finalize() throws Throwable {
         close();
@@ -274,24 +274,22 @@ public class RpcClient implements com.tracelytics.joboe.rpc.Client {
         });
         executorService.shutdown();
     }
-    
+
     /**
      * Initialize the underlying protocol channel (create connection and perform a ping check)
-     * 
+     *
      * It blocks and retries on failure unless max retry for CONNECTION_FAILURE is reached according to defaultRetryParamConstants.
      *
      */
     private synchronized final void initClient() {
         RetryParams retryParams = new RetryParams(TaskType.CONNECTION_INIT);
-        
+
         boolean initClient = !RpcClient.this.isClosing;
         while (initClient) {
             logger.debug("Creating collector client  : " + host + ":" + port);
             try {
                 protocolClient = protocolClientFactory.buildClient(host, port);
                 logger.debug("Created collector client  : " + host + ":" + port);
-                protocolClient.doPing(serviceKey);
-                logger.debug("Collector client Ping successful");
 
                 connectionStatus = Status.OK;
                 return;
@@ -302,13 +300,13 @@ public class RpcClient implements com.tracelytics.joboe.rpc.Client {
                 } else {
                     logConnectException(e, TaskType.CONNECTION_INIT);
                 }
-                
+
                 retryParams.flagRetry(RetryType.CONNECTION_FAILURE);
                 shutdownProtocolClient(); //always shuts down underlying and retry in this case
             }
 
             initClient = !RpcClient.this.isClosing && retryParams.retry();
-        } 
+        }
     }
 
 
@@ -318,19 +316,19 @@ public class RpcClient implements com.tracelytics.joboe.rpc.Client {
      * @param taskType
      */
     private void logConnectException(Exception e, TaskType taskType) {
-        if (logger.shouldLog(Level.DEBUG)) { //if logging level is debug, then log this exception always 
+        if (logger.shouldLog(Level.DEBUG)) { //if logging level is debug, then log this exception always
             logger.warn("SSL client connection to collector [" + host + ":" + port + "] failed [" + taskType + "], message : " + e.getMessage(), e);
             reportedConnectError = true;
         }
     }
-    
+
     /**
-     * Logs on critical connection exception - for example prolonged connection init failure 
+     * Logs on critical connection exception - for example prolonged connection init failure
      * @param e
      * @param taskType
      */
     private void logCriticalConnectException(Exception e, TaskType taskType) {
-        if (logger.shouldLog(Level.DEBUG) || !reportedConnectError) { //Warn it on the first time only for INFO+ logging settings 
+        if (logger.shouldLog(Level.DEBUG) || !reportedConnectError) { //Warn it on the first time only for INFO+ logging settings
             if (logger.shouldLog(Level.DEBUG)) { //only report full trace if it's DEBUG logging settings
                 logger.warn("SSL client connection to collector [" + host + ":" + port + "] failed after retries [" + taskType + "], message : " + e.getMessage(), e);
             } else {
@@ -339,9 +337,9 @@ public class RpcClient implements com.tracelytics.joboe.rpc.Client {
             reportedConnectError = true;
         }
     }
-    
+
     private void handleRejectedExecutionException(RejectedExecutionException e) {
-        if (logger.shouldLog(Level.DEBUG) || !reportedRejectedExecutionError) { //Warn it on the first time only for INFO+ logging settings 
+        if (logger.shouldLog(Level.DEBUG) || !reportedRejectedExecutionError) { //Warn it on the first time only for INFO+ logging settings
             logger.warn("Rejected operation on Collector client side, probably due to full queue : " + e.getMessage());
             reportedRejectedExecutionError = true;
         }
@@ -421,7 +419,7 @@ public class RpcClient implements com.tracelytics.joboe.rpc.Client {
      */
     public void close() {
         isClosing = true;
-        
+
         //stop all the job queue executor services, but it should still process jobs that are queued
         for (ExecutorService service : services.values()) {
             if (connectionStatus != Status.OK) {
@@ -450,8 +448,8 @@ public class RpcClient implements com.tracelytics.joboe.rpc.Client {
     public Status getStatus() {
         return connectionStatus;
     }
-    
-    
+
+
     @Override
     public String toString() {
         return "RpcClient [host=" + host + ", port=" + port + "]";
@@ -465,7 +463,7 @@ public class RpcClient implements com.tracelytics.joboe.rpc.Client {
              this.callback = callback;
         }
         private static String previousReportedWarning = null; //could be modified by multiple thread, but it's rather harmless even if that happens
-        
+
         public final T call() throws Exception {
             try {
                 T result = doCall(); //might be more performant to separate the load generation with the actual collector outbound call
@@ -482,7 +480,7 @@ public class RpcClient implements com.tracelytics.joboe.rpc.Client {
                 } else if (result.getResultCode() == ResultCode.OK) { //then reset the previous warning, since it's OK now
                     previousReportedWarning = null;
                 }
-                
+
                 return result;
             } catch (Exception e) {
                 if (callback != null) {
@@ -491,31 +489,31 @@ public class RpcClient implements com.tracelytics.joboe.rpc.Client {
                 throw e;
             }
         }
-        
+
         public abstract T doCall() throws Exception;
     }
-    
+
     /**
      * Identifies reasoning for a retry operation
      * @author pluk
      *
      */
-    enum RetryType { 
-        TRY_LATER(true), //retry as result code is TRY_LATER 
+    enum RetryType {
+        TRY_LATER(true), //retry as result code is TRY_LATER
         LIMIT_EXCEED(true), //retry as result code is LIMIT_EXCEED
         CONNECTION_FAILURE(true), //retry due to failed connection
         SERVER_ERROR(true), //retry after a error triggered by server
         CONNECTION_RECOVERED(false), //retry due to connection successfully recovered from failure
         REDIRECT(false); //retry as result code is REDIRECT
-        
+
         private boolean failure;
-        
+
         RetryType(boolean failure) {
             this.failure = failure;
         }
-        
+
         /**
-         * 
+         *
          * @return whether this result code is considered a "failure" result code
          */
         public boolean isFailure() {
@@ -530,25 +528,25 @@ public class RpcClient implements com.tracelytics.joboe.rpc.Client {
         private final Map<TaskType, Map<RetryType, Integer>> initRetryDelaysByTaskType = new HashMap<TaskType, Map<RetryType, Integer>>();
         private final Map<TaskType, Map<RetryType, Integer>> maxRetryDelaysByTaskType = new HashMap<TaskType, Map<RetryType, Integer>>();
         private final Map<TaskType, Map<RetryType, Integer>> maxRetryCountsByTaskType = new HashMap<TaskType, Map<RetryType, Integer>>();
-        
-        
+
+
         private static final int DEFAULT_INIT_DELAY = 500;
         private static final int DEFAULT_MAX_DELAY = 60000;
         private static final int DEAFULT_MAX_RETRY_COUNT = 20;
-        
+
         /**
-         * Retrieves the default param constants, which has init delay 500 ms, max delay 60000 ms, and max retry count 20. 
-         * 
+         * Retrieves the default param constants, which has init delay 500 ms, max delay 60000 ms, and max retry count 20.
+         *
          * Take note that for task type "GET_SETTING", the max retry count is set to 0 on failure RetryType (no retry on failure RetryType)
-         * 
+         *
          * @return
          */
         static final RetryParamConstants getDefault() {
             RetryParamConstants retryParamConstants = new RetryParamConstants(DEFAULT_INIT_DELAY, DEFAULT_MAX_DELAY, DEAFULT_MAX_RETRY_COUNT);
-            
+
             return retryParamConstants;
         }
-        
+
         private final void setMaxRetryCountsOnFailure(TaskType taskType, Integer maxRetryCount) {
             for (Entry<RetryType, Integer> maxRetryCountEntry : maxRetryCountsByTaskType.get(taskType).entrySet()) {
                 if (maxRetryCountEntry.getKey().isFailure()) {
@@ -590,43 +588,43 @@ public class RpcClient implements com.tracelytics.joboe.rpc.Client {
         }
 
     }
-    
+
     /**
-     * Represents the state of retrying. Provides ways to flag retry and performs sleep based {@link RetryType} 
+     * Represents the state of retrying. Provides ways to flag retry and performs sleep based {@link RetryType}
      */
     class RetryParams {
         private static final double RETRY_MULTIPLIER = 1.5;
         private final Map<RetryType, Integer> currentRetryDelays = new HashMap<RetryType, Integer>();
         private final Map<RetryType, Integer> currentRetryCounts = new HashMap<RetryType, Integer>();
-        
+
         private boolean shouldRetry;
         private Integer activeDelay;
         private TaskType taskType;
-        
+
         RetryParams(TaskType taskType) {
             this.taskType = taskType;
         }
-        
-        
+
+
         /**
          * Flags for a retry with a given reason in the {@link RetryType}, this will affect the outcome of the next {@link RetryParams#retry()} call.
-         * 
-         * Take note that flagging a retry with this method alone does not determine the final outcome of the next {@link RetryParams#retry()} call, 
+         *
+         * Take note that flagging a retry with this method alone does not determine the final outcome of the next {@link RetryParams#retry()} call,
          * the current states of the <code>RetryParams</code> would also be assessed (for example if the current retry count has exceeded the limit)
-         * 
+         *
          * @param retryType
          * @return whether flagging is successful based on the current state
          */
         public boolean flagRetry(RetryType retryType) {
             return flagRetry(retryType, false);
         }
-        
+
         /**
          * Flags for a retry with a given reason in the {@link RetryType}, this will affect the outcome of the next {@link RetryParams#retry()} call.
-         * 
-         * Take note that flagging a retry with this method alone does not determine the final outcome of the next {@link RetryParams#retry()} call, 
+         *
+         * Take note that flagging a retry with this method alone does not determine the final outcome of the next {@link RetryParams#retry()} call,
          * the current states of the <code>RetryParams</code> would also be assessed (for example if the current retry count has exceeded the limit)
-         * 
+         *
          * @param retryType
          * @param resetOtherParams  whether to reset the states of all params with other <code>RetryType</code>
          * @return whether flagging is successful based on the current state
@@ -643,13 +641,13 @@ public class RpcClient implements com.tracelytics.joboe.rpc.Client {
                 Integer maxRetryDelay = getMaxRetryDelay(taskType, retryType);
                 delay = maxRetryDelay != null ? Math.min((int) (delay * RETRY_MULTIPLIER), maxRetryDelay) : (int) (delay * RETRY_MULTIPLIER);
             }
-            
+
             if (resetOtherParams) {
                 currentRetryDelays.clear();
             }
-            
+
             currentRetryDelays.put(retryType, delay);
-            
+
             //then increment count
             Integer retryCount = currentRetryCounts.get(retryType);
             if (retryCount == null) {
@@ -657,13 +655,13 @@ public class RpcClient implements com.tracelytics.joboe.rpc.Client {
             } else {
                 retryCount ++;
             }
-            
+
             if (resetOtherParams) {
                 currentRetryCounts.clear();
             }
-            
+
             currentRetryCounts.put(retryType, retryCount);
-            
+
             //update the should retry flag
             Integer maxRetryCount = getMaxRetryCount(taskType, retryType); //could be null if there's no limit to it
             shouldRetry = maxRetryCount == null || retryCount <= maxRetryCount;
@@ -674,10 +672,10 @@ public class RpcClient implements com.tracelytics.joboe.rpc.Client {
                 logger.debug("Flagging to retry message with delay [" + delay + "] ms, cause: " + retryType);
                 activeDelay = delay;
             }
-            
+
             return shouldRetry;
         }
-        
+
         private Integer getMaxRetryCount(TaskType taskType, RetryType retryType) {
             return defaultRetryParamConstants.maxRetryCountsByTaskType.get(taskType).get(retryType);
         }
@@ -689,17 +687,17 @@ public class RpcClient implements com.tracelytics.joboe.rpc.Client {
         private Integer getInitRetryDelay(TaskType taskType, RetryType retryType) {
             return defaultRetryParamConstants.initRetryDelaysByTaskType.get(taskType).get(retryType);
         }
-        
+
         private int getCurrentRetryCount(RetryType retryType) {
             return currentRetryCounts.containsKey(retryType) ? currentRetryCounts.get(retryType) : 0;
         }
-        
+
         /**
-         * Determines whether a retry should be performed based on previous call of {@link RetryParams#flagRetry(RetryType) } with consideration of current states 
+         * Determines whether a retry should be performed based on previous call of {@link RetryParams#flagRetry(RetryType) } with consideration of current states
          * for retry restrictions on the "TaskType" of this RetryParam refers to.
-         * 
-         * This might enforce time wait (thread sleep) if a retry should be performed with delay 
-         *  
+         *
+         * This might enforce time wait (thread sleep) if a retry should be performed with delay
+         *
          * @return  whether retry should be performed
          */
         public boolean retry() {
@@ -722,7 +720,7 @@ public class RpcClient implements com.tracelytics.joboe.rpc.Client {
             }
         }
     }
-    
+
     /**
      * A keep alive monitor that sends a ping message if it has been idle for 20 seconds
      * @author pluk
@@ -733,7 +731,7 @@ public class RpcClient implements com.tracelytics.joboe.rpc.Client {
         private ScheduledFuture<?> keepAliveFuture;
         private Runnable keepAliveRunnable;
         private static final long KEEP_ALIVE_INTERVAL = 20; //in seconds
-        
+
         public KeepAliveMontior() {
             keepAliveService = Executors.newScheduledThreadPool(1, DaemonThreadFactory.newInstance("keep-alive"));
             keepAliveRunnable = new Runnable() {
@@ -743,7 +741,7 @@ public class RpcClient implements com.tracelytics.joboe.rpc.Client {
                             protocolClient.doPing(serviceKey);
                             updateKeepAlive(); //reschedule another keep alive ping
                         } catch (Exception e) {
-                            logger.debug("Keep alive ping failed [" + e.getMessage() + "]", e); 
+                            logger.debug("Keep alive ping failed [" + e.getMessage() + "]", e);
                             //do not re-schedule another keep alive ping if it was having issues
                         }
                     }
@@ -751,12 +749,12 @@ public class RpcClient implements com.tracelytics.joboe.rpc.Client {
             };
             updateKeepAlive();
         }
-        
+
         private synchronized void updateKeepAlive() {
             if (keepAliveFuture != null) {
                 keepAliveFuture.cancel(false);
             }
-            
+
             keepAliveFuture = keepAliveService.schedule(keepAliveRunnable, KEEP_ALIVE_INTERVAL, TimeUnit.SECONDS);
         }
     }
