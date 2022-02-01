@@ -1,4 +1,4 @@
-name: Java Agent with Maven
+name: Core libs with Maven
 
 on:
   workflow_dispatch:
@@ -31,17 +31,12 @@ jobs:
       env:
           JAVA_1_8_HOME : "${{ steps.setup-jdk-8.outputs.path }}"
           JAVA_HOME : "${{ steps.setup-jdk-11.outputs.path }}"
-    - name: checksum
-      run: |
-          mv api/target/appoptics-sdk.jar api/target/appoptics-sdk.jar.unsigned
-          SHA=$(sha256sum agent/target/appoptics-agent.jar api/target/appoptics-sdk.jar.unsigned)
-          echo "$SHA" | sed 's/\([0-9a-f]\+\)  \(.\+\)/\2=\1/g' > checksums
     - name: upload artifact
       uses: actions/upload-artifact@v2
       with:
         path: |
           commit
-          checksums
-          agent/target/appoptics-agent.jar
-          api/target/appoptics-sdk.jar.unsigned      
-          
+          core/target/core-*.jar
+          metrics/target/metrics-*.jar
+          dependencies/target/dependencies-*.jar
+
