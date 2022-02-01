@@ -31,12 +31,8 @@ jobs:
       env:
           JAVA_1_8_HOME : "${{ steps.setup-jdk-8.outputs.path }}"
           JAVA_HOME : "${{ steps.setup-jdk-11.outputs.path }}"
-    - name: upload artifact
-      uses: actions/upload-artifact@v2
-      with:
-        path: |
-          commit
-          core/target/core-*.jar
-          metrics/target/metrics-*.jar
-          dependencies/target/dependencies-*.jar
+    - name: Publish to GitHub Packages Apache Maven
+      run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
 
