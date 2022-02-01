@@ -1,6 +1,10 @@
 name: Release
+
 on:
   workflow_dispatch:
+    inputs:
+      checkout-ref:
+        description: branch, tag or SHA to checkout. defaults to ref or SHA of triggering event.
 
 jobs:
   test:
