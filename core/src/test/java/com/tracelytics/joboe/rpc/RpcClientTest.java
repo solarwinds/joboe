@@ -48,7 +48,7 @@ public abstract class RpcClientTest {
     protected static final List<Settings> TEST_SETTINGS = generateTestSettings();
     private static final Map<Field, Integer> originalFieldIntValues = new HashMap<Field, Integer>();
 
-    
+
     private static final RpcClient.RetryParamConstants QUICK_RETRY = new RpcClient.RetryParamConstants(100, 200, 3);
 
     protected TestCollector testCollector;
@@ -67,7 +67,7 @@ public abstract class RpcClientTest {
         for (Entry<Field, Integer> originalFieldValue : originalFieldIntValues.entrySet()) {
             originalFieldValue.getKey().setInt(null, originalFieldValue.getValue().intValue());
         }
-        
+
         testCollector.stop();
     }
 
@@ -91,12 +91,12 @@ public abstract class RpcClientTest {
 
     private static List<Settings> generateTestSettings() {
         List<Settings> settings = new ArrayList<Settings>();
-        
+
         Map<String, ByteBuffer> arguments = new HashMap<String, ByteBuffer>();
-        
+
         arguments.put(SettingsArg.BUCKET_CAPACITY.getKey(), SettingsArg.BUCKET_CAPACITY.toByteBuffer(32.0));
         arguments.put(SettingsArg.BUCKET_RATE.getKey(), SettingsArg.BUCKET_RATE.toByteBuffer(2.0));
-        
+
         settings.add(new Settings(Settings.OBOE_SETTINGS_TYPE_DEFAULT_SAMPLE_RATE, PollingSettingsFetcherTest.DEFAULT_FLAGS_STRING, TimeUtils.getTimestampMicroSeconds(), 1000000, 600, "test-layer", arguments));
         return settings;
     }
@@ -108,13 +108,13 @@ public abstract class RpcClientTest {
         entryEvent.addInfo("Layer", "test-thrift");
         entryEvent.addInfo("Label", "entry");
         testEvents.add(entryEvent);
-        
-        
+
+
         Event exitEvent = Context.createEvent();
         exitEvent.addInfo("Layer", "test-thrift");
         exitEvent.addInfo("Label", "exit");
         testEvents.add(exitEvent);
-        
+
         return testEvents;
     }
 
@@ -143,9 +143,9 @@ public abstract class RpcClientTest {
                 client.close();
             }
         }
-        
+
     }
-    
+
     @Test
     public void testConnectInvalidServer() throws Exception {
         System.out.println("running testConnectInvalidServer");
@@ -161,7 +161,7 @@ public abstract class RpcClientTest {
             }
         }
     }
-    
+
     @Test
     public void testConnectDeadServer() throws Exception {
         System.out.println("running testConnectDeadServer");
@@ -170,35 +170,35 @@ public abstract class RpcClientTest {
             client = new RpcClient(TEST_SERVER_HOST, 19876, TEST_CLIENT_ID, QUICK_RETRY, getProtocolClientFactory(new File(getServerPublicKeyLocation()).toURI().toURL()));
             client.postEvents(TEST_EVENTS, null).get(5, TimeUnit.SECONDS);
             fail("Expect exception thrown, but no exception found!");
-        } catch (TimeoutException e) {
+        } catch (TimeoutException | ExecutionException e) {
             //expected;
             System.out.println("Fret not! Expected ^^");
         } finally {
             if (client != null) {
                 client.close();
             }
-        } 
+        }
     }
-    
+
     @Test
     public void testConnectLazyServer() throws Exception {
     	int lazyServerPort = locateAvailablePort();
-        
+
         //TServer lazyServer = startTestCollector(tryLaterPort, tryLaterHandler); //DO NOT START SERVER YET
         TestCollector lazyServer = null;
         Client client = null;
-        
+
         try {
             client = new RpcClient(TEST_SERVER_HOST, lazyServerPort, TEST_CLIENT_ID, getProtocolClientFactory(new File(getServerPublicKeyLocation()).toURI().toURL()));
             Future<Result> futureResult = client.postEvents(TEST_EVENTS, null);
-            
+
             TimeUnit.SECONDS.sleep(5); //lazy!!
             lazyServer = startCollector(lazyServerPort); //now start the lazy server
-            
+
             assertEquals(com.tracelytics.joboe.rpc.ResultCode.OK, futureResult.get().getResultCode());
             assertEventEquals(TEST_EVENTS, lazyServer.flush());
-            
-            
+
+
         } finally {
             if (client != null) {
                 client.close();
@@ -206,21 +206,21 @@ public abstract class RpcClientTest {
             lazyServer.stop();
         }
     }
-    
+
     @Test
     public void testPostManyEvents() throws Exception {
         System.out.println("running testPostManyEvents");
         Client client = null;
-        
+
         try {
             client = new RpcClient(TEST_SERVER_HOST, testServerPort, TEST_CLIENT_ID, getProtocolClientFactory(new File(getServerPublicKeyLocation()).toURI().toURL()));
 
             List<Event> events = new ArrayList<Event>();
-            
+
             for (int i = 0 ; i < 1000; i ++) {
                 events.addAll(TEST_EVENTS);
             }
-            
+
             assertEquals(com.tracelytics.joboe.rpc.ResultCode.OK, client.postEvents(events, null).get().getResultCode());
             assertEventEquals(events, testCollector.flush());
         } finally {
@@ -229,7 +229,7 @@ public abstract class RpcClientTest {
             }
         }
     }
-    
+
     @Test
     public void testPostManyBigEvents() throws Exception {
         System.out.println("running testPostManyBigEvents");
@@ -259,7 +259,7 @@ public abstract class RpcClientTest {
             }
         }
     }
-    
+
     @Test
     public void testGetSettings() throws Exception  {
         System.out.println("running testGetSettings");
@@ -292,7 +292,7 @@ public abstract class RpcClientTest {
             }
         }
     }
-    
+
     @Test
     public void testGetSettingsDeadServer() throws Exception  {
         System.out.println("running testGetSettingsDeadServer");
@@ -301,7 +301,7 @@ public abstract class RpcClientTest {
             client = new RpcClient(TEST_SERVER_HOST, 19876, TEST_CLIENT_ID, getProtocolClientFactory(new File(getServerPublicKeyLocation()).toURI().toURL()));
             client.getSettings("", null).get(5, TimeUnit.SECONDS);
             fail("Expect exception thrown, but no exception found!");
-        } catch (TimeoutException e) {
+        } catch (TimeoutException | ExecutionException e) {
             //expected;
             System.out.println("Fret not! Expected ^^");
         } finally {
@@ -335,12 +335,12 @@ public abstract class RpcClientTest {
             }
         }
     }
-    
+
     @Test
     public void testPostStatus() throws Exception {
         System.out.println("running testPostStatus");
         Client client = null;
-        
+
         try {
             client = new RpcClient(TEST_SERVER_HOST, testServerPort, TEST_CLIENT_ID, getProtocolClientFactory(new File(getServerPublicKeyLocation()).toURI().toURL()));
 
@@ -349,16 +349,16 @@ public abstract class RpcClientTest {
             testMessage.put("SomeInteger", 456);
             testMessage.put("SomeDouble", 0.789);
             testMessage.put("SomeBoolean", true);
-            
+
             Map<String, Object> subMap = new HashMap<String, Object>(testMessage);
             testMessage.put("SomeMap", subMap);
-            
+
             Result result = client.postStatus(Collections.singletonList(testMessage), null).get();
             assertEquals(com.tracelytics.joboe.rpc.ResultCode.OK, result.getResultCode());
-            
+
             List<ByteBuffer> receivedMessages = testCollector.flush();
             assertEquals(1, receivedMessages.size());
-            
+
             Set<Entry<String, Object>> recievedEntries = getEntriesFromBytes(receivedMessages.get(0).array());
             assertEquals(testMessage.entrySet(), recievedEntries);
         } finally {
@@ -367,8 +367,8 @@ public abstract class RpcClientTest {
             }
         }
     }
-    
-    
+
+
     @Test
     public void testPostStatusBigMessage() throws Exception {
         System.out.println("running testPostStatusBigMessage");
@@ -384,7 +384,7 @@ public abstract class RpcClientTest {
                 testMessage.put(String.valueOf(j), new Byte[ENTRY_SIZE]);
             }
             testMessages.add(testMessage);
-        
+
             client.postStatus(testMessages, null).get(); //big but it's within the max size defined in ThriftClient MAX_MESSAGE_SIZE
         } finally {
             if (client != null) {
@@ -392,8 +392,8 @@ public abstract class RpcClientTest {
             }
         }
     }
-    
-    
+
+
     @Test
     public void testPostStatusHugeMessage() throws Exception {
         System.out.println("running testPostStatusHugeMessage");
@@ -409,7 +409,7 @@ public abstract class RpcClientTest {
                 testMessage.put(String.valueOf(j), new Byte[ENTRY_SIZE]);
             }
             testMessages.add(testMessage);
-        
+
             client.postStatus(testMessages, null).get(); //should throw exception
             fail("Expected " + ExecutionException.class.getName() + " but it was not thrown");
         } catch (ExecutionException e) {
@@ -424,14 +424,14 @@ public abstract class RpcClientTest {
             }
         }
     }
-    
+
     //TODO isn't postMetrics essentially the same as postStatus???
-    
+
     @Test
     public void testPostMetrics() throws Exception {
         System.out.println("running testPostMetrics");
         Client client = null;
-        
+
         try {
             client = new RpcClient(TEST_SERVER_HOST, testServerPort, TEST_CLIENT_ID, getProtocolClientFactory(new File(getServerPublicKeyLocation()).toURI().toURL()));
 
@@ -440,43 +440,43 @@ public abstract class RpcClientTest {
             testMessage.put("SomeInteger", 456);
             testMessage.put("SomeDouble", 0.789);
             testMessage.put("SomeBoolean", true);
-            
+
             Map<String, Object> subMap = new HashMap<String, Object>(testMessage);
             testMessage.put("SomeMap", subMap);
-            
+
             Result result = client.postMetrics(Collections.singletonList(testMessage), null).get();
             assertEquals(com.tracelytics.joboe.rpc.ResultCode.OK, result.getResultCode());
-            
+
             List<ByteBuffer> receivedMessages = testCollector.flush();
             assertEquals(1, receivedMessages.size());
-            
+
             Set<Entry<String, Object>> recievedEntries = getEntriesFromBytes(receivedMessages.get(0).array());
             assertEquals(testMessage.entrySet(), recievedEntries);
         } finally {
             if (client != null) {
                 client.close();
             }
-            
+
         }
     }
-    
+
     @Test
     public void testConnectionInit() throws Exception {
         System.out.println("running testConnectionInit");
         Client client = null;
-        
+
         try {
             client = new RpcClient(TEST_SERVER_HOST, testServerPort, TEST_CLIENT_ID, getProtocolClientFactory(new File(getServerPublicKeyLocation()).toURI().toURL()));
 
             Map<String, Object> testMessage = new HashMap<String, Object>();
             Result result = client.postMetrics(Collections.singletonList(testMessage), null).get(); //post something to ensure connection init is triggered and sent
             assertEquals(com.tracelytics.joboe.rpc.ResultCode.OK, result.getResultCode());
-            
+
             List<ByteBuffer> receivedMessages = testCollector.flush();
             assertEquals(1, receivedMessages.size());
-            
+
             Set<Entry<String, Object>> receivedEntries = getEntriesFromBytes(receivedMessages.get(0).array()); //first message should be connection init
-            
+
             Set<String> receivedKeys = new HashSet<String>();
             for (Entry<String, Object> receivedEntry : receivedEntries) {
                 receivedKeys.add(receivedEntry.getKey());
@@ -487,16 +487,16 @@ public abstract class RpcClientTest {
             }
         }
     }
-    
-    
+
+
     @Test
     public void testRedirectLoop() throws Exception {
         System.out.println("running testRedirectLoop");
         int redirectPort = locateAvailablePort();
         TestCollector redirectServer = startRedirectCollector(redirectPort, "localhost:" + redirectPort); //redirect loop
-        
+
         Client client = null;
-        
+
         try {
             client = new RpcClient(TEST_SERVER_HOST, redirectPort, TEST_CLIENT_ID, getProtocolClientFactory(new File(getServerPublicKeyLocation()).toURI().toURL()));
 
@@ -508,7 +508,7 @@ public abstract class RpcClientTest {
             redirectServer.stop();
         }
     }
-    
+
     @Test
     public void testValidRedirect() throws Exception {
         System.out.println("running testValidRedirect");
@@ -517,7 +517,7 @@ public abstract class RpcClientTest {
         TestCollector redirectServer1 = startRedirectCollector(redirectPort1, "localhost:" + redirectPort2);
         TestCollector redirectServer2 = startRedirectCollector(redirectPort2, "localhost:" + testServerPort);//redirect back to correct server
 
-        
+
         Client client = null;
 
         try {
@@ -532,20 +532,20 @@ public abstract class RpcClientTest {
             redirectServer1.stop();
             redirectServer2.stop();
         }
-        
+
     }
-    
+
     @Test
     public void testInvalidRedirectArg() throws Exception {
         System.out.println("running testInvalidRedirectArg");
         int redirectPort = locateAvailablePort();
         TestCollector redirectServer = startRedirectCollector(redirectPort, "http://localhost:" + redirectPort); //invalid redirect arg format
         Client client = null;
-        
+
         try {
             client = new RpcClient(TEST_SERVER_HOST, redirectPort, TEST_CLIENT_ID, getProtocolClientFactory(new File(getServerPublicKeyLocation()).toURI().toURL()));
             client.postEvents(TEST_EVENTS, null).get();
-            fail("Expect exception thrown, but no exception found!"); 
+            fail("Expect exception thrown, but no exception found!");
         } catch (ExecutionException e) {
            //expected
             System.out.println("Fret not! Expected ^^");
@@ -556,21 +556,21 @@ public abstract class RpcClientTest {
             redirectServer.stop();
         }
     }
-    
+
     @Test
     public void testInvalidRedirectTarget() throws Exception {
         System.out.println("running testInvalidRedirectTarget");
         int redirectPort = locateAvailablePort();
         TestCollector redirectServer = startRedirectCollector(redirectPort, "unknown-host-aieeeeeeee:" + redirectPort); //invalid redirect arg format
         Client client = null;
-        
+
         try {
             client = new RpcClient(TEST_SERVER_HOST, redirectPort, TEST_CLIENT_ID, QUICK_RETRY, getProtocolClientFactory(new File(getServerPublicKeyLocation()).toURI().toURL()));
 
             client.postEvents(TEST_EVENTS, null).get(5, TimeUnit.SECONDS);
-            
+
             fail("Expect exception thrown, but no exception found!");
-        } catch (TimeoutException e) {
+        } catch (TimeoutException | ExecutionException e) {
             //expected;
             System.out.println("Fret not! Expected ^^");
         } finally {
@@ -580,10 +580,10 @@ public abstract class RpcClientTest {
             redirectServer.stop();
         }
     }
-    
+
     /**
      * Tests against thrift server that processes on certain speed, once exceeded it will return try later.
-     * 
+     *
      * This verifies the retry mechanism of this client
      * @throws Exception
      */
@@ -592,24 +592,24 @@ public abstract class RpcClientTest {
         System.out.println("running testTryLater");
         final int TIME_PER_EVENT = 10;
         int tryLaterPort = locateAvailablePort();
-        
+
         TestCollector tryLaterCollector = startRatedCollector(tryLaterPort, TIME_PER_EVENT, ResultCode.TRY_LATER);
         Client client = null;
-        
+
         try {
             client = new RpcClient(TEST_SERVER_HOST, tryLaterPort, TEST_CLIENT_ID, getProtocolClientFactory(new File(getServerPublicKeyLocation()).toURI().toURL()));
 
             List<Future<Result>> futures = new ArrayList<Future<Result>>();
             List<Event> sentEvents = new ArrayList<Event>();
-            for (int i = 0 ; i < 10; i ++) { 
+            for (int i = 0 ; i < 10; i ++) {
                  futures.add(client.postEvents(TEST_EVENTS, null)); //post events, the handler will return TRY_LATER most of the time, but the client should be able to retry the request until it's OK eventually
                  sentEvents.addAll(TEST_EVENTS);
             }
-            
+
             for (Future<Result> future : futures) {
                 assertEquals(com.tracelytics.joboe.rpc.ResultCode.OK, future.get().getResultCode());
             }
-            
+
              assertEventEquals(sentEvents, tryLaterCollector.flush());
         } finally {
             if (client != null) {
@@ -618,10 +618,10 @@ public abstract class RpcClientTest {
             tryLaterCollector.stop();
         }
     }
-    
+
     /**
      * Tests against thrift server that processes on certain speed, once exceeded it will return limit exceed
-     * 
+     *
      * This verifies the retry mechanism of this client
      * @throws Exception
      */
@@ -630,7 +630,7 @@ public abstract class RpcClientTest {
         System.out.println("running testLimitExceed");
         final int TIME_PER_EVENT = 10;
         int tryLaterPort = locateAvailablePort();
-        
+
         TestCollector tryLaterServer = startRatedCollector(tryLaterPort, TIME_PER_EVENT, ResultCode.LIMIT_EXCEEDED);
         Client client = null;
 
@@ -639,15 +639,15 @@ public abstract class RpcClientTest {
 
             List<Future<Result>> futures = new ArrayList<Future<Result>>();
             List<Event> sentEvents = new ArrayList<Event>();
-            for (int i = 0 ; i < 10; i ++) { 
+            for (int i = 0 ; i < 10; i ++) {
                  futures.add(client.postEvents(TEST_EVENTS, null)); //post events, the handler will return LIMIT_EXCEEDED most of the time, but the client should be able to retry the request until it's OK eventually
                  sentEvents.addAll(TEST_EVENTS);
             }
-            
+
             for (Future<Result> future : futures) {
                 assertEquals(com.tracelytics.joboe.rpc.ResultCode.OK, future.get().getResultCode());
             }
-            
+
              assertEventEquals(sentEvents, tryLaterServer.flush());
         } finally {
             if (client != null) {
@@ -656,12 +656,12 @@ public abstract class RpcClientTest {
             tryLaterServer.stop();
         }
     }
-    
+
     @Test
     public void testUnstableServer() throws Exception {
         System.out.println("running testUnstableServer");
         final int unstableServerPort = locateAvailablePort();
-       
+
         final AtomicBoolean keepRunning = new AtomicBoolean(true);
 
         final List<ByteBuffer> collectorEvents = new ArrayList<ByteBuffer>();
@@ -687,11 +687,11 @@ public abstract class RpcClientTest {
                 }
             }
         };
-        
+
         serverThread.start();
-          
+
         Client client = null;
-        
+
         try {
             client = new RpcClient(TEST_SERVER_HOST, unstableServerPort, TEST_CLIENT_ID, getProtocolClientFactory(new File(getServerPublicKeyLocation()).toURI().toURL()));
 
@@ -709,21 +709,21 @@ public abstract class RpcClientTest {
                 //sentEvents.addAll(TEST_EVENTS);
                 sentEvents.add(entryEvent);
             }
-            
+
             for (Future<Result> future : futures) {
                 assertEquals(com.tracelytics.joboe.rpc.ResultCode.OK, future.get().getResultCode());
             }
 
             keepRunning.set(false);
             serverThread.join(); //wait for the server thread to complete (so server is stopped properly)
-            
+
             assertEventEquals(sentEvents, collectorEvents);
         } finally {
             if (client != null) {
                 client.close();
             }
 
-                     
+
 
         }
     }
@@ -800,55 +800,55 @@ public abstract class RpcClientTest {
     public void testBiasedServer() throws Exception {
         System.out.println("running testBiasedServer");
         int biasedServerPort = locateAvailablePort();
-        
+
         TestCollector basiedServer = startBiasedTestCollector(biasedServerPort, Collections.singletonMap(TaskType.POST_METRICS, ResultCode.TRY_LATER));
         Client client = null;
-        
+
         try {
             client = new RpcClient(TEST_SERVER_HOST, biasedServerPort, TEST_CLIENT_ID, getProtocolClientFactory(new File(getServerPublicKeyLocation()).toURI().toURL()));
 
             List<Future<Result>> futures = new ArrayList<Future<Result>>();
-            
+
             try {
                 Result result = client.postMetrics(new ArrayList<Map<String,Object>>(), null).get(5, TimeUnit.SECONDS); //this is supposed to get held up because of TRY_LAYER
                 fail("Not expecting to return any result for this call!");
             } catch (TimeoutException e) {
                 //expected
             }
-            
+
             assertEquals(com.tracelytics.joboe.rpc.ResultCode.OK, client.getSettings("", null).get().getResultCode()); //this should be successful
-             
+
         } finally {
             if (client != null) {
                 client.close();
             }
             basiedServer.stop();
         }
-        
+
     }
 
 
-    
+
     protected void assertEventEquals(List<Event> testEvents, List<ByteBuffer> receivedMessages) throws BsonBufferException {
         assertEquals(testEvents.size(), receivedMessages.size());
         for (int i = 0; i < testEvents.size() ; i++ ) {
             assertEquals(testEvents.get(i).toByteBuffer(), receivedMessages.get(i));
         }
-        
+
     }
 
     protected static Set<Entry<String, Object>> getEntriesFromBytes(byte[] bytes) {
-        return getBsonDocumentFromBytes(bytes).entrySet();        
+        return getBsonDocumentFromBytes(bytes).entrySet();
     }
 
     protected static BsonDocument getBsonDocumentFromBytes(byte[] bytes) {
         ByteBuffer buffer =  ByteBuffer.allocate(Constants.MAX_EVENT_BUFFER_SIZE).order(ByteOrder.LITTLE_ENDIAN);
         buffer.put(bytes);
         buffer.flip();
-        
+
         return BsonDocuments.readFrom(buffer);
     }
-    
+
     /**
      * Checks to see if a specific port is available.
      *
@@ -870,7 +870,7 @@ public abstract class RpcClientTest {
 //                if (ds != null) {
 //                    ds.close();
 //                }
-//    
+//
 //                if (ss != null) {
 //                    try {
 //                        ss.close();
@@ -881,7 +881,7 @@ public abstract class RpcClientTest {
 //                portWalker ++;
 //            }
 //        }
-        
+
         int MAX_PORT = portWalker + 2000; //huh shouldn't hit it
         while (portWalker <= MAX_PORT) {
             if (!isPortAvailable(portWalker)) {
@@ -893,7 +893,7 @@ public abstract class RpcClientTest {
 
         return 0;
     }
-    
+
     private static boolean isPortAvailable(int port) {
         Socket s = new Socket();
         try {
