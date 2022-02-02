@@ -31,8 +31,8 @@ jobs:
       env:
           JAVA_1_8_HOME : "${{ steps.setup-jdk-8.outputs.path }}"
           JAVA_HOME : "${{ steps.setup-jdk-11.outputs.path }}"
-    - name: Publish to GitHub Packages Apache Maven
-      run: mvn deploy -s $GITHUB_WORKSPACE/settings.xml
+    - name: Publish package
+      run: mvn --batch-mode deploy
       env:
-        GITHUB_TOKEN: ${{ github.token }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
