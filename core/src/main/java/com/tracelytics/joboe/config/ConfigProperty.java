@@ -63,7 +63,7 @@ public enum ConfigProperty {
     AGENT_RPC_CLIENT_TYPE(new ConfigKey("agent.rpcType", EnvPrefix.PRODUCT + "RPC_TYPE", "rpc_type"), ConfigGroup.AGENT, String.class), //not advertised
     AGENT_GRPC_COMPRESSION(new ConfigKey(null, EnvPrefix.PRODUCT + "GRPC_COMPRESSION", "grpc_compression"), ConfigGroup.AGENT, String.class), //not advertised
     AGENT_DISALLOW_UNSAFE(new ConfigKey("agent.disallowUnsafe"), ConfigGroup.AGENT, Boolean.class),
-
+    AGENT_SQL_INJECTION(new ConfigKey("agent.sqlInjection", EnvPrefix.PRODUCT + "SQL_INJECTION", "sql_injection"), ConfigGroup.AGENT, Boolean.class),
     MONITOR_JMX_SCOPES (new ConfigKey("monitor.jmx.scopes"), ConfigGroup.MONITOR, String.class),
     MONITOR_JMX_ENABLE (new ConfigKey("monitor.jmx.enable"), ConfigGroup.MONITOR, Boolean.class),
     MONITOR_JMX_MAX_ENTRY (new ConfigKey("monitor.jmx.maxEntry"), ConfigGroup.MONITOR, Integer.class),
