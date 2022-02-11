@@ -31,7 +31,7 @@ public abstract class RpcClientManager {
     private static final Map<ClientType, RpcClientManager> registeredManagers = new HashMap<ClientType, RpcClientManager>();
     static final URL DEFAULT_COLLECTER_CERT_LOCATION = RpcClientManager.class.getResource("/collector-ca.crt"); //cert by default included in the resource folder or root folder in jar
 
-    static final String DEFAULT_HOST = "apm-collector.st-nighthawk.solarwinds.cloud"; //default collector host: NH staging
+    static final String DEFAULT_HOST = "apm-collector.dc-01.st-ssp.solarwinds.com"; //default collector host: NH staging
     static final int DEFAULT_PORT = 443; //default collector port
 
     protected static String collectorHost;
@@ -160,15 +160,15 @@ public abstract class RpcClientManager {
     /**
      * Obtains a client by the <code>clientType</code> and <code>operationType</code>
      * @param clientType    The protocol/type of the Client. For example THRIFT
-     * @param operationType The operation type this client will handle 
+     * @param operationType The operation type this client will handle
      * @return
      * @throws ClientException
      */
     static Client getClient(ClientType clientType, OperationType operationType) throws ClientException {
        return getClient(clientType, operationType, (String) ConfigManager.getConfig(ConfigProperty.AGENT_SERVICE_KEY));
     }
-    
-    
+
+
     static Client getClient(ClientType clientType, OperationType operationType, String serviceKey) throws ClientException {
         logger.debug("Using " + clientType + " for rpc calls");
 
@@ -183,11 +183,11 @@ public abstract class RpcClientManager {
             throw new ClientException("Unknown Client type requested : " + clientType);
         }
     }
-    
-    
-    
+
+
+
     protected abstract Client getClientImpl(OperationType operationType, String serviceKey);
-    
-    
+
+
     public enum OperationType { TRACING, PROFILING, SETTINGS, METRICS, STATUS }
 }
