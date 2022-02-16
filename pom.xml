@@ -10,7 +10,7 @@
     <name>appoptics-parent</name>
 
     <properties>
-        <revision>7.0.0</revision>
+        <revision>7.0.3-p1</revision>
         <maven.plugin.version>1.0.0</maven.plugin.version>
         <is.snapshot></is.snapshot>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
