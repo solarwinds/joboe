@@ -36,4 +36,5 @@ jobs:
         run: gh release create ${{ env.RELEASE_NAME }} --title "${{ env.RELEASE_NAME }}" core/target/core-*.jar dependencies/target/dependencies-*.jar metrics/target/metrics-*.jar
         env:
           RELEASE_NAME: ${{ github.event.inputs.release-name }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
