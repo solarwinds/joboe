@@ -36,7 +36,7 @@ jobs:
           JAVA_1_8_HOME: "${{ steps.setup-jdk-8.outputs.path }}"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Release and upload artifacts
-        run: gh release create v${{ env.RELEASE_NAME || env.POM_VERSION }} --title "v${{ env.RELEASE_NAME || env.POM_VERSION }}" core/target/core-*.jar dependencies/target/dependencies-*.jar metrics/target/metrics-*.jar
+        run: gh release create v${{ env.RELEASE_NAME || env.POM_VERSION }} --title "v${{ env.RELEASE_NAME || env.POM_VERSION }}" --target ${{ github.event.inputs.checkout-ref }} --draft core/target/core-*.jar dependencies/target/dependencies-*.jar metrics/target/metrics-*.jar
         env:
           RELEASE_NAME: ${{ github.event.inputs.release-name }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
