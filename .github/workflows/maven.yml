@@ -29,16 +29,16 @@ jobs:
           distribution: 'adopt'
       - name: Set version env to pom version
         run: |
-          echo "POM_VERSION=v$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
+          echo "POM_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
       - name: Publish package
         run: mvn --batch-mode deploy
         env:
           JAVA_1_8_HOME: "${{ steps.setup-jdk-8.outputs.path }}"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Release and upload artifacts
-        run: gh release create ${{ env.RELEASE_NAME || env.POM_VERSION }} --title "${{ env.RELEASE_NAME || env.POM_VERSION }}" core/target/core-*.jar dependencies/target/dependencies-*.jar metrics/target/metrics-*.jar
+        run: gh release create v${{ env.RELEASE_NAME || env.POM_VERSION }} --title "v${{ env.RELEASE_NAME || env.POM_VERSION }}" core/target/core-*.jar dependencies/target/dependencies-*.jar metrics/target/metrics-*.jar
         env:
-          RELEASE_NAME: v${{ github.event.inputs.release-name }}
+          RELEASE_NAME: ${{ github.event.inputs.release-name }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
