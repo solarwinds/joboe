@@ -9,7 +9,6 @@
   </parent>
 
   <artifactId>metrics</artifactId>
-<!--  <version>7.0.0</version>-->
   <packaging>jar</packaging>
 
   <name>Agent Metrics</name>

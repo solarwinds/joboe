@@ -9,7 +9,6 @@
   </parent>
 
   <artifactId>dependencies</artifactId>
-<!--  <version>7.0.0</version>-->
   <packaging>jar</packaging>
 
   <name>dependencies</name>

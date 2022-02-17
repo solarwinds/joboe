@@ -91,7 +91,9 @@ public abstract class MessageListenerInstrumentation extends ClassInstrumentatio
 
     public static void layerExit() {
         Scope scope = scopeManager.active();
-        scope.close();
+        if (scope != null) {
+            scope.close();
+        }
     }
 }
 

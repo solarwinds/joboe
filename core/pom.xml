@@ -9,7 +9,6 @@
   </parent>
 
   <artifactId>core</artifactId>
-<!--  <version>7.0.2</version>-->
   <packaging>jar</packaging>
 
   <name>core</name>
