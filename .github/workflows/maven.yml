@@ -10,9 +10,6 @@ name: Build and Publish Core libs with Maven
 
 on:
   workflow_dispatch:
-    inputs:
-      checkout-ref:
-        description: branch, tag or SHA to checkout. defaults to ref or SHA of triggering event.
 
 jobs:
   publish:
@@ -20,7 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          ref: ${{ github.event.inputs.checkout-ref }}
+          ref: ${{ github.ref_name }}
       - name: Set up JDK 8
         id: setup-jdk-8
         uses: actions/setup-java@v1
@@ -39,7 +36,7 @@ jobs:
           JAVA_1_8_HOME: "${{ steps.setup-jdk-8.outputs.path }}"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Release and upload artifacts
-        run: gh release create ${{ env.POM_VERSION }} --title "${{ env.POM_VERSION }}" --notes "for the OpenTelemetry custom distro" --target ${{ github.event.inputs.checkout-ref }} --draft core/target/core-*.jar dependencies/target/dependencies-*.jar metrics/target/metrics-*.jar
+        run: gh release create ${{ env.POM_VERSION }} --title "${{ env.POM_VERSION }}" --notes "for the OpenTelemetry custom distro" --target ${{ github.ref_name }} --draft core/target/core-*.jar dependencies/target/dependencies-*.jar metrics/target/metrics-*.jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
