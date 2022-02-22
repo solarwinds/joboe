@@ -1,15 +1,18 @@
-name: Core libs with Maven
+# This workflow does the following things:
+# 1. build and test the core Joboe libs (core, metrics and dependencies)
+# 2. publish the jars to Github Packages (which can be used by the NightHawk agent at https://github.com/appoptics/opentelemetry-java-instrumentation-custom-distro)
+# 3. make a **draft** release on Github and upload the jars as artifacts (you may need to publish the release manually after it)
+
+# The workflow needs to be triggered manually. (go to the Actions tab in the repo page, choose the workflow and click `Run Workflow`)
+# The draft release will be named based on the `revision` property in the pom file. For example, if the pom revision is 7.0.4, the release
+# will be named as "v7.0.4"
+name: Build and Publish Core libs with Maven
 
 on:
   workflow_dispatch:
-    push:
-      tags:
-        - "v*.*.*"
     inputs:
       checkout-ref:
         description: branch, tag or SHA to checkout. defaults to ref or SHA of triggering event.
-      release-name:
-        description: the release name
 
 jobs:
   publish:
@@ -29,16 +32,15 @@ jobs:
           distribution: 'adopt'
       - name: Set version env to pom version
         run: |
-          echo "POM_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
+          echo "POM_VERSION=v$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
       - name: Publish package
         run: mvn --batch-mode deploy
         env:
           JAVA_1_8_HOME: "${{ steps.setup-jdk-8.outputs.path }}"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Release and upload artifacts
-        run: gh release create v${{ env.RELEASE_NAME || env.POM_VERSION }} --title "v${{ env.RELEASE_NAME || env.POM_VERSION }}" --target ${{ github.event.inputs.checkout-ref }} --draft core/target/core-*.jar dependencies/target/dependencies-*.jar metrics/target/metrics-*.jar
+        run: gh release create {{ env.POM_VERSION }} --title "{{ env.POM_VERSION }}" --notes "for the OpenTelemetry custom distro" --target ${{ github.event.inputs.checkout-ref }} --draft core/target/core-*.jar dependencies/target/dependencies-*.jar metrics/target/metrics-*.jar
         env:
-          RELEASE_NAME: ${{ github.event.inputs.release-name }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
