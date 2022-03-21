@@ -8,8 +8,8 @@ import java.util.Map;
 public class EnvConfigReaderTest extends TestCase {
     public void testValidRead() throws InvalidConfigException {
         Map<String, String> vars = new HashMap<String, String>();
-        vars.put("SOLARWINDS_SERVICE_KEY", "some key");
-        vars.put("SOLARWINDS_SQL_SANITIZE", "2");
+        vars.put(ConfigProperty.EnvPrefix.PRODUCT + "SERVICE_KEY", "some key");
+        vars.put(ConfigProperty.EnvPrefix.PRODUCT + "SQL_SANITIZE", "2");
         EnvConfigReader reader = new EnvConfigReader(vars);
         ConfigContainer container = new ConfigContainer();
         reader.read(container);
@@ -23,8 +23,8 @@ public class EnvConfigReaderTest extends TestCase {
      */
     public void testPartialRead() {
         Map<String, String> vars = new HashMap<String, String>();
-        vars.put("SOLARWINDS_SERVICE_KEY", "some key");
-        vars.put("SOLARWINDS_SQL_SANITIZE", "2.1");
+        vars.put(ConfigProperty.EnvPrefix.PRODUCT + "SERVICE_KEY", "some key");
+        vars.put(ConfigProperty.EnvPrefix.PRODUCT + "SQL_SANITIZE", "2.1");
         EnvConfigReader reader = new EnvConfigReader(vars);
         ConfigContainer container = new ConfigContainer();
         try {

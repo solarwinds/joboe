@@ -81,8 +81,8 @@ public enum ConfigProperty {
     private ConfigGroup group;
     private ConfigParser<?, ?> configParser;
 
-    private static class EnvPrefix {
-        private static final String PRODUCT = "SW_APM";
+    public static class EnvPrefix {
+        public static final String PRODUCT = "SW_APM_";
     }
 
     private static class ConfigKey {
