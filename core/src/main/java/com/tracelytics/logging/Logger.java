@@ -25,7 +25,7 @@ import java.util.concurrent.*;
  * @author Patson Luk
  */
 public class Logger {
-    public static final String SOLARWINDSS_TAG = "[Solarwinds]";
+    public static final String SOLARWINDSS_TAG = "[SolarWinds APM]";
 
     private static final Level DEFAULT_LOGGING = Level.INFO;
     private static final ThreadLocal<DateFormat> DATE_FORMAT = new ThreadLocal<DateFormat>() {

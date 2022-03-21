@@ -82,7 +82,7 @@ public enum ConfigProperty {
     private ConfigParser<?, ?> configParser;
 
     private static class EnvPrefix {
-        private static final String PRODUCT = "SOLARWINDS_";
+        private static final String PRODUCT = "SW_APM";
     }
 
     private static class ConfigKey {
