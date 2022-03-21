@@ -19,27 +19,27 @@ import com.tracelytics.util.HostInfoUtils;
  */
 public class RpcSettingsReader implements SettingsReader {
     private static final Logger logger = LoggerFactory.getLogger();
-    
-   
+
+
     private Client rpcClient;
     private ClientLoggingCallback<SettingsResult> loggingCallback = new ClientLoggingCallback<SettingsResult>("get service settings");
 
     private static final String SSL_CLIENT_VERSION = "2";
-    
+
     /**
-     * 
+     *
      * @param rpcClient
      * @param hostname
      * @param addresses
      * @param uuid
-     *  
+     *
      */
     RpcSettingsReader(Client rpcClient) {
         this.rpcClient = rpcClient;
     }
-    
-    
-    
+
+
+
     /* (non-Javadoc)
      * @see com.tracelytics.joboe.SettingsReader#getLayerSampleRate(java.lang.String)
      */
@@ -53,6 +53,7 @@ public class RpcSettingsReader implements SettingsReader {
         if (result.getResultCode() == ResultCode.OK) {
             Map<String, Settings> updatedSettings = new LinkedHashMap<String, Settings>();
             for (Settings settingsForLayer : result.getSettings()) {
+                logger.debug("Got settings from collector: " + settingsForLayer);
                 updatedSettings.put(settingsForLayer.getLayer(), settingsForLayer);
             }
             return updatedSettings;
@@ -60,7 +61,7 @@ public class RpcSettingsReader implements SettingsReader {
             throw new OboeSettingsException("Rpc call returns non OK status code: " + result.getResultCode());
         }
     }
-    
+
     public void close() {
         if (rpcClient != null) {
             rpcClient.close();
