@@ -31,7 +31,7 @@ public abstract class RpcClientManager {
     private static final Map<ClientType, RpcClientManager> registeredManagers = new HashMap<ClientType, RpcClientManager>();
     static final URL DEFAULT_COLLECTER_CERT_LOCATION = RpcClientManager.class.getResource("/collector-ca.crt"); //cert by default included in the resource folder or root folder in jar
 
-    static final String DEFAULT_HOST = "apm-collector.dc-01.st-ssp.solarwinds.com"; //default collector host: NH staging
+    static final String DEFAULT_HOST = "apm-collector.dc-01.cloud.solarwinds.com"; //default collector host: NH production
     static final int DEFAULT_PORT = 443; //default collector port
 
     protected static String collectorHost;
