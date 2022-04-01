@@ -38,7 +38,7 @@ public class GreetingController {
     public String prepareSql(@RequestParam(defaultValue="World") String name) {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "newuser", "password");
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?serverTimezone=UTC", "newuser", "password");
             PreparedStatement ps = con.prepareStatement("insert into mytable values(?)");
             ps.setString(1, "hello " + name);
             ps.execute();
@@ -53,7 +53,7 @@ public class GreetingController {
         StringBuilder sb = new StringBuilder();
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test", "newuser", "password");
+            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?serverTimezone=UTC", "newuser", "password");
             Statement stmt = con.createStatement();
             ResultSet rs = stmt.executeQuery("select * from mytable");
 

@@ -9,7 +9,6 @@ import java.security.PrivilegedExceptionAction;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.tracelytics.ext.javassist.bytecode.ClassFile;
 import com.tracelytics.joboe.config.ConfigManager;
 import com.tracelytics.joboe.config.ConfigProperty;
 import com.tracelytics.joboe.rpc.Client.ClientType;
@@ -114,12 +113,15 @@ public abstract class RpcClientManager {
     public static Client getClient(OperationType operationType, String serviceKey) throws ClientException {
         ClientType clientType;
         if (configuredClientType == null) { //By default, determine the clientType by java version
-            if (ClassFile.MAJOR_VERSION >= ClassFile.JAVA_9) {
+            String javaVersion = System.getProperty("java.version");
+            if (javaVersion.startsWith("1.")) { // < Java 9
+                if (javaVersion.startsWith("1.8")) { // Java 8
+                    clientType = alpnAvailable() ? ClientType.GRPC : ClientType.THRIFT;
+                } else { // < Java 8
+                    clientType = ClientType.THRIFT;
+                }
+            } else { // Java 9 and onwards
                 clientType = ClientType.GRPC;
-            } else if (ClassFile.MAJOR_VERSION == ClassFile.JAVA_8) {
-                clientType = alpnAvailable() ? ClientType.GRPC : ClientType.THRIFT;
-            } else {
-                clientType = ClientType.THRIFT;
             }
         } else {
             clientType = configuredClientType;

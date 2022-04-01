@@ -1,6 +1,5 @@
 package com.tracelytics.logging;
 
-import com.tracelytics.ext.javassist.bytecode.ClassFile;
 import com.tracelytics.joboe.config.ConfigContainer;
 import com.tracelytics.joboe.config.ConfigProperty;
 import com.tracelytics.logging.setting.LogSetting;
@@ -191,7 +190,10 @@ public class Logger {
         //other log file parameters
         LoggerStream logFileStream = null;
         if (path != null) {
-            if (ClassFile.MAJOR_VERSION < ClassFile.JAVA_7) {
+            String javaVersion = System.getProperty("java.version");
+
+            if (javaVersion.startsWith("1.6")) {
+
                 info("Cannot set up log file at [" + path + "] as it is only supported for JDK 7 or later");
             } else {
                 logFileStream = getLogFileStream(path, logSetting.getLogFileMaxSize(), logSetting.getLogFileMaxBackup());
