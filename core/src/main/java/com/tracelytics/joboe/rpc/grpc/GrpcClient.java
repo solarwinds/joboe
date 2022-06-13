@@ -363,7 +363,7 @@ public class GrpcClient implements ProtocolClient {
         }
 
         private static HostID toGrpcHostID(HostId hostId) {
-            return buildGrpcHostID(HostInfoUtils.getHostName(), hostId.getPid(), hostId.getEc2InstanceId(), hostId.getEc2AvailabilityZone(), hostId.getDockerContainerId(), hostId.getMacAddresses(), hostId.getHerokuDynoId(), hostId.getAzureInstanceId(), hostId.getHostType());
+            return buildGrpcHostID(HostInfoUtils.getHostName(), hostId.getPid(), hostId.getEc2InstanceId(), hostId.getEc2AvailabilityZone(), hostId.getDockerContainerId(), hostId.getMacAddresses(), hostId.getHerokuDynoId(), hostId.getAzureInstanceId(), hostId.getHostType(), hostId.getUamsClientId());
         }
 
         /**
@@ -378,7 +378,7 @@ public class GrpcClient implements ProtocolClient {
         }
 
 
-        private static HostID buildGrpcHostID(String hostName, Integer pid, String ec2InstanceId, String ec2AvailabilityZone, String dockerContainerId, List<String> macAddresses, String herokuDynoId, String azureInstanceId, HostType hostType) {
+        private static HostID buildGrpcHostID(String hostName, Integer pid, String ec2InstanceId, String ec2AvailabilityZone, String dockerContainerId, List<String> macAddresses, String herokuDynoId, String azureInstanceId, HostType hostType, String uamsClientId) {
             HostID.Builder builder = HostID.newBuilder();
 
             if (hostName != null) {

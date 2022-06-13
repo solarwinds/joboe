@@ -19,7 +19,7 @@ public class DummyHostInfoReader implements HostInfoReader {
 
     @Override
     public HostId getHostId() {
-        return new HostId(getHostName(), 0, Collections.EMPTY_LIST, null, null, null, null, null, HostType.PERSISTENT);
+        return new HostId(getHostName(), 0, Collections.EMPTY_LIST, null, null, null, null, null, HostType.PERSISTENT, null);
 
     }
 

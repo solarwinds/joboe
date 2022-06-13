@@ -19,8 +19,9 @@ public class HostId {
     private final String azureInstanceId;
     private List<String> macAddresses;
     private final HostType hostType;
+    private final String uamsClientId;
     
-    public HostId(String hostname, int pid, List<String> macAddresses, String ec2InstanceId, String ec2AvailabilityZone, String dockerContainerId, String herokuDynoId, String azureInstanceId, HostType hostType) {
+    public HostId(String hostname, int pid, List<String> macAddresses, String ec2InstanceId, String ec2AvailabilityZone, String dockerContainerId, String herokuDynoId, String azureInstanceId, HostType hostType, String uamsClientId) {
         super();
         this.hostname = hostname;
         this.pid = pid;
@@ -31,6 +32,7 @@ public class HostId {
         this.herokuDynoId = herokuDynoId;
         this.azureInstanceId = azureInstanceId;
         this.hostType = hostType;
+        this.uamsClientId = uamsClientId;
     }
     
     public String getHostname() {
@@ -69,6 +71,10 @@ public class HostId {
         return hostType;
     }
 
+    public String getUamsClientId() {
+        return uamsClientId;
+    }
+
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder("HostId [");
@@ -93,6 +99,9 @@ public class HostId {
         }
         if (hostType != null) {
             result.append(", hostType=" + hostType);
+        }
+        if (uamsClientId != null) {
+            result.append(", uamsClientId=" + uamsClientId);
         }
         
         result.append("]");
