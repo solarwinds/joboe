@@ -33,6 +33,7 @@ message HostID {
   string herokuDynoID = 9;
   string azAppServiceInstanceID = 10;
   HostType hostType = 11;
+  string uamsClientID = 12;
 }
 
 enum OboeSettingType {

@@ -24,7 +24,7 @@ public class UamaClientIdReader {
     private static final HostInfoUtils.OsType osType = HostInfoUtils.getOsType();
     private static final String uamsClientIdFile = osType == HostInfoUtils.OsType.LINUX ?
             UAMS_CLIENT_ID_PATH_LINUX : UAMS_CLIENT_ID_PATH_WIN;
-    private static final AtomicReference<String> uamsClientId = new AtomicReference<>(new String(""));
+    private static final AtomicReference<String> uamsClientId = new AtomicReference<>();
     private static final AtomicReference<FileTime> lastModified = new AtomicReference<>(FileTime.from(Instant.EPOCH));
 
     private static final AtomicBoolean uamsClientIDInitialized = new AtomicBoolean(false);
@@ -60,7 +60,7 @@ public class UamaClientIdReader {
     }
 
     private static String readFirstLine(String filePath) throws IOException {
-        String line = "";
+        String line = null;
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             line = br.readLine();
         }

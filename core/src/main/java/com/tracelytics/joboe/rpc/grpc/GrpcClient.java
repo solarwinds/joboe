@@ -374,7 +374,7 @@ public class GrpcClient implements ProtocolClient {
          * @return
          */
         private static HostID toGrpcHostnameOnlyHostID(String hostname) {
-            return buildGrpcHostID(HostInfoUtils.getHostName(), null, null, null, null, null, null, null, null);
+            return buildGrpcHostID(HostInfoUtils.getHostName(), null, null, null, null, null, null, null, null, null);
         }
 
 
@@ -417,6 +417,9 @@ public class GrpcClient implements ProtocolClient {
                 builder.setHostType(Collector.HostType.valueOf(hostType.name()));
             }
 
+            if (uamsClientId != null) {
+                builder.setUamsClientID(uamsClientId);
+            }
             return builder.build();
         }
 
