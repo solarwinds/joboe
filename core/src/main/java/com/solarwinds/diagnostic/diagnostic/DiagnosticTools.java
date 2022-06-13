@@ -1,4 +1,4 @@
-package com.appoptics.diagnostic;
+package com.solarwinds.diagnostic.diagnostic;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -31,9 +31,9 @@ import com.tracelytics.util.ServiceKeyUtils;
  * 
  * This is packaged into the java agent jar and can be invoked as:
  * 
- * java -cp appoptics-agent.jar com.appoptics.diagnostic.DiagnosticTools [optional parameters]
+ * java -cp appoptics-agent.jar DiagnosticTools [optional parameters]
  * 
- * For example: java -cp appoptics-agent.jar com.appoptics.diagnostic.DiagnosticTools service_key=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef:my-service timeout=10000 log_file=appoptics-diagnostics.log
+ * For example: java -cp appoptics-agent.jar DiagnosticTools service_key=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef:my-service timeout=10000 log_file=appoptics-diagnostics.log
  * 
  * @author Patson
  *
@@ -110,7 +110,7 @@ public class DiagnosticTools {
     }
     
     private static void printUsage() {
-        logger.info("Usage example : java -cp appoptics-agent.jar com.appoptics.diagnostic.DiagnosticTools service_key=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef:my-service timeout=10000 \"log_file=my folder/appoptics-diagnostics.log\"");
+        logger.info("Usage example : java -cp appoptics-agent.jar DiagnosticTools service_key=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef:my-service timeout=10000 \"log_file=my folder/appoptics-diagnostics.log\"");
         logger.info("All program parameters are optional and in format of [key]=[value], available parameters are:");
         logger.info("service_key : Service key to be used for the diagnostics");
         logger.info("timeout     : Max time to wait for the diagnostics to finish");
