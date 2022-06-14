@@ -22,14 +22,15 @@ public class UamaClientIdReader {
     private static final int UAMS_CLIENT_ID_CHECK_INTERVAL = 60;
     private static final Logger logger = LoggerFactory.getLogger();
     private static final HostInfoUtils.OsType osType = HostInfoUtils.getOsType();
-    private static final String uamsClientIdFile = osType == HostInfoUtils.OsType.LINUX ?
-            UAMS_CLIENT_ID_PATH_LINUX : UAMS_CLIENT_ID_PATH_WIN;
+    private static final String uamsClientIdFile = osType == HostInfoUtils.OsType.WINDOWS ?
+            UAMS_CLIENT_ID_PATH_WIN : UAMS_CLIENT_ID_PATH_LINUX;
     private static final AtomicReference<String> uamsClientId = new AtomicReference<>();
     private static final AtomicReference<FileTime> lastModified = new AtomicReference<>(FileTime.from(Instant.EPOCH));
 
     private static final AtomicBoolean uamsClientIDInitialized = new AtomicBoolean(false);
     public static String getUamsClientId() {
         if (!uamsClientIDInitialized.get()) {
+            uamsClientIDInitialized.set(true);
             refreshUamsClientId();
             startUamsClientIdChecker();
         }
@@ -44,18 +45,20 @@ public class UamaClientIdReader {
             public void run() {
                 refreshUamsClientId();
             }
-        }, delay, UAMS_CLIENT_ID_CHECK_INTERVAL, TimeUnit.SECONDS);
+        }, delay, UAMS_CLIENT_ID_CHECK_INTERVAL * 1000, TimeUnit.MILLISECONDS);
     }
 
     private static void refreshUamsClientId() {
         try {
+            logger.debug("Refreshing uamsclientid.");
             FileTime modifiedTime = Files.getLastModifiedTime(Paths.get(uamsClientIdFile));
             if (!lastModified.get().equals(modifiedTime)) {
                 lastModified.set(modifiedTime);
                 uamsClientId.set(readFirstLine(uamsClientIdFile));
+                logger.debug("Updated uamsclientid to " + uamsClientId.get() + ", lastModifiedTime=" + modifiedTime);
             }
         } catch (IOException e) {
-            logger.debug("Error reading file " + uamsClientIdFile, e);
+            logger.debug("I cannot read the file " + uamsClientIdFile + ", maybe it doesn't exist.");
         }
     }
 
