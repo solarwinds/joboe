@@ -10,10 +10,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.time.Instant;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class UamaClientIdReader {
@@ -31,7 +27,7 @@ public class UamaClientIdReader {
             FileTime modifiedTime = Files.getLastModifiedTime(Paths.get(uamsClientIdFile));
             if (!lastModified.get().equals(modifiedTime)) {
                 lastModified.set(modifiedTime);
-                uamsClientId.set(readFirstLine(uamsClientIdFile));
+                uamsClientId.set(sanitize(readFirstLine(uamsClientIdFile)));
                 logger.debug("Updated uamsclientid to " + uamsClientId.get() + ", lastModifiedTime=" + modifiedTime);
             }
         } catch (IOException e) {
@@ -46,5 +42,23 @@ public class UamaClientIdReader {
             line = br.readLine();
         }
         return line;
+    }
+
+    private static String sanitize(String id) {
+        String res = null;
+        try {
+            if (id.length() != 36) { // UUID in 8-4-4-4-12 format
+                throw new IllegalArgumentException("incorrect length");
+            }
+
+            String[] parts = id.split("-");
+            if (parts.length != 5) {
+                throw new IllegalArgumentException("incorrect format");
+            }
+            res = id;
+        } catch (IllegalArgumentException e) {
+            logger.debug("Discarded invalid UAMS client id: " + id, e);
+        }
+        return res;
     }
 }
