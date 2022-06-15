@@ -29,7 +29,7 @@ import com.tracelytics.util.ServiceKeyUtils;
  * 
  * java -cp solarwinds-apm-agent.jar com.tracelytics.util.diagnostic.DiagnosticTools [optional parameters]
  * 
- * For example: java -cp solarwinds-apm-agent.jar com.tracelytics.util.diagnostic.DiagnosticTools service_key=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef:my-service timeout=10000 log_file=appoptics-diagnostics.log
+ * For example: java -cp solarwinds-apm-agent.jar com.tracelytics.util.diagnostic.DiagnosticTools service_key=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef:my-service timeout=10000 log_file=solarwinds-apm-diagnostics.log
  * 
  * @author Patson
  *
@@ -88,7 +88,7 @@ public class DiagnosticTools {
     }
     
     private static void printUsage() {
-        logger.info("Usage example : java -cp agent/build/libs/solarwinds-apm-agent.jar com.tracelytics.util.diagnostic.DiagnosticTools service_key=service_key:service_name");
+        logger.info("Usage example : java -cp solarwinds-apm-agent.jar com.tracelytics.util.diagnostic.DiagnosticTools service_key=service_key:service_name");
         logger.info("All program parameters are optional and in format of [key]=[value], available parameters are:");
         logger.info("service_key : Service key to be used for the diagnostics");
         logger.info("timeout     : Max time to wait for the diagnostics to finish");
@@ -157,9 +157,9 @@ public class DiagnosticTools {
         private final String message;
         
         private static final Result OK = new Result(ResultType.OK, "Diagnostics successful");
-        private static final Result TIMEOUT_FAILED = new Result(ResultType.CONNECTION_FAILURE, "Failed to get response from AppOptics server after waiting for " + timeout + " milliseconds");
-        private static final Result TRY_LATER = new Result(ResultType.TRY_LATER, "AppOptics server returned non-ok status code TRY_LATER");
-        private static final Result LIMIT_EXCEEDED = new Result(ResultType.LIMIT_EXCEEDED, "AppOptics server returned non-ok status code LIMIT_EXCEEDED");
+        private static final Result TIMEOUT_FAILED = new Result(ResultType.CONNECTION_FAILURE, "Failed to get response from Solarwinds server after waiting for " + timeout + " milliseconds");
+        private static final Result TRY_LATER = new Result(ResultType.TRY_LATER, "Solarwinds server returned non-ok status code TRY_LATER");
+        private static final Result LIMIT_EXCEEDED = new Result(ResultType.LIMIT_EXCEEDED, "Solarwinds server returned non-ok status code LIMIT_EXCEEDED");
         
         private Result(ResultType resultType) {
             this(resultType, null);
@@ -194,7 +194,7 @@ public class DiagnosticTools {
         
         
         private static Result unexpectedException(Exception e) {
-            StringBuilder message = new StringBuilder("Failed to connect to AppOptics collector due to unexpected exception.");
+            StringBuilder message = new StringBuilder("Failed to connect to Solarwinds collector due to unexpected exception.");
             
             if (e != null && e.getMessage() != null) {
                 message.append(" Reason: " + e.getMessage());
