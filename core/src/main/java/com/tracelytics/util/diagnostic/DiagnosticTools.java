@@ -1,4 +1,4 @@
-package com.solarwinds.diagnostic.diagnostic;
+package com.tracelytics.util.diagnostic;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -12,11 +12,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import com.tracelytics.agent.Agent;
-import com.tracelytics.joboe.config.ConfigManager;
-import com.tracelytics.joboe.config.ConfigProperty;
-import com.tracelytics.joboe.config.InvalidConfigException;
-import com.tracelytics.joboe.config.InvalidConfigServiceKeyException;
+import com.tracelytics.joboe.config.*;
 import com.tracelytics.joboe.rpc.Client;
 import com.tracelytics.joboe.rpc.ClientException;
 import com.tracelytics.joboe.rpc.ResultCode;
@@ -31,16 +27,15 @@ import com.tracelytics.util.ServiceKeyUtils;
  * 
  * This is packaged into the java agent jar and can be invoked as:
  * 
- * java -cp appoptics-agent.jar DiagnosticTools [optional parameters]
+ * java -cp solarwinds-apm-agent.jar com.tracelytics.util.diagnostic.DiagnosticTools [optional parameters]
  * 
- * For example: java -cp appoptics-agent.jar DiagnosticTools service_key=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef:my-service timeout=10000 log_file=appoptics-diagnostics.log
+ * For example: java -cp solarwinds-apm-agent.jar com.tracelytics.util.diagnostic.DiagnosticTools service_key=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef:my-service timeout=10000 log_file=appoptics-diagnostics.log
  * 
  * @author Patson
  *
  */
 public class DiagnosticTools {
     private static final int DEFAULT_TIMEOUT = 8000; //8 seconds
-    private static final String VERSIONS_PROPERTIES_FILE = "/versions.properties";
     private static final Logger logger = LoggerFactory.getLogger();
     private static final int APPOPTICS_API_TOKEN_LENGTH = 64;
     private static final int SWOKEN_API_TOKEN_LENGTH = 71;
@@ -49,11 +44,8 @@ public class DiagnosticTools {
     
     public static void main(String[] args) {
         Result result = null;
-        String serviceKey = null;
         try {
-            String serviceKeyFromParameter = null;
-            String agentArgument = null;
-            
+            String serviceKey = null;
             if (args.length == 0) {
                 logger.info("No parameters string is provided, using defaults");
                 printUsage();
@@ -68,8 +60,8 @@ public class DiagnosticTools {
                         System.setErr(logFileStream);
                     }
                 }
-                
-                serviceKeyFromParameter = parameters.get(ParameterKey.SERVICE_KEY);
+
+                serviceKey = parameters.get(ParameterKey.SERVICE_KEY);
                 String timeoutFromParameter = parameters.get(ParameterKey.TIMEOUT); 
                 if (timeoutFromParameter != null) {
                     try {
@@ -78,25 +70,11 @@ public class DiagnosticTools {
                         logger.warn("Cannot parse timeout from argument [" + timeoutFromParameter + "]. Using default " + DEFAULT_TIMEOUT + " ms instead.");
                     }
                 }
-                
-                if (parameters.containsKey(ParameterKey.AGENT_CONFIG)) {
-                    agentArgument = "config=" + parameters.get(ParameterKey.AGENT_CONFIG);
-                }
             } 
-            
-            Agent.initConfig(agentArgument, serviceKeyFromParameter); //service key could be null if not defined, which is okay, it will just read from the config/env variable like in agent
-            
-            serviceKey = (String) ConfigManager.getConfig(ConfigProperty.AGENT_SERVICE_KEY); //the final service key to be used
-            
+
             logger.info("Using service key " + ServiceKeyUtils.maskServiceKey(serviceKey));
-            
+            ConfigManager.initialize(new ConfigContainer());
             result = testServiceKey(serviceKey);
-        } catch (InvalidConfigServiceKeyException e) {
-            logger.warn("Cannot read service key from existing config file: " + e.getMessage());
-            result = Result.unexpectedException(e);
-        } catch (InvalidConfigException e) {
-            logger.warn(e.getMessage(), e);
-            result = Result.unexpectedException(e);
         } catch (InvalidArgumentsException e) {
             logger.warn(e.getMessage());
             printUsage();
@@ -110,12 +88,11 @@ public class DiagnosticTools {
     }
     
     private static void printUsage() {
-        logger.info("Usage example : java -cp appoptics-agent.jar DiagnosticTools service_key=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef:my-service timeout=10000 \"log_file=my folder/appoptics-diagnostics.log\"");
+        logger.info("Usage example : java -cp agent/build/libs/solarwinds-apm-agent.jar com.tracelytics.util.diagnostic.DiagnosticTools service_key=service_key:service_name");
         logger.info("All program parameters are optional and in format of [key]=[value], available parameters are:");
         logger.info("service_key : Service key to be used for the diagnostics");
         logger.info("timeout     : Max time to wait for the diagnostics to finish");
         logger.info("log_file    : File location to print the logs to, could either be relative or absolute path");
-        logger.info("config      : Java agent json config file for running diagnostics");
     }
 
     private enum ParameterKey {
@@ -327,21 +304,14 @@ public class DiagnosticTools {
     }
 
     private static List<Map<String, Object>> generateDiagnosticMessage() {
-        String version = null;
-        try {
-            Properties versionsProperties = new Properties();
-            versionsProperties.load(Agent.class.getResourceAsStream(VERSIONS_PROPERTIES_FILE));
-            version = versionsProperties.getProperty("agent.version");
-        } catch (IOException e) {
-            logger.warn("Cannot find agent version from diagnostic", e);
-        }
-
+        String version = DiagnosticTools.class.getPackage().getImplementationVersion();
+        logger.info("Fetched version " + version + " in the diagnostic tool.");
         Map<String, Object> initMessage = new HashMap<String, Object>();
         
         initMessage.put("__Diagnostic", true);
         
         if (version != null) {
-            initMessage.put("Java.AppOptics.Version", version);
+            initMessage.put("Java.SolarwindsAPM.Version", version);
         }
         
         initMessage.put("DiagnosticTimestamp", System.currentTimeMillis() / 1000); //seconds since epoch
