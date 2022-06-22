@@ -31,7 +31,7 @@ public class UamaClientIdReader {
                 logger.debug("Updated uamsclientid to " + uamsClientId.get() + ", lastModifiedTime=" + modifiedTime);
             }
         } catch (IOException e) {
-            logger.debug("I cannot read the file " + uamsClientIdFile + ", maybe it doesn't exist.");
+            logger.debug("Cannot read the file " + uamsClientIdFile);
         }
         return uamsClientId.get();
     }
