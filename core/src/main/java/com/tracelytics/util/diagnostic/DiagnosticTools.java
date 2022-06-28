@@ -20,6 +20,7 @@ import com.tracelytics.joboe.rpc.RpcClientManager;
 import com.tracelytics.joboe.rpc.RpcClientManager.OperationType;
 import com.tracelytics.logging.Logger;
 import com.tracelytics.logging.LoggerFactory;
+import com.tracelytics.logging.setting.LogSetting;
 import com.tracelytics.util.ServiceKeyUtils;
 
 /**
@@ -41,7 +42,9 @@ public class DiagnosticTools {
     private static final int SWOKEN_API_TOKEN_LENGTH = 71;
     
     private static int timeout = DEFAULT_TIMEOUT;
-    
+    private static final LogSetting DEFAULT_LOG_SETTING = new LogSetting(Logger.Level.DEBUG, true, true, null, null, null);
+
+
     public static void main(String[] args) {
         Result result = null;
         try {
@@ -73,9 +76,13 @@ public class DiagnosticTools {
             } 
 
             logger.info("Using service key " + ServiceKeyUtils.maskServiceKey(serviceKey));
-            ConfigManager.initialize(new ConfigContainer());
+            ConfigContainer container = new ConfigContainer();
+            container.put(ConfigProperty.AGENT_LOGGING, DEFAULT_LOG_SETTING);
+            LoggerFactory.init(container.subset(ConfigGroup.AGENT));
+            
+            ConfigManager.initialize(container);
             result = testServiceKey(serviceKey);
-        } catch (InvalidArgumentsException e) {
+        } catch (InvalidArgumentsException | InvalidConfigException e) {
             logger.warn(e.getMessage());
             printUsage();
             result = Result.invalidArguments(args);
