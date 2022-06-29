@@ -1,13 +1,11 @@
 package com.tracelytics.util.diagnostic;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -28,9 +26,9 @@ import com.tracelytics.util.ServiceKeyUtils;
  * 
  * This is packaged into the java agent jar and can be invoked as:
  * 
- * java -cp solarwinds-apm-agent.jar com.tracelytics.util.diagnostic.DiagnosticTools [optional parameters]
+ * java -Djava.security.debug=certpath,provider -Djavax.net.debug=ssl:session -cp solarwinds-apm-agent.jar com.tracelytics.util.diagnostic.DiagnosticTools [optional parameters]
  * 
- * For example: java -cp solarwinds-apm-agent.jar com.tracelytics.util.diagnostic.DiagnosticTools service_key=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef:my-service timeout=10000 log_file=solarwinds-apm-diagnostics.log
+ * For example: java -Djava.security.debug=certpath,provider -Djavax.net.debug=ssl:session -cp solarwinds-apm-agent.jar com.tracelytics.util.diagnostic.DiagnosticTools service_key=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef:my-service timeout=10000 log_file=solarwinds-apm-diagnostics.log
  * 
  * @author Patson
  *
@@ -95,7 +93,7 @@ public class DiagnosticTools {
     }
     
     private static void printUsage() {
-        logger.info("Usage example : java -cp solarwinds-apm-agent.jar com.tracelytics.util.diagnostic.DiagnosticTools service_key=YourSolarWindsApiToken:YourServiceName");
+        logger.info("Usage example : java -Djava.security.debug=certpath,provider -Djavax.net.debug=ssl:session -cp solarwinds-apm-agent.jar com.tracelytics.util.diagnostic.DiagnosticTools service_key=YourSolarWindsApiToken:YourServiceName");
         logger.info("All program parameters are optional and in format of [key]=[value], available parameters are:");
         logger.info("service_key : Service key to be used for the diagnostics");
         logger.info("timeout     : Max time to wait for the diagnostics to finish");
