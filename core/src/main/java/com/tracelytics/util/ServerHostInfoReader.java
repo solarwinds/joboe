@@ -590,7 +590,7 @@ public class ServerHostInfoReader implements HostInfoReader {
         NetworkAddressInfo networkAddressInfo = getNetworkAddressInfo();
         List<String> macAddresses = networkAddressInfo != null ? networkAddressInfo.getMacAddresses() : Collections.<String>emptyList();
         //assume all that uses HostInfoUtils are persistent server, can be improved to recognize different types later
-        return new HostId(getHostName(), JavaProcessUtils.getPid(), macAddresses, Ec2InstanceReader.getInstanceId(), Ec2InstanceReader.getAvailabilityZone(), DockerInfoReader.getDockerId(), HerokuDynoReader.getDynoId(), AzureReader.getInstanceId(), HostType.PERSISTENT, UamaClientIdReader.getUamsClientId());
+        return new HostId(getHostName(), JavaProcessUtils.getPid(), macAddresses, Ec2InstanceReader.getInstanceId(), Ec2InstanceReader.getAvailabilityZone(), DockerInfoReader.getDockerId(), HerokuDynoReader.getDynoId(), AzureReader.getInstanceId(), HostType.PERSISTENT, UamsClientIdReader.getUamsClientId());
     }
     
     public static class Ec2InstanceReader {

@@ -12,9 +12,9 @@ import java.nio.file.attribute.FileTime;
 import java.time.Instant;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class UamaClientIdReader {
-    private static final String UAMS_CLIENT_ID_PATH_LINUX = "/var/solarwinds/uamsclient/uamsclientid";
-    private static final String UAMS_CLIENT_ID_PATH_WIN = "C:\\ProgramData\\Solarwinds\\uamsclient\\uamsclientid";
+public class UamsClientIdReader {
+    private static final String UAMS_CLIENT_ID_PATH_LINUX = "/opt/solarwinds/uamsclient/var/uamsclientid";
+    private static final String UAMS_CLIENT_ID_PATH_WIN = "C:\\ProgramData\\SolarWinds\\UAMSClient\\uamsclientid";
     private static final Logger logger = LoggerFactory.getLogger();
     private static final HostInfoUtils.OsType osType = HostInfoUtils.getOsType();
     private static final String uamsClientIdFile = osType == HostInfoUtils.OsType.WINDOWS ?
