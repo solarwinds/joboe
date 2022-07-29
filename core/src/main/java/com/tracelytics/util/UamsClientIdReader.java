@@ -22,7 +22,11 @@ public class UamsClientIdReader {
 
     static {
         if (osType == HostInfoUtils.OsType.WINDOWS) {
-            uamsClientIdPath = Paths.get(System.getenv("PROGRAMDATA"), "SolarWinds", "UAMSClient", "uamsclientid");
+            String programData = System.getenv("PROGRAMDATA");
+            if (programData == null) {
+                programData = "C:\\ProgramData\\";
+            }
+            uamsClientIdPath = Paths.get(programData, "SolarWinds", "UAMSClient", "uamsclientid");
         } else {
             uamsClientIdPath = Paths.get("/", "opt", "solarwinds", "uamsclient", "var", "uamsclientid");
         }
