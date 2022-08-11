@@ -37,7 +37,7 @@ public class EventImpl extends Event {
     
     static final int MAX_KEY_COUNT = 1024;
     private static /*final*/ EventReporter DEFAULT_REPORTER; //cannot make final due to unit testing problem...
-    private static final Collection<String> BASIC_KEYS = Arrays.asList("Layer", "Label", Constants.XTR_ASYNC_KEY, Constants.XTR_EDGE_KEY, Constants.XTR_THREAD_ID_KEY, Constants.XTR_HOSTNAME_KEY, Constants.XTR_METADATA_KEY, Constants.XTR_PROCESS_ID_KEY, Constants.XTR_TIMESTAMP_U_KEY);
+    private static final Collection<String> BASIC_KEYS = Arrays.asList("Layer", "Label", Constants.XTR_ASYNC_KEY, Constants.XTR_EDGE_KEY, Constants.XTR_THREAD_ID_KEY, Constants.XTR_HOSTNAME_KEY, Constants.XTR_METADATA_KEY, Constants.XTR_XTRACE, Constants.XTR_PROCESS_ID_KEY, Constants.XTR_TIMESTAMP_U_KEY);
     
 
     // Buffer: used for building BSON byte stream, one-per-thread so we don't keep reallocating buffers
@@ -89,7 +89,9 @@ public class EventImpl extends Event {
     private void init() {
         metadata.randomizeOpID();
         bsonBuilder = BsonDocuments.builder();
-        bsonBuilder.put(XTR_METADATA_KEY, metadata.toHexString());
+        String traceContext = metadata.toHexString();
+        bsonBuilder.put(XTR_METADATA_KEY, traceContext);
+        bsonBuilder.put(XTR_XTRACE, w3cContextToXTrace(traceContext));
     }
 
     /** Sets XTrace ID - used in special cases where we need to override  (See ServlerInstrumentation for an example)
@@ -97,9 +99,16 @@ public class EventImpl extends Event {
     private void initOverride() {
         // We do NOT randomize here because we assume we are constructed with a metadata that was already randomized
         bsonBuilder = BsonDocuments.builder();
-        bsonBuilder.put(XTR_METADATA_KEY, metadata.toHexString());
+        String traceContext = metadata.toHexString();
+        bsonBuilder.put(XTR_METADATA_KEY, traceContext);
+        bsonBuilder.put(XTR_XTRACE, w3cContextToXTrace(traceContext));
     }
-    
+
+    private String w3cContextToXTrace(String w3cContext) {
+        // TODO
+        return w3cContext;
+    }
+
     /* (non-Javadoc)
      * @see com.tracelytics.joboe.Event#addInfo(java.lang.String, java.lang.Object)
      */

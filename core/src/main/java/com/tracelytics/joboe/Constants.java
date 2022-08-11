@@ -30,6 +30,7 @@ public class Constants {
             XTR_THREAD_ID_KEY = "TID",
             XTR_HOSTNAME_KEY = "Hostname",
             XTR_METADATA_KEY = SW_W3C_KEY_PREFIX + "trace_context",
+            XTR_XTRACE = "X-Trace",
             XTR_PROCESS_ID_KEY = "PID",
             XTR_TIMESTAMP_U_KEY = "Timestamp_u",
             XTR_UDP_HOST = "127.0.0.1";

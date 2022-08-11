@@ -61,6 +61,7 @@ public class EventImplTest extends TestCase {
         
         // Check that we received expected values:
         assertEquals(doc.get(XTR_METADATA_KEY), evt.getMetadata().toHexString());
+        assertEquals(doc.get(XTR_XTRACE), evt.getMetadata().toHexString());
         assertEquals(doc.get(XTR_EDGE_KEY), origMdOp);
         assertEquals(doc.get(testKey), testVal);
 
@@ -110,6 +111,7 @@ public class EventImplTest extends TestCase {
 
         // Check that we received expected values:
         assertEquals(doc.get(XTR_METADATA_KEY), evt.getMetadata().toHexString());
+        assertEquals(doc.get(XTR_XTRACE), evt.getMetadata().toHexString());
         assertEquals(doc.get(XTR_EDGE_KEY), origMdOp);
 
         // If these aren't there the test will fail due to an exception:
@@ -217,6 +219,7 @@ public class EventImplTest extends TestCase {
         assertTrue(doc.containsKey(Constants.XTR_THREAD_ID_KEY));
         assertTrue(doc.containsKey(Constants.XTR_HOSTNAME_KEY));
         assertTrue(doc.containsKey(Constants.XTR_METADATA_KEY));
+        assertTrue(doc.containsKey(XTR_XTRACE));
         assertTrue(doc.containsKey(Constants.XTR_PROCESS_ID_KEY));
         assertTrue(doc.containsKey(Constants.XTR_TIMESTAMP_U_KEY));
         
@@ -251,6 +254,7 @@ public class EventImplTest extends TestCase {
         assertTrue(doc.containsKey(Constants.XTR_THREAD_ID_KEY));
         assertTrue(doc.containsKey(Constants.XTR_HOSTNAME_KEY));
         assertTrue(doc.containsKey(Constants.XTR_METADATA_KEY));
+        assertTrue(doc.containsKey(XTR_XTRACE));
         assertTrue(doc.containsKey(Constants.XTR_PROCESS_ID_KEY));
         assertTrue(doc.containsKey(Constants.XTR_TIMESTAMP_U_KEY));
         
@@ -284,6 +288,7 @@ public class EventImplTest extends TestCase {
         assertTrue(doc.containsKey(Constants.XTR_THREAD_ID_KEY));
         assertTrue(doc.containsKey(Constants.XTR_HOSTNAME_KEY));
         assertTrue(doc.containsKey(Constants.XTR_METADATA_KEY));
+        assertTrue(doc.containsKey(XTR_XTRACE));
         assertTrue(doc.containsKey(Constants.XTR_PROCESS_ID_KEY));
         assertTrue(doc.containsKey(Constants.XTR_TIMESTAMP_U_KEY));
         
@@ -321,6 +326,7 @@ public class EventImplTest extends TestCase {
         assertTrue(doc.containsKey(Constants.XTR_THREAD_ID_KEY));
         assertTrue(doc.containsKey(Constants.XTR_HOSTNAME_KEY));
         assertTrue(doc.containsKey(Constants.XTR_METADATA_KEY));
+        assertTrue(doc.containsKey(XTR_XTRACE));
         assertTrue(doc.containsKey(Constants.XTR_PROCESS_ID_KEY));
         assertTrue(doc.containsKey(Constants.XTR_TIMESTAMP_U_KEY));
         
@@ -357,6 +363,7 @@ public class EventImplTest extends TestCase {
         assertTrue(doc.containsKey(Constants.XTR_THREAD_ID_KEY));
         assertTrue(doc.containsKey(Constants.XTR_HOSTNAME_KEY));
         assertTrue(doc.containsKey(Constants.XTR_METADATA_KEY));
+        assertTrue(doc.containsKey(XTR_XTRACE));
         assertTrue(doc.containsKey(Constants.XTR_PROCESS_ID_KEY));
         assertTrue(doc.containsKey(Constants.XTR_TIMESTAMP_U_KEY));
 
@@ -397,6 +404,7 @@ public class EventImplTest extends TestCase {
         assertTrue(doc.containsKey(Constants.XTR_THREAD_ID_KEY));
         assertTrue(doc.containsKey(Constants.XTR_HOSTNAME_KEY));
         assertTrue(doc.containsKey(Constants.XTR_METADATA_KEY));
+        assertTrue(doc.containsKey(XTR_XTRACE));
         assertTrue(doc.containsKey(Constants.XTR_PROCESS_ID_KEY));
         assertTrue(doc.containsKey(Constants.XTR_TIMESTAMP_U_KEY));
 
