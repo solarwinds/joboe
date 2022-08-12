@@ -28,7 +28,18 @@ import javax.net.ssl.SSLEngine;
 public abstract class RpcClientManager {
     private static final Logger logger = LoggerFactory.getLogger();
     private static final Map<ClientType, RpcClientManager> registeredManagers = new HashMap<ClientType, RpcClientManager>();
-    static final URL DEFAULT_COLLECTER_CERT_LOCATION = RpcClientManager.class.getResource("/collector-ca.crt"); //cert by default included in the resource folder or root folder in jar
+    static final URL AO_DEFAULT_COLLECTER_CERT_LOCATION = getCertURL();
+
+    private static URL getCertURL() {
+        URL url = RpcClientManager.class.getResource("ao-collector.crt"); //cert by default included in the resource folder or root folder in jar
+        if (url == null) {
+            ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+            if (contextClassLoader != null) {
+                url = contextClassLoader.getResource("ao-collector.crt");
+            }
+        }
+        return url;
+    }
 
     static final String DEFAULT_HOST = "apm.collector.cloud.solarwinds.com"; //default collector host: NH production
     static final int DEFAULT_PORT = 443; //default collector port
@@ -58,6 +69,7 @@ public abstract class RpcClientManager {
             collectorPort = DEFAULT_PORT;
         }
 
+        URL defaultCertLocation = collectorHost.contains("appoptics.com") ? AO_DEFAULT_COLLECTER_CERT_LOCATION : null;
         if (collectorCertValue != null) {
             logger.info("Setting RPC Client to use server cert at [" + collectorCertValue + "]");
             try {
@@ -66,16 +78,16 @@ public abstract class RpcClientManager {
                     collectorCertLocation = collectorCert.toURI().toURL();
                 }else {
                     logger.warn("Failed to load RPC collector server certificate from location [" + collectorCertValue + "], file does not exist!");
-                    collectorCertLocation = DEFAULT_COLLECTER_CERT_LOCATION;
+                    collectorCertLocation = defaultCertLocation;
                 }
 
 
             } catch (MalformedURLException e) {
                 logger.warn("Failed to load RPC collector server certificate from location [" + collectorCertValue + "], using default location instead!");
-                collectorCertLocation = DEFAULT_COLLECTER_CERT_LOCATION;
+                collectorCertLocation = defaultCertLocation;
             }
         } else {
-            collectorCertLocation = DEFAULT_COLLECTER_CERT_LOCATION;
+            collectorCertLocation = defaultCertLocation;
         }
 
         if (rpcType != null) {
@@ -129,6 +141,14 @@ public abstract class RpcClientManager {
 
         return getClient(clientType, operationType, serviceKey);
     }
+
+    public static void closeAllManagers() {
+        for (RpcClientManager clientManager : registeredManagers.values()) {
+            clientManager.close();
+        }
+    }
+
+    abstract protected void close();
 
     /**
      * https://github.com/grpc/grpc-java/blob/v1.34.1/netty/src/main/java/io/grpc/netty/JettyTlsUtil.java#L39

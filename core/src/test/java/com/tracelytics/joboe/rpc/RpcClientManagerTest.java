@@ -60,7 +60,7 @@ public class RpcClientManagerTest extends TestCase {
         RpcClientManager.init(null, "not-found-location");
         field = RpcClientManager.class.getDeclaredField("collectorCertLocation");
         field.setAccessible(true);
-        assertEquals(RpcClientManager.DEFAULT_COLLECTER_CERT_LOCATION, field.get(null));
+        assertEquals(RpcClientManager.AO_DEFAULT_COLLECTER_CERT_LOCATION, field.get(null));
         
         RpcClientManager.init(null, null); //revert
     }
@@ -80,6 +80,6 @@ public class RpcClientManagerTest extends TestCase {
         
         field = RpcClientManager.class.getDeclaredField("collectorCertLocation");
         field.setAccessible(true);
-        assertEquals(RpcClientManager.DEFAULT_COLLECTER_CERT_LOCATION, field.get(null));
+        assertEquals(RpcClientManager.AO_DEFAULT_COLLECTER_CERT_LOCATION, field.get(null));
     }
 }
