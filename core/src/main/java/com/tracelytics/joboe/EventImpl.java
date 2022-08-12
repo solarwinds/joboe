@@ -37,7 +37,7 @@ public class EventImpl extends Event {
     
     static final int MAX_KEY_COUNT = 1024;
     private static /*final*/ EventReporter DEFAULT_REPORTER; //cannot make final due to unit testing problem...
-    private static final Collection<String> BASIC_KEYS = Arrays.asList("Layer", "Label", Constants.XTR_ASYNC_KEY, Constants.XTR_EDGE_KEY, Constants.XTR_THREAD_ID_KEY, Constants.XTR_HOSTNAME_KEY, Constants.XTR_METADATA_KEY, Constants.XTR_XTRACE, Constants.XTR_PROCESS_ID_KEY, Constants.XTR_TIMESTAMP_U_KEY);
+    private static final Collection<String> BASIC_KEYS = Arrays.asList("Layer", "Label", Constants.XTR_ASYNC_KEY, Constants.XTR_EDGE_KEY, Constants.XTR_AO_EDGE_KEY, Constants.XTR_THREAD_ID_KEY, Constants.XTR_HOSTNAME_KEY, Constants.XTR_METADATA_KEY, Constants.XTR_XTRACE, Constants.XTR_PROCESS_ID_KEY, Constants.XTR_TIMESTAMP_U_KEY);
     
 
     // Buffer: used for building BSON byte stream, one-per-thread so we don't keep reallocating buffers
@@ -105,8 +105,12 @@ public class EventImpl extends Event {
     }
 
     private String w3cContextToXTrace(String w3cContext) {
-        // TODO
-        return w3cContext;
+        String[] arr = w3cContext.split("-");
+        if (arr.length != 4) {
+            return "";
+        }
+
+        return "2B" + arr[1].toUpperCase() + "0".repeat(8) + arr[2].toUpperCase() + arr[3];
     }
 
     /* (non-Javadoc)
@@ -561,7 +565,16 @@ public class EventImpl extends Event {
     private void addEdges() {
         if (!edges.isEmpty()) {
             addInfo(XTR_EDGE_KEY, edges);
+            addInfo(XTR_AO_EDGE_KEY, toAOEdges(edges));
         }
+    }
+
+    private MultiValList<String> toAOEdges(MultiValList<String> edges) {
+        MultiValList<String> aoEdges = new MultiValList<>();
+        for (String edge : edges) {
+            aoEdges.add(edge.toUpperCase());
+        }
+        return aoEdges;
     }
     
     private void addAsync() {
