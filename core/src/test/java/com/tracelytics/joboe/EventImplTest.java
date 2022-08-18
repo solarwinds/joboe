@@ -61,7 +61,6 @@ public class EventImplTest extends TestCase {
         
         // Check that we received expected values:
         assertEquals(doc.get(XTR_METADATA_KEY), evt.getMetadata().toHexString());
-        assertEquals(doc.get(XTR_XTRACE), evt.getMetadata().toHexString());
         assertEquals(doc.get(XTR_EDGE_KEY), origMdOp);
         assertEquals(doc.get(testKey), testVal);
 
@@ -111,7 +110,6 @@ public class EventImplTest extends TestCase {
 
         // Check that we received expected values:
         assertEquals(doc.get(XTR_METADATA_KEY), evt.getMetadata().toHexString());
-        assertEquals(doc.get(XTR_XTRACE), evt.getMetadata().toHexString());
         assertEquals(doc.get(XTR_EDGE_KEY), origMdOp);
 
         // If these aren't there the test will fail due to an exception:

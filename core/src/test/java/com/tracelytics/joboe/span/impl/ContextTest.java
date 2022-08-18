@@ -357,7 +357,6 @@ public class ContextTest extends TestCase {
             
             assertEquals(startEdge, sentEvent.getSentEntries().get(Constants.XTR_EDGE_KEY));
             assertEquals(metadata.toHexString(), sentEvent.getSentEntries().get(Constants.XTR_METADATA_KEY));
-            assertEquals(metadata.toHexString(), sentEvent.getSentEntries().get(Constants.XTR_XTRACE));
         } catch (OboeException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -379,7 +378,6 @@ public class ContextTest extends TestCase {
             
             assertEquals(startEdge, sentEvent.getSentEntries().get(Constants.XTR_EDGE_KEY));
             assertEquals(metadata.toHexString(), sentEvent.getSentEntries().get(Constants.XTR_METADATA_KEY));
-            assertEquals(metadata.toHexString(), sentEvent.getSentEntries().get(Constants.XTR_XTRACE));
         } catch (OboeException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
