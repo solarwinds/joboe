@@ -104,7 +104,7 @@ public class EventImpl extends Event {
         bsonBuilder.put(XTR_XTRACE, w3cContextToXTrace(traceContext));
     }
 
-    private String w3cContextToXTrace(String w3cContext) {
+    protected static String w3cContextToXTrace(String w3cContext) {
         String[] arr = w3cContext.split("-");
         if (arr.length != 4) {
             return "";

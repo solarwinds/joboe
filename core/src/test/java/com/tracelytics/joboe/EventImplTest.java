@@ -484,4 +484,9 @@ public class EventImplTest extends TestCase {
         }
         
     }
+
+    public void testW3cContextToXTrace() {
+        assertEquals("2BA6A6D97A748BFC9F91A4DC46A0D15BBB00000000B6968E14AC09A25A01", EventImpl.w3cContextToXTrace("00-a6a6d97a748bfc9f91a4dc46a0d15bbb-b6968e14ac09a25a-01"));
+        assertEquals("2BA6A6D97A748BFC9F91A4DC46A0D15BBB00000000B6968E14AC09A25A00", EventImpl.w3cContextToXTrace("00-a6a6d97a748bfc9f91a4dc46a0d15bbb-b6968e14ac09a25a-00"));
+    }
 }
