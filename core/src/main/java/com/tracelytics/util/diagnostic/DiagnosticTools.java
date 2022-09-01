@@ -26,7 +26,7 @@ import com.tracelytics.util.ServiceKeyUtils;
  * 
  * This is packaged into the java agent jar and can be invoked as:
  * 
- * java -Djava.security.debug=certpath,provider -Djavax.net.debug=ssl:session -cp solarwinds-apm-agent.jar com.tracelytics.util.diagnostic.DiagnosticTools [optional parameters]
+ * java -Djava.security.debug=certpath,provider -Djavax.net.debug=ssl:session -cp solarwinds-apm-agent.jar com.tracelytics.util.diagnostic.DiagnosticTools service_key=YourSolarWindsApiToken:YourServiceName [optional parameters]
  * 
  * For example: java -Djava.security.debug=certpath,provider -Djavax.net.debug=ssl:session -cp solarwinds-apm-agent.jar com.tracelytics.util.diagnostic.DiagnosticTools service_key=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef:my-service timeout=10000 log_file=solarwinds-apm-diagnostics.log
  * 
@@ -94,7 +94,7 @@ public class DiagnosticTools {
     
     private static void printUsage() {
         logger.info("Usage example : java -Djava.security.debug=certpath,provider -Djavax.net.debug=ssl:session -cp solarwinds-apm-agent.jar com.tracelytics.util.diagnostic.DiagnosticTools service_key=YourSolarWindsApiToken:YourServiceName");
-        logger.info("All program parameters are optional and in format of [key]=[value], available parameters are:");
+        logger.info("All other program parameters except for the service_key are optional and in format of [key]=[value], available parameters are:");
         logger.info("service_key : Service key to be used for the diagnostics");
         logger.info("timeout     : Max time to wait for the diagnostics to finish");
         logger.info("log_file    : File location to print the logs to, could either be relative or absolute path");
@@ -286,6 +286,11 @@ public class DiagnosticTools {
     }
     
     private static boolean isValidServiceKeyFormat(String serviceKey) {
+        if (serviceKey == null) {
+            logger.warn("Service key is not defined!");
+            return false;
+        }
+
         String[] tokens = serviceKey.split(":", 2);
         if (tokens.length !=  2) {
             logger.warn("Service Key [" + ServiceKeyUtils.maskServiceKey(serviceKey) + "] format is incorrect - not in <API Token>:<Service Name>");
