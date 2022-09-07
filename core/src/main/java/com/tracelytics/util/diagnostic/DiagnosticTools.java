@@ -46,6 +46,7 @@ public class DiagnosticTools {
     public static void main(String[] args) {
         Result result = null;
         try {
+            ConfigContainer container = new ConfigContainer();
             String serviceKey = null;
             if (args.length == 0) {
                 logger.info("No parameters string is provided, using defaults");
@@ -71,10 +72,15 @@ public class DiagnosticTools {
                         logger.warn("Cannot parse timeout from argument [" + timeoutFromParameter + "]. Using default " + DEFAULT_TIMEOUT + " ms instead.");
                     }
                 }
+
+                String collector = parameters.get(ParameterKey.COLLECTOR);
+                if (collector != null) {
+                    container.putByStringValue(ConfigProperty.AGENT_COLLECTOR, collector);
+                    logger.info("Using collector endpoint " + container.get(ConfigProperty.AGENT_COLLECTOR));
+                }
             } 
 
             logger.info("Using service key " + ServiceKeyUtils.maskServiceKey(serviceKey));
-            ConfigContainer container = new ConfigContainer();
             container.put(ConfigProperty.AGENT_LOGGING, DEFAULT_LOG_SETTING);
             LoggerFactory.init(container.subset(ConfigGroup.AGENT));
             
@@ -98,10 +104,12 @@ public class DiagnosticTools {
         logger.info("service_key : Service key to be used for the diagnostics");
         logger.info("timeout     : Max time to wait for the diagnostics to finish");
         logger.info("log_file    : File location to print the logs to, could either be relative or absolute path");
+        logger.info("collector   : The collector endpoint for the diagnostics tool to connect to");
     }
 
     private enum ParameterKey {
         SERVICE_KEY("service_key"),
+        COLLECTOR("collector"),
         TIMEOUT("timeout"),
         LOG_FILE("log_file"),
         AGENT_CONFIG("config");
