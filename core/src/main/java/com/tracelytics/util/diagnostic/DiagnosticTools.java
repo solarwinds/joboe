@@ -223,7 +223,12 @@ public class DiagnosticTools {
         private static Result invalidArguments(String[] arguments) {
             String argumentString = "";
             for (String argument : arguments) {
-                argumentString += argument + " ";
+                if (argument.contains("=") && argument.split("=")[0].equals(ParameterKey.SERVICE_KEY.key)) {
+                    String[] arg = argument.split("=");
+                    argumentString = argumentString + " " + arg[0] + " " + ServiceKeyUtils.maskServiceKey(arg[1]);
+                } else {
+                    argumentString += argument + " ";
+                }
             }
             argumentString = argumentString.trim();
             return new Result(ResultType.INVALID_ARGUMENTS, "[" + argumentString + "] is not a valid argument");
@@ -256,7 +261,7 @@ public class DiagnosticTools {
     
     private static Result testServiceKey(String serviceKey) {
         if (!isValidServiceKeyFormat(serviceKey)) {
-            return Result.invalidFormatArgument(ParameterKey.SERVICE_KEY.key, serviceKey);
+            return Result.invalidFormatArgument(ParameterKey.SERVICE_KEY.key, ServiceKeyUtils.maskServiceKey(serviceKey));
         }
         
         Client client = null;
