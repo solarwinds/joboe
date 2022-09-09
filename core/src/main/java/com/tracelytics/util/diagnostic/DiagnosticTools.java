@@ -19,6 +19,7 @@ import com.tracelytics.joboe.rpc.RpcClientManager.OperationType;
 import com.tracelytics.logging.Logger;
 import com.tracelytics.logging.LoggerFactory;
 import com.tracelytics.logging.setting.LogSetting;
+import com.tracelytics.util.JavaRuntimeVersionChecker;
 import com.tracelytics.util.ServiceKeyUtils;
 
 /**
@@ -44,6 +45,11 @@ public class DiagnosticTools {
 
 
     public static void main(String[] args) {
+        if (!JavaRuntimeVersionChecker.isJdkVersionSupported()) {
+            logger.error("The current Java runtime version is not supported. Minimum version=" + JavaRuntimeVersionChecker.minVersionSupported);
+            return;
+        }
+
         Result result = null;
         try {
             ConfigContainer container = new ConfigContainer();
