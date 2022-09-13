@@ -110,7 +110,8 @@ public class EventImpl extends Event {
             return "";
         }
 
-        return "2B" + arr[1].toUpperCase() + "0".repeat(8) + arr[2].toUpperCase() + arr[3];
+        String padding = new String(new char[8]).replace("\0", "0");
+        return "2B" + arr[1].toUpperCase() + padding + arr[2].toUpperCase() + arr[3];
     }
 
     /* (non-Javadoc)
