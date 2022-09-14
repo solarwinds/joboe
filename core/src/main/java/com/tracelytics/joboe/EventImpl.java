@@ -110,7 +110,7 @@ public class EventImpl extends Event {
             return "";
         }
 
-        String padding = new String(new char[8]).replace("\0", "0");
+        String padding = "00000000"; // eight zeros
         return "2B" + arr[1].toUpperCase() + padding + arr[2].toUpperCase() + arr[3];
     }
 
