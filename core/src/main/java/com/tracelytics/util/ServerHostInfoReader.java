@@ -37,7 +37,7 @@ public class ServerHostInfoReader implements HostInfoReader {
     private static String distro;
     private static HostId hostId; //lazily initialized to avoid cyclic init
     private static String hostname;
-    private static UUID uuid;
+    private static String uuid;
     private static boolean checkedDistro = false;
     private static HostInfoUtils.OsType osType = HostInfoUtils.getOsType();
 
@@ -79,11 +79,11 @@ public class ServerHostInfoReader implements HostInfoReader {
         return HerokuDynoReader.getDynoId();
     }
 
-    public UUID getUuid()
+    public String getUuid()
     {
         if (uuid == null)
         {
-            uuid = UUID.randomUUID();
+            uuid = UUID.randomUUID().toString();
         }
 
         return uuid;
