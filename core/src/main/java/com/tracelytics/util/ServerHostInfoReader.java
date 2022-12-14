@@ -20,6 +20,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import com.google.auto.service.AutoService;
 
 /**
  * Helper to extract information on the host this JVM runs on
@@ -36,6 +37,7 @@ public class ServerHostInfoReader implements HostInfoReader {
     private static String distro;
     private static HostId hostId; //lazily initialized to avoid cyclic init
     private static String hostname;
+    private static UUID uuid;
     private static boolean checkedDistro = false;
     private static HostInfoUtils.OsType osType = HostInfoUtils.getOsType();
 
@@ -60,7 +62,7 @@ public class ServerHostInfoReader implements HostInfoReader {
     private ServerHostInfoReader() {
         //prevent instantiations
     }
-    
+
     public String getAwsInstanceId() {
         return Ec2InstanceReader.getInstanceId();
     }
@@ -77,6 +79,17 @@ public class ServerHostInfoReader implements HostInfoReader {
         return HerokuDynoReader.getDynoId();
     }
 
+    public UUID getUuid()
+    {
+        if (uuid == null)
+        {
+            uuid = UUID.randomUUID();
+        }
+
+        return uuid;
+    }
+
+    @Override
     public String getAzureInstanceId() {
         return AzureReader.getInstanceId();
     }
@@ -155,6 +168,7 @@ public class ServerHostInfoReader implements HostInfoReader {
      * Extracts network interface info from the system. Take note that loop back, point-to-point and non-physical addresses are excluded
      * @return
      */
+    @Override
     public NetworkAddressInfo getNetworkAddressInfo() {
         try {
             List<String> ips = new ArrayList<String>();
@@ -590,26 +604,26 @@ public class ServerHostInfoReader implements HostInfoReader {
         NetworkAddressInfo networkAddressInfo = getNetworkAddressInfo();
         List<String> macAddresses = networkAddressInfo != null ? networkAddressInfo.getMacAddresses() : Collections.<String>emptyList();
         //assume all that uses HostInfoUtils are persistent server, can be improved to recognize different types later
-        return new HostId(getHostName(), JavaProcessUtils.getPid(), macAddresses, Ec2InstanceReader.getInstanceId(), Ec2InstanceReader.getAvailabilityZone(), DockerInfoReader.getDockerId(), HerokuDynoReader.getDynoId(), AzureReader.getInstanceId(), HostType.PERSISTENT, UamsClientIdReader.getUamsClientId());
+        return new HostId(getHostName(), JavaProcessUtils.getPid(), macAddresses, Ec2InstanceReader.getInstanceId(), Ec2InstanceReader.getAvailabilityZone(), DockerInfoReader.getDockerId(), HerokuDynoReader.getDynoId(), AzureReader.getInstanceId(), HostType.PERSISTENT, UamsClientIdReader.getUamsClientId(), getUuid());
     }
     
     public static class Ec2InstanceReader {
-        private static final int CONNECT_TIMEOUT_DEFAULT = 1000;
-        private static final int CONNECT_TIMEOUT_MIN = 0; //do not wait at all, disable retrieval
-        private static final int CONNECT_TIMEOUT_MAX = 3000;
+        private static final int TIMEOUT_DEFAULT = 1000;
+        private static final int TIMEOUT_MIN = 0; //do not wait at all, disable retrieval
+        private static final int TIMEOUT_MAX = 3000;
 
-        private static final int CONNECT_TIMEOUT = getTimeout();
+        private static final int TIMEOUT = getTimeout();
 
         private static int getTimeout() {
             Integer configValue = (Integer) ConfigManager.getConfig(ConfigProperty.AGENT_EC2_METADATA_TIMEOUT);
             if (configValue == null) {
-                return CONNECT_TIMEOUT_DEFAULT;
-            } else if (configValue > CONNECT_TIMEOUT_MAX) {
-                logger.warn("EC2 metadata read timeout cannot be greater than " + CONNECT_TIMEOUT_MAX + " millisec but found [" + configValue + "]. Using " + CONNECT_TIMEOUT_MAX + " instead.");
-                return CONNECT_TIMEOUT_MAX;
-            } else if (configValue < CONNECT_TIMEOUT_MIN) {
-                logger.warn("EC2 metadata read timeout cannot be smaller than " + CONNECT_TIMEOUT_MIN + " millisec but found [" + configValue + "]. Using " + CONNECT_TIMEOUT_MIN + " instead, which essentially disable reading EC2 metadata");
-                return CONNECT_TIMEOUT_MIN;
+                return TIMEOUT_DEFAULT;
+            } else if (configValue > TIMEOUT_MAX) {
+                logger.warn("EC2 metadata read timeout cannot be greater than " + TIMEOUT_MAX + " millisec but found [" + configValue + "]. Using " + TIMEOUT_MAX + " instead.");
+                return TIMEOUT_MAX;
+            } else if (configValue < TIMEOUT_MIN) {
+                logger.warn("EC2 metadata read timeout cannot be smaller than " + TIMEOUT_MIN + " millisec but found [" + configValue + "]. Using " + TIMEOUT_MIN + " instead, which essentially disable reading EC2 metadata");
+                return TIMEOUT_MIN;
             } else {
                 return configValue;
             }
@@ -643,7 +657,7 @@ public class ServerHostInfoReader implements HostInfoReader {
         }
         
         private void initialize() {
-            if (CONNECT_TIMEOUT == CONNECT_TIMEOUT_MIN) { //disable reader
+            if (TIMEOUT == TIMEOUT_MIN) { //disable reader
                 return;
             }
             instanceId = getResourceOnEndpoint(INSTANCE_ID_PATH);
@@ -659,7 +673,8 @@ public class ServerHostInfoReader implements HostInfoReader {
             try {
                 URI uri = new URI(getMetadataHost() + "/" + relativePath);
                 connection = (HttpURLConnection) uri.toURL().openConnection(Proxy.NO_PROXY);
-                connection.setConnectTimeout(CONNECT_TIMEOUT);
+                connection.setConnectTimeout(TIMEOUT);
+                connection.setReadTimeout(TIMEOUT);
 
                 int statusCode = connection.getResponseCode();
 
@@ -670,7 +685,7 @@ public class ServerHostInfoReader implements HostInfoReader {
                     return null;
                 } 
             } catch (IOException e) { 
-                logger.debug("Timeout on reading EC2 metadata after waiting for [" + CONNECT_TIMEOUT + "] milliseconds. Probably not an EC2 instance");
+                logger.debug("Timeout on reading EC2 metadata after waiting for [" + TIMEOUT + "] milliseconds. Probably not an EC2 instance");
                 return null; 
             } catch (URISyntaxException e) {
                 logger.warn(e.getMessage(), e);

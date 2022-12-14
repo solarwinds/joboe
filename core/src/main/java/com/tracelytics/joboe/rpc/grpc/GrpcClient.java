@@ -364,7 +364,7 @@ public class GrpcClient implements ProtocolClient {
         }
 
         private static HostID toGrpcHostID(HostId hostId) {
-            return buildGrpcHostID(HostInfoUtils.getHostName(), hostId.getPid(), hostId.getEc2InstanceId(), hostId.getEc2AvailabilityZone(), hostId.getDockerContainerId(), hostId.getMacAddresses(), hostId.getHerokuDynoId(), hostId.getAzureInstanceId(), hostId.getHostType(), hostId.getUamsClientId());
+            return buildGrpcHostID(HostInfoUtils.getHostName(), hostId.getPid(), hostId.getEc2InstanceId(), hostId.getEc2AvailabilityZone(), hostId.getDockerContainerId(), hostId.getMacAddresses(), hostId.getHerokuDynoId(), hostId.getAzureInstanceId(), hostId.getHostType(), hostId.getUamsClientId(), hostId.getUuid());
         }
 
         /**
@@ -375,11 +375,11 @@ public class GrpcClient implements ProtocolClient {
          * @return
          */
         private static HostID toGrpcHostnameOnlyHostID(String hostname) {
-            return buildGrpcHostID(HostInfoUtils.getHostName(), null, null, null, null, null, null, null, null, null);
+            return buildGrpcHostID(HostInfoUtils.getHostName(), null, null, null, null, null, null, null, null, null, null);
         }
 
 
-        private static HostID buildGrpcHostID(String hostName, Integer pid, String ec2InstanceId, String ec2AvailabilityZone, String dockerContainerId, List<String> macAddresses, String herokuDynoId, String azureInstanceId, HostType hostType, String uamsClientId) {
+        private static HostID buildGrpcHostID(String hostName, Integer pid, String ec2InstanceId, String ec2AvailabilityZone, String dockerContainerId, List<String> macAddresses, String herokuDynoId, String azureInstanceId, HostType hostType, String uamsClientId, UUID uuid) {
             HostID.Builder builder = HostID.newBuilder();
 
             if (hostName != null) {
@@ -420,6 +420,10 @@ public class GrpcClient implements ProtocolClient {
 
             if (uamsClientId != null) {
                 builder.setUamsClientID(uamsClientId);
+            }
+
+            if (uuid != null) {
+                builder.setUuid(uuid);
             }
             return builder.build();
         }
