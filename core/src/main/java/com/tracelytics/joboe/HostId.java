@@ -77,7 +77,7 @@ public class HostId {
         return uamsClientId;
     }
 
-    public String getUuid() {
+    public UUID getUuid() {
         return uuid;
     }
 
@@ -110,7 +110,7 @@ public class HostId {
             result.append(", uamsClientId=" + uamsClientId);
         }
         if (uuid != null) {
-            result.append(", uuid=" + uuid);
+            result.append(", uuid=" + uuid.toString());
         }
         
         result.append("]");
