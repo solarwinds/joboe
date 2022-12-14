@@ -379,7 +379,7 @@ public class GrpcClient implements ProtocolClient {
         }
 
 
-        private static HostID buildGrpcHostID(String hostName, Integer pid, String ec2InstanceId, String ec2AvailabilityZone, String dockerContainerId, List<String> macAddresses, String herokuDynoId, String azureInstanceId, HostType hostType, String uamsClientId, UUID uuid) {
+        private static HostID buildGrpcHostID(String hostName, Integer pid, String ec2InstanceId, String ec2AvailabilityZone, String dockerContainerId, List<String> macAddresses, String herokuDynoId, String azureInstanceId, HostType hostType, String uamsClientId, String uuid) {
             HostID.Builder builder = HostID.newBuilder();
 
             if (hostName != null) {
