@@ -1,13 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+  <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.appoptics.agent.java</groupId>
-    <artifactId>appoptics-parent</artifactId>
-    <version>${revision}</version>
-    <packaging>pom</packaging>
+  <groupId>com.appoptics.agent.java</groupId>
+  <artifactId>appoptics-parent</artifactId>
+  <version>${revision}</version>
+  <packaging>pom</packaging>
 
-    <name>appoptics-parent</name>
+  <name>appoptics-parent</name>
 
     <properties>
         <revision>7.8.2</revision>
@@ -19,199 +19,106 @@
         <project.build.outputTimestamp>${git.commit.time}</project.build.outputTimestamp>
     </properties>
 
-<!--    <dependencyManagement>-->
-<!--        <dependencies>-->
-<!--            <dependency>-->
-<!--                <groupId>com.appoptics.agent.java</groupId>-->
-<!--                <artifactId>dependencies</artifactId>-->
-<!--                <version>${revision}</version>-->
-<!--            </dependency>-->
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <configuration>
+            <skip>false</skip>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>3.2.0</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>3.2.0</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>3.2.0</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>3.2.0</version>
+          <configuration>
+            <notimestamp>true</notimestamp>
+          </configuration>
+        </plugin>
 
-<!--            <dependency>-->
-<!--                <groupId>com.appoptics.agent.java</groupId>-->
-<!--                <artifactId>core</artifactId>-->
-<!--                <version>${revision}</version>-->
-<!--            </dependency>-->
+      </plugins>
+    </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>pl.project13.maven</groupId>
+        <artifactId>git-commit-id-plugin</artifactId>
+        <version>4.0.5</version>
+        <executions>
+          <execution>
+            <id>retrieve-git-info</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>revision</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <injectAllReactorProjects>true</injectAllReactorProjects>
+          <runOnlyOnce>true</runOnlyOnce>
+          <skipPoms>false</skipPoms>
+          <dateFormat>yyyy-MM-dd'T'HH:mm:ss'Z'</dateFormat>
+          <dateFormatTimeZone>UTC</dateFormatTimeZone>
+        </configuration>
+      </plugin>
 
-<!--            <dependency>-->
-<!--                <groupId>com.appoptics.agent.java</groupId>-->
-<!--                <artifactId>metrics</artifactId>-->
-<!--                <version>${revision}</version>-->
-<!--            </dependency>-->
-
-<!--            <dependency>-->
-<!--                <groupId>com.appoptics.agent.java</groupId>-->
-<!--                <artifactId>instrumentation</artifactId>-->
-<!--                <version>${revision}</version>-->
-<!--            </dependency>-->
-
-<!--            <dependency>-->
-<!--                <groupId>com.appoptics.agent.java</groupId>-->
-<!--                <artifactId>agent</artifactId>-->
-<!--                <version>${revision}</version>-->
-<!--            </dependency>-->
-
-<!--            <dependency>-->
-<!--                <groupId>com.appoptics.agent.java</groupId>-->
-<!--                <artifactId>instrumentation-kafka</artifactId>-->
-<!--                <version>${revision}</version>-->
-<!--            </dependency>-->
-
-<!--            <dependency>-->
-<!--                <groupId>com.appoptics.agent.java</groupId>-->
-<!--                <artifactId>instrumentation-rabbit-mq</artifactId>-->
-<!--                <version>${revision}</version>-->
-<!--            </dependency>-->
-
-<!--            <dependency>-->
-<!--                <groupId>com.appoptics.agent.java</groupId>-->
-<!--                <artifactId>instrumentation-reactor</artifactId>-->
-<!--                <version>${revision}</version>-->
-<!--            </dependency>-->
-
-<!--            <dependency>-->
-<!--                <groupId>com.appoptics.agent.java</groupId>-->
-<!--                <artifactId>instrumentation-mongo-2</artifactId>-->
-<!--                <version>${revision}</version>-->
-<!--            </dependency>-->
-
-<!--            <dependency>-->
-<!--                <groupId>com.appoptics.agent.java</groupId>-->
-<!--                <artifactId>instrumentation-mongo-3</artifactId>-->
-<!--                <version>${revision}</version>-->
-<!--            </dependency>-->
-
-<!--            <dependency>-->
-<!--                <groupId>com.appoptics.agent.java</groupId>-->
-<!--                <artifactId>instrumentation-mongo-4</artifactId>-->
-<!--                <version>${revision}</version>-->
-<!--            </dependency>-->
-
-<!--            <dependency>-->
-<!--                <groupId>com.appoptics.agent.java</groupId>-->
-<!--                <artifactId>instrumentation-redisson-2</artifactId>-->
-<!--                <version>${revision}</version>-->
-<!--            </dependency>-->
-
-<!--            <dependency>-->
-<!--                <groupId>com.appoptics.agent.java</groupId>-->
-<!--                <artifactId>instrumentation-redisson-3</artifactId>-->
-<!--                <version>${revision}</version>-->
-<!--            </dependency>-->
-<!--        </dependencies>-->
-<!--    </dependencyManagement>-->
-
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-deploy-plugin</artifactId>
-                    <configuration>
-                        <skip>false</skip>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-source-plugin</artifactId>
-                    <version>3.2.0</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.2.0</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-assembly-plugin</artifactId>
-                    <version>3.2.0</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.2.0</version>
-                    <configuration>
-                        <notimestamp>true</notimestamp>
-                    </configuration>
-                </plugin>
-
-            </plugins>
-        </pluginManagement>
-        <plugins>
-            <plugin>
-                <groupId>pl.project13.maven</groupId>
-                <artifactId>git-commit-id-plugin</artifactId>
-                <version>4.0.5</version>
-                <executions>
-                    <execution>
-                        <id>retrieve-git-info</id>
-                        <phase>initialize</phase>
-                        <goals>
-                            <goal>revision</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <injectAllReactorProjects>true</injectAllReactorProjects>
-                    <runOnlyOnce>true</runOnlyOnce>
-                    <skipPoms>false</skipPoms>
-                    <dateFormat>yyyy-MM-dd'T'HH:mm:ss'Z'</dateFormat>
-                    <dateFormatTimeZone>UTC</dateFormatTimeZone>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>flatten-maven-plugin</artifactId>
-                <version>1.1.0</version>
-                <configuration>
-                    <updatePomFile>true</updatePomFile>
-                    <flattenMode>resolveCiFriendliesOnly</flattenMode>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>flatten</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>flatten</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>flatten.clean</id>
-                        <phase>clean</phase>
-                        <goals>
-                            <goal>clean</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>flatten-maven-plugin</artifactId>
+        <version>1.1.0</version>
+        <configuration>
+          <updatePomFile>true</updatePomFile>
+          <flattenMode>resolveCiFriendliesOnly</flattenMode>
+        </configuration>
+        <executions>
+          <execution>
+            <id>flatten</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>flatten</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>flatten.clean</id>
+            <phase>clean</phase>
+            <goals>
+              <goal>clean</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 
 
-    <modules>
-        <module>dependencies</module>
-        <module>core</module>
-		<module>metrics</module>
-<!--        <module>instrumentation</module>-->
-<!--        <module>instrumentation/kafka</module>-->
-<!--        <module>instrumentation/reactor</module>-->
-<!--        <module>instrumentation/mongo-2</module>-->
-<!--        <module>instrumentation/mongo-3</module>-->
-<!--        <module>instrumentation/mongo-4</module>-->
-<!--        <module>instrumentation/rabbit-mq</module>-->
-<!--        <module>instrumentation/redisson-2</module>-->
-<!--        <module>instrumentation/redisson-3</module>-->
-<!--        <module>agent</module>-->
-<!--        <module>api</module>-->
-    </modules>
+  <modules>
+    <module>dependencies</module>
+    <module>core</module>
+    <module>metrics</module>
+  </modules>
 
-    <distributionManagement>
-        <repository>
-            <id>github</id>
-            <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/librato/joboe</url>
-        </repository>
-    </distributionManagement>
+  <distributionManagement>
+    <repository>
+      <id>github</id>
+      <name>GitHub Packages</name>
+      <url>https://maven.pkg.github.com/librato/joboe</url>
+    </repository>
+  </distributionManagement>
 
 </project>
