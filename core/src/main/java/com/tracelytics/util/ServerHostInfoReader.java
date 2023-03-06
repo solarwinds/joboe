@@ -688,22 +688,24 @@ public class ServerHostInfoReader implements HostInfoReader {
             }
         }
 
-        private static String useIMDSv1(String relativePath) throws IOException, URISyntaxException {
-            URI uri = new URI(getMetadataHost() + "/" + relativePath);
-            HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection(Proxy.NO_PROXY);
-            connection.setConnectTimeout(TIMEOUT);
-
+        private static String useIMDSv1(String relativePath){
             String result = null;
-            connection.setReadTimeout(TIMEOUT);
-            int statusCode = connection.getResponseCode();
+            try {
+                URI uri = new URI(getMetadataHost() + "/" + relativePath);
+                HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection(Proxy.NO_PROXY);
+                connection.setConnectTimeout(TIMEOUT);
+                connection.setReadTimeout(TIMEOUT);
+                int statusCode = connection.getResponseCode();
 
-            if (statusCode == HttpURLConnection.HTTP_OK) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                result = reader.readLine();
-                reader.close();
+                if (statusCode == HttpURLConnection.HTTP_OK) {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                    result = reader.readLine();
+                    reader.close();
+                }
+
+                connection.disconnect();
+            } catch (URISyntaxException | IOException ignore) {
             }
-
-            connection.disconnect();
             return result;
         }
 
