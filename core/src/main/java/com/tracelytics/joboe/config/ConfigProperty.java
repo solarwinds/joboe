@@ -1,11 +1,11 @@
 package com.tracelytics.joboe.config;
 
-import com.tracelytics.joboe.TracingMode;
 import com.tracelytics.logging.Logger;
 import com.tracelytics.logging.LoggerFactory;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Lists and describes the properties used in configurations with its value type (Java Class Type).
@@ -58,6 +58,10 @@ public enum ConfigProperty {
     //AGENT_INTERNAL_TRANSACTION_SETTINGS should NOT be specified directly in the json file. This is used to store the result after comparing AGENT_TRANSACTION_SETTINGS and AGENT_URL_SAMPLE_RATE - not an ideal solution as this is confusing
     AGENT_INTERNAL_TRANSACTION_SETTINGS(new ConfigKey("agent.internal.transactionSettings"), ConfigGroup.AGENT, String.class),
     AGENT_EC2_METADATA_TIMEOUT(new ConfigKey("agent.ec2MetadataTimeout", EnvPrefix.PRODUCT + "EC2_METADATA_TIMEOUT"), ConfigGroup.AGENT, Integer.class),
+    AGENT_AZURE_VM_METADATA_TIMEOUT(new ConfigKey("agent.azureVmMetadataTimeout", EnvPrefix.PRODUCT +
+            "AZURE_VM_METADATA_TIMEOUT"), ConfigGroup.AGENT, Integer.class),
+    AGENT_AZURE_VM_METADATA_VERSION(new ConfigKey("agent.azureVmMetadataVersion", EnvPrefix.PRODUCT +
+            "AZURE_VM_METADATA_VERSION"), ConfigGroup.AGENT, String.class),
     AGENT_TRIGGER_TRACE_ENABLED(new ConfigKey("agent.triggerTrace", EnvPrefix.PRODUCT + "TRIGGER_TRACE"), ConfigGroup.AGENT, String.class),
     AGENT_PROXY(new ConfigKey("agent.proxy",EnvPrefix.PRODUCT + "PROXY", "proxy"), ConfigGroup.AGENT, String.class),
     AGENT_RPC_CLIENT_TYPE(new ConfigKey("agent.rpcType", EnvPrefix.PRODUCT + "RPC_TYPE", "rpc_type"), ConfigGroup.AGENT, String.class), //not advertised
