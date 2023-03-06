@@ -14,7 +14,7 @@ import java.util.ServiceLoader;
  *
  */
 public class HostInfoUtils {
-    private static Logger logger = LoggerFactory.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger();
     private static HostInfoReader reader;
 
     static {
@@ -98,8 +98,8 @@ public class HostInfoUtils {
             this.ipAddresses = ipAddresses;
             this.macAddresses = macAddresses;
         }
-        private List<String> ipAddresses;
-        private List<String> macAddresses;
+        private final List<String> ipAddresses;
+        private final List<String> macAddresses;
 
         public List<String> getIpAddresses() {
             return ipAddresses;

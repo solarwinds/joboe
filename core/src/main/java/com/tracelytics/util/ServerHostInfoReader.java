@@ -1,26 +1,47 @@
 package com.tracelytics.util;
 
+import com.google.auto.service.AutoService;
+import com.tracelytics.joboe.Context;
+import com.tracelytics.joboe.HostId;
+import com.tracelytics.joboe.Metadata;
 import com.tracelytics.joboe.config.ConfigManager;
 import com.tracelytics.joboe.config.ConfigProperty;
 import com.tracelytics.joboe.rpc.HostType;
-import com.tracelytics.joboe.HostId;
 import com.tracelytics.joboe.span.impl.ScopeContextSnapshot;
 import com.tracelytics.joboe.span.impl.ScopeManager;
-import com.tracelytics.joboe.Context;
-import com.tracelytics.joboe.Metadata;
 import com.tracelytics.logging.Logger;
 import com.tracelytics.logging.LoggerFactory;
 import com.tracelytics.util.HostInfoUtils.NetworkAddressInfo;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
-import java.net.*;
-import java.util.*;
+import java.net.HttpURLConnection;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.Proxy;
+import java.net.SocketException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import com.google.auto.service.AutoService;
 
 /**
  * Helper to extract information on the host this JVM runs on
@@ -666,42 +687,81 @@ public class ServerHostInfoReader implements HostInfoReader {
                 logger.debug("Found EC2 instance id " + instanceId + " availability zone: " + availabilityZone);
             }
         }
-        
+
+        private static String useIMDSv1(String relativePath) throws IOException, URISyntaxException {
+            URI uri = new URI(getMetadataHost() + "/" + relativePath);
+            HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection(Proxy.NO_PROXY);
+            connection.setConnectTimeout(TIMEOUT);
+
+            String result = null;
+            connection.setReadTimeout(TIMEOUT);
+            int statusCode = connection.getResponseCode();
+
+            if (statusCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                result = reader.readLine();
+                reader.close();
+            }
+
+            connection.disconnect();
+            return result;
+        }
+
+        private static String getApiToken() throws IOException, URISyntaxException {
+            String result = null;
+            URI tokenApiUri = new URI(getMetadataHost() + "/latest/api/token" );
+            HttpURLConnection connection = (HttpURLConnection) tokenApiUri.toURL().openConnection(Proxy.NO_PROXY);
+
+            connection.setConnectTimeout(TIMEOUT);
+            connection.setReadTimeout(TIMEOUT);
+            connection.setRequestMethod("PUT");
+
+            connection.setRequestProperty("X-aws-ec2-metadata-token-ttl-seconds", "3600");
+            int statusCode = connection.getResponseCode();
+            if (statusCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                result = reader.readLine();
+                reader.close();
+            }
+
+            connection.disconnect();
+            return result;
+        }
+        private static String useIMDSv2(String token, String relativePath) throws IOException, URISyntaxException {
+            String result = null;
+            URI uri = new URI(getMetadataHost() + "/" + relativePath);
+            HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection(Proxy.NO_PROXY);
+
+            connection.setReadTimeout(TIMEOUT);
+            connection.setConnectTimeout(TIMEOUT);
+            connection.setRequestProperty("X-aws-ec2-metadata-token", token);
+
+            int statusCode = connection.getResponseCode();
+            if (statusCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                result = reader.readLine();
+                reader.close();
+            }
+
+            logger.debug(String.format("Retrieved metadata using IMDSv2: %s", result));
+            connection.disconnect();
+            return result;
+        }
+
         private static String getResourceOnEndpoint(String relativePath) {
-            HttpURLConnection connection =  null;
-            BufferedReader reader = null;
             try {
-                URI uri = new URI(getMetadataHost() + "/" + relativePath);
-                connection = (HttpURLConnection) uri.toURL().openConnection(Proxy.NO_PROXY);
-                connection.setConnectTimeout(TIMEOUT);
-                connection.setReadTimeout(TIMEOUT);
+                String result = useIMDSv2(getApiToken(), relativePath);
+                if (result == null){
+                    result = useIMDSv1(relativePath);
+                }
+                return result;
 
-                int statusCode = connection.getResponseCode();
-
-                if (statusCode == HttpURLConnection.HTTP_OK) {
-                    reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                    return reader.readLine();
-                } else {
-                    return null;
-                } 
             } catch (IOException e) { 
                 logger.debug("Timeout on reading EC2 metadata after waiting for [" + TIMEOUT + "] milliseconds. Probably not an EC2 instance");
-                return null; 
             } catch (URISyntaxException e) {
                 logger.warn(e.getMessage(), e);
-                return null;
-            } finally {
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-                if (connection != null) {
-                    connection.disconnect();
-                }
             }
+            return null;
         }
         
         private static String getMetadataHost() {
