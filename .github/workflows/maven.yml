@@ -32,7 +32,7 @@ jobs:
         run: |
           echo "POM_VERSION=v$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
       - name: Publish package
-        run: mvn --batch-mode deploy
+        run: mvn -Dmaven.resolver.transport=wagon --batch-mode deploy
         env:
           JAVA_1_8_HOME: "${{ steps.setup-jdk-8.outputs.path }}"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
