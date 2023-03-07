@@ -1,14 +1,5 @@
 package com.tracelytics.joboe.rpc;
 
-import java.io.File;
-import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.security.AccessController;
-import java.security.PrivilegedExceptionAction;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.tracelytics.joboe.config.ConfigManager;
 import com.tracelytics.joboe.config.ConfigProperty;
 import com.tracelytics.joboe.rpc.Client.ClientType;
@@ -19,6 +10,14 @@ import com.tracelytics.logging.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
+import java.io.File;
+import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.security.AccessController;
+import java.security.PrivilegedExceptionAction;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Manages creation of PRC {@link Client}
@@ -31,7 +30,8 @@ public abstract class RpcClientManager {
     static final URL AO_DEFAULT_COLLECTER_CERT_LOCATION = getCertURL();
 
     private static URL getCertURL() {
-        URL url = RpcClientManager.class.getResource("ao-collector.crt"); //cert by default included in the resource folder or root folder in jar
+        //cert by default included in the resource folder or root folder in jar
+        URL url = RpcClientManager.class.getResource("/ao-collector.crt");
         if (url == null) {
             ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
             if (contextClassLoader != null) {
