@@ -45,14 +45,14 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Helper to extract information on the host this JVM runs on
- * @author pluk
  *
+ * @author pluk
  */
 @AutoService(HostInfoReader.class)
 public class ServerHostInfoReader implements HostInfoReader {
     public static final ServerHostInfoReader INSTANCE = new ServerHostInfoReader();
     private static Logger logger = LoggerFactory.getLogger();
-    
+
     private static final int HOST_ID_CHECK_INTERVAL = 60;
 
     private static String distro;
@@ -64,9 +64,10 @@ public class ServerHostInfoReader implements HostInfoReader {
 
     static final String HOSTNAME_SEPARATOR = ";";
 
-    static enum DistroType { AMAZON, UBUNTU, DEBIAN, REDHAT_BASED, SUSE, SLACKWARE, GENTOO }
+    static enum DistroType {AMAZON, UBUNTU, DEBIAN, REDHAT_BASED, SUSE, SLACKWARE, GENTOO}
+
     static final Map<DistroType, String> DISTRO_FILE_NAMES = new HashMap<DistroType, String>();
-    
+
     public static final String HOSTNAME_ALIAS_KEY = "ConfiguredHostname";
 
     static {
@@ -87,23 +88,21 @@ public class ServerHostInfoReader implements HostInfoReader {
     public String getAwsInstanceId() {
         return Ec2InstanceReader.getInstanceId();
     }
-    
+
     public String getAwsAvailabilityZone() {
         return Ec2InstanceReader.getAvailabilityZone();
     }
-    
+
     public String getDockerContainerId() {
         return DockerInfoReader.getDockerId();
     }
-    
+
     public String getHerokuDynoId() {
         return HerokuDynoReader.getDynoId();
     }
 
-    public String getUuid()
-    {
-        if (uuid == null)
-        {
+    public String getUuid() {
+        if (uuid == null) {
             uuid = UUID.randomUUID().toString();
         }
 
@@ -122,12 +121,12 @@ public class ServerHostInfoReader implements HostInfoReader {
         DISCONNECTED("Disconnected");
 
         private final String desc;
-        private static final Map<String,NicStatus> ENUM_MAP;
+        private static final Map<String, NicStatus> ENUM_MAP;
 
         static {
-            Map<String,NicStatus> map = new ConcurrentHashMap<String, NicStatus>();
+            Map<String, NicStatus> map = new ConcurrentHashMap<String, NicStatus>();
             for (NicStatus instance : NicStatus.values()) {
-                map.put(instance.getDesc(),instance);
+                map.put(instance.getDesc(), instance);
             }
             ENUM_MAP = Collections.unmodifiableMap(map);
         }
@@ -147,12 +146,14 @@ public class ServerHostInfoReader implements HostInfoReader {
 
     /**
      * Get the network adapters status by executing a command on Windows.
+     *
      * @param nicStatusMap
      */
     private static void buildNicStatusMap(Map<String, NicStatus> nicStatusMap) {
         String output;
         try {
-            output = ExecUtils.exec("powershell.exe Get-NetAdapter -IncludeHidden | Select-Object InterfaceDescription,Status | Format-Table -AutoSize",
+            output = ExecUtils.exec(
+                    "powershell.exe Get-NetAdapter -IncludeHidden | Select-Object InterfaceDescription,Status | Format-Table -AutoSize",
                     System.getProperty("line.separator"));
         } catch (Exception e) {
             logger.info("Failed to obtain nic status from exec `Get-NetAdapter` : " + e.getMessage());
@@ -161,7 +162,8 @@ public class ServerHostInfoReader implements HostInfoReader {
 
         String[] lines = output.split(System.getProperty("line.separator"));
         if (lines.length < 3) {
-            logger.info("No enough data received from exec `Get-NetAdapter`(" + lines.length + "): " + Arrays.toString(lines));
+            logger.info("No enough data received from exec `Get-NetAdapter`(" + lines.length + "): " + Arrays.toString(
+                    lines));
             return;
         }
 
@@ -185,8 +187,10 @@ public class ServerHostInfoReader implements HostInfoReader {
         }
 
     }
+
     /**
      * Extracts network interface info from the system. Take note that loop back, point-to-point and non-physical addresses are excluded
+     *
      * @return
      */
     @Override
@@ -205,9 +209,12 @@ public class ServerHostInfoReader implements HostInfoReader {
 
             for (NetworkInterface networkInterface : Collections.list(NetworkInterface.getNetworkInterfaces())) {
                 try {
-                    logger.debug("Found network interface " + networkInterface.getName() + " " + networkInterface.getDisplayName());
-                    if (!networkInterface.isLoopback() && !networkInterface.isPointToPoint() && isPhysicalInterface(networkInterface) && !isGhostHyperV(networkInterface)) {
-                        logger.debug("Processing physical network interface " + networkInterface.getName() + " " + networkInterface.getDisplayName());
+                    logger.debug(
+                            "Found network interface " + networkInterface.getName() + " " + networkInterface.getDisplayName());
+                    if (!networkInterface.isLoopback() && !networkInterface.isPointToPoint() && isPhysicalInterface(
+                            networkInterface) && !isGhostHyperV(networkInterface)) {
+                        logger.debug(
+                                "Processing physical network interface " + networkInterface.getName() + " " + networkInterface.getDisplayName());
                         boolean hasIp = false;
                         for (InetAddress address : Collections.list(networkInterface.getInetAddresses())) {
                             String ipAddress = address.getHostAddress();
@@ -220,10 +227,12 @@ public class ServerHostInfoReader implements HostInfoReader {
 
                         if (isWindowsIPv4) { //extra check for windows IPv4 preferred environment, see https://github.com/librato/joboe/pull/1090 for details
                             NicStatus status = nicStatusMap.get(networkInterface.getDisplayName());
-                            logger.debug("Checking " + networkInterface.getName() + ", " + networkInterface.getDisplayName() + ", status=" + status);
+                            logger.debug(
+                                    "Checking " + networkInterface.getName() + ", " + networkInterface.getDisplayName() + ", status=" + status);
                             if (!(NicStatus.UP.equals(status) || NicStatus.DISCONNECTED.equals(status))) {
                                 // ignore disabled/null NIC on Windows when "-Djava.net.preferIPv4Stack=true" is set
-                                logger.debug("Ignore disabled/null network adapter " + networkInterface.getDisplayName() + ", status=" + status);
+                                logger.debug(
+                                        "Ignore disabled/null network adapter " + networkInterface.getDisplayName() + ", status=" + status);
                                 continue;
                             }
                             // We cannot simply filter out NICs without an IP for all the scenarios. This is because if an NIC is DISCONNECTED, it will have
@@ -232,17 +241,18 @@ public class ServerHostInfoReader implements HostInfoReader {
                             // Therefore, if the isWindowsIPv4 is true (check that when it's true), we'll accept the DISCONNECTED NIC without
                             // considering if it has an IP. For all other cases, that NIC will be filtered out if it doesn't have an IP address.
                             if (NicStatus.UP.equals(status) && !hasIp) {
-                                logger.debug("Ignore network adapter which is up but no IP assigned: " + networkInterface.getDisplayName());
+                                logger.debug(
+                                        "Ignore network adapter which is up but no IP assigned: " + networkInterface.getDisplayName());
                                 continue;
                             }
-                        } else if (!hasIp){
+                        } else if (!hasIp) {
                             logger.debug("Ignore network adapter without an IP: " + networkInterface.getName());
                             continue;
                         }
                         //add mac addresses too
                         byte[] hwAddr = networkInterface.getHardwareAddress();
                         if ((hwAddr != null) && (hwAddr.length != 0)) {
-                            String macAddress = getMacAddressFromBytes(hwAddr); 
+                            String macAddress = getMacAddressFromBytes(hwAddr);
                             logger.debug("Found MAC address " + macAddress);
                             if (!macAddresses.contains(macAddress)) {
                                 macAddresses.add(macAddress);
@@ -250,9 +260,10 @@ public class ServerHostInfoReader implements HostInfoReader {
                         }
                     }
                 } catch (NoSuchMethodError e) {
-                    logger.debug("Failed to get network info for " +  networkInterface.getName() + ", probably running JDK 1.5 or earlier");
+                    logger.debug(
+                            "Failed to get network info for " + networkInterface.getName() + ", probably running JDK 1.5 or earlier");
                 } catch (SocketException e) {
-                    logger.debug("Failed to get network info for " +  networkInterface.getName() + ":" + e.getMessage());
+                    logger.debug("Failed to get network info for " + networkInterface.getName() + ":" + e.getMessage());
                 }
             }
             logger.debug("All MAC addresses accepted: " + Arrays.toString(macAddresses.toArray()));
@@ -262,15 +273,15 @@ public class ServerHostInfoReader implements HostInfoReader {
         }
         return null;
     }
-    
+
     /**
-     * Determines whether a network interface is physical (for Linux only). 
-     * 
+     * Determines whether a network interface is physical (for Linux only).
+     * <p>
      * By our definition, a network interface is considered physical if its link in /sys/class/net does NOT contain "/virtual/"
      * https://github.com/librato/joboe/issues/728
-     * 
+     * <p>
      * Take note that this definition is different from NetworkInterface.isVirtual()
-     *  
+     *
      * @param networkInterface
      * @return
      */
@@ -278,26 +289,28 @@ public class ServerHostInfoReader implements HostInfoReader {
         if (osType != HostInfoUtils.OsType.LINUX) { //not applicable to non-linux systems, consider all interfaces physical
             return true;
         }
-        
+
         //cannot use java.nio.file.Files.readSymbolicLink as it's not available in jdk 1.6
         String interfaceFilePath = "/sys/class/net/" + networkInterface.getName();
         File interfaceFile = new File(interfaceFilePath);
         try {
             return !interfaceFile.getCanonicalPath().contains("/virtual/");
         } catch (IOException e) {
-            logger.warn("Error identifying network interface in " + interfaceFilePath + " message : " + e.getMessage(), e);
+            logger.warn("Error identifying network interface in " + interfaceFilePath + " message : " + e.getMessage(),
+                    e);
             return true; //having problem identifying the interface, treat it as physical
         }
     }
 
     /**
      * To detect whether it is a ghost Microsoft Hyper-V Network Adapter.
-     *
+     * <p>
      * Since in IPv4 preferred environment, `NetworkInterface.getAll` might return ghost Microsoft Hyper-V Network Adapter
-     *
+     * <p>
      * https://swicloud.atlassian.net/browse/AO-14670 for details
+     *
      * @param networkInterface
-     * @return  false if it's NOT a Microsoft Hyper-V Network Adapter or it's UP
+     * @return false if it's NOT a Microsoft Hyper-V Network Adapter or it's UP
      */
     private static boolean isGhostHyperV(NetworkInterface networkInterface) {
         final String hyperVPrefix = "Microsoft Hyper-V Network Adapter";
@@ -351,38 +364,38 @@ public class ServerHostInfoReader implements HostInfoReader {
         }
         return hostId;
     }
-    
+
     public static String loadHostName() {
         String hostName = loadHostNameFromExec();
-        
+
         if (hostName != null) {
             return hostName;
         }
-        
+
         hostName = loadHostNameFromInetAddress();
-        
+
         if (hostName != null) {
             return hostName;
         }
-        
+
         // We've failed to get an IP address, so as a last resort...
         hostName = "unknown_hostname";
         return hostName;
     }
-    
+
     /**
      * This was copied from JAgentInfo.java
-     * 
+     * <p>
      * Returns system host name using external 'hostname' command.
-     *
+     * <p>
      * This feels lame, but there is no other way to get a hostname that definitively matches
      * the gethostname() C library function we use elsewhere (liboboe, tracelyzer, etc.) without
      * resorting to JNI. We only do this at startup so I think we can live with it.
-     *
-     * 'InetAddress.getHostName()' and 'getCanonicalHostName()' may vary or fail based on 
-     * DNS settings, /etc/hosts settings, etc. and just aren't guaranteed to be the same 
+     * <p>
+     * 'InetAddress.getHostName()' and 'getCanonicalHostName()' may vary or fail based on
+     * DNS settings, /etc/hosts settings, etc. and just aren't guaranteed to be the same
      * as gethostname(), even though on many systems they are.
-     *
+     * <p>
      * Also see http://stackoverflow.com/questions/7348711/recommended-way-to-get-hostname-in-java
      */
     private static String loadHostNameFromExec() {
@@ -394,44 +407,45 @@ public class ServerHostInfoReader implements HostInfoReader {
             return null;
         }
     }
-    
+
     /**
      * This was copied from JAgentInfo.java
+     *
      * @return
      */
     private static String loadHostNameFromInetAddress() {
         try {
             InetAddress addr = InetAddress.getLocalHost();
             return addr.getCanonicalHostName();
-        } catch(UnknownHostException hostEx) {
+        } catch (UnknownHostException hostEx) {
             // Our hostname doesn't resolve, likely a mis-configured host, so fallback to using the first non-loopback IP address
             try {
-                Enumeration <NetworkInterface> netInts = NetworkInterface.getNetworkInterfaces();
+                Enumeration<NetworkInterface> netInts = NetworkInterface.getNetworkInterfaces();
                 NetworkInterface netInt;
-                Enumeration <InetAddress> addrs;
+                Enumeration<InetAddress> addrs;
                 InetAddress addr;
-                
+
                 while (netInts.hasMoreElements()) {
                     netInt = netInts.nextElement();
                     addrs = netInt.getInetAddresses();
-                
+
                     while (addrs.hasMoreElements()) {
                         addr = addrs.nextElement();
-                
+
                         if (!addr.isLoopbackAddress() && !addr.isLinkLocalAddress()) {
                             return addr.getHostAddress();
                         }
                     }
                 }
-                
-            } catch(SocketException socketEx) {
+
+            } catch (SocketException socketEx) {
                 logger.warn("Unable to retrieve network interfaces", socketEx);
             }
-            
+
             return null;
         }
     }
-    
+
     public static String getDistro() {
         if (!checkedDistro) {
             if (osType == HostInfoUtils.OsType.LINUX) {
@@ -452,22 +466,22 @@ public class ServerHostInfoReader implements HostInfoReader {
      */
     public Map<String, Object> getHostMetadata() {
         HashMap<String, Object> infoMap = new HashMap<String, Object>();
-        
+
         String hostnameAlias = (String) ConfigManager.getConfig(ConfigProperty.AGENT_HOSTNAME_ALIAS);
         if (hostnameAlias != null) {
             infoMap.put(HOSTNAME_ALIAS_KEY, hostnameAlias);
         }
-        
+
         addOsInfo(infoMap);
         addNetworkAddresses(infoMap);
-        
+
         return infoMap;
     }
-    
+
     private static void addOsInfo(Map<String, Object> infoMap) {
         infoMap.put("UnameSysName", osType.getLabel());
         infoMap.put("UnameVersion", ManagementFactory.getOperatingSystemMXBean().getVersion());
-        
+
         String distro = getDistro();
         if (distro != null) {
             infoMap.put("Distro", distro);
@@ -482,18 +496,18 @@ public class ServerHostInfoReader implements HostInfoReader {
     }
 
     /**
-     * 
      * Identifies the distro value on a Linux system
-     * 
+     * <p>
      * Code logic copied from https://github.com/librato/oboe/blob/a3dd998e7ea239e3d5e5c7ece8c635c3ff61c903/liboboe/reporter/ssl.cc#L559
+     *
      * @return
      */
     private static String getLinuxDistro() {
         // Note: Order of checking is important because some distros share same file names but with different function.
         // Keep this order: redhat based -> ubuntu -> debian
-        
+
         BufferedReader fileReader = null;
-        
+
         try {
             if ((fileReader = getFileReader(DistroType.REDHAT_BASED)) != null) {
                 // Redhat, CentOS, Fedora
@@ -531,11 +545,11 @@ public class ServerHostInfoReader implements HostInfoReader {
             }
         }
     }
-    
+
     private static String getWindowsDistro() {
         return ManagementFactory.getOperatingSystemMXBean().getName();
     }
-    
+
     static String getGentooDistro(BufferedReader fileReader) throws IOException {
         String line;
         return (line = fileReader.readLine()) != null ? line : "Gentoo unknown";
@@ -560,7 +574,7 @@ public class ServerHostInfoReader implements HostInfoReader {
         String line;
         return (line = fileReader.readLine()) != null ? line : "Red Hat based unknown";
     }
-    
+
     static String getAmazonLinuxDistro(BufferedReader fileReader) throws IOException {
         String line;
         if ((line = fileReader.readLine()) != null) {
@@ -572,7 +586,7 @@ public class ServerHostInfoReader implements HostInfoReader {
         }
         return "Amzn Linux unknown";
     }
-    
+
     static String getUbuntuDistro(BufferedReader fileReader) throws IOException {
         String line;
         while ((line = fileReader.readLine()) != null) {
@@ -582,19 +596,18 @@ public class ServerHostInfoReader implements HostInfoReader {
                 String patch = tokens[1];
                 if (patch.startsWith("\"")) {
                     patch = patch.substring(1);
-                } 
+                }
                 if (patch.endsWith("\"")) {
                     patch = patch.substring(0, patch.length() - 1);
                 }
-                
+
                 return patch;
             }
         }
         return "Ubuntu unknown";
     }
-    
-    
-    
+
+
     private static BufferedReader getFileReader(DistroType distroType) {
         String path = DISTRO_FILE_NAMES.get(distroType);
         if (path == null) {
@@ -609,25 +622,28 @@ public class ServerHostInfoReader implements HostInfoReader {
             return null;
         }
     }
-    
+
     private void startHostIdChecker() {
-        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1, DaemonThreadFactory.newInstance("host-id-checker"));
+        ScheduledExecutorService executorService = Executors.newScheduledThreadPool(1,
+                DaemonThreadFactory.newInstance("host-id-checker"));
         //align to minute, figure out the delay in ms
-        long delay = 60 * 1000 - System.currentTimeMillis() % (60 * 1000); 
+        long delay = 60 * 1000 - System.currentTimeMillis() % (60 * 1000);
         executorService.scheduleAtFixedRate(new Runnable() {
             public void run() {
                 hostId = buildHostId();
             }
         }, delay, HOST_ID_CHECK_INTERVAL * 1000, TimeUnit.MILLISECONDS);
     }
-    
+
     private HostId buildHostId() {
         NetworkAddressInfo networkAddressInfo = getNetworkAddressInfo();
         List<String> macAddresses = networkAddressInfo != null ? networkAddressInfo.getMacAddresses() : Collections.<String>emptyList();
         //assume all that uses HostInfoUtils are persistent server, can be improved to recognize different types later
-        return new HostId(getHostName(), JavaProcessUtils.getPid(), macAddresses, Ec2InstanceReader.getInstanceId(), Ec2InstanceReader.getAvailabilityZone(), DockerInfoReader.getDockerId(), HerokuDynoReader.getDynoId(), AzureReader.getInstanceId(), HostType.PERSISTENT, UamsClientIdReader.getUamsClientId(), getUuid());
+        return new HostId(getHostName(), JavaProcessUtils.getPid(), macAddresses, Ec2InstanceReader.getInstanceId(),
+                Ec2InstanceReader.getAvailabilityZone(), DockerInfoReader.getDockerId(), HerokuDynoReader.getDynoId(),
+                AzureReader.getInstanceId(), HostType.PERSISTENT, UamsClientIdReader.getUamsClientId(), getUuid());
     }
-    
+
     public static class Ec2InstanceReader {
         private static final int TIMEOUT_DEFAULT = 1000;
         private static final int TIMEOUT_MIN = 0; //do not wait at all, disable retrieval
@@ -640,10 +656,12 @@ public class ServerHostInfoReader implements HostInfoReader {
             if (configValue == null) {
                 return TIMEOUT_DEFAULT;
             } else if (configValue > TIMEOUT_MAX) {
-                logger.warn("EC2 metadata read timeout cannot be greater than " + TIMEOUT_MAX + " millisec but found [" + configValue + "]. Using " + TIMEOUT_MAX + " instead.");
+                logger.warn(
+                        "EC2 metadata read timeout cannot be greater than " + TIMEOUT_MAX + " millisec but found [" + configValue + "]. Using " + TIMEOUT_MAX + " instead.");
                 return TIMEOUT_MAX;
             } else if (configValue < TIMEOUT_MIN) {
-                logger.warn("EC2 metadata read timeout cannot be smaller than " + TIMEOUT_MIN + " millisec but found [" + configValue + "]. Using " + TIMEOUT_MIN + " instead, which essentially disable reading EC2 metadata");
+                logger.warn(
+                        "EC2 metadata read timeout cannot be smaller than " + TIMEOUT_MIN + " millisec but found [" + configValue + "]. Using " + TIMEOUT_MIN + " instead, which essentially disable reading EC2 metadata");
                 return TIMEOUT_MIN;
             } else {
                 return configValue;
@@ -655,28 +673,28 @@ public class ServerHostInfoReader implements HostInfoReader {
          * endpoint.
          */
         public static final String EC2_METADATA_SERVICE_OVERRIDE_SYSTEM_PROPERTY = "com.amazonaws.sdk.ec2MetadataServiceEndpointOverride";
-        
+
         private static final String EC2_METADATA_SERVICE_URL = "http://169.254.169.254";
         private static final String INSTANCE_ID_PATH = "latest/meta-data/instance-id";
         private static final String AVAILABILITY_ZONE_PATH = "latest/meta-data/placement/availability-zone";
-        
+
         private String instanceId;
         private String availabilityZone;
-        
+
         private static final Ec2InstanceReader SINGLETON = new Ec2InstanceReader();
-        
+
         public static String getInstanceId() {
             return SINGLETON.instanceId;
         }
-        
+
         public static String getAvailabilityZone() {
             return SINGLETON.availabilityZone;
         }
-        
+
         private Ec2InstanceReader() {
             initialize();
         }
-        
+
         private void initialize() {
             if (TIMEOUT == TIMEOUT_MIN) { //disable reader
                 return;
@@ -688,30 +706,54 @@ public class ServerHostInfoReader implements HostInfoReader {
             }
         }
 
-        private static String useIMDSv1(String relativePath){
+        private static String useIMDSv1(String relativePath) {
             String result = null;
+            BufferedReader reader = null;
+            HttpURLConnection connection = null;
+
             try {
                 URI uri = new URI(getMetadataHost() + "/" + relativePath);
-                HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection(Proxy.NO_PROXY);
+                connection = (HttpURLConnection) uri.toURL().openConnection(Proxy.NO_PROXY);
                 connection.setConnectTimeout(TIMEOUT);
+
                 connection.setReadTimeout(TIMEOUT);
                 int statusCode = connection.getResponseCode();
-
                 if (statusCode == HttpURLConnection.HTTP_OK) {
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                    reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                     result = reader.readLine();
                     reader.close();
                 }
 
                 connection.disconnect();
-            } catch (URISyntaxException | IOException ignore) {
+                if (result == null) {
+                    logger.debug(String.format("Failed to retrieved metadata using IMDSv1: status code=%d",
+                            statusCode));
+                } else {
+                    logger.debug(String.format("Retrieved metadata using IMDSv1: %s", result));
+                }
+
+            } catch (URISyntaxException | IOException exception) {
+                logger.debug(String.format("Error retrieving metadata using IMDSv1: %s", exception));
             }
+
+            if (connection != null) {
+                connection.disconnect();
+            }
+
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException ioException) {
+                    logger.debug(String.format("Error closing reader for IMDSv1: %s", ioException));
+                }
+            }
+
             return result;
         }
 
         private static String getApiToken() throws IOException, URISyntaxException {
             String result = null;
-            URI tokenApiUri = new URI(getMetadataHost() + "/latest/api/token" );
+            URI tokenApiUri = new URI(getMetadataHost() + "/latest/api/token");
             HttpURLConnection connection = (HttpURLConnection) tokenApiUri.toURL().openConnection(Proxy.NO_PROXY);
 
             connection.setConnectTimeout(TIMEOUT);
@@ -729,95 +771,121 @@ public class ServerHostInfoReader implements HostInfoReader {
             connection.disconnect();
             return result;
         }
-        private static String useIMDSv2(String token, String relativePath) throws IOException, URISyntaxException {
+
+        private static String useIMDSv2(String relativePath) {
             String result = null;
-            URI uri = new URI(getMetadataHost() + "/" + relativePath);
-            HttpURLConnection connection = (HttpURLConnection) uri.toURL().openConnection(Proxy.NO_PROXY);
+            BufferedReader reader = null;
+            HttpURLConnection connection = null;
 
-            connection.setReadTimeout(TIMEOUT);
-            connection.setConnectTimeout(TIMEOUT);
-            connection.setRequestProperty("X-aws-ec2-metadata-token", token);
+            try {
+                String apiToken = getApiToken();
+                if (apiToken == null) {
+                    return null;
+                }
 
-            int statusCode = connection.getResponseCode();
-            if (statusCode == HttpURLConnection.HTTP_OK) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                result = reader.readLine();
-                reader.close();
+                URI uri = new URI(getMetadataHost() + "/" + relativePath);
+                connection = (HttpURLConnection) uri.toURL().openConnection(Proxy.NO_PROXY);
+                int statusCode = connection.getResponseCode();
+
+                connection.setReadTimeout(TIMEOUT);
+                connection.setConnectTimeout(TIMEOUT);
+                connection.setRequestProperty("X-aws-ec2-metadata-token", apiToken);
+
+                connection.disconnect();
+                if (statusCode == HttpURLConnection.HTTP_OK) {
+                    reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                    result = reader.readLine();
+                    reader.close();
+                }
+
+
+                if (result == null) {
+                    logger.debug(String.format("Failed to retrieved metadata using IMDSv2: status code=%d",
+                            statusCode));
+                } else {
+                    logger.debug(String.format("Retrieved metadata using IMDSv2: %s", result));
+                }
+
+            } catch (IOException | URISyntaxException e) {
+                logger.debug(String.format("Error retrieving metadata using IMDSv2: %s", e));
             }
 
-            logger.debug(String.format("Retrieved metadata using IMDSv2: %s", result));
-            connection.disconnect();
+            if (connection != null) {
+                connection.disconnect();
+            }
+
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException ioException) {
+                    logger.debug(String.format("Error closing reader for IMDSv2: %s", ioException));
+                }
+            }
+
             return result;
         }
 
         private static String getResourceOnEndpoint(String relativePath) {
-            try {
-                String result = useIMDSv2(getApiToken(), relativePath);
-                if (result == null){
-                    result = useIMDSv1(relativePath);
-                }
-                return result;
-
-            } catch (IOException e) { 
-                logger.debug("Timeout on reading EC2 metadata after waiting for [" + TIMEOUT + "] milliseconds. Probably not an EC2 instance");
-            } catch (URISyntaxException e) {
-                logger.warn(e.getMessage(), e);
+            String result = useIMDSv2(relativePath);
+            if (result == null) {
+                result = useIMDSv1(relativePath);
             }
-            return null;
+            return result;
         }
-        
+
         private static String getMetadataHost() {
             String host = System.getProperty(EC2_METADATA_SERVICE_OVERRIDE_SYSTEM_PROPERTY);
             return host != null ? host : EC2_METADATA_SERVICE_URL;
         }
     }
-    
+
     public static class DockerInfoReader {
         public static final String DEFAULT_LINUX_DOCKER_FILE_LOCATION = "/proc/self/cgroup";
         private static final int DOCKER_ID_LENGTH = 64;
         private static final Set<String> DOCKER_CGROUP_PATH_TOKEN = new HashSet<String>();
-        
+
         static {
             DOCKER_CGROUP_PATH_TOKEN.add("docker");
             DOCKER_CGROUP_PATH_TOKEN.add("ecs");
             DOCKER_CGROUP_PATH_TOKEN.add("kubepods");
             DOCKER_CGROUP_PATH_TOKEN.add("docker.service");
         }
-        
+
         private String dockerId;
-        
+
         static final DockerInfoReader SINGLETON = new DockerInfoReader();
-        
+
         public static String getDockerId() {
             return SINGLETON.dockerId;
         }
-        
+
         private DockerInfoReader() {
             if (osType == HostInfoUtils.OsType.LINUX) {
                 initializeLinux(DEFAULT_LINUX_DOCKER_FILE_LOCATION);
             } else if (osType == HostInfoUtils.OsType.WINDOWS) {
                 initializeWindows();
             }
-            
+
             if (dockerId != null) {
                 logger.debug("Found Docker instance ID :" + this.dockerId);
             } else {
                 logger.debug("Cannot locate Docker id, not a Docker container");
             }
         }
-        
+
         void initializeLinux(String dockerFileLocation) {
             BufferedReader reader = null;
-            
+
             try {
                 reader = new BufferedReader(new FileReader(dockerFileLocation));
                 String line;
-                
+
                 // refers to logic from c-lib https://github.com/librato/oboe/blob/af14cd2daaba7b6c21fa4aa780b222f02fe95f07/liboboe/reporter/ssl.cc#L1134
                 // iterate over each line and look for the keyword "docker" or "ecs"
                 while ((line = reader.readLine()) != null) {
                     List<String> tokens = Arrays.asList(line.split("/"));
-                    if (!Collections.disjoint(tokens, DOCKER_CGROUP_PATH_TOKEN)) { //if the tokens contains any of the valid "docker" label segments in it
+                    if (!Collections.disjoint(tokens,
+                            DOCKER_CGROUP_PATH_TOKEN)) { //if the tokens contains any of the valid "docker" label segments in it
                         for (String token : tokens) {
                             if (token.length() == DOCKER_ID_LENGTH) {
                                 dockerId = token;
@@ -826,36 +894,38 @@ public class ServerHostInfoReader implements HostInfoReader {
                         }
                     }
                 }
-                
+
                 dockerId = null;
             } catch (FileNotFoundException e) {
                 dockerId = null;
-                logger.debug("Cannot locate docker id as file " + dockerFileLocation + " cannot be found : " + e.getMessage());
+                logger.debug(
+                        "Cannot locate docker id as file " + dockerFileLocation + " cannot be found : " + e.getMessage());
             } catch (IOException e) {
                 dockerId = null;
-                logger.debug("Cannot locate docker id as file " + dockerFileLocation + " throws IOException : " + e.getMessage());
+                logger.debug(
+                        "Cannot locate docker id as file " + dockerFileLocation + " throws IOException : " + e.getMessage());
             } finally {
                 if (reader != null) {
                     try {
                         reader.close();
                     } catch (IOException e) {
                         logger.warn(e.getMessage(), e);
-                    }   
+                    }
                 }
             }
         }
-        
+
         /**
          * Initializes Windows docker ID if the java process is running within a Windows docker container
-         * 
+         * <p>
          * Determines if it is a Windows container by checking if `cexecsvc` exists in `powershell get-process`
-         * 
-         * If so, set the host name as Docker ID 
-         * 
+         * <p>
+         * If so, set the host name as Docker ID
          */
         private void initializeWindows() {
             try {
-                String getContainerTypeResult = ExecUtils.exec("powershell Get-ItemProperty -Path HKLM:\\SYSTEM\\CurrentControlSet\\Control\\ -Name \"ContainerType\"");
+                String getContainerTypeResult = ExecUtils.exec(
+                        "powershell Get-ItemProperty -Path HKLM:\\SYSTEM\\CurrentControlSet\\Control\\ -Name \"ContainerType\"");
                 if (getContainerTypeResult != null && !"".equals(getContainerTypeResult)) {
                     dockerId = ServerHostInfoReader.INSTANCE.getHostName();
                 }
@@ -864,25 +934,25 @@ public class ServerHostInfoReader implements HostInfoReader {
             }
         }
     }
-    
-    
+
+
     public static class HerokuDynoReader {
         private static final String DYNO_ENV_VARIABLE = "DYNO";
         private static final HerokuDynoReader SINGLETON = new HerokuDynoReader();
-        
+
         private final String dynoId;
-        
+
         public static String getDynoId() {
             return SINGLETON.dynoId;
         }
-        
+
         private HerokuDynoReader() {
             this.dynoId = System.getenv(DYNO_ENV_VARIABLE);
             if (this.dynoId != null) {
                 logger.debug("Found Heroku Dyno ID: " + this.dynoId);
             }
         }
-     }
+    }
 
     public static class AzureReader {
         private static final String INSTANCE_ID_ENV_VARIABLE = "WEBSITE_INSTANCE_ID";
