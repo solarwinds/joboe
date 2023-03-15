@@ -908,10 +908,7 @@ public class ServerHostInfoReader implements HostInfoReader {
                     String payload = reader.readLine();
 
                     JSONObject jsonObject = new JSONObject(payload);
-                    String vmId = jsonObject.getJSONObject("compute").getString("vmId");
-                    logger.debug(String.format("Azure VM id: %s", vmId));
-
-                    return vmId;
+                    return jsonObject.getJSONObject("compute").getString("vmId");
                 }
                 logger.debug(String.format("Azure IMDS status code: %s", statusCode));
 
@@ -935,8 +932,11 @@ public class ServerHostInfoReader implements HostInfoReader {
         private AzureReader() {
             instanceId = getVmId();
             if (instanceId == null) {
+                logger.debug(String.format("Unable to retrieve vmId from IMDS using environment variable(%s)",
+                        INSTANCE_ID_ENV_VARIABLE));
                 instanceId = System.getenv(INSTANCE_ID_ENV_VARIABLE);
             }
+            logger.debug(String.format("Azure vmId: %s", instanceId));
         }
     }
 }
