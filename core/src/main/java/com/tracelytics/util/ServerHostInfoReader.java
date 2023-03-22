@@ -1,6 +1,8 @@
 package com.tracelytics.util;
 
 import com.google.auto.service.AutoService;
+import com.tracelytics.ext.json.JSONException;
+import com.tracelytics.ext.json.JSONObject;
 import com.tracelytics.joboe.Context;
 import com.tracelytics.joboe.HostId;
 import com.tracelytics.joboe.Metadata;
@@ -12,6 +14,8 @@ import com.tracelytics.joboe.span.impl.ScopeManager;
 import com.tracelytics.logging.Logger;
 import com.tracelytics.logging.LoggerFactory;
 import com.tracelytics.util.HostInfoUtils.NetworkAddressInfo;
+import lombok.Builder;
+import lombok.Value;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -681,6 +685,8 @@ public class ServerHostInfoReader implements HostInfoReader {
         private String instanceId;
         private String availabilityZone;
 
+        private AwsMetadata awsMetadata;
+
         private static final Ec2InstanceReader SINGLETON = new Ec2InstanceReader();
 
         public static String getInstanceId() {
@@ -699,11 +705,14 @@ public class ServerHostInfoReader implements HostInfoReader {
             if (TIMEOUT == TIMEOUT_MIN) { //disable reader
                 return;
             }
-            instanceId = getResourceOnEndpoint(INSTANCE_ID_PATH);
+            String token = getApiToken();
+            instanceId = getResourceOnEndpoint(INSTANCE_ID_PATH, token);
             if (instanceId != null) { //only proceed if instance id can be found
-                availabilityZone = getResourceOnEndpoint(AVAILABILITY_ZONE_PATH);
+                availabilityZone = getResourceOnEndpoint(AVAILABILITY_ZONE_PATH, token);
                 logger.debug("Found EC2 instance id " + instanceId + " availability zone: " + availabilityZone);
             }
+
+            awsMetadata = getMetadata(token);
         }
 
         private static String useIMDSv1(String relativePath) {
@@ -751,47 +760,50 @@ public class ServerHostInfoReader implements HostInfoReader {
             return result;
         }
 
-        private static String getApiToken() throws IOException, URISyntaxException {
+        private static String getApiToken() {
             String result = null;
-            URI tokenApiUri = new URI(getMetadataHost() + "/latest/api/token");
-            HttpURLConnection connection = (HttpURLConnection) tokenApiUri.toURL().openConnection(Proxy.NO_PROXY);
+            HttpURLConnection connection = null;
+            try {
+                URI tokenApiUri = new URI(getMetadataHost() + "/latest/api/token");
+                connection = (HttpURLConnection) tokenApiUri.toURL().openConnection(Proxy.NO_PROXY);
+                connection.setConnectTimeout(TIMEOUT);
 
-            connection.setConnectTimeout(TIMEOUT);
-            connection.setReadTimeout(TIMEOUT);
-            connection.setRequestMethod("PUT");
+                connection.setReadTimeout(TIMEOUT);
+                connection.setRequestMethod("PUT");
+                connection.setRequestProperty("X-aws-ec2-metadata-token-ttl-seconds", "3600");
 
-            connection.setRequestProperty("X-aws-ec2-metadata-token-ttl-seconds", "3600");
-            int statusCode = connection.getResponseCode();
-            if (statusCode == HttpURLConnection.HTTP_OK) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                result = reader.readLine();
-                reader.close();
+                int statusCode = connection.getResponseCode();
+                if (statusCode == HttpURLConnection.HTTP_OK) {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                    result = reader.readLine();
+                    reader.close();
+                }
+
+            } catch (URISyntaxException | IOException e) {
+                logger.debug(String.format("Error getting token for IMDSv2: %s", e));
+            } finally {
+                if (connection != null) {
+                    connection.disconnect();
+                }
             }
 
-            connection.disconnect();
             return result;
         }
 
-        private static String useIMDSv2(String relativePath) {
+        private static String useIMDSv2(String relativePath, String apiToken) {
             String result = null;
             BufferedReader reader = null;
             HttpURLConnection connection = null;
 
             try {
-                String apiToken = getApiToken();
-                if (apiToken == null) {
-                    return null;
-                }
-
                 URI uri = new URI(getMetadataHost() + "/" + relativePath);
                 connection = (HttpURLConnection) uri.toURL().openConnection(Proxy.NO_PROXY);
-                int statusCode = connection.getResponseCode();
-
                 connection.setReadTimeout(TIMEOUT);
+
                 connection.setConnectTimeout(TIMEOUT);
                 connection.setRequestProperty("X-aws-ec2-metadata-token", apiToken);
+                int statusCode = connection.getResponseCode();
 
-                connection.disconnect();
                 if (statusCode == HttpURLConnection.HTTP_OK) {
                     reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                     result = reader.readLine();
@@ -825,17 +837,66 @@ public class ServerHostInfoReader implements HostInfoReader {
             return result;
         }
 
-        private static String getResourceOnEndpoint(String relativePath) {
-            String result = useIMDSv2(relativePath);
+        private static String getResourceOnEndpoint(String relativePath, String token) {
+            String result = null;
+            if (token != null) {
+                result = useIMDSv2(relativePath, token);
+            }
+
             if (result == null) {
                 result = useIMDSv1(relativePath);
             }
             return result;
         }
 
+        private static AwsMetadata getMetadata(String token) {
+            String payload = getResourceOnEndpoint("latest/dynamic/instance-identity/document", token);
+            if (payload != null) {
+                try {
+                    AwsMetadata metadata = AwsMetadata.fromJson(payload, getResourceOnEndpoint("hostname", token));
+                    logger.debug(String.format("Aws Metadata: %s", metadata));
+                    return metadata;
+
+                } catch (JSONException e) {
+                    logger.debug(String.format("Error converting json to AwsMetadata model: %s\n %s", payload, e));
+                }
+            }
+            return null;
+        }
+
         private static String getMetadataHost() {
             String host = System.getProperty(EC2_METADATA_SERVICE_OVERRIDE_SYSTEM_PROPERTY);
             return host != null ? host : EC2_METADATA_SERVICE_URL;
+        }
+
+        @Value
+        @Builder
+        private static class AwsMetadata {
+            @Builder.Default
+            String cloudProvider = "aws";
+            @Builder.Default
+            String cloudPlatform = "aws_ec2";
+            String cloudAccountId;
+            String cloudRegion;
+            String cloudAvailabilityZone;
+            String hostId;
+            String hostImageId;
+            String hostName;
+            String hostType;
+
+            public static AwsMetadata fromJson(String json, String hostName) throws JSONException {
+                if (json == null) return null;
+                JSONObject jsonObject = new JSONObject(json);
+                return AwsMetadata.builder()
+                        .cloudRegion(jsonObject.getString("region"))
+                        .cloudAccountId(jsonObject.getString("accountId"))
+                        .cloudAvailabilityZone(jsonObject.getString("availabilityZone"))
+                        .hostId(jsonObject.getString("instanceId"))
+                        .hostImageId(jsonObject.getString("imageId"))
+                        .hostType(jsonObject.getString("instanceType"))
+                        .hostName(hostName)
+                        .build();
+            }
         }
     }
 
