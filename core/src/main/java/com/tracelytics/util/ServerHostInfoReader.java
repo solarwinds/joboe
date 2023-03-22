@@ -716,7 +716,7 @@ public class ServerHostInfoReader implements HostInfoReader {
         }
 
         private static String useIMDSv1(String relativePath) {
-            String result = null;
+            StringBuilder result = null;
             BufferedReader reader = null;
             HttpURLConnection connection = null;
 
@@ -728,36 +728,43 @@ public class ServerHostInfoReader implements HostInfoReader {
                 connection.setReadTimeout(TIMEOUT);
                 int statusCode = connection.getResponseCode();
                 if (statusCode == HttpURLConnection.HTTP_OK) {
+
                     reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                    result = reader.readLine();
+                    result = new StringBuilder();
+                    String nextLine;
+
+                    while ((nextLine = reader.readLine()) != null) {
+                        result.append(nextLine);
+                    }
                     reader.close();
                 }
 
-                connection.disconnect();
                 if (result == null) {
                     logger.debug(String.format("Failed to retrieved metadata using IMDSv1: status code=%d",
                             statusCode));
                 } else {
                     logger.debug(String.format("Retrieved metadata using IMDSv1: %s", result));
+                    return result.toString();
                 }
 
             } catch (URISyntaxException | IOException exception) {
                 logger.debug(String.format("Error retrieving metadata using IMDSv1: %s", exception));
-            }
 
-            if (connection != null) {
-                connection.disconnect();
-            }
+            } finally {
+                if (connection != null) {
+                    connection.disconnect();
+                }
 
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException ioException) {
-                    logger.debug(String.format("Error closing reader for IMDSv1: %s", ioException));
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (IOException ioException) {
+                        logger.debug(String.format("Error closing reader for IMDSv1: %s", ioException));
+                    }
                 }
             }
 
-            return result;
+            return null;
         }
 
         private static String getApiToken() {
@@ -791,7 +798,7 @@ public class ServerHostInfoReader implements HostInfoReader {
         }
 
         private static String useIMDSv2(String relativePath, String apiToken) {
-            String result = null;
+            StringBuilder result = null;
             BufferedReader reader = null;
             HttpURLConnection connection = null;
 
@@ -806,35 +813,40 @@ public class ServerHostInfoReader implements HostInfoReader {
 
                 if (statusCode == HttpURLConnection.HTTP_OK) {
                     reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                    result = reader.readLine();
+                    result = new StringBuilder();
+                    String nextLine;
+
+                    while ((nextLine = reader.readLine()) != null) {
+                        result.append(nextLine);
+                    }
                     reader.close();
                 }
 
-
                 if (result == null) {
-                    logger.debug(String.format("Failed to retrieved metadata using IMDSv2: status code=%d",
+                    logger.debug(String.format("Failed to retrieve metadata using IMDSv2: status code=%d",
                             statusCode));
                 } else {
                     logger.debug(String.format("Retrieved metadata using IMDSv2: %s", result));
+                    return result.toString();
                 }
 
             } catch (IOException | URISyntaxException e) {
                 logger.debug(String.format("Error retrieving metadata using IMDSv2: %s", e));
-            }
 
-            if (connection != null) {
-                connection.disconnect();
-            }
+            } finally {
+                if (connection != null) {
+                    connection.disconnect();
+                }
 
-            if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException ioException) {
-                    logger.debug(String.format("Error closing reader for IMDSv2: %s", ioException));
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (IOException ioException) {
+                        logger.debug(String.format("Error closing reader for IMDSv2: %s", ioException));
+                    }
                 }
             }
-
-            return result;
+            return null;
         }
 
         private static String getResourceOnEndpoint(String relativePath, String token) {
@@ -853,7 +865,7 @@ public class ServerHostInfoReader implements HostInfoReader {
             String payload = getResourceOnEndpoint("latest/dynamic/instance-identity/document", token);
             if (payload != null) {
                 try {
-                    AwsMetadata metadata = AwsMetadata.fromJson(payload, getResourceOnEndpoint("hostname", token));
+                    AwsMetadata metadata = AwsMetadata.fromJson(payload, getResourceOnEndpoint("latest/meta-data/hostname", token));
                     logger.debug(String.format("Aws Metadata: %s", metadata));
                     return metadata;
 
