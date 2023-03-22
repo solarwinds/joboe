@@ -909,8 +909,13 @@ public class ServerHostInfoReader implements HostInfoReader {
 
                 if (statusCode == HttpURLConnection.HTTP_OK) {
                     reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                    String payload = reader.readLine();
-                    return AzureVmMetadata.fromJson(payload);
+                    StringBuilder payload = new StringBuilder();
+                    String nextLine;
+
+                    while ((nextLine =reader.readLine()) != null){
+                        payload.append(nextLine);
+                    }
+                    return AzureVmMetadata.fromJson(payload.toString());
                 }
                 logger.debug(String.format("Azure IMDS status code: %s", statusCode));
 
