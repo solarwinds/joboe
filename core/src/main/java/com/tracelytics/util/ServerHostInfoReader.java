@@ -14,6 +14,8 @@ import com.tracelytics.joboe.span.impl.ScopeManager;
 import com.tracelytics.logging.Logger;
 import com.tracelytics.logging.LoggerFactory;
 import com.tracelytics.util.HostInfoUtils.NetworkAddressInfo;
+import lombok.Builder;
+import lombok.Value;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -118,7 +120,7 @@ public class ServerHostInfoReader implements HostInfoReader {
 
     @Override
     public String getAzureInstanceId() {
-        return AzureReader.getInstanceId();
+        return AzureReader.getAppInstanceId();
     }
 
     // The network adapter status. It's used for Windows only.
@@ -648,7 +650,7 @@ public class ServerHostInfoReader implements HostInfoReader {
         //assume all that uses HostInfoUtils are persistent server, can be improved to recognize different types later
         return new HostId(getHostName(), JavaProcessUtils.getPid(), macAddresses, Ec2InstanceReader.getInstanceId(),
                 Ec2InstanceReader.getAvailabilityZone(), DockerInfoReader.getDockerId(), HerokuDynoReader.getDynoId(),
-                AzureReader.getInstanceId(), HostType.PERSISTENT, UamsClientIdReader.getUamsClientId(), getUuid());
+                AzureReader.getAppInstanceId(), HostType.PERSISTENT, UamsClientIdReader.getUamsClientId(), getUuid());
     }
 
     public static class Ec2InstanceReader {
@@ -874,13 +876,15 @@ public class ServerHostInfoReader implements HostInfoReader {
         private static final String INSTANCE_ID_ENV_VARIABLE = "WEBSITE_INSTANCE_ID";
         private static final AzureReader SINGLETON = new AzureReader();
         private static final String DEFAULT_METADATA_VERSION = "2021-12-13";
-        private String instanceId;
+        private final String appInstanceId;
 
-        public static String getInstanceId() {
-            return SINGLETON.instanceId;
+        private final AzureVmMetadata azureVmMetadata;
+
+        public static String getAppInstanceId() {
+            return SINGLETON.appInstanceId;
         }
 
-        private String getVmId() {
+        private AzureVmMetadata getVmMetadata() {
             HttpURLConnection connection = null;
             BufferedReader reader = null;
             Integer timeout = (Integer) ConfigManager.getConfig(ConfigProperty.AGENT_AZURE_VM_METADATA_TIMEOUT);
@@ -906,9 +910,7 @@ public class ServerHostInfoReader implements HostInfoReader {
                 if (statusCode == HttpURLConnection.HTTP_OK) {
                     reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                     String payload = reader.readLine();
-
-                    JSONObject jsonObject = new JSONObject(payload);
-                    return jsonObject.getJSONObject("compute").getString("vmId");
+                    return AzureVmMetadata.fromJson(payload);
                 }
                 logger.debug(String.format("Azure IMDS status code: %s", statusCode));
 
@@ -930,13 +932,44 @@ public class ServerHostInfoReader implements HostInfoReader {
         }
 
         private AzureReader() {
-            instanceId = getVmId();
-            if (instanceId == null) {
-                logger.debug(String.format("Unable to retrieve vmId from IMDS using environment variable(%s)",
-                        INSTANCE_ID_ENV_VARIABLE));
-                instanceId = System.getenv(INSTANCE_ID_ENV_VARIABLE);
+            this.appInstanceId = System.getenv(INSTANCE_ID_ENV_VARIABLE);
+            if (this.appInstanceId != null) {
+                logger.debug("Found Azure instance ID: " + this.appInstanceId);
             }
-            logger.debug(String.format("Azure vmId: %s", instanceId));
+            azureVmMetadata = getVmMetadata();
+            logger.debug(String.format("Azure vm metadata: %s", azureVmMetadata));
+        }
+    }
+
+    @Value
+    @Builder
+    public static class AzureVmMetadata {
+        @Builder.Default
+        String cloudProvider = "azure";
+        @Builder.Default
+        String cloudPlatform = "azure_vm";
+        String cloudRegion;
+        String cloudAccountId;
+        String hostId;
+        String hostName;
+        String azureVmName;
+        String azureVmSize;
+        String azureVmScaleSetName;
+        String azureResourceGroupName;
+
+        public static AzureVmMetadata fromJson(String payload) throws JSONException {
+            JSONObject jsonObject = new JSONObject(payload);
+            JSONObject compute = jsonObject.getJSONObject("compute");
+            return AzureVmMetadata.builder()
+                    .hostId(compute.getString("vmId"))
+                    .cloudRegion(compute.getString("location"))
+                    .hostName(compute.getString("name"))
+                    .azureVmName(compute.getString("name"))
+                    .cloudAccountId(compute.getString("subscriptionId"))
+                    .azureVmSize(compute.getString("vmSize"))
+                    .azureVmScaleSetName(compute.getString("vmScaleSetName"))
+                    .azureResourceGroupName(compute.getString("resourceGroupName"))
+                    .build();
         }
     }
 }
