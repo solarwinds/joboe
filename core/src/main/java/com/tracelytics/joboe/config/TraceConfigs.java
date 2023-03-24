@@ -1,38 +1,68 @@
 package com.tracelytics.joboe.config;
 
-import java.io.Serializable;
-import java.util.Map;
-import java.util.Map.Entry;
-
+import com.tracelytics.ext.google.common.cache.Cache;
+import com.tracelytics.ext.google.common.cache.CacheBuilder;
 import com.tracelytics.joboe.TraceConfig;
 import com.tracelytics.logging.Logger;
 import com.tracelytics.logging.LoggerFactory;
 
+import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 
 /**
  * Container that stores {@link TraceConfig} mapped by URL
- * @author pluk
  *
+ * @author pluk
  */
 public class TraceConfigs implements Serializable {
-    private Logger logger = LoggerFactory.getLogger();
-    
+    private final Logger logger = LoggerFactory.getLogger();
+
     private final Map<ResourceMatcher, TraceConfig> traceConfigsByMatcher;
-    
-    
+
+    private final Cache<String, TraceConfig> lruCache = CacheBuilder.newBuilder()
+            .recordStats()
+            .maximumSize(1048)
+            .build();
+
+    private final Cache<String, String> lruCacheKey = CacheBuilder.newBuilder()
+            .recordStats()
+            .maximumSize(1048)
+            .build();
+
+
     public TraceConfigs(Map<ResourceMatcher, TraceConfig> traceConfigsByMatcher) {
         this.traceConfigsByMatcher = traceConfigsByMatcher;
     }
-    
-    public TraceConfig getTraceConfig(String resource) {
-        //this could be slow and need a cache if so
+
+    public TraceConfig getTraceConfig(List<String> signals) {
+        StringBuilder key = new StringBuilder();
+        signals.forEach(key::append);
+        TraceConfig result = null;
+
+        if (lruCacheKey.getIfPresent(key.toString()) != null) {
+            return lruCache.getIfPresent(key.toString());
+        }
+
+        outer:
         for (Entry<ResourceMatcher, TraceConfig> entry : traceConfigsByMatcher.entrySet()) {
-            if (entry.getKey().matches(resource)) {
-                return entry.getValue();
+            for (String signal : signals) {
+                if (entry.getKey().matches(signal)) {
+                    result = entry.getValue();
+                    break outer;
+                }
             }
         }
-        
-        return null;
+
+        if (result != null) {
+            lruCache.put(key.toString(), result);
+        }
+
+        logger.debug(lruCache.stats().toString());
+        lruCacheKey.put(key.toString(), key.toString());
+        return result;
     }
 }
 

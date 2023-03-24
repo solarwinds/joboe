@@ -1,20 +1,29 @@
 package com.tracelytics.joboe;
 
-import java.lang.reflect.Field;
-import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
-import com.tracelytics.util.TestUtils;
 import com.tracelytics.joboe.TraceDecisionUtil.MetricType;
-import com.tracelytics.joboe.config.*;
+import com.tracelytics.joboe.config.ConfigManager;
+import com.tracelytics.joboe.config.ConfigProperty;
+import com.tracelytics.joboe.config.ResourceMatcher;
+import com.tracelytics.joboe.config.TraceConfigs;
 import com.tracelytics.joboe.settings.Settings;
 import com.tracelytics.joboe.settings.SettingsArg;
 import com.tracelytics.joboe.settings.TestSettingsReader;
 import com.tracelytics.joboe.settings.TestSettingsReader.SettingsMockupBuilder;
+import com.tracelytics.util.TestUtils;
 import junit.framework.TestCase;
+
+import java.lang.reflect.Field;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 
 public class TraceDecisionUtilTest extends TestCase {
@@ -145,8 +154,8 @@ public class TraceDecisionUtilTest extends TestCase {
         ConfigManager.setConfig(ConfigProperty.AGENT_INTERNAL_TRANSACTION_SETTINGS, testingUrlSampleRateConfigs);
 
 
-        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, "http://something.html").isSampled());
-        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, X_TRACE_ID_SAMPLED, null, "http://something.html").isSampled());
+        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, Collections.singletonList("http://something.html")).isSampled());
+        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, X_TRACE_ID_SAMPLED, null, Collections.singletonList("http://something.html")).isSampled());
         
         //case 7: add transaction settings with Trace modes with no sample rate
         //local transaction settings (*.png, *.jpg) : DISABLED/0%
@@ -159,10 +168,10 @@ public class TraceDecisionUtilTest extends TestCase {
         ConfigManager.setConfig(ConfigProperty.AGENT_INTERNAL_TRANSACTION_SETTINGS, new TraceConfigs(urlTraceConfigsByMatcher));
 
 
-        assertEquals(false, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, "http://something.png").isSampled());
-        assertEquals(SampleRateSource.FILE, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, "http://something.png").getTraceConfig().getSampleRateSource());
-        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, "http://trace-this").isSampled());
-        assertEquals(SampleRateSource.OBOE, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, "http://trace-this").getTraceConfig().getSampleRateSource()); //source is from OBOE as rate is NOT defined in local config
+        assertEquals(false, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, Collections.singletonList("http://something.png")).isSampled());
+        assertEquals(SampleRateSource.FILE, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, Collections.singletonList("http://something.png")).getTraceConfig().getSampleRateSource());
+        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, Collections.singletonList("http://trace-this")).isSampled());
+        assertEquals(SampleRateSource.OBOE, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, Collections.singletonList("http://trace-this")).getTraceConfig().getSampleRateSource()); //source is from OBOE as rate is NOT defined in local config
 
 
         //clean up
@@ -174,37 +183,37 @@ public class TraceDecisionUtilTest extends TestCase {
         testSettingsReader.put(new SettingsMockupBuilder().withFlags(true, false, true, true, true).withSampleRate(1000000).withSettingsType(Settings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE).build());
 
         assertEquals(1000000, TraceDecisionUtil.getRemoteTraceConfig().getSampleRate());
-        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, "http://something.html").isSampled());
-        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, X_TRACE_ID_SAMPLED, null, "http://something.html").isSampled());
-        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, "http://something.html").isReportMetrics());
+        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, Collections.singletonList("http://something.html")).isSampled());
+        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, X_TRACE_ID_SAMPLED, null, Collections.singletonList("http://something.html")).isSampled());
+        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, Collections.singletonList("http://something.html")).isReportMetrics());
 
         //Add local URL rate, should override the SRv1 rate if pattern matches
         TraceConfigs testingUrlSampleRateConfigs = buildUrlConfigs(url -> url.endsWith(".html"), TracingMode.ALWAYS, 0);
         ConfigManager.setConfig(ConfigProperty.AGENT_INTERNAL_TRANSACTION_SETTINGS, testingUrlSampleRateConfigs);
 
         //pattern match, should all have sample rate 0% for new traces, but continuing/AVW trace should still go on
-        assertEquals(false, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, "http://something.html").isSampled());
-        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, X_TRACE_ID_SAMPLED, null, "http://something.html").isSampled());
-        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, "http://something.html").isReportMetrics()); //metrics should still be reported even for 0% rate
+        assertEquals(false, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, Collections.singletonList("http://something.html")).isSampled());
+        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, X_TRACE_ID_SAMPLED, null, Collections.singletonList("http://something.html")).isSampled());
+        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, Collections.singletonList("http://something.html")).isReportMetrics()); //metrics should still be reported even for 0% rate
 
         //pattern not match, take the Srv1 override with sample rate 100%
-        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, "http://something.xxx").isSampled());
-        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, X_TRACE_ID_SAMPLED, null, "http://something.xxx").isSampled());
-        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, "http://something.xxx").isReportMetrics());
+        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, Collections.singletonList("http://something.xxx")).isSampled());
+        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, X_TRACE_ID_SAMPLED, null, Collections.singletonList("http://something.xxx")).isSampled());
+        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, Collections.singletonList("http://something.xxx")).isReportMetrics());
 
         //Add local URL rate, should override the SRv1 rate if pattern matches
         testingUrlSampleRateConfigs = buildUrlConfigs(url -> url.endsWith(".html"), TracingMode.NEVER, 0);
         ConfigManager.setConfig(ConfigProperty.AGENT_INTERNAL_TRANSACTION_SETTINGS, testingUrlSampleRateConfigs);
 
         //pattern match, should block all traffic even for continuing traces since the url tracingMode is never
-        assertEquals(false, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, "http://something.html").isSampled());
-        assertEquals(false, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, X_TRACE_ID_SAMPLED, null, "http://something.html").isSampled());
-        assertEquals(false, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, X_TRACE_ID_SAMPLED, null, "http://something.html").isReportMetrics()); //trace mode never disables metrics too
+        assertEquals(false, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, Collections.singletonList("http://something.html")).isSampled());
+        assertEquals(false, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, X_TRACE_ID_SAMPLED, null, Collections.singletonList("http://something.html")).isSampled());
+        assertEquals(false, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, X_TRACE_ID_SAMPLED, null, Collections.singletonList("http://something.html")).isReportMetrics()); //trace mode never disables metrics too
 
         //pattern not match, take the Srv1 override with sample rate 100%
-        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, "http://something.xxx").isSampled());
-        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, X_TRACE_ID_SAMPLED, null, "http://something.xxx").isSampled());
-        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, X_TRACE_ID_SAMPLED, null, "http://something.xxx").isReportMetrics());
+        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, Collections.singletonList("http://something.xxx")).isSampled());
+        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, X_TRACE_ID_SAMPLED, null, Collections.singletonList("http://something.xxx")).isSampled());
+        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, X_TRACE_ID_SAMPLED, null, Collections.singletonList("http://something.xxx")).isReportMetrics());
 
         Map<ResourceMatcher, TraceConfig> urlTraceConfigsByMatcher = new LinkedHashMap<>();
         urlTraceConfigsByMatcher.put(url -> url.endsWith("png") || url.endsWith("jpg"), buildTraceConfig(TracingMode.DISABLED, 0));
@@ -214,28 +223,28 @@ public class TraceDecisionUtilTest extends TestCase {
         TraceDecision traceDecision;
 
         //pattern match on "disabled", should block all traffic even for continuing traces since the transaction settings tracingMode is disabled
-        traceDecision = TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, "http://something.png");
+        traceDecision = TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, Collections.singletonList("http://something.png"));
         assertEquals(false, traceDecision.isSampled());
         assertEquals(0, traceDecision.getTraceConfig().getSampleRate()); //rate is coming from the local transaction settings
         assertEquals(SampleRateSource.FILE, traceDecision.getTraceConfig().getSampleRateSource());  //rate is coming from the local transaction settings
-        assertEquals(false, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, X_TRACE_ID_SAMPLED, null, "http://something.png").isSampled());
-        assertEquals(false, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, X_TRACE_ID_SAMPLED, null, "http://something.png").isReportMetrics()); //trace mode never disables metrics too
+        assertEquals(false, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, X_TRACE_ID_SAMPLED, null, Collections.singletonList("http://something.png")).isSampled());
+        assertEquals(false, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, X_TRACE_ID_SAMPLED, null, Collections.singletonList("http://something.png")).isReportMetrics()); //trace mode never disables metrics too
         
         //pattern match on "enabled", take the flags from local config but sample rate from remote settings
-        traceDecision = TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, "http://trace.com");
+        traceDecision = TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, Collections.singletonList("http://trace.com"));
         assertEquals(true, traceDecision.isSampled());
         assertEquals(1000000, traceDecision.getTraceConfig().getSampleRate()); //rate is coming from the remote settings
         assertEquals(SampleRateSource.OBOE, traceDecision.getTraceConfig().getSampleRateSource());  //rate is coming from the remote settings
-        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, X_TRACE_ID_SAMPLED, null, "http://trace.com").isSampled());
-        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, X_TRACE_ID_SAMPLED, null, "http://trace.com").isReportMetrics());
+        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, X_TRACE_ID_SAMPLED, null, Collections.singletonList("http://trace.com")).isSampled());
+        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, X_TRACE_ID_SAMPLED, null, Collections.singletonList("http://trace.com")).isReportMetrics());
         
         //pattern not match, take the Srv1 override with sample rate 100%
-        traceDecision = TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, "http://something.xxx");
+        traceDecision = TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, Collections.singletonList("http://something.xxx"));
         assertEquals(true, traceDecision.isSampled());
         assertEquals(1000000, traceDecision.getTraceConfig().getSampleRate()); //rate is coming from the remote settings
         assertEquals(SampleRateSource.OBOE, traceDecision.getTraceConfig().getSampleRateSource());  //rate is coming from the remote settings
-        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, X_TRACE_ID_SAMPLED, null, "http://something.xxx").isSampled());
-        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, X_TRACE_ID_SAMPLED, null, "http://something.xxx").isReportMetrics());
+        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, X_TRACE_ID_SAMPLED, null, Collections.singletonList("http://something.xxx")).isSampled());
+        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, X_TRACE_ID_SAMPLED, null, Collections.singletonList("http://something.xxx")).isReportMetrics());
     }
     
    
@@ -371,28 +380,28 @@ public class TraceDecisionUtilTest extends TestCase {
         //bucket capacity at 100, rate at 100 trace per sec
         testSettingsReader.put(new SettingsMockupBuilder().withFlags(true, true, true, true, true).withSampleRate(1000000).withSettingsArg(SettingsArg.BUCKET_CAPACITY, 30.0).withSettingsArg(SettingsArg.BUCKET_RATE, 0.0).build());
 
-        TraceConfig config = TraceDecisionUtil.shouldTraceRequest(bucketLayer, null, null, "http://something.html").getTraceConfig(); //tracing with token
+        TraceConfig config = TraceDecisionUtil.shouldTraceRequest(bucketLayer, null, null, Collections.singletonList("http://something.html")).getTraceConfig(); //tracing with token
         assertNotNull(config); 
         assertEquals(30.0, config.getBucketCapacity(TokenBucketType.REGULAR));
         assertEquals(0.0, config.getBucketRate(TokenBucketType.REGULAR));
-        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(bucketLayer, X_TRACE_ID_SAMPLED, null, "http://something.html").isSampled()); //continue trace not restricted by token bucket
+        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(bucketLayer, X_TRACE_ID_SAMPLED, null, Collections.singletonList("http://something.html")).isSampled()); //continue trace not restricted by token bucket
 
         //bucket capacity at 0, rate at 100 trace per sec
         testSettingsReader.put(new SettingsMockupBuilder().withFlags(true, true, true, true, true).withSampleRate(1000000).withSettingsArg(SettingsArg.BUCKET_CAPACITY, 0.0).withSettingsArg(SettingsArg.BUCKET_RATE, 100.0).build());
 
         TimeUnit.SECONDS.sleep(1);
-        assertEquals(false, TraceDecisionUtil.shouldTraceRequest(bucketLayer, null, null, "http://something.html").isSampled()); //no new trace as capacity is at zero
-        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(bucketLayer, X_TRACE_ID_SAMPLED, null, "http://something.html").isSampled()); //continue trace not restricted by token bucket
+        assertEquals(false, TraceDecisionUtil.shouldTraceRequest(bucketLayer, null, null, Collections.singletonList("http://something.html")).isSampled()); //no new trace as capacity is at zero
+        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(bucketLayer, X_TRACE_ID_SAMPLED, null, Collections.singletonList("http://something.html")).isSampled()); //continue trace not restricted by token bucket
         
         //bucket capacity at 50, rate at 0 trace per sec
         testSettingsReader.put(new SettingsMockupBuilder().withFlags(true, true, true, true, true).withSampleRate(1000000).withSettingsArg(SettingsArg.BUCKET_CAPACITY, 50.0).withSettingsArg(SettingsArg.BUCKET_RATE, 0.0).build());
         TimeUnit.SECONDS.sleep(1);
-        assertEquals(false, TraceDecisionUtil.shouldTraceRequest(bucketLayer, null, null, "http://something.html").isSampled()); //not tracing, sharing the same bucket instance, it has capacity 50 now but zero replenish rate and 0 left-over token from previous capacity which is zero
+        assertEquals(false, TraceDecisionUtil.shouldTraceRequest(bucketLayer, null, null, Collections.singletonList("http://something.html")).isSampled()); //not tracing, sharing the same bucket instance, it has capacity 50 now but zero replenish rate and 0 left-over token from previous capacity which is zero
 
         //bucket capacity at 50, rate at 100 trace per sec, should trace again
         testSettingsReader.put(new SettingsMockupBuilder().withFlags(true, true, true, true, true).withSampleRate(1000000).withSettingsArg(SettingsArg.BUCKET_CAPACITY, 50.0).withSettingsArg(SettingsArg.BUCKET_RATE, 100.0).build());
         TimeUnit.SECONDS.sleep(1);
-        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(bucketLayer, null, null, "http://something.html").isSampled()); //not tracing, sharing the same bucket instance, it has capacity 50 now but zero replenish rate and 0 left-over token from previous capacity which is zero
+        assertEquals(true, TraceDecisionUtil.shouldTraceRequest(bucketLayer, null, null, Collections.singletonList("http://something.html")).isSampled()); //not tracing, sharing the same bucket instance, it has capacity 50 now but zero replenish rate and 0 left-over token from previous capacity which is zero
     }
 
     public void testGetTokenBucket() throws Exception {
@@ -589,7 +598,7 @@ public class TraceDecisionUtilTest extends TestCase {
 
         testSettingsReader.put(new SettingsMockupBuilder().withFlags(true, false, true, true, false).withSampleRate(1000000).withSettingsType(Settings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE).build()); //ALWAYS sample rate = 100%
         TraceDecisionUtil.shouldTraceRequest("LayerA", null, null, null); //100%, ALWAYS => record 100%
-        TraceDecisionUtil.shouldTraceRequest("LayerA", null, null, "something.html"); //URL overrides, NEVER => do not record
+        TraceDecisionUtil.shouldTraceRequest("LayerA", null, null, Collections.singletonList("something.html")); //URL overrides, NEVER => do not record
         testSettingsReader.put(new SettingsMockupBuilder().withFlags(true, false, true, true, false).withSampleRate(0).withSettingsType(Settings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE).build()); //ALWAYS. sample rate = 0%
         TraceDecisionUtil.shouldTraceRequest("LayerB", null, null, null); //0%, ALWAYS => record 0%
         testSettingsReader.put(new SettingsMockupBuilder().withFlags(false, false, true, false, false).withSampleRate(1000000).withSettingsType(Settings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE).build()); //THROUGH. sample rate = 100% (not used anyway for THROUGH traces)
@@ -614,7 +623,7 @@ public class TraceDecisionUtilTest extends TestCase {
         localUniversalSettingsField.set(null, new TraceConfig(500000, SampleRateSource.FILE, TracingMode.ALWAYS.toFlags()));
 
         TraceDecisionUtil.shouldTraceRequest("LayerA", null, null, null); //50% (local settings), ALWAYS => record 50%
-        TraceDecisionUtil.shouldTraceRequest("LayerA", null, null, "something.html"); //URL overrides, NEVER => do not record
+        TraceDecisionUtil.shouldTraceRequest("LayerA", null, null, Collections.singletonList("something.html")); //URL overrides, NEVER => do not record
         TraceDecisionUtil.shouldTraceRequest("LayerB", null, null, null); //50% (local settings), ALWAYS => record 50%
         TraceDecisionUtil.shouldTraceRequest("LayerC", X_TRACE_ID_SAMPLED, null, null); //50% (local settings), ALWAYS => record 50%
 

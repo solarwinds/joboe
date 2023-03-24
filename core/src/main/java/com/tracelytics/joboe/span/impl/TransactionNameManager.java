@@ -240,9 +240,7 @@ public final class TransactionNameManager {
         String transactionName = urlTransactionNameCache.getIfPresent(url);
         if (transactionName == null) {
             transactionName = buildTransactionNameByUrlAndPattern(host, url, transactionNamePattern, separatorAsPrefix, separator);
-            if (transactionName != null) {
-                urlTransactionNameCache.put(url, transactionName);
-            }
+            urlTransactionNameCache.put(url, transactionName);
         }
         
         return transactionName;
@@ -265,7 +263,7 @@ public final class TransactionNameManager {
         if (host != null) {
           //remove port?
             int colonIndex = host.indexOf(":");
-            if (host.indexOf(":") != -1) {
+            if (host.contains(":")) {
                 host = host.substring(0, colonIndex);
             }
             urlTokenMap.put("host", host);
@@ -279,19 +277,19 @@ public final class TransactionNameManager {
             }
         }
         
-        String transactionName = separatorAsPrefix ? separator : "";
+        StringBuilder transactionName = new StringBuilder(separatorAsPrefix ? separator : "");
         boolean isFirstToken = true;
         for (String patternToken : transactionNamePattern) {
             if (urlTokenMap.containsKey(patternToken)) {
                 if (isFirstToken) {
-                    transactionName += urlTokenMap.get(patternToken);
+                    transactionName.append(urlTokenMap.get(patternToken));
                     isFirstToken = false;
                 } else {
-                    transactionName += separator + urlTokenMap.get(patternToken);
+                    transactionName.append(separator).append(urlTokenMap.get(patternToken));
                 }
             }
         }
-        return transactionName;
+        return transactionName.toString();
     }
 
     /**

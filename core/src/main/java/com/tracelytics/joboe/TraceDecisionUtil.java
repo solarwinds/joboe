@@ -11,6 +11,7 @@ import com.tracelytics.logging.LoggerFactory;
 
 import java.util.AbstractMap;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
@@ -50,12 +51,13 @@ public class TraceDecisionUtil {
      * @param layer
      * @param inXTraceID    incoming validated X-Trace-Id, if it is not valid, it should be null
      * @param xTraceOptions incoming X-Trace-Options, null if not defined
-     * @param resource      resource if the request has one, for example URL for web request, job name for jobs
+     * @param signals      resource if the request has one, for example URL for web request, job name for jobs
      *
      * @return  trace decision, should always be non null
      * @see XTraceHeader
      */
-    public static TraceDecision shouldTraceRequest(String layer, String inXTraceID, XTraceOptions xTraceOptions, String resource) {
+    public static TraceDecision shouldTraceRequest(String layer, String inXTraceID, XTraceOptions xTraceOptions,
+                                                   List<String> signals) {
         boolean isTriggerTrace;
         try {
             RequestType requestType = getRequestType(inXTraceID, xTraceOptions);
@@ -79,7 +81,7 @@ public class TraceDecisionUtil {
             }
 
             //Get the local sample rate (either from file, defaults, JVM, url matching etc)
-            TraceConfig localConfig = getLocalTraceConfig(resource);
+            TraceConfig localConfig = getLocalTraceConfig(signals);
 
             TraceConfig config = computeTraceConfig(remoteConfig, localConfig, TRIGGER_TRACE_CONFIG_ENABLED);
 
@@ -263,11 +265,11 @@ public class TraceDecisionUtil {
     /**
      * Gets the Trace Config from local system based on the URL (if available) of the request
      * 
-     * @param resource   URL of a web based request, null otherwise
+     * @param signals   URL of a web based request, null otherwise
      * @return  A URL specific Trace Config will be returned if a match is found, otherwise the universal Trace Config from local settings.
      */
-    public static TraceConfig getLocalTraceConfig(String resource) {
-        TraceConfig localTraceConfig = getLocalSpecificTraceConfig(resource);
+    public static TraceConfig getLocalTraceConfig(List<String> signals) {
+        TraceConfig localTraceConfig = getLocalSpecificTraceConfig(signals);
         if (localTraceConfig == null) {
             localTraceConfig = getLocalUniversalTraceConfig();
         }
@@ -292,12 +294,12 @@ public class TraceDecisionUtil {
 
     /**
      * Retrieves Resource specific Trace Config from local settings (by URL, job names etc)
-     * @param resource   URL of the web request, null otherwise
+     * @param signals   URL of the web request, null otherwise
      * @return  Resource specific Trace Config if a match is found from local settings, otherwise null is returned
      */
-    private static TraceConfig getLocalSpecificTraceConfig(String resource) {
-        if (resource != null && ConfigManager.getConfig(ConfigProperty.AGENT_INTERNAL_TRANSACTION_SETTINGS) != null) {
-            return ((TraceConfigs) ConfigManager.getConfig(ConfigProperty.AGENT_INTERNAL_TRANSACTION_SETTINGS)).getTraceConfig(resource);
+    private static TraceConfig getLocalSpecificTraceConfig(List<String> signals) {
+        if (signals != null && ConfigManager.getConfig(ConfigProperty.AGENT_INTERNAL_TRANSACTION_SETTINGS) != null) {
+            return ((TraceConfigs) ConfigManager.getConfig(ConfigProperty.AGENT_INTERNAL_TRANSACTION_SETTINGS)).getTraceConfig(signals);
         } else{
             return null;
         }
