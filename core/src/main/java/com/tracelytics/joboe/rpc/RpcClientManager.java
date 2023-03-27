@@ -87,6 +87,7 @@ public abstract class RpcClientManager {
                 collectorCertLocation = defaultCertLocation;
             }
         } else {
+            logger.info(String.format("Setting RPC Client to use bundled Certificate: %s", defaultCertLocation));
             collectorCertLocation = defaultCertLocation;
         }
 
