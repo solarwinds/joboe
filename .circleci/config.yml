@@ -1,35 +1,158 @@
-version: 2 # use CircleCI 2.0
-jobs: # a collection of steps
-  build: # runs not using Workflows must have a `build` job as entry point
-    
-    working_directory: ~/circleci-joboe # directory where steps will run
+version: 2.1 # use CircleCI 2.1
 
+executors:
+  java:
+    parameters:
+      tag:
+        type: string
+        default: 8-jdk-hotspot
+    docker:
+      - image: 377069709311.dkr.ecr.us-east-1.amazonaws.com/base_ci_build:<< parameters.tag >>
+        aws_auth:
+          aws_access_key_id: $ECR_AWS_ACCESS_KEY_ID
+          aws_secret_access_key: $ECR_AWS_SECRET_ACCESS_KEY
+    working_directory: ~/repo
+    environment:
+      PROJECT_NAME: joboe
+      SLACK_NOTIFY_CHANNEL: "#nighthawk-apm-libraries"
+      EMOJI: ":circle-pass:"
+      MAVEN_OPTS: -Xms2g -Xmx3g -Dmaven.resolver.transport=wagon
+
+commands:
+  cacheit:
+    steps:
+      - run:
+          name: generate cache checksum
+          command: find . -name pom.xml | sort | xargs -n 1 cat > /tmp/maven_cached_poms
+      - restore_cache:
+          keys:
+            - maven-repo-v2-{{ .Branch }}-{{ checksum "/tmp/maven_cached_poms" }}
+            - maven-repo-v2-{{ .Branch }}-
+            - maven-repo-v2-
+      - run: mvn -q -s .circleci/m2/settings.xml package -DskipTests
+      - save_cache:
+          paths:
+            - ~/.m2/repository
+          key: maven-repo-v2-{{ .Branch }}-{{ checksum "/tmp/maven_cached_poms" }}
+
+jobs:
+  test:
+    working_directory: ~/circleci-joboe # directory where steps will run
     docker: # run the steps with Docker
       - image: testbeds/java-agent-build:1.0.0
-    
     resource_class: medium+
-
     steps: # a collection of executable commands
-
       - checkout # check out source code to working directory
-
       - restore_cache: # restore the saved cache after the first run or if `pom.xml` has changed
           # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
           key: circleci-joboe-{{ checksum "pom.xml" }}
-      
       - run: mvn clean install -DskipTests # run it once first to install dependencies
-      
       - run: mvn dependency:go-offline # gets the project dependencies
-      
       - save_cache: # saves the project dependencies
           paths:
             - ~/.m2
           key: circleci-joboe-{{ checksum "pom.xml" }}
-      
       - run: mvn clean package # run the actual tests
-      
       - store_test_results: # uploads the test metadata from the `target/surefire-reports` directory so that it can show up in the CircleCI dashboard. 
-      # Upload test results for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
+          # Upload test results for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
           path: target/surefire-reports
-      
-      
+  deploy:
+    executor: java
+    steps:
+      - checkout
+      - cacheit
+      - run:
+          name: Deploy snapshot
+          command: |
+            VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+            BRANCH=$(echo -n "${CIRCLE_BRANCH}" | sed -e 's/[^0-9a-zA-Z\._\-]/./g' | tr '[:upper:]' '[:lower:]')
+            NEW_VERSION=${VERSION%%-SNAPSHOT}-$BRANCH-SNAPSHOT
+            
+            mvn versions:set -DnewVersion=$NEW_VERSION
+            mvn -s .circleci/m2/settings.xml -T 8 deploy -DskipTests            
+            source /ci-scripts/bin/helpers.sh
+            
+            send_to_slack "A new snapshot is ready \`$NEW_VERSION\`"
+  release:
+    executor: java
+    steps:
+      - checkout
+      - cacheit
+      - run:
+          name: Check versions
+          command: mvn versions:use-releases
+      - run:
+          name: Configure git for release
+          command: |
+            git config user.name "librato-ci"
+            git config user.email "tools+librato-ci-githublibrato.com"
+      - run:
+          name: Rewrite github url for release tagging
+          command: |
+            git config --global url."https://${GITHUB_TOKEN}:@github.com/".insteadOf git@github.com:
+      - run:
+          name: Prepare release
+          command: |
+            mvn -s .circleci/m2/settings.xml \
+                --batch-mode \
+                -DscmCommentPrefix="[maven-release-plugin][ci skip] " \
+                -Ddependency-check.skip=true \
+                -DskipTests \
+                -Darguments="-DskipTests -Ddependency-check.skip=true" \
+                release:prepare
+      - run:
+          name: Perform release
+          command: |
+            mvn -s .circleci/m2/settings.xml \
+                --batch-mode \
+                -Ddependency-check.skip=true \
+                -DskipTests \
+                -Dmaven.test.skip=true \
+                -Darguments="-DskipTests -Ddependency-check.skip=true" \
+                release:perform
+            
+            # Go back to the commit before the snapshot
+            git reset --hard HEAD~1            
+            VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+            
+            echo "Current version is $VERSION"
+            source /ci-scripts/bin/helpers.sh
+            send_to_slack "A new release is ready \`$VERSION\`"
+
+workflows:
+  build_test_release:
+    jobs:
+      - test:
+          context:
+            - AWS_CIRCLE_CI_BUILD
+            - GH_LIBRATO_CI_PKG_READ
+      - deploy:
+          context:
+            - AWS_CIRCLE_CI_BUILD
+            - GH_LIBRATO_CI_PKG_READ
+            - GH_LIBRATO_CI_PKG_WRITE
+            - GH_LIBRATO_CI_REPO
+            - SLACK_HOOK
+          filters:
+            branches:
+              ignore: main
+      - approve_me:
+          type: approval
+          requires:
+            - test
+          filters:
+            branches:
+              only: main
+      - release:
+          context:
+            - AWS_CIRCLE_CI_BUILD
+            - GH_LIBRATO_CI_PKG_READ
+            - GH_LIBRATO_CI_PKG_WRITE
+            - GH_LIBRATO_CI_REPO
+            - SLACK_HOOK
+          requires:
+            - approve_me
+          filters:
+            branches:
+              only: main
+
