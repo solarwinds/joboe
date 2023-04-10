@@ -64,7 +64,7 @@ public class ServerHostInfoReader implements HostInfoReader {
 
     private static String distro;
     private static HostId hostId; //lazily initialized to avoid cyclic init
-    private static String hostname;
+    private static final String hostname = loadHostName();
     private static String uuid;
     private static boolean checkedDistro = false;
     private static HostInfoUtils.OsType osType = HostInfoUtils.getOsType();
@@ -343,15 +343,12 @@ public class ServerHostInfoReader implements HostInfoReader {
     }
 
     @Override
-    public synchronized String getHostName() {
-        if (hostname == null) { //only load host name on the first time as we wish to minimize spawning processes
-            hostname = loadHostName();
-        }
+    public String getHostName() {
         return hostname;
     }
 
     @Override
-    public synchronized HostId getHostId() {
+    public HostId getHostId() {
         if (hostId == null) {
             Metadata existingMetdataContext = null;
             ScopeContextSnapshot scopeContextSnapshot = null;
@@ -405,7 +402,7 @@ public class ServerHostInfoReader implements HostInfoReader {
      * DNS settings, /etc/hosts settings, etc. and just aren't guaranteed to be the same
      * as gethostname(), even though on many systems they are.
      * <p>
-     * Also see http://stackoverflow.com/questions/7348711/recommended-way-to-get-hostname-in-java
+     * Also see <a href="http://stackoverflow.com/questions/7348711/recommended-way-to-get-hostname-in-java">...</a>
      */
     private static String loadHostNameFromExec() {
         try {
