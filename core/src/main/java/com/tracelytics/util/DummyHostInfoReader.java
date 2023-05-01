@@ -19,17 +19,18 @@ public class DummyHostInfoReader implements HostInfoReader {
 
     @Override
     public HostId getHostId() {
-        return new HostId(getHostName(), 0, Collections.EMPTY_LIST, null, null, null, null, null, HostType.PERSISTENT, null, null);
-
+        return  HostId.builder()
+                .hostname(getHostName())
+                .build();
     }
 
     @Override
     public Map<String, Object> getHostMetadata() {
-        return Collections.EMPTY_MAP;
+        return Collections.emptyMap();
     }
 
     @Override
     public HostInfoUtils.NetworkAddressInfo getNetworkAddressInfo() {
-        return new HostInfoUtils.NetworkAddressInfo(Collections.EMPTY_LIST, Collections.EMPTY_LIST);
+        return new HostInfoUtils.NetworkAddressInfo(Collections.emptyList(), Collections.emptyList());
     }
 }

@@ -12,7 +12,6 @@ import com.tracelytics.joboe.HostId;
 import com.tracelytics.joboe.config.ConfigManager;
 import com.tracelytics.joboe.config.ConfigProperty;
 import com.tracelytics.joboe.config.ProxyConfig;
-import com.tracelytics.joboe.rpc.HostType;
 import com.tracelytics.joboe.rpc.ResultCode;
 import com.tracelytics.joboe.rpc.SettingsResult;
 import com.tracelytics.joboe.rpc.*;
@@ -41,7 +40,7 @@ import static com.tracelytics.util.HostInfoUtils.getHostId;
 
 /**
  * Collector protocol client that uses the gRPC protocol.
- *
+ * <p>
  * Wraps the gRPC client generated from the collector.proto definition
  */
 public class GrpcClient implements ProtocolClient {
@@ -76,7 +75,7 @@ public class GrpcClient implements ProtocolClient {
 
     @Override
     public Result doPostStatus(String serviceKey, List<Map<String, Object>> messages) throws ClientException {
-       return postInBatch(serviceKey, messages, KEY_VALUE_MAP_SERIALIZER, POST_STATUS_ACTION);
+        return postInBatch(serviceKey, messages, KEY_VALUE_MAP_SERIALIZER, POST_STATUS_ACTION);
     }
 
     @Override
@@ -95,7 +94,7 @@ public class GrpcClient implements ProtocolClient {
             }
 
             return new SettingsResult(ResultCode.valueOf(result.getResult().name()), result.getArg(), result.getWarning(), settings);
-        } catch (StatusRuntimeException e){
+        } catch (StatusRuntimeException e) {
             throw new ClientRecoverableException("gRPC Operation failed : [get settings] status [" + e.getStatus() + "]", e);
         }
     }
@@ -130,7 +129,7 @@ public class GrpcClient implements ProtocolClient {
     }
 
     private short convertType(Collector.OboeSettingType grpcType) {
-        switch(grpcType) {
+        switch (grpcType) {
             case DEFAULT_SAMPLE_RATE:
                 return Settings.OBOE_SETTINGS_TYPE_DEFAULT_SAMPLE_RATE;
             case LAYER_SAMPLE_RATE:
@@ -164,7 +163,7 @@ public class GrpcClient implements ProtocolClient {
                 byteStrings.add(itemByteString);
 
             } catch (BsonBufferException e) {
-                logger.warn("Failed to perform action [" + postAction.getDescription() +"] due to buffer exception : " + e.getMessage(), e);
+                logger.warn("Failed to perform action [" + postAction.getDescription() + "] due to buffer exception : " + e.getMessage(), e);
                 throw new ClientFatalException(e);
             }
         }
@@ -177,7 +176,7 @@ public class GrpcClient implements ProtocolClient {
             try {
                 builder.addAllMessages(itemsAsByteString);
                 resultMessage = postAction.post(client, builder.build());
-            } catch (StatusRuntimeException e){
+            } catch (StatusRuntimeException e) {
                 if (e.getStatus().getCode() == Status.RESOURCE_EXHAUSTED.getCode()) {
                     throw new ClientFatalException("gRPC Operation failed : [post events] status [" + e.getStatus() + "]. This is not recoverable due to exhausted resource.", e);
                 } else {
@@ -360,69 +359,66 @@ public class GrpcClient implements ProtocolClient {
         }
 
         private static Collector.HostID toGrpcHostID(HostId hostId) {
-            return buildGrpcHostID(HostInfoUtils.getHostName(), hostId.getPid(), hostId.getEc2InstanceId(), hostId.getEc2AvailabilityZone(), hostId.getDockerContainerId(), hostId.getMacAddresses(), hostId.getHerokuDynoId(), hostId.getAzureInstanceId(), hostId.getHostType(), hostId.getUamsClientId(), hostId.getUuid());
+            Collector.HostID.Builder builder = Collector.HostID.newBuilder();
+
+            if (hostId.getHostname() != null) {
+                builder.setHostname(hostId.getHostname());
+            }
+
+            if (hostId.getEc2InstanceId() != null) {
+                builder.setEc2InstanceID(hostId.getEc2InstanceId());
+            }
+
+            if (hostId.getEc2AvailabilityZone() != null) {
+                builder.setEc2AvailabilityZone(hostId.getEc2AvailabilityZone());
+            }
+
+            if (hostId.getDockerContainerId() != null) {
+                builder.setDockerContainerID(hostId.getDockerContainerId());
+            }
+
+            if (hostId.getHerokuDynoId() != null) {
+                builder.setHerokuDynoID(hostId.getHerokuDynoId());
+            }
+
+            if (hostId.getAzureAppServiceInstanceId() != null) {
+                builder.setAzAppServiceInstanceID(hostId.getAzureAppServiceInstanceId());
+            }
+
+            if (hostId.getUamsClientId() != null) {
+                builder.setUamsClientID(hostId.getUamsClientId());
+            }
+
+            if (hostId.getUuid() != null) {
+                builder.setUuid(hostId.getUuid());
+            }
+
+            if (hostId.getAzureVmMetadata() != null) {
+                builder.setAzureMetadata(hostId.getAzureVmMetadata().toGrpc());
+            }
+
+            if (hostId.getAwsMetadata() != null) {
+                builder.setAwsMetadata(hostId.getAwsMetadata().toGrpc());
+            }
+
+            return builder
+                    .setHostType(Collector.HostType.valueOf(hostId.getHostType().name()))
+                    .addAllMacAddresses(hostId.getMacAddresses())
+                    .setPid(hostId.getPid())
+                    .build();
         }
 
         /**
          * For getSettings call, we decided to fill in `hostname` only for `HostID` for consistency with other agent implementation.
-         *
+         * <p>
          * Unlike other language agent, this change does not give any performance boost to java agent.
          *
          * @return
          */
         private static Collector.HostID toGrpcHostnameOnlyHostID(String hostname) {
-            return buildGrpcHostID(HostInfoUtils.getHostName(), null, null, null, null, null, null, null, null, null, null);
+            return Collector.HostID.newBuilder()
+                    .setHostname(hostname)
+                    .build();
         }
-
-
-        private static Collector.HostID buildGrpcHostID(String hostName, Integer pid, String ec2InstanceId, String ec2AvailabilityZone, String dockerContainerId, List<String> macAddresses, String herokuDynoId, String azureInstanceId, HostType hostType, String uamsClientId, String uuid) {
-            Collector.HostID.Builder builder = Collector.HostID.newBuilder();
-
-            if (hostName != null) {
-                builder.setHostname(hostName);
-            }
-
-            if (pid != null) {
-                builder.setPid(pid);
-            }
-
-            if (ec2InstanceId != null) {
-                builder.setEc2InstanceID(ec2InstanceId);
-            }
-
-            if (ec2AvailabilityZone != null) {
-                builder.setEc2AvailabilityZone(ec2AvailabilityZone);
-            }
-
-            if (dockerContainerId != null) {
-                builder.setDockerContainerID(dockerContainerId);
-            }
-
-            if (macAddresses != null) {
-                builder.addAllMacAddresses(macAddresses);
-            }
-
-            if (herokuDynoId != null) {
-                builder.setHerokuDynoID(herokuDynoId);
-            }
-
-            if (azureInstanceId != null) {
-                builder.setAzAppServiceInstanceID(azureInstanceId);
-            }
-
-            if (hostType != null) {
-                builder.setHostType(Collector.HostType.valueOf(hostType.name()));
-            }
-
-            if (uamsClientId != null) {
-                builder.setUamsClientID(uamsClientId);
-            }
-
-            if (uuid != null) {
-                builder.setUuid(uuid);
-            }
-            return builder.build();
-        }
-
     }
 }

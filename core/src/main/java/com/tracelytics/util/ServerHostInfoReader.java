@@ -2,20 +2,16 @@ package com.tracelytics.util;
 
 import com.google.auto.service.AutoService;
 import com.tracelytics.ext.json.JSONException;
-import com.tracelytics.ext.json.JSONObject;
 import com.tracelytics.joboe.Context;
 import com.tracelytics.joboe.HostId;
 import com.tracelytics.joboe.Metadata;
 import com.tracelytics.joboe.config.ConfigManager;
 import com.tracelytics.joboe.config.ConfigProperty;
-import com.tracelytics.joboe.rpc.HostType;
 import com.tracelytics.joboe.span.impl.ScopeContextSnapshot;
 import com.tracelytics.joboe.span.impl.ScopeManager;
 import com.tracelytics.logging.Logger;
 import com.tracelytics.logging.LoggerFactory;
 import com.tracelytics.util.HostInfoUtils.NetworkAddressInfo;
-import lombok.Builder;
-import lombok.Value;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -643,11 +639,22 @@ public class ServerHostInfoReader implements HostInfoReader {
 
     private HostId buildHostId() {
         NetworkAddressInfo networkAddressInfo = getNetworkAddressInfo();
-        List<String> macAddresses = networkAddressInfo != null ? networkAddressInfo.getMacAddresses() : Collections.<String>emptyList();
+        List<String> macAddresses = networkAddressInfo != null ? networkAddressInfo.getMacAddresses() : Collections.emptyList();
         //assume all that uses HostInfoUtils are persistent server, can be improved to recognize different types later
-        return new HostId(getHostName(), JavaProcessUtils.getPid(), macAddresses, Ec2InstanceReader.getInstanceId(),
-                Ec2InstanceReader.getAvailabilityZone(), DockerInfoReader.getDockerId(), HerokuDynoReader.getDynoId(),
-                AzureReader.getAppInstanceId(), HostType.PERSISTENT, UamsClientIdReader.getUamsClientId(), getUuid());
+        return  HostId.builder()
+                .hostname(getHostName())
+                .pid(JavaProcessUtils.getPid())
+                .macAddresses(macAddresses)
+                .ec2InstanceId(Ec2InstanceReader.getInstanceId())
+                .ec2AvailabilityZone(Ec2InstanceReader.getAvailabilityZone())
+                .dockerContainerId(DockerInfoReader.getDockerId())
+                .herokuDynoId(HerokuDynoReader.getDynoId())
+                .azureAppServiceInstanceId(AzureReader.getAppInstanceId())
+                .uamsClientId(UamsClientIdReader.getUamsClientId())
+                .uuid(getUuid())
+                .awsMetadata(Ec2InstanceReader.SINGLETON.awsMetadata)
+                .azureVmMetadata(AzureReader.SINGLETON.azureVmMetadata)
+                .build();
     }
 
     public static class Ec2InstanceReader {
@@ -679,11 +686,15 @@ public class ServerHostInfoReader implements HostInfoReader {
          */
         public static final String EC2_METADATA_SERVICE_OVERRIDE_SYSTEM_PROPERTY = "com.amazonaws.sdk.ec2MetadataServiceEndpointOverride";
 
+
+        private static final String EC2_METADATA_SERVICE_URL = "http://169.254.169.254";
         private static final String INSTANCE_ID_PATH = "latest/meta-data/instance-id";
         private static final String AVAILABILITY_ZONE_PATH = "latest/meta-data/placement/availability-zone";
 
         private String instanceId;
         private String availabilityZone;
+
+        private HostId.AwsMetadata awsMetadata;
 
         private static final Ec2InstanceReader SINGLETON = new Ec2InstanceReader();
 
@@ -703,55 +714,182 @@ public class ServerHostInfoReader implements HostInfoReader {
             if (TIMEOUT == TIMEOUT_MIN) { //disable reader
                 return;
             }
-            instanceId = getResourceOnEndpoint(INSTANCE_ID_PATH);
+            String token = getApiToken();
+            instanceId = getResourceOnEndpoint(INSTANCE_ID_PATH, token);
             if (instanceId != null) { //only proceed if instance id can be found
-                availabilityZone = getResourceOnEndpoint(AVAILABILITY_ZONE_PATH);
+                availabilityZone = getResourceOnEndpoint(AVAILABILITY_ZONE_PATH, token);
                 logger.debug("Found EC2 instance id " + instanceId + " availability zone: " + availabilityZone);
             }
+
+            awsMetadata = getMetadata(token);
         }
 
-        private static String getResourceOnEndpoint(String relativePath) {
-            HttpURLConnection connection = null;
+        private static String useIMDSv1(String relativePath) {
+            StringBuilder result = null;
             BufferedReader reader = null;
+            HttpURLConnection connection = null;
+
             try {
                 URI uri = new URI(getMetadataHost() + "/" + relativePath);
                 connection = (HttpURLConnection) uri.toURL().openConnection(Proxy.NO_PROXY);
                 connection.setConnectTimeout(TIMEOUT);
+
                 connection.setReadTimeout(TIMEOUT);
-
                 int statusCode = connection.getResponseCode();
-
                 if (statusCode == HttpURLConnection.HTTP_OK) {
+
                     reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                    return reader.readLine();
-                } else {
-                    return null;
+                    result = new StringBuilder();
+                    String nextLine;
+
+                    while ((nextLine = reader.readLine()) != null) {
+                        result.append(nextLine);
+                    }
+                    reader.close();
                 }
-            } catch (IOException e) {
-                logger.debug(
-                        "Timeout on reading EC2 metadata after waiting for [" + TIMEOUT + "] milliseconds. Probably not an EC2 instance");
-                return null;
-            } catch (URISyntaxException e) {
-                logger.warn(e.getMessage(), e);
-                return null;
+
+                if (result == null) {
+                    logger.debug(String.format("Failed to retrieved metadata using IMDSv1: status code=%d",
+                            statusCode));
+                } else {
+                    logger.debug(String.format("Retrieved metadata using IMDSv1: %s", result));
+                    return result.toString();
+                }
+
+            } catch (URISyntaxException | IOException exception) {
+                logger.debug(String.format("Error retrieving metadata using IMDSv1: %s", exception));
+
             } finally {
+                if (connection != null) {
+                    connection.disconnect();
+                }
+
                 if (reader != null) {
                     try {
                         reader.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    } catch (IOException ioException) {
+                        logger.debug(String.format("Error closing reader for IMDSv1: %s", ioException));
                     }
                 }
+            }
+
+            return null;
+        }
+
+        private static String getApiToken() {
+            String result = null;
+            HttpURLConnection connection = null;
+            try {
+                URI tokenApiUri = new URI(getMetadataHost() + "/latest/api/token");
+                connection = (HttpURLConnection) tokenApiUri.toURL().openConnection(Proxy.NO_PROXY);
+                connection.setConnectTimeout(TIMEOUT);
+
+                connection.setReadTimeout(TIMEOUT);
+                connection.setRequestMethod("PUT");
+                connection.setRequestProperty("X-aws-ec2-metadata-token-ttl-seconds", "3600");
+
+                int statusCode = connection.getResponseCode();
+                if (statusCode == HttpURLConnection.HTTP_OK) {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                    result = reader.readLine();
+                    reader.close();
+                }
+
+            } catch (URISyntaxException | IOException e) {
+                logger.debug(String.format("Error getting token for IMDSv2: %s", e));
+            } finally {
                 if (connection != null) {
                     connection.disconnect();
                 }
             }
+
+            return result;
+        }
+
+        private static String useIMDSv2(String relativePath, String apiToken) {
+            StringBuilder result = null;
+            BufferedReader reader = null;
+            HttpURLConnection connection = null;
+
+            try {
+                URI uri = new URI(getMetadataHost() + "/" + relativePath);
+                connection = (HttpURLConnection) uri.toURL().openConnection(Proxy.NO_PROXY);
+                connection.setReadTimeout(TIMEOUT);
+
+                connection.setConnectTimeout(TIMEOUT);
+                connection.setRequestProperty("X-aws-ec2-metadata-token", apiToken);
+                int statusCode = connection.getResponseCode();
+
+                if (statusCode == HttpURLConnection.HTTP_OK) {
+                    reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                    result = new StringBuilder();
+                    String nextLine;
+
+                    while ((nextLine = reader.readLine()) != null) {
+                        result.append(nextLine);
+                    }
+                    reader.close();
+                }
+
+                if (result == null) {
+                    logger.debug(String.format("Failed to retrieve metadata using IMDSv2: status code=%d",
+                            statusCode));
+                } else {
+                    logger.debug(String.format("Retrieved metadata using IMDSv2: %s", result));
+                    return result.toString();
+                }
+
+            } catch (IOException | URISyntaxException e) {
+                logger.debug(String.format("Error retrieving metadata using IMDSv2: %s", e));
+
+            } finally {
+                if (connection != null) {
+                    connection.disconnect();
+                }
+
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (IOException ioException) {
+                        logger.debug(String.format("Error closing reader for IMDSv2: %s", ioException));
+                    }
+                }
+            }
+            return null;
+        }
+
+        private static String getResourceOnEndpoint(String relativePath, String token) {
+            String result = null;
+            if (token != null) {
+                result = useIMDSv2(relativePath, token);
+            }
+
+            if (result == null) {
+                result = useIMDSv1(relativePath);
+            }
+            return result;
+        }
+
+        private static HostId.AwsMetadata getMetadata(String token) {
+            String payload = getResourceOnEndpoint("latest/dynamic/instance-identity/document", token);
+            if (payload != null) {
+                try {
+                    HostId.AwsMetadata metadata = HostId.AwsMetadata.fromJson(payload, getResourceOnEndpoint("latest/meta-data/hostname", token));
+                    logger.debug(String.format("Aws Metadata: %s", metadata));
+                    return metadata;
+
+                } catch (JSONException e) {
+                    logger.debug(String.format("Error converting json to AwsMetadata model: %s\n %s", payload, e));
+                }
+            }
+            return null;
         }
 
         private static String getMetadataHost() {
             String host = System.getProperty(EC2_METADATA_SERVICE_OVERRIDE_SYSTEM_PROPERTY);
             return host != null ? host : METADATA_SERVICE_URL;
         }
+
     }
 
     public static class DockerInfoReader {
@@ -875,13 +1013,13 @@ public class ServerHostInfoReader implements HostInfoReader {
         private static final String DEFAULT_METADATA_VERSION = "2021-12-13";
         private final String appInstanceId;
 
-        private final AzureVmMetadata azureVmMetadata;
+        private final HostId.AzureVmMetadata azureVmMetadata;
 
         public static String getAppInstanceId() {
             return SINGLETON.appInstanceId;
         }
 
-        private AzureVmMetadata getVmMetadata() {
+        private HostId.AzureVmMetadata getVmMetadata() {
             HttpURLConnection connection = null;
             BufferedReader reader = null;
             Integer timeout = (Integer) ConfigManager.getConfig(ConfigProperty.AGENT_AZURE_VM_METADATA_TIMEOUT);
@@ -912,7 +1050,7 @@ public class ServerHostInfoReader implements HostInfoReader {
                     while ((nextLine =reader.readLine()) != null){
                         payload.append(nextLine);
                     }
-                    return AzureVmMetadata.fromJson(payload.toString());
+                    return HostId.AzureVmMetadata.fromJson(payload.toString());
                 }
                 logger.debug(String.format("Azure IMDS status code: %s", statusCode));
 
@@ -943,35 +1081,4 @@ public class ServerHostInfoReader implements HostInfoReader {
         }
     }
 
-    @Value
-    @Builder
-    public static class AzureVmMetadata {
-        @Builder.Default
-        String cloudProvider = "azure";
-        @Builder.Default
-        String cloudPlatform = "azure_vm";
-        String cloudRegion;
-        String cloudAccountId;
-        String hostId;
-        String hostName;
-        String azureVmName;
-        String azureVmSize;
-        String azureVmScaleSetName;
-        String azureResourceGroupName;
-
-        public static AzureVmMetadata fromJson(String payload) throws JSONException {
-            JSONObject jsonObject = new JSONObject(payload);
-            JSONObject compute = jsonObject.getJSONObject("compute");
-            return AzureVmMetadata.builder()
-                    .hostId(compute.getString("vmId"))
-                    .cloudRegion(compute.getString("location"))
-                    .hostName(compute.getString("name"))
-                    .azureVmName(compute.getString("name"))
-                    .cloudAccountId(compute.getString("subscriptionId"))
-                    .azureVmSize(compute.getString("vmSize"))
-                    .azureVmScaleSetName(compute.getString("vmScaleSetName"))
-                    .azureResourceGroupName(compute.getString("resourceGroupName"))
-                    .build();
-        }
-    }
 }

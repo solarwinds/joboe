@@ -155,7 +155,7 @@ public class ThriftClient implements ProtocolClient {
                 hostId.getDockerContainerId(),
                 hostId.getMacAddresses(),
                 hostId.getHerokuDynoId(),
-                hostId.getAzureInstanceId(),
+                hostId.getAzureAppServiceInstanceId(),
                 HostType.valueOf(hostId.getHostType().name()));
 
         return thriftHostID;
