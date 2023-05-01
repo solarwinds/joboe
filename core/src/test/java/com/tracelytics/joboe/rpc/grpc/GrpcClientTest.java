@@ -1,7 +1,8 @@
 package com.tracelytics.joboe.rpc.grpc;
 
-import com.appoptics.ext.grpcgenerated.Collector;
-import com.appoptics.ext.grpcgenerated.TraceCollectorGrpc;
+
+import com.solarwinds.trace.ingestion.proto.Collector;
+import com.solarwinds.trace.ingestion.proto.TraceCollectorGrpc;
 import com.appoptics.ext.io.grpc.Server;
 import com.appoptics.ext.io.grpc.ServerBuilder;
 import com.appoptics.ext.io.grpc.Status;
@@ -195,7 +196,7 @@ public class GrpcClientTest extends RpcClientTest {
         }
 
         @Override
-        public void postEvents(com.appoptics.ext.grpcgenerated.Collector.MessageRequest request, StreamObserver<com.appoptics.ext.grpcgenerated.Collector.MessageResult> responseObserver) {
+        public void postEvents(Collector.MessageRequest request, StreamObserver<Collector.MessageResult> responseObserver) {
             buffer.addAll(request.getMessagesList());
             responseObserver.onNext(result);
             responseObserver.onCompleted();
@@ -204,7 +205,7 @@ public class GrpcClientTest extends RpcClientTest {
         }
 
         @Override
-        public void postMetrics(com.appoptics.ext.grpcgenerated.Collector.MessageRequest request, StreamObserver<com.appoptics.ext.grpcgenerated.Collector.MessageResult> responseObserver) {
+        public void postMetrics(Collector.MessageRequest request, StreamObserver<Collector.MessageResult> responseObserver) {
             buffer.addAll(request.getMessagesList());
             responseObserver.onNext(result);
             responseObserver.onCompleted();
@@ -213,7 +214,7 @@ public class GrpcClientTest extends RpcClientTest {
         }
 
         @Override
-        public void postStatus(com.appoptics.ext.grpcgenerated.Collector.MessageRequest request, StreamObserver<com.appoptics.ext.grpcgenerated.Collector.MessageResult> responseObserver) {
+        public void postStatus(Collector.MessageRequest request, StreamObserver<Collector.MessageResult> responseObserver) {
             buffer.addAll(request.getMessagesList());
             responseObserver.onNext(result);
             responseObserver.onCompleted();
@@ -222,7 +223,7 @@ public class GrpcClientTest extends RpcClientTest {
         }
 
         @Override
-        public void getSettings(com.appoptics.ext.grpcgenerated.Collector.SettingsRequest request, StreamObserver<com.appoptics.ext.grpcgenerated.Collector.SettingsResult> responseObserver) {
+        public void getSettings(Collector.SettingsRequest request, StreamObserver<Collector.SettingsResult> responseObserver) {
             Collector.SettingsResult settingsResult = Collector.SettingsResult.newBuilder().setResult(resultCode).setArg(arg).setWarning(warning).addAllSettings(TEST_OBOE_SETTINGS).build();
             responseObserver.onNext(settingsResult);
             responseObserver.onCompleted();
@@ -239,7 +240,7 @@ public class GrpcClientTest extends RpcClientTest {
         }
 
         @Override
-        public void ping(com.appoptics.ext.grpcgenerated.Collector.PingRequest request, StreamObserver<com.appoptics.ext.grpcgenerated.Collector.MessageResult> responseObserver) {
+        public void ping(Collector.PingRequest request, StreamObserver<Collector.MessageResult> responseObserver) {
             responseObserver.onNext(PING_RESULT);
             responseObserver.onCompleted();
         }
@@ -323,32 +324,32 @@ public class GrpcClientTest extends RpcClientTest {
         }
 
         @Override
-        public void postEvents(com.appoptics.ext.grpcgenerated.Collector.MessageRequest request, StreamObserver<com.appoptics.ext.grpcgenerated.Collector.MessageResult> responseObserver) {
+        public void postEvents(Collector.MessageRequest request, StreamObserver<Collector.MessageResult> responseObserver) {
             responseObserver.onNext(REDIRECT_RESULT);
             responseObserver.onCompleted();
         }
 
         @Override
-        public void postMetrics(com.appoptics.ext.grpcgenerated.Collector.MessageRequest request, StreamObserver<com.appoptics.ext.grpcgenerated.Collector.MessageResult> responseObserver) {
+        public void postMetrics(Collector.MessageRequest request, StreamObserver<Collector.MessageResult> responseObserver) {
             responseObserver.onNext(REDIRECT_RESULT);
             responseObserver.onCompleted();
         }
 
         @Override
-        public void postStatus(com.appoptics.ext.grpcgenerated.Collector.MessageRequest request, StreamObserver<com.appoptics.ext.grpcgenerated.Collector.MessageResult> responseObserver) {
+        public void postStatus(Collector.MessageRequest request, StreamObserver<Collector.MessageResult> responseObserver) {
             responseObserver.onNext(REDIRECT_RESULT);
             responseObserver.onCompleted();
         }
 
         @Override
-        public void getSettings(com.appoptics.ext.grpcgenerated.Collector.SettingsRequest request, StreamObserver<com.appoptics.ext.grpcgenerated.Collector.SettingsResult> responseObserver) {
+        public void getSettings(Collector.SettingsRequest request, StreamObserver<Collector.SettingsResult> responseObserver) {
             Collector.SettingsResult settingsResult = Collector.SettingsResult.newBuilder().setResult(Collector.ResultCode.REDIRECT).setArg(redirectArg).addAllSettings(TEST_OBOE_SETTINGS).build();
             responseObserver.onNext(settingsResult);
             responseObserver.onCompleted();
         }
 
         @Override
-        public void ping(com.appoptics.ext.grpcgenerated.Collector.PingRequest request, StreamObserver<com.appoptics.ext.grpcgenerated.Collector.MessageResult> responseObserver) {
+        public void ping(Collector.PingRequest request, StreamObserver<Collector.MessageResult> responseObserver) {
             responseObserver.onNext(REDIRECT_RESULT);
             responseObserver.onCompleted();
         }
@@ -367,27 +368,27 @@ public class GrpcClientTest extends RpcClientTest {
         }
 
         @Override
-        public void postEvents(com.appoptics.ext.grpcgenerated.Collector.MessageRequest request, StreamObserver<com.appoptics.ext.grpcgenerated.Collector.MessageResult> responseObserver) {
+        public void postEvents(Collector.MessageRequest request, StreamObserver<Collector.MessageResult> responseObserver) {
             processMessage(request.getMessagesList(), responseObserver);
         }
 
         @Override
-        public void postMetrics(com.appoptics.ext.grpcgenerated.Collector.MessageRequest request, StreamObserver<com.appoptics.ext.grpcgenerated.Collector.MessageResult> responseObserver) {
+        public void postMetrics(Collector.MessageRequest request, StreamObserver<Collector.MessageResult> responseObserver) {
             processMessage(request.getMessagesList(), responseObserver);
         }
 
         @Override
-        public void postStatus(com.appoptics.ext.grpcgenerated.Collector.MessageRequest request, StreamObserver<com.appoptics.ext.grpcgenerated.Collector.MessageResult> responseObserver) {
+        public void postStatus(Collector.MessageRequest request, StreamObserver<Collector.MessageResult> responseObserver) {
             processMessage(request.getMessagesList(), responseObserver);
         }
 
         @Override
-        public void getSettings(com.appoptics.ext.grpcgenerated.Collector.SettingsRequest request, StreamObserver<com.appoptics.ext.grpcgenerated.Collector.SettingsResult> responseObserver) {
+        public void getSettings(Collector.SettingsRequest request, StreamObserver<Collector.SettingsResult> responseObserver) {
             //do nothing
         }
 
         @Override
-        public void ping(com.appoptics.ext.grpcgenerated.Collector.PingRequest request, StreamObserver<com.appoptics.ext.grpcgenerated.Collector.MessageResult> responseObserver) {
+        public void ping(Collector.PingRequest request, StreamObserver<Collector.MessageResult> responseObserver) {
             processMessage(Collections.<ByteString>emptyList(), responseObserver);
         }
 

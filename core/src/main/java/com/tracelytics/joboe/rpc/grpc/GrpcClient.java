@@ -1,14 +1,10 @@
 package com.tracelytics.joboe.rpc.grpc;
 
-import com.appoptics.ext.grpcgenerated.Collector;
-import com.appoptics.ext.grpcgenerated.Collector.EncodingType;
-import com.appoptics.ext.grpcgenerated.Collector.*;
-import com.appoptics.ext.grpcgenerated.Collector.MessageRequest.Builder;
-import com.appoptics.ext.grpcgenerated.TraceCollectorGrpc;
-import com.appoptics.ext.grpcgenerated.TraceCollectorGrpc.TraceCollectorBlockingStub;
 import com.appoptics.ext.io.grpc.*;
 import com.appoptics.ext.io.grpc.netty.GrpcSslContexts;
 import com.appoptics.ext.io.grpc.netty.NettyChannelBuilder;
+import com.solarwinds.trace.ingestion.proto.Collector;
+import com.solarwinds.trace.ingestion.proto.TraceCollectorGrpc;
 import com.tracelytics.ext.google.protobuf.ByteString;
 import com.tracelytics.joboe.BsonBufferException;
 import com.tracelytics.joboe.Event;
@@ -50,13 +46,13 @@ import static com.tracelytics.util.HostInfoUtils.getHostId;
  */
 public class GrpcClient implements ProtocolClient {
     private static Logger logger = LoggerFactory.getLogger();
-    private final TraceCollectorBlockingStub client;
+    private final TraceCollectorGrpc.TraceCollectorBlockingStub client;
     private final GrpcHostIdManager hostIdManager = new GrpcHostIdManager();
 
     private static final int INITIAL_MESSAGE_SIZE = 64 * 1024; //64 kB
 
 
-    GrpcClient(TraceCollectorBlockingStub blockingStub) {
+    GrpcClient(TraceCollectorGrpc.TraceCollectorBlockingStub blockingStub) {
         this.client = blockingStub;
     }
 
@@ -87,12 +83,12 @@ public class GrpcClient implements ProtocolClient {
     public SettingsResult doGetSettings(String serviceKey, String version) throws ClientException {
         //For getSettings call, we decided to fill in `hostname` only for `HostID` for consistency with other agent implementation
         //Unlike other language agent, this change does not give any performance boost to java agent
-        SettingsRequest request = SettingsRequest.newBuilder().setApiKey(serviceKey).setClientVersion(version).setIdentity(hostIdManager.getHostnameOnlyHostID()).build();
+        Collector.SettingsRequest request = Collector.SettingsRequest.newBuilder().setApiKey(serviceKey).setClientVersion(version).setIdentity(hostIdManager.getHostnameOnlyHostID()).build();
         try {
-            com.appoptics.ext.grpcgenerated.Collector.SettingsResult result = client.getSettings(request);
+            Collector.SettingsResult result = client.getSettings(request);
 
             List<Settings> settings = new ArrayList<Settings>();
-            if (result.getResult() != null && result.getResult() == com.appoptics.ext.grpcgenerated.Collector.ResultCode.OK) {
+            if (result.getResult() != null && result.getResult() == Collector.ResultCode.OK) {
                 for (Collector.OboeSetting oboeSetting : result.getSettingsList()) {
                     settings.add(convertSetting(oboeSetting));
                 }
@@ -107,13 +103,13 @@ public class GrpcClient implements ProtocolClient {
     @Override
     public void doPing(String serviceKey) throws ClientException {
         try {
-            client.ping(PingRequest.newBuilder().setApiKey(serviceKey).build());
+            client.ping(Collector.PingRequest.newBuilder().setApiKey(serviceKey).build());
         } catch (StatusRuntimeException e) {
             throw new ClientRecoverableException("gRPC Operation failed : [ping] status [" + e.getStatus() + "]", e);
         }
     }
 
-    private Settings convertSetting(OboeSetting grpcOboeSetting) {
+    private Settings convertSetting(Collector.OboeSetting grpcOboeSetting) {
         Map<String, ByteBuffer> convertedArguments = new HashMap<String, ByteBuffer>();
 
         for (Entry<String, ByteString> argumentEntry : grpcOboeSetting.getArgumentsMap().entrySet()) {
@@ -133,7 +129,7 @@ public class GrpcClient implements ProtocolClient {
         return settings;
     }
 
-    private short convertType(OboeSettingType grpcType) {
+    private short convertType(Collector.OboeSettingType grpcType) {
         switch(grpcType) {
             case DEFAULT_SAMPLE_RATE:
                 return Settings.OBOE_SETTINGS_TYPE_DEFAULT_SAMPLE_RATE;
@@ -173,10 +169,10 @@ public class GrpcClient implements ProtocolClient {
             }
         }
 
-        MessageResult resultMessage = null;
+        Collector.MessageResult resultMessage = null;
         for (List<ByteString> itemsAsByteString : itemsByCalls) {
-            HostID hostId = hostIdManager.getHostID();
-            Builder builder = MessageRequest.newBuilder().setApiKey(serviceKey).setIdentity(hostId).setEncoding(EncodingType.BSON);
+            Collector.HostID hostId = hostIdManager.getHostID();
+            Collector.MessageRequest.Builder builder = Collector.MessageRequest.newBuilder().setApiKey(serviceKey).setIdentity(hostId).setEncoding(Collector.EncodingType.BSON);
             logger.debug(postAction.getDescription() + " " + itemsAsByteString.size() + " item(s) using gRPC client " + GrpcClient.this + ", hostId=" + hostId);
             try {
                 builder.addAllMessages(itemsAsByteString);
@@ -198,7 +194,7 @@ public class GrpcClient implements ProtocolClient {
     }
 
     interface PostAction {
-        MessageResult post(TraceCollectorBlockingStub client, MessageRequest messageRequest) throws StatusRuntimeException;
+        Collector.MessageResult post(TraceCollectorGrpc.TraceCollectorBlockingStub client, Collector.MessageRequest messageRequest) throws StatusRuntimeException;
         String getDescription();
     }
 
@@ -218,7 +214,7 @@ public class GrpcClient implements ProtocolClient {
 
     private static final PostAction POST_EVENTS_ACTION = new PostAction() {
         @Override
-        public MessageResult post(TraceCollectorBlockingStub client, MessageRequest request) {
+        public Collector.MessageResult post(TraceCollectorGrpc.TraceCollectorBlockingStub client, Collector.MessageRequest request) {
             return client.postEvents(request);
         }
 
@@ -230,7 +226,7 @@ public class GrpcClient implements ProtocolClient {
 
     private static final PostAction POST_STATUS_ACTION = new PostAction() {
         @Override
-        public MessageResult post(TraceCollectorBlockingStub client, MessageRequest request) {
+        public Collector.MessageResult post(TraceCollectorGrpc.TraceCollectorBlockingStub client, Collector.MessageRequest request) {
             return client.postStatus(request);
         }
 
@@ -242,7 +238,7 @@ public class GrpcClient implements ProtocolClient {
 
     private static final PostAction POST_METRICS_ACTION = new PostAction() {
         @Override
-        public MessageResult post(TraceCollectorBlockingStub client, MessageRequest request) {
+        public Collector.MessageResult post(TraceCollectorGrpc.TraceCollectorBlockingStub client, Collector.MessageRequest request) {
             return client.postMetrics(request);
         }
 
@@ -312,7 +308,7 @@ public class GrpcClient implements ProtocolClient {
             ManagedChannel channel = channelBuilder.build();
 
 
-            TraceCollectorBlockingStub stub = TraceCollectorGrpc.newBlockingStub(channel);
+            TraceCollectorGrpc.TraceCollectorBlockingStub stub = TraceCollectorGrpc.newBlockingStub(channel);
             if (!"none".equals(compression)) {
                 stub = stub.withCompression(compression);
             }
@@ -323,14 +319,14 @@ public class GrpcClient implements ProtocolClient {
 
     private static class GrpcHostIdManager {
         private HostId localHostId;
-        private HostID grpcHostID;
-        private HostID grpcHostnameOnlyHostID;
+        private Collector.HostID grpcHostID;
+        private Collector.HostID grpcHostnameOnlyHostID;
         private String localHostname;
 
         private GrpcHostIdManager() {
         }
 
-        private HostID getHostID() {
+        private Collector.HostID getHostID() {
             HostId hostId = getHostId();
             boolean loadGrpcHostId;
             if (hostId == localHostId || hostId.equals(localHostId)) {
@@ -347,7 +343,7 @@ public class GrpcClient implements ProtocolClient {
             return grpcHostID;
         }
 
-        private HostID getHostnameOnlyHostID() {
+        private Collector.HostID getHostnameOnlyHostID() {
             String hostname = HostInfoUtils.getHostName();
             boolean loadGrpcHostId;
             if (hostname.equals(localHostname)) {
@@ -363,7 +359,7 @@ public class GrpcClient implements ProtocolClient {
             return grpcHostnameOnlyHostID;
         }
 
-        private static HostID toGrpcHostID(HostId hostId) {
+        private static Collector.HostID toGrpcHostID(HostId hostId) {
             return buildGrpcHostID(HostInfoUtils.getHostName(), hostId.getPid(), hostId.getEc2InstanceId(), hostId.getEc2AvailabilityZone(), hostId.getDockerContainerId(), hostId.getMacAddresses(), hostId.getHerokuDynoId(), hostId.getAzureInstanceId(), hostId.getHostType(), hostId.getUamsClientId(), hostId.getUuid());
         }
 
@@ -374,13 +370,13 @@ public class GrpcClient implements ProtocolClient {
          *
          * @return
          */
-        private static HostID toGrpcHostnameOnlyHostID(String hostname) {
+        private static Collector.HostID toGrpcHostnameOnlyHostID(String hostname) {
             return buildGrpcHostID(HostInfoUtils.getHostName(), null, null, null, null, null, null, null, null, null, null);
         }
 
 
-        private static HostID buildGrpcHostID(String hostName, Integer pid, String ec2InstanceId, String ec2AvailabilityZone, String dockerContainerId, List<String> macAddresses, String herokuDynoId, String azureInstanceId, HostType hostType, String uamsClientId, String uuid) {
-            HostID.Builder builder = HostID.newBuilder();
+        private static Collector.HostID buildGrpcHostID(String hostName, Integer pid, String ec2InstanceId, String ec2AvailabilityZone, String dockerContainerId, List<String> macAddresses, String herokuDynoId, String azureInstanceId, HostType hostType, String uamsClientId, String uuid) {
+            Collector.HostID.Builder builder = Collector.HostID.newBuilder();
 
             if (hostName != null) {
                 builder.setHostname(hostName);
