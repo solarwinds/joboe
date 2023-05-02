@@ -19,7 +19,7 @@
 
   <repositories>
     <repository>
-      <id>github</id>
+      <id>solarwinds-cloud</id>
       <url>https://maven.pkg.github.com/solarwindscloud/maven-releases</url>
       <releases>
         <enabled>true</enabled>

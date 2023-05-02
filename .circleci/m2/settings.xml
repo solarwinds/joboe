@@ -4,14 +4,14 @@
   http://maven.apache.org/xsd/settings-1.0.0.xsd">
     <servers>
         <server>
-            <id>github</id>
+            <id>librato</id>
             <username>lt-global-circleci</username>
-            <password>${env.GITHUB_TOKEN}</password>
+            <password>${env.GITHUB_PACKAGE_WRITE_TOKEN}</password>
         </server>
         <server>
-            <id>github-write</id>
-            <username>lt-global-circleci</username>
-            <password>${env.GITHUB_TOKEN}</password>
+            <id>solarwinds-cloud</id>
+            <username>trace-build</username>
+            <password>${env.SOLARWINDS_CLOUD_PKG_READ_TOKEN}</password>
         </server>
     </servers>
 </settings>
