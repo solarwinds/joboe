@@ -14,7 +14,7 @@ executors:
     working_directory: ~/repo
     environment:
       PROJECT_NAME: joboe
-      SLACK_NOTIFY_CHANNEL: "#nighthawk-apm-libraries"
+      SLACK_NOTIFY_CHANNEL: "#nighthawk-apm-releases"
       EMOJI: ":circle-pass:"
       MAVEN_OPTS: -Xms2g -Xmx3g -Dmaven.resolver.transport=wagon
 
@@ -63,8 +63,6 @@ jobs:
             mvn versions:set -DnewVersion=$NEW_VERSION
             mvn -s .circleci/m2/settings.xml -T 8 deploy -DskipTests            
             source /ci-scripts/bin/helpers.sh
-            
-            send_to_slack "A new snapshot is ready \`$NEW_VERSION\`"
   release:
     executor: java
     steps:
@@ -117,13 +115,11 @@ workflows:
       - test:
           context:
             - AWS_CIRCLE_CI_BUILD
-            - PACKAGECLOUD
       - deploy:
           context:
             - AWS_CIRCLE_CI_BUILD
             - GH_LIBRATO_CI_PKG_READ
             - GH_LIBRATO_CI_PKG_WRITE
-#            - SLACK_HOOK
           filters:
             branches:
               ignore: main
@@ -139,7 +135,6 @@ workflows:
             - AWS_CIRCLE_CI_BUILD
             - GH_LIBRATO_CI_PKG_READ
             - GH_LIBRATO_CI_PKG_WRITE
-            - GH_LIBRATO_CI_REPO
             - SLACK_HOOK
           requires:
             - approve_me
