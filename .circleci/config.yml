@@ -122,14 +122,14 @@ workflows:
             - GH_LIBRATO_CI_PKG_WRITE
           filters:
             branches:
-              ignore: main
+              ignore: otel
       - approve_me:
           type: approval
           requires:
             - test
           filters:
             branches:
-              only: main
+              only: otel
       - release:
           context:
             - AWS_CIRCLE_CI_BUILD
@@ -140,5 +140,5 @@ workflows:
             - approve_me
           filters:
             branches:
-              only: main
+              only: otel
 
