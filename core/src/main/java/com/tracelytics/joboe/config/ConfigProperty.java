@@ -61,6 +61,8 @@ public enum ConfigProperty {
             "AZURE_VM_METADATA_TIMEOUT"), ConfigGroup.AGENT, Integer.class),
     AGENT_AZURE_VM_METADATA_VERSION(new ConfigKey("agent.azureVmMetadataVersion", EnvPrefix.PRODUCT +
             "AZURE_VM_METADATA_VERSION"), ConfigGroup.AGENT, String.class),
+    AGENT_COLLECTOR_TIMEOUT(new ConfigKey("agent.collectorTimeout", EnvPrefix.PRODUCT +
+            "COLLECTOR_TIMEOUT"), ConfigGroup.AGENT, Integer.class),
     AGENT_TRIGGER_TRACE_ENABLED(new ConfigKey("agent.triggerTrace", EnvPrefix.PRODUCT + "TRIGGER_TRACE"), ConfigGroup.AGENT, String.class),
     AGENT_PROXY(new ConfigKey("agent.proxy",EnvPrefix.PRODUCT + "PROXY", "proxy"), ConfigGroup.AGENT, String.class),
     AGENT_RPC_CLIENT_TYPE(new ConfigKey("agent.rpcType", EnvPrefix.PRODUCT + "RPC_TYPE", "rpc_type"), ConfigGroup.AGENT, String.class), //not advertised

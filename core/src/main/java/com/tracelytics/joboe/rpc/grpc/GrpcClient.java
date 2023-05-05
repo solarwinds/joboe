@@ -12,8 +12,6 @@ import com.tracelytics.joboe.HostId;
 import com.tracelytics.joboe.config.ConfigManager;
 import com.tracelytics.joboe.config.ConfigProperty;
 import com.tracelytics.joboe.config.ProxyConfig;
-import com.tracelytics.joboe.rpc.ResultCode;
-import com.tracelytics.joboe.rpc.SettingsResult;
 import com.tracelytics.joboe.rpc.*;
 import com.tracelytics.joboe.settings.Settings;
 import com.tracelytics.logging.Logger;
@@ -35,6 +33,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 
 import static com.tracelytics.util.HostInfoUtils.getHostId;
 
@@ -50,9 +49,12 @@ public class GrpcClient implements ProtocolClient {
 
     private static final int INITIAL_MESSAGE_SIZE = 64 * 1024; //64 kB
 
+    private final int deadlineMs;
 
     GrpcClient(TraceCollectorGrpc.TraceCollectorBlockingStub blockingStub) {
         this.client = blockingStub;
+        Integer configuredDeadLine = (Integer) ConfigManager.getConfig(ConfigProperty.AGENT_COLLECTOR_TIMEOUT);
+        this.deadlineMs =  configuredDeadLine == null ? 120 : configuredDeadLine;
     }
 
 
@@ -175,7 +177,7 @@ public class GrpcClient implements ProtocolClient {
             logger.debug(postAction.getDescription() + " " + itemsAsByteString.size() + " item(s) using gRPC client " + GrpcClient.this + ", hostId=" + hostId);
             try {
                 builder.addAllMessages(itemsAsByteString);
-                resultMessage = postAction.post(client, builder.build());
+                resultMessage = postAction.post(client.withDeadlineAfter(deadlineMs, TimeUnit.SECONDS), builder.build());
             } catch (StatusRuntimeException e) {
                 if (e.getStatus().getCode() == Status.RESOURCE_EXHAUSTED.getCode()) {
                     throw new ClientFatalException("gRPC Operation failed : [post events] status [" + e.getStatus() + "]. This is not recoverable due to exhausted resource.", e);
