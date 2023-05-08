@@ -9,7 +9,6 @@ import com.tracelytics.joboe.Constants;
 import com.tracelytics.joboe.Context;
 import com.tracelytics.joboe.Event;
 import com.tracelytics.joboe.rpc.RpcClient.TaskType;
-import com.tracelytics.joboe.rpc.thrift.ThriftClient;
 import com.tracelytics.joboe.settings.PollingSettingsFetcherTest;
 import com.tracelytics.joboe.settings.SettingsArg;
 import com.tracelytics.util.TimeUtils;

@@ -3,8 +3,6 @@ package com.tracelytics.joboe.rpc;
 import com.tracelytics.joboe.config.ConfigManager;
 import com.tracelytics.joboe.config.ConfigProperty;
 import com.tracelytics.joboe.rpc.Client.ClientType;
-import com.tracelytics.joboe.rpc.grpc.GrpcClientManager;
-import com.tracelytics.joboe.rpc.thrift.ThriftClientManager;
 import com.tracelytics.logging.Logger;
 import com.tracelytics.logging.LoggerFactory;
 
@@ -16,8 +14,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedExceptionAction;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Manages creation of PRC {@link Client}
@@ -26,7 +22,6 @@ import java.util.Map;
  */
 public abstract class RpcClientManager {
     private static final Logger logger = LoggerFactory.getLogger();
-    private static final Map<ClientType, RpcClientManager> registeredManagers = new HashMap<ClientType, RpcClientManager>();
     static final URL AO_DEFAULT_COLLECTER_CERT_LOCATION = getCertURL();
 
     private static URL getCertURL() {
@@ -52,8 +47,6 @@ public abstract class RpcClientManager {
 
     static {
         init((String) ConfigManager.getConfig(ConfigProperty.AGENT_COLLECTOR), (String) ConfigManager.getConfig(ConfigProperty.AGENT_COLLECTOR_SERVER_CERT_LOCATION), (String) ConfigManager.getConfig(ConfigProperty.AGENT_RPC_CLIENT_TYPE));
-        registeredManagers.put(ClientType.THRIFT, new ThriftClientManager());
-        registeredManagers.put(ClientType.GRPC, new GrpcClientManager());
     }
 
     //for existing unit test
@@ -124,93 +117,14 @@ public abstract class RpcClientManager {
     }
 
     public static Client getClient(OperationType operationType, String serviceKey) throws ClientException {
-        ClientType clientType;
-        if (configuredClientType == null) { //By default, determine the clientType by java version
-            String javaVersion = System.getProperty("java.version");
-            if (javaVersion.startsWith("1.")) { // < Java 9
-                if (javaVersion.startsWith("1.8")) { // Java 8
-                    clientType = alpnAvailable() ? ClientType.GRPC : ClientType.THRIFT;
-                } else { // < Java 8
-                    clientType = ClientType.THRIFT;
-                }
-            } else { // Java 9 and onwards
-                clientType = ClientType.GRPC;
-            }
-        } else {
-            clientType = configuredClientType;
-        }
-
-        return getClient(clientType, operationType, serviceKey);
-    }
-
-    public static void closeAllManagers() {
-        for (RpcClientManager clientManager : registeredManagers.values()) {
-            clientManager.close();
-        }
+        return ClientManagerProvider.getClientManager(ClientType.GRPC)
+                .orElseThrow(() -> new ClientException("Unknown Client type requested"))
+                .getClientImpl(operationType, serviceKey);
     }
 
     abstract protected void close();
 
-    /**
-     * https://github.com/grpc/grpc-java/blob/v1.34.1/netty/src/main/java/io/grpc/netty/JettyTlsUtil.java#L39
-     * @return
-     */
-    private static boolean alpnAvailable() {
-        if (alpnAvailable != null) {
-            return alpnAvailable;
-        }
-        try {
-            SSLContext context = SSLContext.getInstance("TLS");
-            context.init(null, null, null);
-            SSLEngine engine = context.createSSLEngine();
-            Method getApplicationProtocol =
-                    AccessController.doPrivileged(new PrivilegedExceptionAction<Method>() {
-                        @Override
-                        public Method run() throws Exception {
-                            return SSLEngine.class.getMethod("getApplicationProtocol");
-                        }
-                    });
-            getApplicationProtocol.invoke(engine);
-            alpnAvailable = true;
-        } catch (Throwable t) {
-            alpnAvailable = false;
-        }
-        return alpnAvailable;
-    }
-
-
-
-    /**
-     * Obtains a client by the <code>clientType</code> and <code>operationType</code>
-     * @param clientType    The protocol/type of the Client. For example THRIFT
-     * @param operationType The operation type this client will handle
-     * @return
-     * @throws ClientException
-     */
-    static Client getClient(ClientType clientType, OperationType operationType) throws ClientException {
-       return getClient(clientType, operationType, (String) ConfigManager.getConfig(ConfigProperty.AGENT_SERVICE_KEY));
-    }
-
-
-    static Client getClient(ClientType clientType, OperationType operationType, String serviceKey) throws ClientException {
-        logger.debug("Using " + clientType + " for rpc calls");
-
-        RpcClientManager manager = registeredManagers.get(clientType);
-        if (manager != null) {
-            Client client = manager.getClientImpl(operationType, serviceKey);
-            if (client == null) {
-                throw new ClientException("Failed to create client for " + clientType);
-            }
-            return client;
-        } else {
-            throw new ClientException("Unknown Client type requested : " + clientType);
-        }
-    }
-
-
-
     protected abstract Client getClientImpl(OperationType operationType, String serviceKey);
-
 
     public enum OperationType { TRACING, PROFILING, SETTINGS, METRICS, STATUS }
 }

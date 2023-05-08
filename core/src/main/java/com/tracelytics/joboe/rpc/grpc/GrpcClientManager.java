@@ -3,7 +3,6 @@ package com.tracelytics.joboe.rpc.grpc;
 import com.tracelytics.joboe.rpc.Client;
 import com.tracelytics.joboe.rpc.RpcClient;
 import com.tracelytics.joboe.rpc.RpcClientManager;
-import com.tracelytics.joboe.rpc.thrift.ThriftClient;
 import com.tracelytics.logging.Logger;
 import com.tracelytics.logging.LoggerFactory;
 
@@ -53,8 +52,10 @@ public class GrpcClientManager extends RpcClientManager {
             logger.warn("Failed to initialize rpc non-tracing client: " + e.getMessage(), e);
         }
     }
-    
-    public static void closeAll() {
+
+
+    @Override
+    public void close() {
         if (tracingRpcClient != null) {
             tracingRpcClient.close();
         }

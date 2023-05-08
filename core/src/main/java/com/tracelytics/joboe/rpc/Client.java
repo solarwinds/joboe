@@ -23,7 +23,7 @@ public interface Client {
     void close();
     Status getStatus();
     
-    public enum ClientType { THRIFT, GRPC }
+    public enum ClientType { GRPC }
     public enum Status {
         NOT_CONNECTED, OK, FAILURE;
     }
