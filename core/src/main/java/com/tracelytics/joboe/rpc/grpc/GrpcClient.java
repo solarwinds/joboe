@@ -49,12 +49,12 @@ public class GrpcClient implements ProtocolClient {
 
     private static final int INITIAL_MESSAGE_SIZE = 64 * 1024; //64 kB
 
-    private final int deadlineMs;
+    private final int deadlineSeconds;
 
     GrpcClient(TraceCollectorGrpc.TraceCollectorBlockingStub blockingStub) {
         this.client = blockingStub;
         Integer configuredDeadLine = (Integer) ConfigManager.getConfig(ConfigProperty.AGENT_COLLECTOR_TIMEOUT);
-        this.deadlineMs =  configuredDeadLine == null ? 120 : configuredDeadLine;
+        this.deadlineSeconds =  configuredDeadLine == null ? 10 : configuredDeadLine;
     }
 
 
@@ -86,7 +86,7 @@ public class GrpcClient implements ProtocolClient {
         //Unlike other language agent, this change does not give any performance boost to java agent
         Collector.SettingsRequest request = Collector.SettingsRequest.newBuilder().setApiKey(serviceKey).setClientVersion(version).setIdentity(hostIdManager.getHostnameOnlyHostID()).build();
         try {
-            Collector.SettingsResult result = client.withDeadlineAfter(deadlineMs, TimeUnit.SECONDS)
+            Collector.SettingsResult result = client.withDeadlineAfter(deadlineSeconds, TimeUnit.SECONDS)
                     .getSettings(request);
 
             List<Settings> settings = new ArrayList<Settings>();
@@ -178,7 +178,7 @@ public class GrpcClient implements ProtocolClient {
             logger.debug(postAction.getDescription() + " " + itemsAsByteString.size() + " item(s) using gRPC client " + GrpcClient.this + ", hostId=" + hostId);
             try {
                 builder.addAllMessages(itemsAsByteString);
-                resultMessage = postAction.post(client.withDeadlineAfter(deadlineMs, TimeUnit.SECONDS), builder.build());
+                resultMessage = postAction.post(client.withDeadlineAfter(deadlineSeconds, TimeUnit.SECONDS), builder.build());
             } catch (StatusRuntimeException e) {
                 if (e.getStatus().getCode() == Status.RESOURCE_EXHAUSTED.getCode()) {
                     throw new ClientFatalException("gRPC Operation failed : [post events] status [" + e.getStatus() + "]. This is not recoverable due to exhausted resource.", e);
