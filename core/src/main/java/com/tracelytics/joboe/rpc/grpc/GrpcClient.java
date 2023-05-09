@@ -86,7 +86,8 @@ public class GrpcClient implements ProtocolClient {
         //Unlike other language agent, this change does not give any performance boost to java agent
         Collector.SettingsRequest request = Collector.SettingsRequest.newBuilder().setApiKey(serviceKey).setClientVersion(version).setIdentity(hostIdManager.getHostnameOnlyHostID()).build();
         try {
-            Collector.SettingsResult result = client.getSettings(request);
+            Collector.SettingsResult result = client.withDeadlineAfter(deadlineMs, TimeUnit.SECONDS)
+                    .getSettings(request);
 
             List<Settings> settings = new ArrayList<Settings>();
             if (result.getResult() != null && result.getResult() == Collector.ResultCode.OK) {
