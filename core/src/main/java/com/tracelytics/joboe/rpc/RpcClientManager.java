@@ -6,14 +6,9 @@ import com.tracelytics.joboe.rpc.Client.ClientType;
 import com.tracelytics.logging.Logger;
 import com.tracelytics.logging.LoggerFactory;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLEngine;
 import java.io.File;
-import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.AccessController;
-import java.security.PrivilegedExceptionAction;
 
 /**
  * Manages creation of PRC {@link Client}
@@ -104,7 +99,7 @@ public abstract class RpcClientManager {
             try {
                 collectorPort = Integer.parseInt(tokens[1]);
             } catch (NumberFormatException e) {
-                logger.warn("Failed to parse the port number from " + ConfigProperty.AGENT_COLLECTOR.getEnviromentVariableKey() + " : [" + variable + "]");
+                logger.warn("Failed to parse the port number from " + ConfigProperty.AGENT_COLLECTOR.getEnvironmentVariableKey() + " : [" + variable + "]");
                 collectorPort = DEFAULT_PORT;
             }
         }

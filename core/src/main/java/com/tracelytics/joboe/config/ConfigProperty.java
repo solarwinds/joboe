@@ -46,7 +46,7 @@ public enum ConfigProperty {
     AGENT_CONTEXT_MAX_BACKTRACES(new ConfigKey("agent.contextMaxBacktraces"), ConfigGroup.AGENT, Integer.class),
     AGENT_HOSTNAME_ALIAS (new ConfigKey("agent.hostnameAlias", EnvPrefix.PRODUCT + "HOSTNAME_ALIAS", "hostname_alias"), ConfigGroup.AGENT, String.class),
     AGENT_LOG_FILE(new ConfigKey(null, EnvPrefix.PRODUCT + "JAVA_LOG_FILE", "log_file"), ConfigGroup.AGENT, String.class),
-    AGENT_COLLECTOR(new ConfigKey(null, EnvPrefix.PRODUCT + "COLLECTOR"), ConfigGroup.AGENT, String.class),
+    AGENT_COLLECTOR(new ConfigKey("agent.collector", EnvPrefix.PRODUCT + "COLLECTOR"), ConfigGroup.AGENT, String.class),
     AGENT_COLLECTOR_SERVER_CERT_LOCATION(new ConfigKey(null, EnvPrefix.PRODUCT + "TRUSTEDPATH"), ConfigGroup.AGENT, String.class),
     AGENT_EVENTS_FLUSH_INTERVAL(new ConfigKey(null, EnvPrefix.PRODUCT + "EVENTS_FLUSH_INTERVAL"), ConfigGroup.AGENT, Integer.class),
     AGENT_TRANSACTION_NAME_PATTERN (new ConfigKey("transaction.namePattern"), ConfigGroup.AGENT, String.class),
@@ -160,7 +160,7 @@ public enum ConfigProperty {
         return configKey.configFileKey;
     }
 
-    public String getEnviromentVariableKey() {
+    public String getEnvironmentVariableKey() {
         return configKey.environmentVariableKey;
     }
 

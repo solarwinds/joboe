@@ -48,7 +48,7 @@ public class InvalidConfigReadSourceException extends InvalidConfigException {
 
     private static String getConfigPropertyLabel(ConfigSourceType configSourceType, ConfigProperty configProperty) {
         switch (configSourceType) {
-            case ENV_VAR: return configProperty.getEnviromentVariableKey();
+            case ENV_VAR: return configProperty.getEnvironmentVariableKey();
             case JVM_ARG: //cannot use String.join due to 1.6 compatibility
                 boolean isFirstKey = true;
                 StringBuilder argumentList = new StringBuilder();
