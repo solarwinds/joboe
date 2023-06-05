@@ -7,10 +7,8 @@ Java Oboe
 * Maven 3.3.9+:  http://maven.apache.org/download.html
   Maven is needed to build the projects.
 
-* Java JDK 1.8.x and JDK 11+
+* Java JDK 8
   http://www.oracle.com/technetwork/java/javase/downloads/index.html 
-  * 1.8.x is used to compile the dependencies project
-  * 11 is used for the main core project
   
 * Recommended: IntelliJ IDE: http://www.jetbrains.com/idea/download/index.html
 

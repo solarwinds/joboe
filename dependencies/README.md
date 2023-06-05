@@ -26,7 +26,7 @@ Renaming is as follows:
    jsr305    => com.tracelytics.ext.javax.annotation
 
 ## Compile/Build
-#### Thrift
+#### Thrift(Deprecated)
 If there's any change to the thrift prototype in `collector.thrift`, then we would need to re-generate the thrift code
 
 1. Download thrift executable [v0.93](http://archive.apache.org/dist/thrift/0.9.3/). Please use this version as it matches the Maven dependency.
@@ -37,7 +37,7 @@ If there's any change to the thrift prototype in `collector.thrift`, then we wou
  
 
 #### General 
-Since some of these packages do not run on JDK 11, we force the maven to use JDK 8 to compile. 
+Use JDK 8 to compile. 
 
 If your maven is run using JDK 8, then the `mvn clean install` should run as is.
 
