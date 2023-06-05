@@ -85,7 +85,6 @@ jobs:
           command: |
             VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
             VERSION=${VERSION%%-SNAPSHOT}
-            NOTE=$(git log --format=%B -n 1 HEAD~1)
             
             curl -L \
               -X POST \
@@ -96,7 +95,7 @@ jobs:
               -d '{
                     "tag_name":"v'"$VERSION"'",
                     "name":"v'"$VERSION"'",
-                    "body":"'"$NOTE"'",
+                    "body":"New release: v'"$VERSION"'",
                     "draft":false,
                     "prerelease":false,
                     "generate_release_notes":false
