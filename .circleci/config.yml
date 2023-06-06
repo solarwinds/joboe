@@ -63,6 +63,7 @@ jobs:
             mvn versions:set -DnewVersion=$NEW_VERSION
             mvn -s .circleci/m2/settings.xml -T 8 deploy -DskipTests            
             source /ci-scripts/bin/helpers.sh
+            send_to_slack "A new snapshot is ready \`$NEW_VERSION\`"
   release:
     executor: java
     steps:
@@ -95,7 +96,7 @@ jobs:
               -d '{
                     "tag_name":"v'"$VERSION"'",
                     "name":"v'"$VERSION"'",
-                    "body":"New release: v'"$VERSION"'",
+                    "body":"New release: v'"$VERSION"' for the OpenTelemetry custom distro",
                     "draft":false,
                     "prerelease":false,
                     "generate_release_notes":false
@@ -119,6 +120,7 @@ workflows:
             - AWS_CIRCLE_CI_BUILD
             - GH_LIBRATO_CI_PKG_READ
             - GH_LIBRATO_CI_PKG_WRITE
+            - SLACK_HOOK
           filters:
             branches:
               ignore: otel

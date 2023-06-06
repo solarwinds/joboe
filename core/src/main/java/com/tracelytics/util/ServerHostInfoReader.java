@@ -29,20 +29,23 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 /**
  * Helper to extract information on the host this JVM runs on
@@ -641,7 +644,7 @@ public class ServerHostInfoReader implements HostInfoReader {
         NetworkAddressInfo networkAddressInfo = getNetworkAddressInfo();
         List<String> macAddresses = networkAddressInfo != null ? networkAddressInfo.getMacAddresses() : Collections.emptyList();
         //assume all that uses HostInfoUtils are persistent server, can be improved to recognize different types later
-        return  HostId.builder()
+        return HostId.builder()
                 .hostname(getHostName())
                 .pid(JavaProcessUtils.getPid())
                 .macAddresses(macAddresses)
@@ -894,17 +897,10 @@ public class ServerHostInfoReader implements HostInfoReader {
 
     public static class DockerInfoReader {
         public static final String DEFAULT_LINUX_DOCKER_FILE_LOCATION = "/proc/self/cgroup";
-        private static final int DOCKER_ID_LENGTH = 64;
-        private static final Set<String> DOCKER_CGROUP_PATH_TOKEN = new HashSet<String>();
-
-        static {
-            DOCKER_CGROUP_PATH_TOKEN.add("docker");
-            DOCKER_CGROUP_PATH_TOKEN.add("ecs");
-            DOCKER_CGROUP_PATH_TOKEN.add("kubepods");
-            DOCKER_CGROUP_PATH_TOKEN.add("docker.service");
-        }
 
         private String dockerId;
+
+        static final Pattern CONTAINER_ID_REGEX = Pattern.compile("[a-f0-9]{64}");
 
         static final DockerInfoReader SINGLETON = new DockerInfoReader();
 
@@ -926,29 +922,55 @@ public class ServerHostInfoReader implements HostInfoReader {
             }
         }
 
-        void initializeLinux(String dockerFileLocation) {
-            BufferedReader reader = null;
+        private static Optional<String> getIdFromLine(String line) {
+            // This cgroup output line should have the container id in it
+            int lastSlashIdx = line.lastIndexOf('/');
+            if (lastSlashIdx < 0) {
+                return Optional.empty();
+            }
 
-            try {
-                reader = new BufferedReader(new FileReader(dockerFileLocation));
-                String line;
+            String containerId;
 
-                // refers to logic from c-lib https://github.com/librato/oboe/blob/af14cd2daaba7b6c21fa4aa780b222f02fe95f07/liboboe/reporter/ssl.cc#L1134
-                // iterate over each line and look for the keyword "docker" or "ecs"
-                while ((line = reader.readLine()) != null) {
-                    List<String> tokens = Arrays.asList(line.split("/"));
-                    if (!Collections.disjoint(tokens,
-                            DOCKER_CGROUP_PATH_TOKEN)) { //if the tokens contains any of the valid "docker" label segments in it
-                        for (String token : tokens) {
-                            if (token.length() == DOCKER_ID_LENGTH) {
-                                dockerId = token;
-                                return;
-                            }
-                        }
-                    }
+            String lastSection = line.substring(lastSlashIdx + 1);
+            int colonIdx = lastSection.lastIndexOf(':');
+
+            if (colonIdx != -1) {
+                // since containerd v1.5.0+, containerId is divided by the last colon when the cgroupDriver is
+                // systemd:
+                // https://github.com/containerd/containerd/blob/release/1.5/pkg/cri/server/helpers_linux.go#L64
+                containerId = lastSection.substring(colonIdx + 1);
+            } else {
+                int startIdx = lastSection.lastIndexOf('-');
+                int endIdx = lastSection.lastIndexOf('.');
+
+                startIdx = startIdx == -1 ? 0 : startIdx + 1;
+                if (endIdx == -1) {
+                    endIdx = lastSection.length();
+                }
+                if (startIdx > endIdx) {
+                    return Optional.empty();
                 }
 
-                dockerId = null;
+                containerId = lastSection.substring(startIdx, endIdx);
+            }
+
+            if (CONTAINER_ID_REGEX.matcher(containerId).matches()) {
+                return Optional.of(containerId);
+            } else {
+                return Optional.empty();
+            }
+        }
+
+        void initializeLinux(String dockerFileLocation) {
+            try (Stream<String> lineStream = Files.lines(Paths.get(dockerFileLocation))) {
+                Optional<String> id = lineStream
+                        .filter(line -> !line.isEmpty())
+                        .map(DockerInfoReader::getIdFromLine)
+                        .filter(Optional::isPresent)
+                        .findFirst()
+                        .orElse(Optional.empty());
+                dockerId = id.orElse(null);
+
             } catch (FileNotFoundException e) {
                 dockerId = null;
                 logger.debug(
@@ -957,14 +979,6 @@ public class ServerHostInfoReader implements HostInfoReader {
                 dockerId = null;
                 logger.debug(
                         "Cannot locate docker id as file " + dockerFileLocation + " throws IOException : " + e.getMessage());
-            } finally {
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (IOException e) {
-                        logger.warn(e.getMessage(), e);
-                    }
-                }
             }
         }
 
@@ -1047,7 +1061,7 @@ public class ServerHostInfoReader implements HostInfoReader {
                     StringBuilder payload = new StringBuilder();
                     String nextLine;
 
-                    while ((nextLine =reader.readLine()) != null){
+                    while ((nextLine = reader.readLine()) != null) {
                         payload.append(nextLine);
                     }
                     return HostId.AzureVmMetadata.fromJson(payload.toString());

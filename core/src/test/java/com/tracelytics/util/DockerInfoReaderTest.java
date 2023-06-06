@@ -27,14 +27,20 @@ public class DockerInfoReaderTest extends TestCase {
         
         DockerInfoReader.SINGLETON.initializeLinux(TEST_FILE_PREFIX + "ecs");
         assertEquals("93d377d55070d2463493706ba7194d119c3efb1c2e7929f36da183ffe71d72a8", DockerInfoReader.getDockerId());
+
+        DockerInfoReader.SINGLETON.initializeLinux(TEST_FILE_PREFIX + "cri-containerd");
+        assertEquals("0531ff3c6395131175507ac7e94fdf387f2a2dea81961e6c96f6ac5ccd7ede3f", DockerInfoReader.getDockerId());
+
+        DockerInfoReader.SINGLETON.initializeLinux(TEST_FILE_PREFIX + "kubepods");
+        assertEquals("0531ff3c6395131175507ac7e94fdf387f2a2dea81961e6c96f6ac5ccd7ede3f", DockerInfoReader.getDockerId());
         
         DockerInfoReader.SINGLETON.initializeLinux(TEST_FILE_PREFIX + "empty");
-        assertEquals(null, DockerInfoReader.getDockerId());
+        assertNull(DockerInfoReader.getDockerId());
         
         DockerInfoReader.SINGLETON.initializeLinux(TEST_FILE_PREFIX + "non-docker");
-        assertEquals(null, DockerInfoReader.getDockerId());
+        assertNull(DockerInfoReader.getDockerId());
         
         DockerInfoReader.SINGLETON.initializeLinux(TEST_FILE_PREFIX + "invalid");
-        assertEquals(null, DockerInfoReader.getDockerId());
+        assertNull(DockerInfoReader.getDockerId());
     }
 }
