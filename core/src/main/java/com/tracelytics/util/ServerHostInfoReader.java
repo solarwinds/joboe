@@ -955,8 +955,11 @@ public class ServerHostInfoReader implements HostInfoReader {
             }
 
             if (CONTAINER_ID_REGEX.matcher(containerId).matches()) {
+                logger.info(String.format("Found container id: {%s} in line: {%s}", containerId, line));
                 return Optional.of(containerId);
+
             } else {
+                logger.debug(String.format("No container id in line: {%s}", line));
                 return Optional.empty();
             }
         }
