@@ -44,6 +44,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -66,7 +70,7 @@ public class ServerHostInfoReader implements HostInfoReader {
     private static final String hostname = loadHostName();
     private static String uuid;
     private static boolean checkedDistro = false;
-    private static HostInfoUtils.OsType osType = HostInfoUtils.getOsType();
+    static HostInfoUtils.OsType osType = HostInfoUtils.getOsType();
 
     static final String HOSTNAME_SEPARATOR = ";";
 
@@ -612,6 +616,19 @@ public class ServerHostInfoReader implements HostInfoReader {
         return "Ubuntu unknown";
     }
 
+    public static <V> void setIfNotNull(Consumer<V> setter, V value) {
+        if (value != null) {
+            setter.accept(value);
+        }
+    }
+
+    public static <V> void setAlternateIfNull(Consumer<V> setter, V value, Supplier<V> alternate) {
+        if (value != null) {
+            setter.accept(value);
+        } else {
+            setIfNotNull(setter, alternate.get());
+        }
+    }
 
     private static BufferedReader getFileReader(DistroType distroType) {
         String path = DISTRO_FILE_NAMES.get(distroType);
@@ -657,6 +674,7 @@ public class ServerHostInfoReader implements HostInfoReader {
                 .uuid(getUuid())
                 .awsMetadata(Ec2InstanceReader.SINGLETON.awsMetadata)
                 .azureVmMetadata(AzureReader.SINGLETON.azureVmMetadata)
+                .k8sMetadata(K8sReader.INSTANCE.k8sMetadata)
                 .build();
     }
 
@@ -965,24 +983,7 @@ public class ServerHostInfoReader implements HostInfoReader {
         }
 
         void initializeLinux(String dockerFileLocation) {
-            try (Stream<String> lineStream = Files.lines(Paths.get(dockerFileLocation))) {
-                Optional<String> id = lineStream
-                        .filter(line -> !line.isEmpty())
-                        .map(DockerInfoReader::getIdFromLine)
-                        .filter(Optional::isPresent)
-                        .findFirst()
-                        .orElse(Optional.empty());
-                dockerId = id.orElse(null);
-
-            } catch (FileNotFoundException e) {
-                dockerId = null;
-                logger.debug(
-                        "Cannot locate docker id as file " + dockerFileLocation + " cannot be found : " + e.getMessage());
-            } catch (IOException e) {
-                dockerId = null;
-                logger.debug(
-                        "Cannot locate docker id as file " + dockerFileLocation + " throws IOException : " + e.getMessage());
-            }
+            dockerId = fileReader(dockerFileLocation, DockerInfoReader::getIdFromLine);
         }
 
         /**
@@ -1004,7 +1005,6 @@ public class ServerHostInfoReader implements HostInfoReader {
             }
         }
     }
-
 
     public static class HerokuDynoReader {
         private static final String DYNO_ENV_VARIABLE = "DYNO";
@@ -1096,6 +1096,82 @@ public class ServerHostInfoReader implements HostInfoReader {
             azureVmMetadata = getVmMetadata();
             logger.debug(String.format("Azure vm metadata: %s", azureVmMetadata));
         }
+    }
+
+    public static class K8sReader {
+        public static String SW_K8S_POD_NAMESPACE = "SW_K8S_POD_NAMESPACE";
+
+        public static String SW_K8S_POD_NAME = "SW_K8S_POD_NAME";
+
+        public static String SW_K8S_POD_UID = "SW_K8S_POD_UID";
+
+        public static String NAMESPACE_FILE_LOC_LINUX = "/run/secrets/kubernetes.io/serviceaccount/namespace";
+
+        public static String NAMESPACE_FILE_LOC_WINDOWS = "C:\\var\\run\\secrets\\kubernetes.io\\serviceaccount\\namespace";
+
+        public static String POD_UUID_FILE_LOC = "/proc/self/mountinfo";
+
+        static final Pattern POD_UID_REGEX = Pattern.compile("[0-9a-fA-F]{8}-([0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}");
+
+        private final HostId.K8sMetadata k8sMetadata;
+
+        public static K8sReader INSTANCE = new K8sReader();
+
+        public K8sReader() {
+            HostId.K8sMetadata.K8sMetadataBuilder builder = HostId.K8sMetadata.builder();
+            Map<String, String> env = System.getenv();
+            setAlternateIfNull(builder::namespace, env.get(SW_K8S_POD_NAMESPACE), K8sReader::getNamespace);
+            setAlternateIfNull(builder::podName, env.get(SW_K8S_POD_NAME), ServerHostInfoReader.INSTANCE::getHostName);
+
+            setAlternateIfNull(builder::podUid, env.get(SW_K8S_POD_UID), K8sReader::getPodId);
+            setIfNotNull(builder::containerId, DockerInfoReader.getDockerId());
+            k8sMetadata = builder.build();
+        }
+
+        private static String getNamespace() {
+            if (osType == HostInfoUtils.OsType.LINUX) {
+                return fileReader(NAMESPACE_FILE_LOC_LINUX, line -> Optional.of(line.trim()));
+
+            } else if (osType == HostInfoUtils.OsType.WINDOWS) {
+                return fileReader(NAMESPACE_FILE_LOC_WINDOWS, line -> Optional.of(line.trim()));
+            }
+
+            return null;
+        }
+
+        private static String getPodId() {
+            return fileReader(POD_UUID_FILE_LOC, line -> {
+                Matcher matcher = POD_UID_REGEX.matcher(line);
+                String podId = null;
+                if (matcher.find()) {
+                    podId = line.substring(matcher.start(), matcher.end());
+                    logger.info(String.format("Found pod uid: %s", podId));
+                } else {
+                    logger.debug(String.format("Pod uid not found on line: %s", line));
+                }
+                return Optional.ofNullable(podId);
+            });
+        }
+
+        public HostId.K8sMetadata getK8sMetadata() {
+            return k8sMetadata;
+        }
+    }
+
+    public static <V> V fileReader(String filepath, Function<String, Optional<V>> lineParser) {
+        Optional<V> value = Optional.empty();
+        try (Stream<String> lineStream = Files.lines(Paths.get(filepath))) {
+            value = lineStream
+                    .filter(line -> !line.isEmpty())
+                    .map(lineParser)
+                    .filter(Optional::isPresent)
+                    .findFirst()
+                    .orElse(Optional.empty());
+
+        } catch (IOException e) {
+            logger.debug(String.format("Error reading file(%s).  %s", filepath, e.getMessage()));
+        }
+        return value.orElse(null);
     }
 
 }

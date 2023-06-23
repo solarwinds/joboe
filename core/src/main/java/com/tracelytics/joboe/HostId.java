@@ -4,10 +4,14 @@ import com.solarwinds.trace.ingestion.proto.Collector;
 import com.tracelytics.ext.json.JSONException;
 import com.tracelytics.ext.json.JSONObject;
 import com.tracelytics.joboe.rpc.HostType;
-import lombok.*;
+import lombok.Builder;
+import lombok.Data;
+import lombok.Value;
 
 import java.util.Collections;
 import java.util.List;
+
+import static com.tracelytics.util.ServerHostInfoReader.setIfNotNull;
 
 /**
  * A combination of values to identify a host that makes the RPC call
@@ -33,6 +37,7 @@ public class HostId {
     private final String uuid;
     private final AwsMetadata awsMetadata;
     private final AzureVmMetadata azureVmMetadata;
+    private final K8sMetadata k8sMetadata;
 
     @Value
     @Builder
@@ -122,6 +127,28 @@ public class HostId {
                     .setHostName(hostName)
                     .setHostType(hostType)
                     .build();
+        }
+    }
+
+    @Value
+    @Builder
+    public static class K8sMetadata {
+        String cGroup;
+        String namespace;
+        String podName;
+        String podUid;
+        String containerId;
+
+        public Collector.K8s toGrpc() {
+            Collector.K8s.Builder builder = Collector.K8s.newBuilder();
+            setIfNotNull(builder::setCgroup, cGroup);
+            setIfNotNull(builder::setNamespace, namespace);
+
+            setIfNotNull(builder::setPodName, podName);
+            setIfNotNull(builder::setPodUid, podUid);
+            setIfNotNull(builder::setContainerId, containerId);
+
+            return builder.build();
         }
     }
 }

@@ -34,7 +34,7 @@
     <dependency>
       <groupId>cloud.solarwindscloud</groupId>
       <artifactId>apm-trace-collector-grpc</artifactId>
-      <version>1.557</version>
+      <version>1.622</version>
       <exclusions>
         <exclusion>
           <artifactId>guava</artifactId>

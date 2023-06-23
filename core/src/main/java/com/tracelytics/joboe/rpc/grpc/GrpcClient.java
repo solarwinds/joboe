@@ -36,6 +36,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 import static com.tracelytics.util.HostInfoUtils.getHostId;
+import static com.tracelytics.util.ServerHostInfoReader.setIfNotNull;
 
 /**
  * Collector protocol client that uses the gRPC protocol.
@@ -363,38 +364,16 @@ public class GrpcClient implements ProtocolClient {
 
         private static Collector.HostID toGrpcHostID(HostId hostId) {
             Collector.HostID.Builder builder = Collector.HostID.newBuilder();
+            setIfNotNull(builder::setHostname, hostId.getHostname());
+            setIfNotNull(builder::setEc2InstanceID, hostId.getEc2InstanceId());
 
-            if (hostId.getHostname() != null) {
-                builder.setHostname(hostId.getHostname());
-            }
+            setIfNotNull(builder::setEc2AvailabilityZone, hostId.getEc2AvailabilityZone());
+            setIfNotNull(builder::setDockerContainerID, hostId.getDockerContainerId());
+            setIfNotNull(builder::setHerokuDynoID, hostId.getHerokuDynoId());
 
-            if (hostId.getEc2InstanceId() != null) {
-                builder.setEc2InstanceID(hostId.getEc2InstanceId());
-            }
-
-            if (hostId.getEc2AvailabilityZone() != null) {
-                builder.setEc2AvailabilityZone(hostId.getEc2AvailabilityZone());
-            }
-
-            if (hostId.getDockerContainerId() != null) {
-                builder.setDockerContainerID(hostId.getDockerContainerId());
-            }
-
-            if (hostId.getHerokuDynoId() != null) {
-                builder.setHerokuDynoID(hostId.getHerokuDynoId());
-            }
-
-            if (hostId.getAzureAppServiceInstanceId() != null) {
-                builder.setAzAppServiceInstanceID(hostId.getAzureAppServiceInstanceId());
-            }
-
-            if (hostId.getUamsClientId() != null) {
-                builder.setUamsClientID(hostId.getUamsClientId());
-            }
-
-            if (hostId.getUuid() != null) {
-                builder.setUuid(hostId.getUuid());
-            }
+            setIfNotNull(builder::setAzAppServiceInstanceID, hostId.getAzureAppServiceInstanceId());
+            setIfNotNull(builder::setUamsClientID, hostId.getUamsClientId());
+            setIfNotNull(builder::setUuid, hostId.getUuid());
 
             if (hostId.getAzureVmMetadata() != null) {
                 builder.setAzureMetadata(hostId.getAzureVmMetadata().toGrpc());
@@ -402,6 +381,10 @@ public class GrpcClient implements ProtocolClient {
 
             if (hostId.getAwsMetadata() != null) {
                 builder.setAwsMetadata(hostId.getAwsMetadata().toGrpc());
+            }
+
+            if (hostId.getK8sMetadata() != null) {
+                builder.setK8SMetadata(hostId.getK8sMetadata().toGrpc());
             }
 
             return builder
