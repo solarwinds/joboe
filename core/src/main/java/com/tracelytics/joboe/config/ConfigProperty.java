@@ -1,8 +1,5 @@
 package com.tracelytics.joboe.config;
 
-import com.tracelytics.logging.Logger;
-import com.tracelytics.logging.LoggerFactory;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -79,8 +76,6 @@ public enum ConfigProperty {
     PROFILER(new ConfigKey("profiler"), ConfigGroup.PROFILER, String.class),
     PROFILER_ENABLED_ENV_VAR(new ConfigKey(null, EnvPrefix.PRODUCT + "PROFILER_ENABLED", "profiler"), ConfigGroup.PROFILER, Boolean.class),
     PROFILER_INTERVAL_ENV_VAR(new ConfigKey(null, EnvPrefix.PRODUCT + "PROFILER_INTERVAL"), ConfigGroup.PROFILER, Integer.class);
-
-    private static final Logger logger = LoggerFactory.getLogger();
     private final ConfigKey configKey;
     private Class<? extends Serializable> typeClass;
     private ConfigGroup group;
@@ -113,7 +108,7 @@ public enum ConfigProperty {
      * @param group
      * @param typeClass             the Java Class of the property value
      */
-    private ConfigProperty(ConfigKey configKey, ConfigGroup group, Class<? extends Serializable> typeClass) {
+    ConfigProperty(ConfigKey configKey, ConfigGroup group, Class<? extends Serializable> typeClass) {
         this.configKey = configKey;
         this.typeClass = typeClass;
         this.group = group;
@@ -128,21 +123,21 @@ public enum ConfigProperty {
         String configFileKey = property.configKey.configFileKey;
         if (configFileKey != null) {
             if (ConfigPropertyRegistry.CONFIG_FILE_KEY_TO_PARAMETER.put(configFileKey, property) != null) { //put the key into the lookup map
-                logger.warn("Config File Key [" + configFileKey + "]  has been defined more than once! Check " + ConfigProperty.class.getName() + " keys usage!");
+                throw new RuntimeException("Config File Key [" + configFileKey + "]  has been defined more than once! Check " + ConfigProperty.class.getName() + " keys usage!");
             }
         }
 
         String environmentVariableKey = property.configKey.environmentVariableKey;
         if (environmentVariableKey != null) {
             if (ConfigPropertyRegistry.ENVIRONMENT_VARIABLE_KEY_TO_PARAMETER.put(environmentVariableKey, property) != null) { //put the key into the lookup map
-                logger.warn("Environment Variable Key [" + environmentVariableKey + "]  has been defined more than once! Check " + ConfigProperty.class.getName() + " keys usage!");
+                throw new RuntimeException("Environment Variable Key [" + environmentVariableKey + "]  has been defined more than once! Check " + ConfigProperty.class.getName() + " keys usage!");
             }
         }
 
         String[] agentArgumentKeys = property.configKey.agentArgumentKeys;
         for (String agentArgumentKey : agentArgumentKeys) { //put the argument name into the lookup map
             if (ConfigPropertyRegistry.AGENT_ARGUMENT_KEY_TO_PARAMETER.put(agentArgumentKey, property) != null) {
-                logger.warn("Agent Argument Key [" + agentArgumentKey + "]  has been defined more than once!");
+                throw new RuntimeException("Agent Argument Key [" + agentArgumentKey + "]  has been defined more than once!");
             }
         }
     }
