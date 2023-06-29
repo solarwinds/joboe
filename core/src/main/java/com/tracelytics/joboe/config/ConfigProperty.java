@@ -122,23 +122,19 @@ public enum ConfigProperty {
     private static void registerLookup(ConfigProperty property) {
         String configFileKey = property.configKey.configFileKey;
         if (configFileKey != null) {
-            if (ConfigPropertyRegistry.CONFIG_FILE_KEY_TO_PARAMETER.put(configFileKey, property) != null) { //put the key into the lookup map
-                throw new RuntimeException("Config File Key [" + configFileKey + "]  has been defined more than once! Check " + ConfigProperty.class.getName() + " keys usage!");
-            }
+            //put the key into the lookup map
+            ConfigPropertyRegistry.CONFIG_FILE_KEY_TO_PARAMETER.put(configFileKey, property);
         }
 
         String environmentVariableKey = property.configKey.environmentVariableKey;
         if (environmentVariableKey != null) {
-            if (ConfigPropertyRegistry.ENVIRONMENT_VARIABLE_KEY_TO_PARAMETER.put(environmentVariableKey, property) != null) { //put the key into the lookup map
-                throw new RuntimeException("Environment Variable Key [" + environmentVariableKey + "]  has been defined more than once! Check " + ConfigProperty.class.getName() + " keys usage!");
-            }
+            //put the key into the lookup map
+            ConfigPropertyRegistry.ENVIRONMENT_VARIABLE_KEY_TO_PARAMETER.put(environmentVariableKey, property);
         }
 
         String[] agentArgumentKeys = property.configKey.agentArgumentKeys;
         for (String agentArgumentKey : agentArgumentKeys) { //put the argument name into the lookup map
-            if (ConfigPropertyRegistry.AGENT_ARGUMENT_KEY_TO_PARAMETER.put(agentArgumentKey, property) != null) {
-                throw new RuntimeException("Agent Argument Key [" + agentArgumentKey + "]  has been defined more than once!");
-            }
+            ConfigPropertyRegistry.AGENT_ARGUMENT_KEY_TO_PARAMETER.put(agentArgumentKey, property);
         }
     }
 
