@@ -133,7 +133,6 @@ public class HostId {
     @Value
     @Builder
     public static class K8sMetadata {
-        String cGroup;
         String namespace;
         String podName;
         String podUid;
@@ -141,7 +140,6 @@ public class HostId {
 
         public Collector.K8s toGrpc() {
             Collector.K8s.Builder builder = Collector.K8s.newBuilder();
-            setIfNotNull(builder::setCgroup, cGroup);
             setIfNotNull(builder::setNamespace, namespace);
 
             setIfNotNull(builder::setPodName, podName);

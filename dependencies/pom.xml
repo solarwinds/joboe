@@ -19,8 +19,8 @@
 
   <repositories>
     <repository>
-      <id>solarwinds-cloud</id>
-      <url>https://maven.pkg.github.com/solarwindscloud/maven-releases</url>
+      <id>solarwinds-apm</id>
+      <url>https://maven.pkg.github.com/solarwindscloud/apm-proto</url>
       <releases>
         <enabled>true</enabled>
       </releases>
@@ -33,12 +33,28 @@
   <dependencies>
     <dependency>
       <groupId>cloud.solarwindscloud</groupId>
-      <artifactId>apm-trace-collector-grpc</artifactId>
-      <version>1.622</version>
+      <artifactId>apm-proto</artifactId>
+      <version>1.0.0</version>
       <exclusions>
         <exclusion>
           <artifactId>guava</artifactId>
           <groupId>com.google.guava</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>grpc-netty-shaded</artifactId>
+          <groupId>io.grpc</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>grpc-services</artifactId>
+          <groupId>io.grpc</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>grpc-stub</artifactId>
+          <groupId>io.grpc</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>grpc-protobuf</artifactId>
+          <groupId>io.grpc</groupId>
         </exclusion>
       </exclusions>
     </dependency>

@@ -9,7 +9,7 @@
             <password>${env.GITHUB_PACKAGE_WRITE_TOKEN}</password>
         </server>
         <server>
-            <id>solarwinds-cloud</id>
+            <id>solarwinds-apm</id>
             <username>trace-build</username>
             <password>${env.SOLARWINDS_CLOUD_PKG_READ_TOKEN}</password>
         </server>
