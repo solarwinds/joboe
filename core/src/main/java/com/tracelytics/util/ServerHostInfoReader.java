@@ -338,8 +338,9 @@ public class ServerHostInfoReader implements HostInfoReader {
     private static String getMacAddressFromBytes(byte[] bytes) {
         StringBuilder sb = new StringBuilder(18);
         for (byte b : bytes) {
-            if (sb.length() > 0)
+            if (sb.length() > 0) {
                 sb.append(':');
+            }
             sb.append(String.format("%02x", b));
         }
         return sb.toString().toUpperCase();
@@ -674,7 +675,7 @@ public class ServerHostInfoReader implements HostInfoReader {
                 .uuid(getUuid())
                 .awsMetadata(Ec2InstanceReader.SINGLETON.awsMetadata)
                 .azureVmMetadata(AzureReader.SINGLETON.azureVmMetadata)
-                .k8sMetadata(K8sReader.INSTANCE.k8sMetadata)
+                .k8sMetadata(K8sReader.INSTANCE.getK8sMetadata())
                 .build();
     }
 
@@ -1154,6 +1155,9 @@ public class ServerHostInfoReader implements HostInfoReader {
         }
 
         public HostId.K8sMetadata getK8sMetadata() {
+            if (k8sMetadata.getNamespace() == null) {
+                return null;
+            }
             return k8sMetadata;
         }
     }
