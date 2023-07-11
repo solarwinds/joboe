@@ -21,7 +21,6 @@ public class K8sReaderTest extends TestCase {
         HostId.K8sMetadata expected = HostId.K8sMetadata.builder()
                 .namespace("o11y-platform")
                 .podUid("9dcdb600-4156-4b7b-afcc-f8c06cb0e474")
-                .containerId(ServerHostInfoReader.DockerInfoReader.getDockerId())
                 .podName(ServerHostInfoReader.INSTANCE.getHostName())
                 .build();
 

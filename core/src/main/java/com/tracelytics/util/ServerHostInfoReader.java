@@ -1125,7 +1125,6 @@ public class ServerHostInfoReader implements HostInfoReader {
             setAlternateIfNull(builder::podName, env.get(SW_K8S_POD_NAME), ServerHostInfoReader.INSTANCE::getHostName);
 
             setAlternateIfNull(builder::podUid, env.get(SW_K8S_POD_UID), K8sReader::getPodId);
-            setIfNotNull(builder::containerId, DockerInfoReader.getDockerId());
             k8sMetadata = builder.build();
         }
 

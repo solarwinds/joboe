@@ -136,7 +136,6 @@ public class HostId {
         String namespace;
         String podName;
         String podUid;
-        String containerId;
 
         public Collector.K8s toGrpc() {
             Collector.K8s.Builder builder = Collector.K8s.newBuilder();
@@ -144,8 +143,6 @@ public class HostId {
 
             setIfNotNull(builder::setPodName, podName);
             setIfNotNull(builder::setPodUid, podUid);
-            setIfNotNull(builder::setContainerId, containerId);
-
             return builder.build();
         }
     }
