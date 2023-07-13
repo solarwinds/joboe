@@ -51,6 +51,7 @@ public enum ConfigProperty {
     AGENT_SYSMON_EARLY_START(new ConfigKey("agent.sysMonEarlyStart", EnvPrefix.PRODUCT + "SYSMON_EARLY_START"), ConfigGroup.AGENT, Boolean.class),
     AGENT_INIT_TIMEOUT(new ConfigKey("agent.initTimeout", EnvPrefix.PRODUCT + "INIT_TIMEOUT"), ConfigGroup.AGENT, Integer.class),
     AGENT_TRANSACTION_SETTINGS(new ConfigKey("agent.transactionSettings"), ConfigGroup.AGENT, String.class),
+    AGENT_TRANSACTION_NAMING_SCHEMES(new ConfigKey("agent.transactionNameSchemes"), ConfigGroup.AGENT, String.class),
     //AGENT_INTERNAL_TRANSACTION_SETTINGS should NOT be specified directly in the json file. This is used to store the result after comparing AGENT_TRANSACTION_SETTINGS and AGENT_URL_SAMPLE_RATE - not an ideal solution as this is confusing
     AGENT_INTERNAL_TRANSACTION_SETTINGS(new ConfigKey("agent.internal.transactionSettings"), ConfigGroup.AGENT, String.class),
     AGENT_EC2_METADATA_TIMEOUT(new ConfigKey("agent.ec2MetadataTimeout", EnvPrefix.PRODUCT + "EC2_METADATA_TIMEOUT"), ConfigGroup.AGENT, Integer.class),
