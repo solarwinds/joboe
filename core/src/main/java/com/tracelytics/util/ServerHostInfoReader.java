@@ -12,22 +12,23 @@ import com.tracelytics.joboe.span.impl.ScopeManager;
 import com.tracelytics.logging.Logger;
 import com.tracelytics.logging.LoggerFactory;
 import com.tracelytics.util.HostInfoUtils.NetworkAddressInfo;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
-import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.Proxy;
 import java.net.SocketException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -747,136 +748,93 @@ public class ServerHostInfoReader implements HostInfoReader {
         }
 
         private static String useIMDSv1(String relativePath) {
-            StringBuilder result = null;
-            BufferedReader reader = null;
-            HttpURLConnection connection = null;
+            OkHttpClient client = new OkHttpClient.Builder()
+                    .readTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
+                    .connectTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
+                    .proxy(Proxy.NO_PROXY)
+                    .build();
 
-            try {
-                URI uri = new URI(getMetadataHost() + "/" + relativePath);
-                connection = (HttpURLConnection) uri.toURL().openConnection(Proxy.NO_PROXY);
-                connection.setConnectTimeout(TIMEOUT);
+            Request request = new Request.Builder()
+                    .url(getMetadataHost() + "/" + relativePath)
+                    .get()
+                    .build();
 
-                connection.setReadTimeout(TIMEOUT);
-                int statusCode = connection.getResponseCode();
-                if (statusCode == HttpURLConnection.HTTP_OK) {
+            try (Response response = client.newCall(request).execute()) {
+                int statusCode = response.code();
+                ResponseBody responseBody = response.body();
 
-                    reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                    result = new StringBuilder();
-                    String nextLine;
-
-                    while ((nextLine = reader.readLine()) != null) {
-                        result.append(nextLine);
-                    }
-                    reader.close();
-                }
-
-                if (result == null) {
+                if (responseBody == null) {
                     logger.debug(String.format("Failed to retrieved metadata using IMDSv1: status code=%d",
                             statusCode));
-                } else {
-                    logger.debug(String.format("Retrieved metadata using IMDSv1: %s", result));
-                    return result.toString();
+                } else if (response.isSuccessful()) {
+                    logger.debug(String.format("Retrieved metadata using IMDSv1: %s", responseBody.string()));
+                    return responseBody.string();
                 }
 
-            } catch (URISyntaxException | IOException exception) {
+            } catch (IOException exception) {
                 logger.debug(String.format("Error retrieving metadata using IMDSv1: %s", exception));
-
-            } finally {
-                if (connection != null) {
-                    connection.disconnect();
-                }
-
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (IOException ioException) {
-                        logger.debug(String.format("Error closing reader for IMDSv1: %s", ioException));
-                    }
-                }
             }
 
             return null;
         }
 
         private static String getApiToken() {
-            String result = null;
-            HttpURLConnection connection = null;
-            try {
-                URI tokenApiUri = new URI(getMetadataHost() + "/latest/api/token");
-                connection = (HttpURLConnection) tokenApiUri.toURL().openConnection(Proxy.NO_PROXY);
-                connection.setConnectTimeout(TIMEOUT);
+            OkHttpClient client = new OkHttpClient.Builder()
+                    .readTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
+                    .connectTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
+                    .proxy(Proxy.NO_PROXY)
+                    .build();
 
-                connection.setReadTimeout(TIMEOUT);
-                connection.setRequestMethod("PUT");
-                connection.setRequestProperty("X-aws-ec2-metadata-token-ttl-seconds", "3600");
+            Request request = new Request.Builder()
+                    .url(getMetadataHost() + "/" + "/latest/api/token")
+                    .put(RequestBody.create("{}", MediaType.parse("application/json")))
+                    .addHeader("X-aws-ec2-metadata-token-ttl-seconds", "3600")
+                    .build();
 
-                int statusCode = connection.getResponseCode();
-                if (statusCode == HttpURLConnection.HTTP_OK) {
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                    result = reader.readLine();
-                    reader.close();
+            try (Response response = client.newCall(request).execute()) {
+                if (response.isSuccessful() && response.body() != null) {
+                    return response.body().string();
+                } else {
+                    logger.debug(String.format("Failed to retrieved metadata request token: status code=%d",
+                            response.code()));
                 }
 
-            } catch (URISyntaxException | IOException e) {
+            } catch (IOException e) {
                 logger.debug(String.format("Error getting token for IMDSv2: %s", e));
-            } finally {
-                if (connection != null) {
-                    connection.disconnect();
-                }
             }
 
-            return result;
+            return null;
         }
 
         private static String useIMDSv2(String relativePath, String apiToken) {
-            StringBuilder result = null;
-            BufferedReader reader = null;
-            HttpURLConnection connection = null;
+            OkHttpClient client = new OkHttpClient.Builder()
+                    .readTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
+                    .connectTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
+                    .proxy(Proxy.NO_PROXY)
+                    .build();
 
-            try {
-                URI uri = new URI(getMetadataHost() + "/" + relativePath);
-                connection = (HttpURLConnection) uri.toURL().openConnection(Proxy.NO_PROXY);
-                connection.setReadTimeout(TIMEOUT);
+            Request request = new Request.Builder()
+                    .url(getMetadataHost() + "/" + relativePath)
+                    .get()
+                    .addHeader("X-aws-ec2-metadata-token", apiToken)
+                    .build();
 
-                connection.setConnectTimeout(TIMEOUT);
-                connection.setRequestProperty("X-aws-ec2-metadata-token", apiToken);
-                int statusCode = connection.getResponseCode();
+            try (Response response = client.newCall(request).execute()) {
+                int statusCode = response.code();
+                ResponseBody responseBody = response.body();
 
-                if (statusCode == HttpURLConnection.HTTP_OK) {
-                    reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                    result = new StringBuilder();
-                    String nextLine;
-
-                    while ((nextLine = reader.readLine()) != null) {
-                        result.append(nextLine);
-                    }
-                    reader.close();
-                }
-
-                if (result == null) {
-                    logger.debug(String.format("Failed to retrieve metadata using IMDSv2: status code=%d",
+                if (responseBody == null) {
+                    logger.debug(String.format("Failed to retrieved metadata using IMDSv2: status code=%d",
                             statusCode));
-                } else {
-                    logger.debug(String.format("Retrieved metadata using IMDSv2: %s", result));
-                    return result.toString();
+                } else if (response.isSuccessful()) {
+                    logger.debug(String.format("Retrieved metadata using IMDSv2: %s", responseBody.string()));
+                    return responseBody.string();
                 }
 
-            } catch (IOException | URISyntaxException e) {
+            } catch (IOException e) {
                 logger.debug(String.format("Error retrieving metadata using IMDSv2: %s", e));
-
-            } finally {
-                if (connection != null) {
-                    connection.disconnect();
-                }
-
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (IOException ioException) {
-                        logger.debug(String.format("Error closing reader for IMDSv2: %s", ioException));
-                    }
-                }
             }
+
             return null;
         }
 
@@ -1038,8 +996,6 @@ public class ServerHostInfoReader implements HostInfoReader {
         }
 
         private HostId.AzureVmMetadata getVmMetadata() {
-            HttpURLConnection connection = null;
-            BufferedReader reader = null;
             Integer timeout = (Integer) ConfigManager.getConfig(ConfigProperty.AGENT_AZURE_VM_METADATA_TIMEOUT);
             if (timeout == null) {
                 timeout = TIMEOUT_DEFAULT;
@@ -1050,41 +1006,32 @@ public class ServerHostInfoReader implements HostInfoReader {
                 metadataVersion = DEFAULT_METADATA_VERSION;
             }
 
-            try {
-                URL url = new URL(String.format("%s%s%s", METADATA_SERVICE_URL, "/metadata/instance?api-version=",
-                        metadataVersion));
-                connection = (HttpURLConnection) url.openConnection(Proxy.NO_PROXY);
-                connection.setConnectTimeout(timeout);
+            OkHttpClient client = new OkHttpClient.Builder()
+                    .readTimeout(timeout, TimeUnit.MILLISECONDS)
+                    .connectTimeout(timeout, TimeUnit.MILLISECONDS)
+                    .proxy(Proxy.NO_PROXY)
+                    .build();
 
-                connection.setReadTimeout(timeout);
-                connection.setRequestProperty("Metadata", "true");
-                int statusCode = connection.getResponseCode();
+            Request request = new Request.Builder()
+                    .url(String.format("%s%s%s", METADATA_SERVICE_URL, "/metadata/instance?api-version=",
+                            metadataVersion))
+                    .get()
+                    .addHeader("Metadata", "true")
+                    .build();
 
-                if (statusCode == HttpURLConnection.HTTP_OK) {
-                    reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                    StringBuilder payload = new StringBuilder();
-                    String nextLine;
-
-                    while ((nextLine = reader.readLine()) != null) {
-                        payload.append(nextLine);
-                    }
-                    return HostId.AzureVmMetadata.fromJson(payload.toString());
-                }
+            try (Response response = client.newCall(request).execute()) {
+                int statusCode = response.code();
                 logger.debug(String.format("Azure IMDS status code: %s", statusCode));
+
+                if (response.isSuccessful() && response.body() != null) {
+                    String payload = response.body().string();
+                    logger.debug(String.format("Azure IMDS payload: %s", payload));
+                    return HostId.AzureVmMetadata.fromJson(payload);
+                }
 
             } catch (IOException | JSONException exception) {
                 logger.debug("Error retrieving vmId from IMDS", exception);
 
-            } finally {
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (IOException ignore) {
-                    }
-                }
-                if (connection != null) {
-                    connection.disconnect();
-                }
             }
             return null;
         }
