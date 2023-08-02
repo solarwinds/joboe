@@ -92,6 +92,10 @@
                   <pattern>okhttp3</pattern>
                   <shadedPattern>com.appoptics.ext.okhttp3</shadedPattern>
                 </relocation>
+                <relocation>
+                  <pattern>kotlin</pattern>
+                  <shadedPattern>com.appoptics.ext.kotlin</shadedPattern>
+                </relocation>
               </relocations>
             </configuration>
           </execution>
