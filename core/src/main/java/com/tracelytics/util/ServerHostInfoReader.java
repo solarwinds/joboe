@@ -767,8 +767,9 @@ public class ServerHostInfoReader implements HostInfoReader {
                     logger.debug(String.format("Failed to retrieved metadata using IMDSv1: status code=%d",
                             statusCode));
                 } else if (response.isSuccessful()) {
-                    logger.debug(String.format("Retrieved metadata using IMDSv1: %s", responseBody.string()));
-                    return responseBody.string();
+                    String payload = responseBody.string();
+                    logger.debug(String.format("Retrieved metadata using IMDSv1: %s", payload));
+                    return payload;
                 }
 
             } catch (IOException exception) {
@@ -827,8 +828,9 @@ public class ServerHostInfoReader implements HostInfoReader {
                     logger.debug(String.format("Failed to retrieved metadata using IMDSv2: status code=%d",
                             statusCode));
                 } else if (response.isSuccessful()) {
-                    logger.debug(String.format("Retrieved metadata using IMDSv2: %s", responseBody.string()));
-                    return responseBody.string();
+                    String payload = responseBody.string();
+                    logger.debug(String.format("Retrieved metadata using IMDSv2: %s", payload));
+                    return payload;
                 }
 
             } catch (IOException e) {
