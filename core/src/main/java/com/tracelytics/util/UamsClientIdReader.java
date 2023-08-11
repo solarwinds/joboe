@@ -1,7 +1,12 @@
 package com.tracelytics.util;
 
+import com.tracelytics.ext.json.JSONException;
+import com.tracelytics.ext.json.JSONObject;
 import com.tracelytics.logging.Logger;
 import com.tracelytics.logging.LoggerFactory;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -11,6 +16,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.time.Instant;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class UamsClientIdReader {
@@ -19,6 +25,8 @@ public class UamsClientIdReader {
     private static final Path uamsClientIdPath;
     private static final AtomicReference<String> uamsClientId = new AtomicReference<>();
     private static final AtomicReference<FileTime> lastModified = new AtomicReference<>(FileTime.from(Instant.EPOCH));
+
+    private static final OkHttpClient restClient = new OkHttpClient.Builder().build();
 
     static {
         if (osType == HostInfoUtils.OsType.WINDOWS) {
@@ -32,6 +40,7 @@ public class UamsClientIdReader {
         }
         logger.debug("Set uamsclientid path to " + uamsClientIdPath);
     }
+
     public static String getUamsClientId() {
         try {
             FileTime modifiedTime = Files.getLastModifiedTime(uamsClientIdPath);
@@ -41,9 +50,36 @@ public class UamsClientIdReader {
                 logger.debug("Updated uamsclientid to " + uamsClientId.get() + ", lastModifiedTime=" + modifiedTime);
             }
         } catch (IOException e) {
-            logger.debug("Cannot read the file " + uamsClientIdPath);
+            logger.debug(String.format("Cannot read the file[%s] due error: %s", uamsClientIdPath, e));
+            getUamsClientIdViaRestApi().ifPresent(uamsClientId::set);
         }
         return uamsClientId.get();
+    }
+
+    static Optional<String> getUamsClientIdViaRestApi() {
+        Request request = new Request.Builder()
+                .url("http://127.0.0.1:2113/info/uamsclient")
+                .get()
+                .build();
+
+        try (Response response = restClient.newCall(request).execute()) {
+            String payload = null;
+            if (response.isSuccessful() && response.body() != null) {
+                payload = response.body().string();
+                JSONObject jsonPayload = new JSONObject(payload);
+                String clientId = jsonPayload.getString("uamsclient_id");
+
+                logger.debug(String.format("Got UAMS client ID(%s) from API, using hardcoded endpoint", clientId));
+                return Optional.ofNullable(clientId);
+            }
+
+            logger.debug(String.format("Request to UAMS REST endpoint failed. Status=%d, payload=%s", response.code(), payload));
+
+        } catch (IOException | JSONException exception) {
+            logger.debug(String.format("Error reading from UAMS REST endpoint\n%s", exception));
+        }
+
+        return Optional.empty();
     }
 
     private static String readFirstLine(Path filePath) throws IOException {
