@@ -16,6 +16,7 @@ import java.util.Map;
  */
 public enum ConfigProperty {
     AGENT_CONFIG (new ConfigKey(null, EnvPrefix.PRODUCT + "CONFIG_FILE", "config"), ConfigGroup.AGENT, String.class),
+    AGENT_CONFIG_FILE_WATCH_PERIOD (new ConfigKey("agent.configFileWatchPeriod"), ConfigGroup.AGENT, Long.class),
     AGENT_ATTR_RENAME (new ConfigKey("agent.attrRename", EnvPrefix.PRODUCT + "ATTR_RENAME"), ConfigGroup.AGENT, String.class),
     AGENT_DEBUG (new ConfigKey(null, null, "debug"), ConfigGroup.AGENT, Boolean.class),
     AGENT_LOGGING (new ConfigKey("agent.logging", EnvPrefix.PRODUCT + "DEBUG_LEVEL", "logging"), ConfigGroup.AGENT, String.class),

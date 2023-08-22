@@ -35,8 +35,6 @@ public class TraceDecisionUtil {
     //map of flags to keep of whether a settings error was reported, only report it once
     private static final ConcurrentHashMap<String, Boolean> reportedSettingsError = new ConcurrentHashMap<String, Boolean>();
 
-    private static final boolean TRIGGER_TRACE_CONFIG_ENABLED = (Boolean) ConfigManager.getConfigOptional(ConfigProperty.AGENT_TRIGGER_TRACE_ENABLED, true);
-    
     private static volatile TraceConfig localUniversalSettings = null;
 
     static {
@@ -83,7 +81,7 @@ public class TraceDecisionUtil {
             //Get the local sample rate (either from file, defaults, JVM, url matching etc)
             TraceConfig localConfig = getLocalTraceConfig(signals);
 
-            TraceConfig config = computeTraceConfig(remoteConfig, localConfig, TRIGGER_TRACE_CONFIG_ENABLED);
+            TraceConfig config = computeTraceConfig(remoteConfig, localConfig, ConfigManager.getConfigOptional(ConfigProperty.AGENT_TRIGGER_TRACE_ENABLED, true));
 
             if (!config.isSampleRateConfigured()) {
                 logger.debug("Cannot trace request as sample rate is undefined"); //debug message, otherwise it could be very noisy
