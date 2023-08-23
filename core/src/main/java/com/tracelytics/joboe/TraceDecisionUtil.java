@@ -35,8 +35,6 @@ public class TraceDecisionUtil {
     //map of flags to keep of whether a settings error was reported, only report it once
     private static final ConcurrentHashMap<String, Boolean> reportedSettingsError = new ConcurrentHashMap<String, Boolean>();
 
-    private static volatile TraceConfig localUniversalSettings = null;
-
     static {
         for (MetricType type : MetricType.values()) {
             requestCounters.put(type, new AtomicInteger(0));
@@ -281,13 +279,9 @@ public class TraceDecisionUtil {
      * @return
      */
     private static TraceConfig getLocalUniversalTraceConfig() {
-        if (localUniversalSettings == null) {
-            Integer sampleRate = (Integer) ConfigManager.getConfig(ConfigProperty.AGENT_SAMPLE_RATE);
-            TracingMode tracingMode = (TracingMode) ConfigManager.getConfig(ConfigProperty.AGENT_TRACING_MODE);
-            localUniversalSettings = new TraceConfig(sampleRate, sampleRate != null ? SampleRateSource.FILE : SampleRateSource.DEFAULT, tracingMode != null ? tracingMode.toFlags() : null);
-        }
-        
-        return localUniversalSettings;
+        Integer sampleRate = (Integer) ConfigManager.getConfig(ConfigProperty.AGENT_SAMPLE_RATE);
+        TracingMode tracingMode = (TracingMode) ConfigManager.getConfig(ConfigProperty.AGENT_TRACING_MODE);
+        return  new TraceConfig(sampleRate, sampleRate != null ? SampleRateSource.FILE : SampleRateSource.DEFAULT, tracingMode != null ? tracingMode.toFlags() : null);
     }
 
     /**
@@ -460,7 +454,6 @@ public class TraceDecisionUtil {
         }
         lastTraceConfigs.clear();
         reportedSettingsError.clear();
-        localUniversalSettings = null;
     }
     
     public enum MetricType {

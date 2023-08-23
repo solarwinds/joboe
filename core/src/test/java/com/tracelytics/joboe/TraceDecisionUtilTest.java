@@ -100,13 +100,7 @@ public class TraceDecisionUtilTest extends TestCase {
 
    
     public void testPrecedence() throws Exception {
-        Field localUniversalSettingsField = TraceDecisionUtil.class.getDeclaredField("localUniversalSettings");
-        localUniversalSettingsField.setAccessible(true);
-        TraceConfig originalLocalUniversalSettings = (TraceConfig) localUniversalSettingsField.get(null);
-        
-        //set local settings to no sample rate nor trace mode
-        localUniversalSettingsField.set(null, new TraceConfig(null, SampleRateSource.DEFAULT, null));
-        
+
         //case 1: set remote TracingMode = ENABLED with no override, no local settings
         //local universal : null/null
         //remote : ENABLED/100% (override OFF) 
@@ -124,7 +118,8 @@ public class TraceDecisionUtilTest extends TestCase {
         //case 3: set local TracingMode = ENABLED with no sample rate
         //local universal : ENABLED/null
         //remote : ENABLED/100%
-        localUniversalSettingsField.set(null, new TraceConfig(null, SampleRateSource.DEFAULT, TracingMode.ENABLED.toFlags()));
+        ConfigManager.setConfig(ConfigProperty.AGENT_TRACING_MODE, TracingMode.ENABLED);
+
         //should still trace
         assertEquals(true, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, null).isSampled());
         assertEquals(true, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, X_TRACE_ID_SAMPLED, null, null).isSampled());
@@ -132,7 +127,8 @@ public class TraceDecisionUtilTest extends TestCase {
         //case 4: set no local TracingMode, with sample rate = 0%
         //local universal : null/0%
         //remote : ENABLED/100%
-        localUniversalSettingsField.set(0, new TraceConfig(0, SampleRateSource.FILE, null));
+        ConfigManager.setConfig(ConfigProperty.AGENT_SAMPLE_RATE, 0);
+        ConfigManager.removeConfig(ConfigProperty.AGENT_TRACING_MODE);
         //should not start trace
         assertEquals(false, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, null).isSampled());
         //but it should continue trace
@@ -141,7 +137,7 @@ public class TraceDecisionUtilTest extends TestCase {
         //case 5: set local TracingMode = DISABLED, with no sample Rate
         //local universal : DISABLED/null
         //remote : ENABLED/100%
-        localUniversalSettingsField.set(null, new TraceConfig(null, SampleRateSource.FILE, TracingMode.DISABLED.toFlags()));
+        ConfigManager.setConfig(ConfigProperty.AGENT_TRACING_MODE, TracingMode.DISABLED);
         //should not trace
         assertEquals(false, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, null).isSampled());
         assertEquals(false, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, X_TRACE_ID_SAMPLED, null, null).isSampled());
@@ -175,7 +171,8 @@ public class TraceDecisionUtilTest extends TestCase {
 
 
         //clean up
-        localUniversalSettingsField.set(null, originalLocalUniversalSettings);
+        ConfigManager.removeConfig(ConfigProperty.AGENT_SAMPLE_RATE);
+        ConfigManager.removeConfig(ConfigProperty.AGENT_TRACING_MODE);
     }
 
     public void testUrlConfigs() throws Exception {
@@ -617,10 +614,9 @@ public class TraceDecisionUtilTest extends TestCase {
 
 
         //case 2: add local settings sampleRate= 500000 (50%), now it should override all the oboe settings
-        Field localUniversalSettingsField = TraceDecisionUtil.class.getDeclaredField("localUniversalSettings");
-        localUniversalSettingsField.setAccessible(true);
-        TraceConfig originalLocalUniversalSettings = (TraceConfig) localUniversalSettingsField.get(null);
-        localUniversalSettingsField.set(null, new TraceConfig(500000, SampleRateSource.FILE, TracingMode.ALWAYS.toFlags()));
+        ConfigManager.setConfig(ConfigProperty.AGENT_SAMPLE_RATE, 500000);
+        ConfigManager.setConfig(ConfigProperty.AGENT_TRACING_MODE, TracingMode.ALWAYS);
+
 
         TraceDecisionUtil.shouldTraceRequest("LayerA", null, null, null); //50% (local settings), ALWAYS => record 50%
         TraceDecisionUtil.shouldTraceRequest("LayerA", null, null, Collections.singletonList("something.html")); //URL overrides, NEVER => do not record
@@ -639,7 +635,8 @@ public class TraceDecisionUtilTest extends TestCase {
 
 
         //clean up
-        localUniversalSettingsField.set(null, originalLocalUniversalSettings);
+        ConfigManager.removeConfig(ConfigProperty.AGENT_SAMPLE_RATE);
+        ConfigManager.removeConfig(ConfigProperty.AGENT_TRACING_MODE);
     }
     
     public void testGetRemoteSampleRate() {
