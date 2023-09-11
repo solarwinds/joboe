@@ -33,7 +33,7 @@ import com.tracelytics.util.DaemonThreadFactory;
  */
 public abstract class QueuingEventReporter implements EventReporter {
     static final int QUEUE_CAPACITY = 10000;
-    static final int SEND_CAPACITY = 1000;
+    static final int SEND_CAPACITY;
     private BlockingQueue<Event> eventQueue = new LinkedBlockingQueue<Event>(QUEUE_CAPACITY);
     protected ExecutorService executorService = Executors.newSingleThreadExecutor(DaemonThreadFactory.newInstance("queuing-event-reporter"));
     
@@ -60,6 +60,8 @@ public abstract class QueuingEventReporter implements EventReporter {
                 }
             }
         });
+
+        SEND_CAPACITY = ConfigManager.getConfigOptional(ConfigProperty.AGENT_EVENTS_SEND_CAPACITY, 1000);
     }
     
     private boolean reportedQueueFull = false;
