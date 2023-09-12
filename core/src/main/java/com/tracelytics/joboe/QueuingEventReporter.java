@@ -23,11 +23,11 @@ import com.tracelytics.logging.LoggerFactory;
 import com.tracelytics.util.DaemonThreadFactory;
 
 /**
- * A reporter that accepts events into a queue w/o blocking but sends out events synchronously. 
- * 
- * Accepts events are inserted into a queue and being consumed and sent out synchronously. 
+ * A reporter that accepts events into a queue w/o blocking but sends out events synchronously.
+ *
+ * Accepts events are inserted into a queue and being consumed and sent out synchronously.
  * If sending rate is slower than the queuing rate, then this report will attempt to send out events in batches
- * 
+ *
  * @author pluk
  *
  */
@@ -36,16 +36,16 @@ public abstract class QueuingEventReporter implements EventReporter {
     static final int SEND_CAPACITY;
     private BlockingQueue<Event> eventQueue = new LinkedBlockingQueue<Event>(QUEUE_CAPACITY);
     protected ExecutorService executorService = Executors.newSingleThreadExecutor(DaemonThreadFactory.newInstance("queuing-event-reporter"));
-    
-    
+
+
     protected static Logger logger = LoggerFactory.getLogger();
     private AtomicEventReporterStats stats = new AtomicEventReporterStats();
-    
+
     private static final long REPORT_QUEUE_FULL_INTERVAL = 60 * 1000; //1 minute
     static final int DEFAULT_FLUSH_INTERVAL = 2; //2 second
-    
+
     static int flushInterval = DEFAULT_FLUSH_INTERVAL; //in unit of second
-    
+
     static {
         if (ConfigManager.getConfig(ConfigProperty.AGENT_EVENTS_FLUSH_INTERVAL) instanceof Integer) {
             setFlushInterval((Integer) ConfigManager.getConfig(ConfigProperty.AGENT_EVENTS_FLUSH_INTERVAL));
@@ -63,12 +63,12 @@ public abstract class QueuingEventReporter implements EventReporter {
 
         SEND_CAPACITY = ConfigManager.getConfigOptional(ConfigProperty.AGENT_EVENTS_SEND_CAPACITY, 1000);
     }
-    
+
     private boolean reportedQueueFull = false;
     private long reportedQueueFullTime = 0;
 
     private final SendRunnable sendRunnable;
-    
+
     static void setFlushInterval(int eventsFlushInterval) {
         if (eventsFlushInterval >= 0) {
             flushInterval = eventsFlushInterval;
@@ -77,12 +77,12 @@ public abstract class QueuingEventReporter implements EventReporter {
             logger.warn("Event flush interval value " + eventsFlushInterval + " is not valid");
         }
     }
-    
+
     protected QueuingEventReporter() {
         sendRunnable = new SendRunnable();
         executorService.execute(sendRunnable);
     }
-    
+
     private class SendRunnable implements Runnable {
         private boolean exitSignalled = false;
         private CountDownLatch countDownLatch = new CountDownLatch(1);
@@ -92,9 +92,9 @@ public abstract class QueuingEventReporter implements EventReporter {
                 List<Event> sendingEvents = new ArrayList<Event>();
                 try {
                     sendingEvents.add(eventQueue.take()); //this blocks until at least one event is available; 
-                    
+
                     eventQueue.drainTo(sendingEvents, SEND_CAPACITY - sendingEvents.size()); //drain the rest of the queue
-                    
+
                     //sleep a while to batch up events, but only sleep if there's no build up, if the sendingEvents reaches capacity, we should send events right the way
                     if (sendingEvents.size() < SEND_CAPACITY) {
                         try {
@@ -104,17 +104,17 @@ public abstract class QueuingEventReporter implements EventReporter {
                         }
                         eventQueue.drainTo(sendingEvents, SEND_CAPACITY - sendingEvents.size()); //try draining again
                     }
-                    
+
                     Result result = synchronousSend(sendingEvents);
                     ResultCode resultCode = result.getResultCode();
-                    
+
                     if (resultCode.isError()) {
                         logger.debug("Failed to send out " + sendingEvents.size() + " events");
                         stats.incrementFailedCount(sendingEvents.size());
                     } else {
                         stats.incrementSentCount(sendingEvents.size());
                     }
-        
+
                 } catch (Exception e) {
                     //do not retry the message, just log the problem
                     logger.debug("Failed to send " + sendingEvents.size() + " events, exception found: " + e.getMessage()); //Should not be too noisy
@@ -125,9 +125,9 @@ public abstract class QueuingEventReporter implements EventReporter {
             }
             scheduledExecutorService.shutdownNow();
         }
-        
+
         /**
-         * Signals sending out events immediately 
+         * Signals sending out events immediately
          */
         protected void sendNow() {
             if (countDownLatch != null && countDownLatch.getCount() > 0) {
@@ -135,7 +135,7 @@ public abstract class QueuingEventReporter implements EventReporter {
                 countDownLatch.countDown();
             }
         }
-        
+
         /**
          * Blocks until the flushInterval elapsed or sendNow is signaled
          */
@@ -147,22 +147,22 @@ public abstract class QueuingEventReporter implements EventReporter {
                    countDownLatch.countDown();
                 }
             }, flushInterval, TimeUnit.SECONDS);
-            
+
             countDownLatch.await();
         }
-        
+
     }
-    
+
     /**
      * Signals to sends an event via this reporter. Take note that the actual outbound request might be sent later on
-     * 
+     *
      * @throws EventReporterException   if the reporter cannot accepts this event, for example the queue is full
      */
     public void send(Event event) throws EventReporterException {
         if (!eventQueue.offer(event)) {
             stats.incrementOverflowedCount(1);
             stats.incrementProcessedCount(1);
-            
+
             if (!reportedQueueFull) {
                 long currentTime = System.currentTimeMillis();
                 if (currentTime - reportedQueueFullTime >= REPORT_QUEUE_FULL_INTERVAL) { //at most once every minute
@@ -171,19 +171,24 @@ public abstract class QueuingEventReporter implements EventReporter {
                     reportedQueueFullTime = currentTime;
                 }
             }
-            
+
             throw new EventReporterQueueFullException("Cannot send event as the reporter queue is full");
         } else {
             stats.setQueueCount(eventQueue.size());
-            
+
             if (eventQueue.size() >= SEND_CAPACITY) { //should start sending early (if sleeping) as it's filling up
                 sendRunnable.sendNow();
             }
-            
+
             reportedQueueFull = false;
         }
     }
-    
+
+    public void flush() {
+        sendRunnable.sendNow();
+    }
+
+
     /**
      * Gets and clears the current reporter stats
      * @return
@@ -191,8 +196,8 @@ public abstract class QueuingEventReporter implements EventReporter {
     public EventReporterStats consumeStats() {
         return stats.consumeStats();
     }
-    
-    
+
+
     /**
      * Closes this reporter orderly. Allow all submitted events to be processed with a default timeout
      */
@@ -206,14 +211,14 @@ public abstract class QueuingEventReporter implements EventReporter {
         } catch (InterruptedException e) {
             //ok, it's shutting down anyway
         }
-        
+
     }
-    
+
     /**
      * This should only returns upon completion of sending all the provided events (success or failure)
      * @param events
      * @return
-     * @throws Exception 
+     * @throws Exception
      */
     public abstract Result synchronousSend(List<Event> events) throws Exception;
 
@@ -228,7 +233,7 @@ public abstract class QueuingEventReporter implements EventReporter {
         private final AtomicLong failedCount = new AtomicLong();
         private final AtomicLong queueLargestCount = new AtomicLong();
         private final AtomicLong processedCount = new AtomicLong();
-        
+
         public AtomicEventReporterStats() {
             super();
         }
@@ -244,7 +249,7 @@ public abstract class QueuingEventReporter implements EventReporter {
         private void incrementFailedCount(long increment) {
             failedCount.addAndGet(increment);
         }
-        
+
         private void incrementProcessedCount(long increment) {
             processedCount.addAndGet(increment);
         }
@@ -256,7 +261,7 @@ public abstract class QueuingEventReporter implements EventReporter {
                 }
             }
         }
-        
+
         private EventReporterStats consumeStats() {
             long sentCount = this.sentCount.getAndSet(0);
             long overflowedCount = this.overflowedCount.getAndSet(0);
