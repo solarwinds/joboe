@@ -1,13 +1,17 @@
 package com.tracelytics.monitor.metrics;
 
 import com.tracelytics.metrics.measurement.SimpleMeasurementMetricsEntry;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SystemMetricsCollectorTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class SystemMetricsCollectorTest {
+
+    @Test
     public void testCollect() throws Exception {
         SystemMetricsCollector collector = new SystemMetricsCollector();
         

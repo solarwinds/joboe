@@ -1,12 +1,17 @@
 package com.tracelytics.metrics.histogram;
 
 import com.tracelytics.ext.base64.Base64;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
 
-public class HdrHistrogramAdapterTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+
+public class HdrHistrogramAdapterTest {
     private static long MAX_VALUE = 60L * 60 * 1000 * 1000;
+
+    @Test
     public void testEncode() throws Exception {
         HdrHistogramAdapter testHistogram = new HdrHistogramAdapter(MAX_VALUE, HistogramFactory.NUMBER_OF_SIGNIFICANT_VALUE_DIGITS);
         
@@ -29,7 +34,8 @@ public class HdrHistrogramAdapterTest extends TestCase {
         
         assertEquals(testHistogram.getUnderlyingHistogram(), readHistogram);
     }
-    
+
+    @Test
     public void testRange() throws Exception {
         
         HdrHistogramAdapter testHistogram = new HdrHistogramAdapter(MAX_VALUE, HistogramFactory.NUMBER_OF_SIGNIFICANT_VALUE_DIGITS);

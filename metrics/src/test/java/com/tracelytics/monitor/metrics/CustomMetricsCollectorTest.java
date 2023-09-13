@@ -9,7 +9,9 @@ import com.tracelytics.joboe.settings.TestSettingsReader.SettingsMockupBuilder;
 import com.tracelytics.metrics.MetricKey;
 import com.tracelytics.metrics.MetricsEntry;
 import com.tracelytics.metrics.measurement.SummaryDoubleMeasurement;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -17,25 +19,25 @@ import java.util.List;
 import java.util.Map;
 
 import static com.tracelytics.joboe.TestUtils.testSettingsReader;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Test sub metrics collector from custom metrics
  * @author pluk
  *
  */
-public class CustomMetricsCollectorTest extends TestCase {
-    @Override
+public class CustomMetricsCollectorTest {
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
         CustomMetricsCollector.INSTANCE.collectMetricsEntries(); //clear everything
     }
     
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         CustomMetricsCollector.INSTANCE.reset();
-        super.tearDown();
     }
-    
+
+    @Test
     public void testIncrementMetrics() throws Exception {
         CustomMetricsCollector.INSTANCE.recordIncrementMetrics("test-1", 1, null);
         CustomMetricsCollector.INSTANCE.recordIncrementMetrics("test-1", 2, null);
@@ -67,7 +69,8 @@ public class CustomMetricsCollectorTest extends TestCase {
         assertEquals(3, (long) entriesByMetricsKey.get(new MetricKey("test-1", tags)));
         assertEquals(1, (long) entriesByMetricsKey.get(new MetricKey("test-2", null)));
     }
-    
+
+    @Test
     public void testSummaryMetrics() throws Exception {
         CustomMetricsCollector.INSTANCE.recordSummaryMetric("test-1", 1, 1, null);
         CustomMetricsCollector.INSTANCE.recordSummaryMetric("test-1", 1, 2, null);
@@ -104,7 +107,8 @@ public class CustomMetricsCollectorTest extends TestCase {
         assertEquals(4.0, entriesByMetricsKey.get(new MetricKey("test-2", null)).getSum());
         assertEquals(1, entriesByMetricsKey.get(new MetricKey("test-2", null)).getCount());
     }
-    
+
+    @Test
     public void testMetricLimit() {
         for (int i = 0 ; i < CustomMetricsCollector.limit; i ++) {
             CustomMetricsCollector.INSTANCE.recordIncrementMetrics("test" + i, 1, null);
@@ -124,7 +128,7 @@ public class CustomMetricsCollectorTest extends TestCase {
         }
         
         assertEquals(2, (long) entriesByMetricsKey.get(new MetricKey("test0", null))); //once from loop and another one in the manual increment
-        assertTrue(!entriesByMetricsKey.containsKey(new MetricKey("test" + CustomMetricsCollector.limit, null))); //not exist as the entry should be dropped due to limit
+        assertFalse(entriesByMetricsKey.containsKey(new MetricKey("test" + CustomMetricsCollector.limit, null))); //not exist as the entry should be dropped due to limit
         
         //simulate a limit change (lower)
         SimpleSettingsFetcher fetcher = (SimpleSettingsFetcher) SettingsManager.getFetcher();
@@ -144,10 +148,11 @@ public class CustomMetricsCollectorTest extends TestCase {
         }
         
         assertTrue(entriesByMetricsKey.containsKey(new MetricKey("test-1", null)));
-        assertTrue(!entriesByMetricsKey.containsKey(new MetricKey("test-2", null)));
+        assertFalse(entriesByMetricsKey.containsKey(new MetricKey("test-2", null)));
         assertTrue(entriesByMetricsKey.containsKey(new MetricKey("test-3", null)));
     }
-    
+
+    @Test
     public void testTagLimit() {
         Map<String, String> tags = new HashMap<String, String>();
         for (int i = 0 ; i < CustomMetricsCollector.TAGS_LIMIT; i ++) {

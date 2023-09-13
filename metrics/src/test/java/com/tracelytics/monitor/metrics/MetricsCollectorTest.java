@@ -1,11 +1,5 @@
 package com.tracelytics.monitor.metrics;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
 import com.tracelytics.joboe.config.ConfigContainer;
 import com.tracelytics.joboe.config.ConfigProperty;
 import com.tracelytics.metrics.MetricKey;
@@ -13,14 +7,25 @@ import com.tracelytics.metrics.MetricsEntry;
 import com.tracelytics.metrics.histogram.HistogramMetricsEntry;
 import com.tracelytics.metrics.histogram.MockHistogramAdapter;
 import com.tracelytics.metrics.measurement.SimpleMeasurementMetricsEntry;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * Test collecting from multiple source, we do not have to test specifically each of the actual collector as tests will created for each of them correspondingly
  * @author pluk
  *
  */
-public class MetricsCollectorTest extends TestCase {
+public class MetricsCollectorTest {
+
+    @Test
     public void testCollectorsInit() throws Exception {
         ConfigContainer configs = new ConfigContainer();
         configs.putByStringValue(ConfigProperty.MONITOR_JMX_SCOPES, "{}");
@@ -47,7 +52,7 @@ public class MetricsCollectorTest extends TestCase {
     }
     
     
-    
+    @Test
     public void testCollect() throws Exception {
         ConfigContainer configs = new ConfigContainer();
         configs.putByStringValue(ConfigProperty.MONITOR_JMX_SCOPES, "{}");
@@ -95,6 +100,7 @@ public class MetricsCollectorTest extends TestCase {
      * Test if one source of collection takes too long to complete
      * @throws Exception
      */
+    @Test
     public void testCollectTimeout() throws Exception {
         ConfigContainer configs = new ConfigContainer();
         configs.putByStringValue(ConfigProperty.MONITOR_JMX_SCOPES, "{}");

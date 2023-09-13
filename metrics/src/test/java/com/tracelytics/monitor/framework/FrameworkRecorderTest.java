@@ -1,11 +1,15 @@
 package com.tracelytics.monitor.framework;
 
 import com.tracelytics.monitor.framework.FrameworkRecorder.FrameworkInfo;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
 import java.util.jar.Attributes;
 
-public class FrameworkRecorderTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class FrameworkRecorderTest {
+
+    @Test
      public void testExtractNoFramework() {
         //manifest from ognl
         Attributes attributes = new Attributes();
@@ -19,6 +23,7 @@ public class FrameworkRecorderTest extends TestCase {
         assertEquals(null, frameworkInfo);
     }
 
+    @Test
     public void testExtractBundleFramework() {
         //manifest from mongodb
 
@@ -37,6 +42,7 @@ public class FrameworkRecorderTest extends TestCase {
         assertEquals("2.1.0", frameworkInfo.getVersion());
     }
 
+    @Test
     public void testExtractSpecificationFramework() {
         //manifest from javassist
         Attributes attributes = new Attributes();
@@ -55,6 +61,7 @@ public class FrameworkRecorderTest extends TestCase {
         assertEquals("3.11.0.GA", frameworkInfo.getVersion());
     }
 
+    @Test
     public void testExtractImplementationFramework() {
         //manifest from freemarker
         Attributes attributes = new Attributes();

@@ -6,24 +6,28 @@ import com.tracelytics.joboe.span.impl.TransactionNameManager;
 import com.tracelytics.metrics.MetricsEntry;
 import com.tracelytics.metrics.TopLevelMetricsEntry;
 import com.tracelytics.metrics.measurement.SimpleMeasurementMetricsEntry;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test collecting metrics from Span reporter/actor and the "TransactionNameOverflow" flag
  * @author pluk
  *
  */
-public class SpanMetricsCollectorTest extends TestCase {
-    @Override
+public class SpanMetricsCollectorTest {
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
         TransactionNameManager.clearTransactionNames();
     }
-    
+
+    @Test
     public void testCollect() throws Exception {
         final List<MetricsEntry<?>> testMetricEntries = new ArrayList<MetricsEntry<?>>();
         testMetricEntries.add(new SimpleMeasurementMetricsEntry("test-key", 1));

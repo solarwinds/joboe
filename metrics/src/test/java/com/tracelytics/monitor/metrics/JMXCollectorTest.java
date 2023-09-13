@@ -4,7 +4,7 @@ import com.tracelytics.joboe.config.ConfigContainer;
 import com.tracelytics.joboe.config.ConfigProperty;
 import com.tracelytics.joboe.config.InvalidConfigException;
 import com.tracelytics.metrics.MetricKey;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
 import javax.management.*;
 import javax.management.loading.ClassLoaderRepository;
@@ -12,11 +12,14 @@ import java.io.ObjectInputStream;
 import java.lang.reflect.Field;
 import java.util.*;
 
-public class JMXCollectorTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.*;
+
+public class JMXCollectorTest {
     /**
      * Test with valid config
      * @throws InvalidConfigException 
      */
+    @Test
     public void testBuildCollector1() throws Exception {
         ConfigContainer configs = new ConfigContainer();
         
@@ -50,6 +53,7 @@ public class JMXCollectorTest extends TestCase {
      * Test with config that disables the JMX monitoring
      * @throws InvalidConfigException 
      */
+    @Test
     public void testBuildCollectors2() throws Exception {
         ConfigContainer configs = new ConfigContainer();
         
@@ -67,6 +71,7 @@ public class JMXCollectorTest extends TestCase {
     /**
      * Test with config with invalid values
      */
+    @Test
     public void testBuildCollectors3() throws Exception {
         ConfigContainer configs = new ConfigContainer();
         
@@ -84,6 +89,7 @@ public class JMXCollectorTest extends TestCase {
     /**
      * Test with config with invalid scope
      */
+    @Test
     public void testBuildCollectors4() throws Exception {
         ConfigContainer configs = new ConfigContainer();
         
@@ -101,6 +107,7 @@ public class JMXCollectorTest extends TestCase {
      * Tests JMXCollector with valid scopes
      * @throws InvalidConfigException 
      */
+    @Test
     public void testCollectInformation1() throws InvalidConfigException {
         ConfigContainer configs = new ConfigContainer();
         
@@ -126,6 +133,7 @@ public class JMXCollectorTest extends TestCase {
     /**
      * Tests JMXCollector with no scopes
      */
+    @Test
     public void testCollectInformation2() {
         try {
             JMXCollector collector = new JMXCollector(new ConfigContainer()); //test defaults
@@ -140,6 +148,7 @@ public class JMXCollectorTest extends TestCase {
      * Tests JMXCollector with Invalid scopes
      * @throws InvalidConfigException 
      */
+    @Test
     public void testCollectInformation3() throws InvalidConfigException {
         ConfigContainer configs = new ConfigContainer();
         
@@ -159,6 +168,7 @@ public class JMXCollectorTest extends TestCase {
      * Tests JMXCollector with wild card
      * @throws InvalidConfigException 
      */
+    @Test
     public void testCollectInformation4() throws InvalidConfigException {
         ConfigContainer configs = new ConfigContainer();
         
@@ -178,6 +188,7 @@ public class JMXCollectorTest extends TestCase {
      * Test with default scopes
      * @throws Exception
      */
+    @Test
     public void testCollectInformation5() throws Exception {
         ConfigContainer configs = new ConfigContainer();
         
@@ -211,6 +222,7 @@ public class JMXCollectorTest extends TestCase {
      * Test with hitting maxEntryCount
      * @throws Exception
      */
+    @Test
     public void testMaxEntryCount() throws Exception {
         ConfigContainer configs = new ConfigContainer();
         

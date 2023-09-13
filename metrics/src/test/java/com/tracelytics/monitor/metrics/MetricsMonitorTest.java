@@ -1,6 +1,5 @@
 package com.tracelytics.monitor.metrics;
 
-import static com.tracelytics.joboe.TestUtils.testSettingsReader;
 import com.tracelytics.joboe.TraceDecisionUtil;
 import com.tracelytics.joboe.TracingMode;
 import com.tracelytics.joboe.config.ConfigContainer;
@@ -11,9 +10,13 @@ import com.tracelytics.joboe.settings.SettingsArg;
 import com.tracelytics.joboe.settings.SettingsManager;
 import com.tracelytics.joboe.settings.SimpleSettingsFetcher;
 import com.tracelytics.joboe.settings.TestSettingsReader.SettingsMockupBuilder;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class MetricsMonitorTest extends TestCase {
+import static com.tracelytics.joboe.TestUtils.testSettingsReader;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class MetricsMonitorTest {
 	private ConfigContainer config = new ConfigContainer();
 	{
         try {
@@ -24,7 +27,7 @@ public class MetricsMonitorTest extends TestCase {
         }		
 	}
 	
-	
+	@Test
 	public void testSingleton() throws Exception {
 		MetricsMonitor monitor1 = MetricsMonitor.buildInstance(config);
 		MetricsMonitor monitor2 = MetricsMonitor.buildInstance(config);
@@ -32,7 +35,8 @@ public class MetricsMonitorTest extends TestCase {
 		//should be same instance
 		assertTrue(monitor1 == monitor2);
 	}
-	
+
+	@Test
 	public void testUpdateInterval() throws InvalidConfigException, ClientException {
 	    long defaultInterval = MetricsMonitor.DEFAULT_TIME_UNIT.getInterval(MetricsMonitor.DEFAULT_FREQUENCY);
 	    MetricsMonitor monitor = MetricsMonitor.buildInstance(config);

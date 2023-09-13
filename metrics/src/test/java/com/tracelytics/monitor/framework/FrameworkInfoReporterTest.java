@@ -2,25 +2,28 @@ package com.tracelytics.monitor.framework;
 
 import com.tracelytics.joboe.TestRpcClient;
 import com.tracelytics.monitor.SystemReporterException;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class FrameworkInfoReporterTest extends TestCase {
+
+public class FrameworkInfoReporterTest {
 
     private FrameworkInfoReporter reporter;
     private TestRpcClient testRpcClient = new TestRpcClient(0);
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
         reporter = new FrameworkInfoReporter(testRpcClient);
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         testRpcClient.reset();
     }

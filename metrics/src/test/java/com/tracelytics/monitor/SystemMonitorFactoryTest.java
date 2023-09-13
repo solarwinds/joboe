@@ -3,16 +3,19 @@ package com.tracelytics.monitor;
 import com.tracelytics.joboe.config.ConfigContainer;
 import com.tracelytics.joboe.config.ConfigProperty;
 import com.tracelytics.joboe.config.InvalidConfigException;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-public class SystemMonitorFactoryTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class SystemMonitorFactoryTest {
     
     /**
      * Test with empty config
      * @throws InvalidConfigException 
      */
+    @Test
     public void testBuildCollectors1() throws InvalidConfigException {
         ConfigContainer configs = new ConfigContainer();
         
@@ -32,6 +35,7 @@ public class SystemMonitorFactoryTest extends TestCase {
      * Test with config that disables the JMX monitoring
      * @throws InvalidConfigException 
      */
+    @Test
     public void testBuildCollectors2() throws InvalidConfigException {
         ConfigContainer configs = new ConfigContainer();
         

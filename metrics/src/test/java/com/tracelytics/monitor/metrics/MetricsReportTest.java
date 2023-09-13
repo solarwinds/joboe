@@ -12,17 +12,20 @@ import com.tracelytics.metrics.measurement.*;
 import com.tracelytics.util.HostInfoUtils;
 import com.tracelytics.util.HostInfoUtils.NetworkAddressInfo;
 import com.tracelytics.util.ServerHostInfoReader;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
 import java.util.*;
 import java.util.Map.Entry;
 
-public class MetricsReportTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.*;
+
+public class MetricsReportTest {
     private static final int INTERVAL = 30000; //30 sec
     static {
         HostInfoUtils.init(ServerHostInfoReader.INSTANCE);
     }
 
+    @Test
     public void testReport() throws Exception {
         TestRpcClient client = new TestRpcClient(0);
         MetricsReporter reporter = new MetricsReporter(client);
@@ -108,6 +111,7 @@ public class MetricsReportTest extends TestCase {
      * 
      * @throws Exception
      */
+    @Test
     public void testReportTooManyJmx() throws Exception {
         TestRpcClient client = new TestRpcClient(0);
         MetricsReporter reporter = new MetricsReporter(client);
@@ -150,7 +154,8 @@ public class MetricsReportTest extends TestCase {
         assertMetricEntries(testJmxEntries.subList(0, expectedPostedJmxEntriesCount), postedMeasurements.subList(layerMetricCount, postedMeasurements.size())); //only a sublist of jmx entries can make it
         
     }
-    
+
+    @Test
     public void testLongTags() throws Exception {
         final String longName = "0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789" +
                                    "0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789" +
@@ -200,7 +205,8 @@ public class MetricsReportTest extends TestCase {
         assertMetricEntries(histogramEntries, (List<Map<String, ?>>) postedMetrics.get("histograms"));
     }
     
-    
+
+    @Test
     public void testReportException() throws Exception {
         Client client = new TestSubmitRejectionRpcClient();
         MetricsReporter reporter = new MetricsReporter(client);

@@ -2,14 +2,18 @@ package com.tracelytics.monitor;
 
 import com.tracelytics.joboe.config.InvalidConfigException;
 import com.tracelytics.monitor.SystemMonitorWithFrequency.TimeUnit;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-public class SystemMonitorWithFrequencyTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
+public class SystemMonitorWithFrequencyTest {
+
+    @Test
     public void testGetSleep() throws Exception {
         Method getSleepTimeMethod = SystemMonitorWithFrequency.class.getDeclaredMethod("getSleepTime", long.class);
         getSleepTimeMethod.setAccessible(true);
@@ -54,7 +58,8 @@ public class SystemMonitorWithFrequencyTest extends TestCase {
         assertEquals((long)1, getSleepTimeMethod.invoke(new TestingSystemMonitorWithFequency(TimeUnit.PER_MINUTE, 2), testTime)); //sleep for 1 ms
         assertEquals((long)1, getSleepTimeMethod.invoke(new TestingSystemMonitorWithFequency(TimeUnit.PER_SECOND, 10), testTime)); //sleep for 1 ms
     }
-    
+
+    @Test
     public void testSetInterval() throws Exception {
         Method getSleepTimeMethod = SystemMonitorWithFrequency.class.getDeclaredMethod("getSleepTime", long.class);
         getSleepTimeMethod.setAccessible(true);
