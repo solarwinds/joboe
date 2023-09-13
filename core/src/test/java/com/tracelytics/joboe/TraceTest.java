@@ -1,9 +1,10 @@
 package com.tracelytics.joboe;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class TraceTest extends TestCase {
+public class TraceTest {
     /* Make sure we can report a trace: generate several events with multiple layers */
+    @Test
     public void testTrace() 
         throws Exception {
         EventReporter reporter = ReporterFactory.getInstance().buildUdpReporter();

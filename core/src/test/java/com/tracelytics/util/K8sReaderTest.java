@@ -1,14 +1,16 @@
 package com.tracelytics.util;
 
 import com.tracelytics.joboe.HostId;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class K8sReaderTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class K8sReaderTest {
     private ServerHostInfoReader.K8sReader tested;
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
         ServerHostInfoReader.K8sReader.NAMESPACE_FILE_LOC_LINUX = "src/test/java/com/tracelytics/util/namespace";
 
         ServerHostInfoReader.K8sReader.POD_UUID_FILE_LOC = "src/test/java/com/tracelytics/util/poduid";
@@ -16,6 +18,7 @@ public class K8sReaderTest extends TestCase {
         tested = new ServerHostInfoReader.K8sReader();
     }
 
+    @Test
     public void testReadK8sMetadata() {
         HostId.K8sMetadata actual = tested.getK8sMetadata();
         HostId.K8sMetadata expected = HostId.K8sMetadata.builder()

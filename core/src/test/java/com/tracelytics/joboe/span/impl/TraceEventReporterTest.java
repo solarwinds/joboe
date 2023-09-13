@@ -1,17 +1,13 @@
 package com.tracelytics.joboe.span.impl;
 
-import com.tracelytics.joboe.Context;
-import com.tracelytics.joboe.EventImpl;
-import com.tracelytics.joboe.EventReporter;
-import com.tracelytics.joboe.SampleRateSource;
+import com.tracelytics.joboe.*;
 import com.tracelytics.joboe.TestReporter;
 import com.tracelytics.joboe.TestReporter.DeserializedEvent;
-import com.tracelytics.joboe.XTraceHeader;
 import com.tracelytics.joboe.settings.SettingsArg;
 import com.tracelytics.joboe.settings.TestSettingsReader;
 import com.tracelytics.joboe.span.impl.Span.SpanProperty;
 import com.tracelytics.util.TestUtils;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.*;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -19,11 +15,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public class TraceEventReporterTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.*;
+
+public class TraceEventReporterTest {
     private static final String TEST_LAYER = "test";
 	private static final TestReporter tracingReporter = TestUtils.initTraceReporter();
-	private EventReporter originalReporter;
-	private static TestSettingsReader reader;
+	private static EventReporter originalReporter;
+	private static final TestSettingsReader reader;
 	public TraceEventReporterTest() throws SecurityException, NoSuchFieldException {
     }
 
@@ -31,9 +29,8 @@ public class TraceEventReporterTest extends TestCase {
 		reader = TestUtils.initSettingsReader();
 	}
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
 
 		reader.put(TestUtils.getDefaultSettings());
 
@@ -41,7 +38,7 @@ public class TraceEventReporterTest extends TestCase {
 		Context.getMetadata().randomize(true); //set context to be sampled
     }
 
-	@Override
+	@AfterEach
 	protected void tearDown() throws Exception {
 	    ScopeManager.INSTANCE.removeAllScopes();
 		Context.clearMetadata(); //clear context
@@ -49,10 +46,10 @@ public class TraceEventReporterTest extends TestCase {
 		reader.reset();
 		EventImpl.setDefaultReporter(originalReporter);
 
-        super.tearDown();
 	}
 
 
+	@Test
 	public void testReportSimpleSpan() {
 		List<DeserializedEvent> sentEvents;
 		Scope scope = Tracer.INSTANCE.buildSpan(TEST_LAYER).withReporters(TraceEventSpanReporter.REPORTER).startActive();
@@ -86,6 +83,7 @@ public class TraceEventReporterTest extends TestCase {
 		assertEquals(TEST_LAYER, sentEvents.get(0).getSentEntries().get("Layer"));
 	}
 
+	@Test
 	public void testReportSpanWithLogEntries() {
 		List<DeserializedEvent> sentEvents;
 		Span span = Tracer.INSTANCE.buildSpan("with-log-entries").withReporters(TraceEventSpanReporter.REPORTER).startManual();
@@ -104,7 +102,7 @@ public class TraceEventReporterTest extends TestCase {
 
 		Map<String, Object> log2Entries = new HashMap<String, Object>();
 		log1Entries.put("4", 4.0);
-		log1Entries.put("5", 5l);
+		log1Entries.put("5", 5L);
 
 		span.log(log1Entries);
 		span.log(log2Entries);
@@ -131,6 +129,7 @@ public class TraceEventReporterTest extends TestCase {
 		assertEquals("with-log-entries", sentEvents.get(2).getSentEntries().get("Layer"));
 	}
 
+	@Test
 	public void testReportSpanWithExplicitTimestamps() {
 		List<DeserializedEvent> sentEvents;
 
@@ -164,6 +163,7 @@ public class TraceEventReporterTest extends TestCase {
 		assertEquals(FINISH_TIME, sentEvents.get(1).getSentEntries().get("Timestamp_u"));
 	}
 
+	@Test
 	public void testReportTracingKvs() {
 	    Context.clearMetadata(); //make this a new trace
 	    TraceDecisionParameters traceDecisionParameters = new TraceDecisionParameters(Collections.EMPTY_MAP, null);
@@ -194,12 +194,13 @@ public class TraceEventReporterTest extends TestCase {
         assertEquals("exit", sentEvents.get(0).getSentEntries().get("Label"));
         assertEquals(TEST_LAYER, sentEvents.get(0).getSentEntries().get("Layer"));
         //ensure there are no trace decision KVs in the exit event
-        assertEquals(null, sentEvents.get(0).getSentEntries().get("SampleRate"));
-        assertEquals(null, sentEvents.get(0).getSentEntries().get("SampleSource"));
-        assertEquals(null, sentEvents.get(0).getSentEntries().get("BucketCapacity"));
-        assertEquals(null, sentEvents.get(0).getSentEntries().get("BucketRate"));
+        assertNull(sentEvents.get(0).getSentEntries().get("SampleRate"));
+        assertNull(sentEvents.get(0).getSentEntries().get("SampleSource"));
+        assertNull(sentEvents.get(0).getSentEntries().get("BucketCapacity"));
+        assertNull(sentEvents.get(0).getSentEntries().get("BucketRate"));
 	}
 
+	@Test
 	public void testTriggerTraceKvs() {
 		Context.clearMetadata(); //make this a new trace
 		Map<XTraceHeader, String> xTraceHeaders = Collections.singletonMap(XTraceHeader.TRACE_OPTIONS, "trigger-trace;sw-keys=lo:se;custom-key1=value1;custom-key2=value2");
@@ -235,14 +236,14 @@ public class TraceEventReporterTest extends TestCase {
 		assertEquals("exit", sentEvents.get(0).getSentEntries().get("Label"));
 		assertEquals(TEST_LAYER, sentEvents.get(0).getSentEntries().get("Layer"));
 		//ensure there are no trace decision/X-Trace-Options KVs in the exit event
-		assertEquals(null, sentEvents.get(0).getSentEntries().get("SampleRate"));
-		assertEquals(null, sentEvents.get(0).getSentEntries().get("SampleSource"));
-		assertEquals(null, sentEvents.get(0).getSentEntries().get("BucketCapacity"));
-		assertEquals(null, sentEvents.get(0).getSentEntries().get("BucketRate"));
-		assertEquals(null, sentEvents.get(0).getSentEntries().get("SWKeys"));
-		assertEquals(null, sentEvents.get(0).getSentEntries().get("TriggeredTrace"));
-		assertEquals(null, sentEvents.get(0).getSentEntries().get("custom-key1"));
-		assertEquals(null, sentEvents.get(0).getSentEntries().get("custom-key2"));
+        assertNull(sentEvents.get(0).getSentEntries().get("SampleRate"));
+        assertNull(sentEvents.get(0).getSentEntries().get("SampleSource"));
+        assertNull(sentEvents.get(0).getSentEntries().get("BucketCapacity"));
+        assertNull(sentEvents.get(0).getSentEntries().get("BucketRate"));
+        assertNull(sentEvents.get(0).getSentEntries().get("SWKeys"));
+        assertNull(sentEvents.get(0).getSentEntries().get("TriggeredTrace"));
+        assertNull(sentEvents.get(0).getSentEntries().get("custom-key1"));
+        assertNull(sentEvents.get(0).getSentEntries().get("custom-key2"));
 	}
 
 }

@@ -1,12 +1,13 @@
 package com.tracelytics.joboe;
 
-import com.tracelytics.util.TestUtils;
 import com.tracelytics.ext.ebson.BsonDocument;
 import com.tracelytics.ext.ebson.BsonReader;
 import com.tracelytics.ext.ebson.BsonToken;
 import com.tracelytics.joboe.TestReporter.DeserializedEvent;
 import com.tracelytics.joboe.config.InvalidConfigException;
-import junit.framework.TestCase;
+import com.tracelytics.util.TestUtils;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -19,22 +20,23 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import static com.tracelytics.joboe.Constants.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class EventImplTest extends TestCase {
+public class EventImplTest {
     private Logger log = Logger.getLogger(getClass().getName());
     private static final TestReporter reporter = TestUtils.initTraceReporter();
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
-        super.tearDown();
         reporter.reset();
         Context.clearMetadata();
     }
 
     /*  Test that events can be sent and decoded, using a mock sender. */
+    @Test
     public void testLocalSendEvent()
             throws Exception {
-        
+
         // Metadata for the context:
         Metadata md = new Metadata();
         md.randomize();
@@ -43,7 +45,7 @@ public class EventImplTest extends TestCase {
 
         // Dummy up an event:
         Event evt = new EventImpl(md, true);
-        
+
         String testKey = "test";
         String testVal = "testFromJava";
 
@@ -58,7 +60,7 @@ public class EventImplTest extends TestCase {
         ByteBuffer buf = ByteBuffer.wrap(reporter.getLastSent()).order(ByteOrder.LITTLE_ENDIAN);
         BsonReader reader = BsonToken.DOCUMENT.reader();
         BsonDocument doc = (BsonDocument)reader.readFrom(buf);
-        
+
         // Check that we received expected values:
         assertEquals(doc.get(XTR_METADATA_KEY), evt.getMetadata().toHexString());
         assertEquals(doc.get(XTR_EDGE_KEY), origMdOp);
@@ -69,13 +71,14 @@ public class EventImplTest extends TestCase {
         Long tid = (Long)doc.get(XTR_THREAD_ID_KEY);
         String host = (String)doc.get(XTR_HOSTNAME_KEY);
         Long time_u = (Long)doc.get(XTR_TIMESTAMP_U_KEY);
-        
+
         log.info("Received: host: " + host + " pid: " + pid + " tid: " + tid + " timestamp_u:" + time_u);
 
     }
-    
+
     
     /** Tests network send/receive by sending UDP to ourselves */
+    @Test
     public void testNetworkSendEvent()
         throws Exception {
         
@@ -120,7 +123,8 @@ public class EventImplTest extends TestCase {
 
         log.info("Received: host: " + host + " pid: " + pid + " tid: " + tid + " timestamp_u:" + time_u);
     }
-    
+
+    @Test
     public void testEventReport() throws Exception {
         Metadata contextMetadata = new Metadata();
         contextMetadata.randomize(true);
@@ -159,6 +163,7 @@ public class EventImplTest extends TestCase {
      * Over-sized event with a large KV
      * @throws InvalidConfigException
      */
+    @Test
     public void testOversizedEvent1() throws InvalidConfigException {
     	String bigValue = new String(new char[1000000]);
     	
@@ -199,6 +204,7 @@ public class EventImplTest extends TestCase {
      * Over-sized event with too many KV pairs
      * @throws InvalidConfigException
      */
+    @Test
     public void testOversizedEvent2() throws InvalidConfigException {
         Event testEvent = Context.startTrace();
         
@@ -231,6 +237,7 @@ public class EventImplTest extends TestCase {
      * Over-sized event with single KV as a huge array
      * @throws InvalidConfigException
      */
+    @Test
     public void testOversizedEvent3() throws InvalidConfigException {
         final int ARRAY_SIZE = 100000;
         Object[] hugeArray = new Object[ARRAY_SIZE];
@@ -265,6 +272,7 @@ public class EventImplTest extends TestCase {
      * Over-sized event with single KV as a very long string
      * @throws InvalidConfigException
      */
+    @Test
     public void testOversizedEvent4() throws InvalidConfigException {
         final int STRING_APPEND_COUNT = 100000;
         StringBuffer longString = new StringBuffer(); 
@@ -299,6 +307,7 @@ public class EventImplTest extends TestCase {
      * Over-sized event with alot of KVs and long keys and values
      * @throws InvalidConfigException
      */
+    @Test
     public void testOversizedEvent5() throws InvalidConfigException {
         final int STRING_APPEND_COUNT = 1000;
         StringBuffer longString = new StringBuffer(); 
@@ -335,6 +344,7 @@ public class EventImplTest extends TestCase {
      * Over-sized event with large map value
      * @throws InvalidConfigException
      */
+    @Test
     public void testOversizedEvent6() throws InvalidConfigException {
         int TEST_KEY_COUNT = 32 * 1024;
         String PREFIX = "漢字";
@@ -366,7 +376,7 @@ public class EventImplTest extends TestCase {
         assertTrue(doc.containsKey(Constants.XTR_TIMESTAMP_U_KEY));
 
         //large-map should be dropped
-        assertTrue(!doc.containsKey("large-map"));
+        assertFalse(doc.containsKey("large-map"));
         //the 2 smaller KVs should be there
         assertEquals(1, doc.get("k1"));
         assertEquals("2", doc.get("k2"));
@@ -376,6 +386,7 @@ public class EventImplTest extends TestCase {
      * Over-sized event with large collection value
      * @throws InvalidConfigException
      */
+    @Test
     public void testOversizedEvent7() throws InvalidConfigException {
         int TEST_KEY_COUNT = 32 * 1024;
         String PREFIX = "漢字";
@@ -407,13 +418,14 @@ public class EventImplTest extends TestCase {
         assertTrue(doc.containsKey(Constants.XTR_TIMESTAMP_U_KEY));
 
         //long-list should be dropped
-        assertTrue(!doc.containsKey("long-list"));
+        assertFalse(doc.containsKey("long-list"));
         //the 2 smaller KVs should be there
         assertEquals(1, doc.get("k1"));
         assertEquals("2", doc.get("k2"));
     }
-    
-    
+
+
+    @Test
     public void testAsyncByMarkedEvent() {
         Context.getMetadata().randomize(true);
         
@@ -433,7 +445,8 @@ public class EventImplTest extends TestCase {
             assertEquals(true, deserializedEvent.getSentEntries().get(Constants.XTR_ASYNC_KEY));
         }
     }
-    
+
+    @Test
     public void testAsyncByMarkedMetadata() {
         Context.getMetadata().randomize(true);
         Context.getMetadata().setIsAsync(true);
@@ -479,12 +492,13 @@ public class EventImplTest extends TestCase {
             if (i == 0 || i == 4) {
                assertEquals(true, deserializedEvents.get(i).getSentEntries().get(Constants.XTR_ASYNC_KEY));
             } else {
-               assertEquals(null, deserializedEvents.get(i).getSentEntries().get(Constants.XTR_ASYNC_KEY));
+                assertNull(deserializedEvents.get(i).getSentEntries().get(XTR_ASYNC_KEY));
             }
         }
         
     }
 
+    @Test
     public void testW3cContextToXTrace() {
         assertEquals("2BA6A6D97A748BFC9F91A4DC46A0D15BBB00000000B6968E14AC09A25A01", EventImpl.w3cContextToXTrace("00-a6a6d97a748bfc9f91a4dc46a0d15bbb-b6968e14ac09a25a-01"));
         assertEquals("2BA6A6D97A748BFC9F91A4DC46A0D15BBB00000000B6968E14AC09A25A00", EventImpl.w3cContextToXTrace("00-a6a6d97a748bfc9f91a4dc46a0d15bbb-b6968e14ac09a25a-00"));

@@ -2,28 +2,25 @@ package com.tracelytics.joboe.span.impl;
 
 import com.tracelytics.joboe.*;
 import com.tracelytics.util.TestUtils;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Test the extra methods provided by ActiveSpan compared to Span
  * @author pluk
  *
  */
-public class ScopeManagerTest extends TestCase {
+public class ScopeManagerTest {
     private static final TestReporter tracingReporter = TestUtils.initTraceReporter();
-    private EventReporter originalReporter;
+    private static EventReporter originalReporter;
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
         Context.clearMetadata();
         ScopeManager.INSTANCE.removeAllScopes();
         TraceDecisionUtil.reset();
@@ -31,7 +28,7 @@ public class ScopeManagerTest extends TestCase {
         originalReporter = EventImpl.setDefaultReporter(tracingReporter);
     }
 
-    @Override
+    @BeforeEach
     protected void tearDown() throws Exception {
         Context.clearMetadata();
         ScopeManager.INSTANCE.removeAllScopes();
@@ -39,9 +36,9 @@ public class ScopeManagerTest extends TestCase {
 
         EventImpl.setDefaultReporter(originalReporter);
         tracingReporter.reset();
-        super.tearDown();
     }
 
+    @Test
 	public void testSnapshot() throws ExecutionException, InterruptedException {
         ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -56,7 +53,7 @@ public class ScopeManagerTest extends TestCase {
                 ScopeManager.INSTANCE.removeAllScopes(); //remove the scope while the 2nd callable still have active scopes
                 TimeUnit.SECONDS.sleep(2);
 
-                assertEquals(null, ScopeManager.INSTANCE.active()); //no active scope since it's cleared
+                assertNull(ScopeManager.INSTANCE.active()); //no active scope since it's cleared
 
                 snapshot.restore();
 
@@ -65,7 +62,7 @@ public class ScopeManagerTest extends TestCase {
                 s2.close();
                 assertEquals(s1, ScopeManager.INSTANCE.active());
                 s1.close();
-                assertEquals(null, ScopeManager.INSTANCE.active());
+                assertNull(ScopeManager.INSTANCE.active());
 
                 return null;
             }
@@ -83,7 +80,7 @@ public class ScopeManagerTest extends TestCase {
                 s2.close();
                 assertEquals(s1, ScopeManager.INSTANCE.active());
                 s1.close();
-                assertEquals(null, ScopeManager.INSTANCE.active());
+                assertNull(ScopeManager.INSTANCE.active());
 
                 return null;
             }
@@ -94,18 +91,19 @@ public class ScopeManagerTest extends TestCase {
         future2.get();
     }
 
+    @Test
     public void testRemoveScope() {
         Context.clearMetadata();
 	    ScopeManager.INSTANCE.removeScope();
 
-	    assertEquals(null, ScopeManager.INSTANCE.active());
+        assertNull(ScopeManager.INSTANCE.active());
 	    assert(!Context.getMetadata().isValid());
 
 	    //has legacy context
         Context.getMetadata().randomize(true);
         Metadata legacyContext = Context.getMetadata();
         ScopeManager.INSTANCE.removeScope();
-        assertEquals(null, ScopeManager.INSTANCE.active());
+        assertNull(ScopeManager.INSTANCE.active());
         assert(Context.getMetadata().isValid()); //does not affect legacy context
         assert(legacyContext == Context.getMetadata());
 
@@ -135,18 +133,19 @@ public class ScopeManagerTest extends TestCase {
         assert(ScopeManager.INSTANCE.active() == null);
     }
 
+    @Test
     public void testRemoveAllScopes() {
         Context.clearMetadata();
         ScopeManager.INSTANCE.removeAllScopes();
 
-        assertEquals(null, ScopeManager.INSTANCE.active());
+        assertNull(ScopeManager.INSTANCE.active());
         assert(!Context.getMetadata().isValid());
 
         //has legacy context
         Context.getMetadata().randomize(true);
         Metadata legacyContext = Context.getMetadata();
         ScopeManager.INSTANCE.removeAllScopes();
-        assertEquals(null, ScopeManager.INSTANCE.active());
+        assertNull(ScopeManager.INSTANCE.active());
         assert(Context.getMetadata().isValid()); //does not affect legacy context
         assert(legacyContext == Context.getMetadata());
 

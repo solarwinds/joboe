@@ -1,20 +1,23 @@
 package com.tracelytics.util;
 
+import com.tracelytics.util.ServerHostInfoReader.DockerInfoReader;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import java.io.IOException;
 
-import com.tracelytics.util.ServerHostInfoReader.DockerInfoReader;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-import junit.framework.TestCase;
-
-public class DockerInfoReaderTest extends TestCase {
+public class DockerInfoReaderTest {
     private static final String TEST_FILE_PREFIX = "src/test/java/com/tracelytics/util/docker-cgroup-"; //using a rather static path. Using Class.getResourceAsStream does not work in test (vs main)
 
-    @Override
+    @BeforeEach
     protected void tearDown() throws Exception {
         DockerInfoReader.SINGLETON.initializeLinux(DockerInfoReader.DEFAULT_LINUX_DOCKER_FILE_LOCATION); //reset to default
-        super.tearDown();
     }
-    
+
+    @Test
     public void testReadDockerContainerId() throws IOException {
         DockerInfoReader.SINGLETON.initializeLinux(TEST_FILE_PREFIX + "standard");
         assertEquals("0531ff3c6395131175507ac7e94fdf387f2a2dea81961e6c96f6ac5ccd7ede3f", DockerInfoReader.getDockerId());

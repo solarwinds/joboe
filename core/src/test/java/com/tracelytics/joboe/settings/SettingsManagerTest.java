@@ -1,32 +1,36 @@
 package com.tracelytics.joboe.settings;
 
+import com.tracelytics.joboe.TraceDecisionUtil;
+import com.tracelytics.joboe.TracingMode;
+import com.tracelytics.joboe.settings.TestSettingsReader.SettingsMockupBuilder;
+import com.tracelytics.util.TestUtils;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import com.tracelytics.util.TestUtils;
-import com.tracelytics.joboe.TraceDecisionUtil;
-import com.tracelytics.joboe.TracingMode;
-import com.tracelytics.joboe.settings.TestSettingsReader.SettingsMockupBuilder;
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class SettingsManagerTest extends TestCase {
-    private final TestSettingsReader testSettingsReader = TestUtils.initSettingsReader();
+public class SettingsManagerTest {
+    private static final TestSettingsReader testSettingsReader = TestUtils.initSettingsReader();
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
         testSettingsReader.put(TestUtils.getDefaultSettings());
     }
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         testSettingsReader.reset();
-        super.tearDown();
     }
 
+    @Test
     public void testArgChangeListener() throws OboeSettingsException {
         TestArgChangeListener<Double> bucketCapacityListener = new TestArgChangeListener<Double>(SettingsArg.BUCKET_CAPACITY);
         TestArgChangeListener<Integer> metricsFlushIntervalListener = new TestArgChangeListener<Integer>(SettingsArg.METRIC_FLUSH_INTERVAL);
@@ -39,7 +43,7 @@ public class SettingsManagerTest extends TestCase {
         
         //test settings args
         Map<SettingsArg<?>, Object> args = new HashMap<SettingsArg<?>, Object>();
-        args.put(SettingsArg.BUCKET_CAPACITY, (double)1.0);
+        args.put(SettingsArg.BUCKET_CAPACITY, 1.0);
         args.put(SettingsArg.METRIC_FLUSH_INTERVAL, 5);
         testSettingsReader.put(new SettingsMockupBuilder().withFlags(TracingMode.ALWAYS).withSampleRate(TraceDecisionUtil.SAMPLE_RESOLUTION).withSettingsArgs(args).build());
         assertEquals(1.0, bucketCapacityListener.newValue);
@@ -47,35 +51,36 @@ public class SettingsManagerTest extends TestCase {
         
         //test settings args changes
         args.clear();
-        args.put(SettingsArg.BUCKET_CAPACITY, (double)2.0);
+        args.put(SettingsArg.BUCKET_CAPACITY, 2.0);
         args.put(SettingsArg.METRIC_FLUSH_INTERVAL, 6);
         testSettingsReader.put(new SettingsMockupBuilder().withFlags(TracingMode.ALWAYS).withSampleRate(TraceDecisionUtil.SAMPLE_RESOLUTION).withSettingsArgs(args).build());
         assertEquals(2.0, bucketCapacityListener.newValue);
         assertEquals((Integer) 6, metricsFlushIntervalListener.newValue);
         
         //test settings args set to null from non null
-        testSettingsReader.put(new SettingsMockupBuilder().withFlags(TracingMode.ALWAYS).withSampleRate(TraceDecisionUtil.SAMPLE_RESOLUTION).withSettingsArgs(Collections.<SettingsArg<?>, Object>emptyMap()).build());
-        assertEquals(null, bucketCapacityListener.newValue);
-        assertEquals(null, metricsFlushIntervalListener.newValue);
+        testSettingsReader.put(new SettingsMockupBuilder().withFlags(TracingMode.ALWAYS).withSampleRate(TraceDecisionUtil.SAMPLE_RESOLUTION).withSettingsArgs(Collections.emptyMap()).build());
+        assertNull(bucketCapacityListener.newValue);
+        assertNull(metricsFlushIntervalListener.newValue);
         
         
         //one of the test args changed from null to some value
         args.clear();
-        args.put(SettingsArg.BUCKET_CAPACITY, (double)3.0);
+        args.put(SettingsArg.BUCKET_CAPACITY, 3.0);
         testSettingsReader.put(new SettingsMockupBuilder().withFlags(TracingMode.ALWAYS).withSampleRate(TraceDecisionUtil.SAMPLE_RESOLUTION).withSettingsArgs(args).build());
         assertEquals(3.0, bucketCapacityListener.newValue); //the value has not been changed
-        assertEquals(null, metricsFlushIntervalListener.newValue); //value has been changed
+        assertNull(metricsFlushIntervalListener.newValue); //value has been changed
         bucketCapacityListener.newValue = null; //reset listener
         
         //test values unchanged
-        assertEquals(null, bucketCapacityListener.newValue); //the value has not been changed
-        assertEquals(null, metricsFlushIntervalListener.newValue); //the value has not been changed
+        assertNull(bucketCapacityListener.newValue); //the value has not been changed
+        assertNull(metricsFlushIntervalListener.newValue); //the value has not been changed
         
 
         SettingsManager.removeListener(bucketCapacityListener);
         SettingsManager.removeListener(metricsFlushIntervalListener);
     }
-    
+
+    @Test
     public void testGetSettings() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         SimpleSettingsFetcher fetcher = new SimpleSettingsFetcher(testSettingsReader) {

@@ -1,9 +1,12 @@
 package com.tracelytics.profiler;
 
 import com.tracelytics.profiler.Profiler.CircuitBreaker;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class CircuitBreakerTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class CircuitBreakerTest {
+    @Test
     public void testPause() {
         CircuitBreaker circuitBreaker = new CircuitBreaker(100, 3);
         

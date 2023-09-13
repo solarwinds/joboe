@@ -1,13 +1,16 @@
 package com.tracelytics.joboe.config;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ConfigPropertyTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+public class ConfigPropertyTest {
+
+    @Test
     public void testThatKeysAreNotDuplicated() {
         List<String> fileKey = new ArrayList<>();
         List<String> envKey = new ArrayList<>();

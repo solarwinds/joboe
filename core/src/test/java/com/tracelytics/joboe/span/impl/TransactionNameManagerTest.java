@@ -1,7 +1,6 @@
 package com.tracelytics.joboe.span.impl;
 
 import com.tracelytics.joboe.TraceDecisionUtil;
-import com.tracelytics.util.TestUtils;
 import com.tracelytics.joboe.TracingMode;
 import com.tracelytics.joboe.settings.SettingsArg;
 import com.tracelytics.joboe.settings.SettingsManager;
@@ -10,14 +9,18 @@ import com.tracelytics.joboe.settings.TestSettingsReader;
 import com.tracelytics.joboe.settings.TestSettingsReader.SettingsMockupBuilder;
 import com.tracelytics.joboe.span.impl.Span.SpanProperty;
 import com.tracelytics.joboe.span.impl.Span.TraceProperty;
-import junit.framework.TestCase;
+import com.tracelytics.util.TestUtils;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-public class TransactionNameManagerTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.*;
+
+public class TransactionNameManagerTest {
     protected static final TestSettingsReader testSettingsReader = TestUtils.initSettingsReader();
     
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
         testSettingsReader.reset();
         testSettingsReader.put(TestUtils.getDefaultSettings());
     
@@ -25,16 +28,16 @@ public class TransactionNameManagerTest extends TestCase {
         TransactionNameManager.reset();
     }
     
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         testSettingsReader.reset();
     
         TransactionNameManager.urlTransactionNameCache.invalidateAll();
         ScopeManager.INSTANCE.removeAllScopes();
         TransactionNameManager.reset();
-        super.tearDown();
     }
-    
+
+    @Test
     public void testTransactionNameLimit() {
         TransactionNameManager.clearTransactionNames();
         
@@ -102,14 +105,16 @@ public class TransactionNameManagerTest extends TestCase {
         assertTrue(TransactionNameManager.isLimitExceeded());
         span.finish();
     }
-    
+
+    @Test
     public void testUnknownTransactionName() {
         //no URL nor controller/action, should return unknown
         Span span = Tracer.INSTANCE.buildSpan("").start();
         assertEquals(TransactionNameManager.UNKNOWN_TRANSACTION_NAME, TransactionNameManager.getTransactionName(span)); 
         span.finish();
     }
-    
+
+    @Test
     public void testGetTransactionNameByPattern() throws Exception {
         String host = "localhost:8080";
         String url = "/1/2/3";
@@ -134,7 +139,8 @@ public class TransactionNameManagerTest extends TestCase {
         pattern = "p5";
         assertEquals("", TransactionNameManager.buildTransactionNameByUrlAndPattern(host, url, TransactionNameManager.parseTransactionNamePattern(pattern), false, "."));
     }
-    
+
+    @Test
     public void testGetTransactionNamePrecedence()  throws Exception {
         Span span = Tracer.INSTANCE.buildSpan("").start();
         span.setTag("Status", 200);
@@ -179,7 +185,8 @@ public class TransactionNameManagerTest extends TestCase {
         
         span.finish();
     }
-    
+
+    @Test
     public void testGetTransactionNameWithDomain()  throws Exception { 
         boolean originalDomainPrefixedTransactionName = TransactionNameManager.domainPrefixedTransactionName;
         TransactionNameManager.domainPrefixedTransactionName = true;
@@ -272,6 +279,7 @@ public class TransactionNameManagerTest extends TestCase {
         TransactionNameManager.domainPrefixedTransactionName = originalDomainPrefixedTransactionName;
     }
 
+    @Test
     public void testTransformTransactionName() {
         assertEquals("valid-name", TransactionNameManager.transformTransactionName("valid-name"));
         
@@ -292,7 +300,8 @@ public class TransactionNameManagerTest extends TestCase {
         assertEquals("-.:_\\/?", TransactionNameManager.transformTransactionName("-.:_\\/?"));
         
     }
-    
+
+    @Test
     public void testGetSdkDefaultTransactionName() {
         //test regular non-sdk trace. it should still give unknown if not enough info is provided
         Span span = Tracer.INSTANCE.buildSpan("ootb-span").start();

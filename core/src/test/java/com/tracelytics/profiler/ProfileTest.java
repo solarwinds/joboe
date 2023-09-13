@@ -1,10 +1,5 @@
 package com.tracelytics.profiler;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
 import com.tracelytics.joboe.Context;
 import com.tracelytics.joboe.TestReporter;
 import com.tracelytics.joboe.TestReporter.DeserializedEvent;
@@ -13,13 +8,21 @@ import com.tracelytics.joboe.span.impl.Span;
 import com.tracelytics.joboe.span.impl.Tracer;
 import com.tracelytics.profiler.Profiler.Profile;
 import com.tracelytics.util.TestUtils;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class ProfileTest extends TestCase {
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class ProfileTest {
 
     private ProfilerSetting profilerSetting = new ProfilerSetting(true, Collections.EMPTY_SET, ProfilerSetting.DEFAULT_INTERVAL, ProfilerSetting.DEFAULT_CIRCUIT_BREAKER_DURATION_THRESHOLD, ProfilerSetting.DEFAULT_CIRCUIT_BREAKER_COUNT_THRESHOLD);
     private TestReporter profilingReporter = TestUtils.initProfilingReporter(profilerSetting);
 
+    @Test
     public void testRecord() {
         Profile profile = new Profile(profilerSetting);
         Thread thread = Thread.currentThread();

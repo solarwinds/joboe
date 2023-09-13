@@ -1,10 +1,5 @@
 package com.tracelytics.joboe;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import com.tracelytics.util.TestUtils;
 import com.tracelytics.joboe.rpc.Client;
 import com.tracelytics.joboe.rpc.ResultCode;
 import com.tracelytics.joboe.settings.SettingsArg;
@@ -12,11 +7,19 @@ import com.tracelytics.joboe.settings.SettingsManager;
 import com.tracelytics.joboe.settings.SimpleSettingsFetcher;
 import com.tracelytics.joboe.settings.TestSettingsReader;
 import com.tracelytics.joboe.settings.TestSettingsReader.SettingsMockupBuilder;
-import junit.framework.TestCase;
+import com.tracelytics.util.TestUtils;
+import org.junit.jupiter.api.Test;
 
-public class RpcEventReporterTest extends TestCase {
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class RpcEventReporterTest {
     private final TestSettingsReader testSettingsReader = TestUtils.initSettingsReader();
 
+    @Test
     public void testQuickClient() throws Exception {
         TestRpcClient rpcClient = new TestRpcClient(0);
         RpcEventReporter rpcReporter = new RpcEventReporter(rpcClient);
@@ -43,8 +46,9 @@ public class RpcEventReporterTest extends TestCase {
         TimeUnit.SECONDS.sleep(QueuingEventReporter.DEFAULT_FLUSH_INTERVAL + 1);
         assertStats(rpcReporter, (long)eventCount * 2, false, 0, eventCount * 2, null);
     }
-    
-    
+
+
+    @Test
     public void testSlowClient() throws Exception {
         TestRpcClient rpcClient;
         RpcEventReporter rpcReporter;
@@ -70,7 +74,8 @@ public class RpcEventReporterTest extends TestCase {
         Thread.sleep(5000);
         assertStats(rpcReporter, (long)eventCount * 2, false, 0, eventCount * 2, null);
     }
-    
+
+    @Test
     public void testDeadSlowClient() throws Exception {
         TestRpcClient rpcClient;
         RpcEventReporter rpcReporter;
@@ -106,6 +111,7 @@ public class RpcEventReporterTest extends TestCase {
      * RPC Client that throws exceptions upon task execution
      * @throws Exception
      */
+    @Test
     public void testExecutionExceptionClient() throws Exception {
         Client rpcClient = new TestExecutionExceptionRpcClient();
         RpcEventReporter rpcReporter = new RpcEventReporter(rpcClient);
@@ -125,6 +131,7 @@ public class RpcEventReporterTest extends TestCase {
      * RPC Client that throws exceptions upon task submission
      * @throws Exception 
      */
+    @Test
     public void testSubmitExceptionClient() throws Exception {
         Client rpcClient = new TestSubmitRejectionRpcClient();
         RpcEventReporter rpcReporter = new RpcEventReporter(rpcClient);
@@ -139,8 +146,9 @@ public class RpcEventReporterTest extends TestCase {
         TimeUnit.SECONDS.sleep(QueuingEventReporter.DEFAULT_FLUSH_INTERVAL + 1);
         assertStats(rpcReporter, 0l, false, eventCount, eventCount, null); //rejection from the client does not count as overflow - overflow refers to the queue within the QueuingEventReporter
     }
-    
-   
+
+
+    @Test
     public void testInvalidApiKeyClient() throws Exception {
         Client rpcClient = new TestRpcClient(0, ResultCode.INVALID_API_KEY);
         
@@ -153,7 +161,8 @@ public class RpcEventReporterTest extends TestCase {
             rpcReporter.send(event); //should still accept it but warning will be print to console once
         }
     }
-    
+
+    @Test
     public void testLimitExceedClient() throws Exception {
         Client rpcClient = new TestRpcClient(0, ResultCode.LIMIT_EXCEEDED);
         
@@ -166,8 +175,9 @@ public class RpcEventReporterTest extends TestCase {
             rpcReporter.send(event); //should still accept it but warning will be print to console once
         }
     }
-    
-    
+
+
+    @Test
     public void testFlushInterval() throws Exception {
         TestRpcClient rpcClient = new TestRpcClient(0);
         
@@ -220,7 +230,8 @@ public class RpcEventReporterTest extends TestCase {
         
         QueuingEventReporter.flushInterval = QueuingEventReporter.DEFAULT_FLUSH_INTERVAL; //reset
     }
-    
+
+    @Test
     public void testSendEventNow() throws Exception {
         TestRpcClient rpcClient = new TestRpcClient(0);
         
@@ -250,7 +261,8 @@ public class RpcEventReporterTest extends TestCase {
         
         QueuingEventReporter.flushInterval = QueuingEventReporter.DEFAULT_FLUSH_INTERVAL; //reset
     }
-    
+
+    @Test
     private void assertStats(RpcEventReporter rpcReporter, Long sentCount, boolean hasOverflowCount, long failedCount, long totalCount, Long queueLargest) throws InterruptedException {
         EventReporterStats stats = rpcReporter.consumeStats();
         

@@ -1,9 +1,12 @@
 package com.tracelytics.joboe;
 
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class TokenBucketTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.*;
+
+public class TokenBucketTest {
+    @Test
     public void testCapacity1()
         throws Exception {
         
@@ -14,14 +17,16 @@ public class TokenBucketTest extends TestCase {
         }
         assertFalse(bucket.consume());
     }
-    
+
+    @Test
     public void testCapacity2() {
         //default capacity
         TokenBucket bucket = new TokenBucket(0, 0);
         
         assertFalse(bucket.consume());
     }
-    
+
+    @Test
     public void testReset1() {
         TokenBucket bucket = new TokenBucket(0.0, 0.0);
         
@@ -32,7 +37,8 @@ public class TokenBucketTest extends TestCase {
         
         assertFalse(bucket.consume());
     }
-    
+
+    @Test
     public void testReset2() {
         TokenBucket bucket = new TokenBucket(100.0, 0.0);
         
@@ -43,7 +49,8 @@ public class TokenBucketTest extends TestCase {
         
         assertFalse(bucket.consume());
     }
-    
+
+    @Test
     public void testReset3() {
         TokenBucket bucket = new TokenBucket(1.0, 0.0);
         
@@ -53,7 +60,8 @@ public class TokenBucketTest extends TestCase {
         
         assertFalse(bucket.consume());
     }
-    
+
+    @Test
     public void testRate1() throws InterruptedException {
         TokenBucket bucket = new TokenBucket(1000.0, 1.0);
                 
@@ -71,7 +79,8 @@ public class TokenBucketTest extends TestCase {
         Thread.sleep(1500);
         assertTrue(bucket.consume());
     }
-    
+
+    @Test
     public void testRate2() throws InterruptedException {
         TokenBucket bucket = new TokenBucket(10.0, 1000.0);
                 
@@ -86,7 +95,8 @@ public class TokenBucketTest extends TestCase {
             fail("TokenBucket is NOT expected to be exhausted but it actually ran out of available token!");
         }
     }
-    
+
+    @Test
     public void testRate3() throws InterruptedException {
         TokenBucket bucket = new TokenBucket(10.0, 10.0);
                 
@@ -95,10 +105,11 @@ public class TokenBucketTest extends TestCase {
             Thread.sleep(100); //roughly 1000/100 = 10 request per second which is the same as rate
         }
     }
-    
-    
-    
-    
+
+
+
+
+    @Test
     public void testConsume() {
         TokenBucket bucket = new TokenBucket(3.00, 0.00);
         

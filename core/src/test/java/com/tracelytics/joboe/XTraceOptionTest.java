@@ -1,12 +1,15 @@
 package com.tracelytics.joboe;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class XTraceOptionTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.*;
+
+public class XTraceOptionTest {
+    @Test
     public void testFromKey() {
         assertEquals(XTraceOption.TRIGGER_TRACE, XTraceOption.fromKey(XTraceOption.TRIGGER_TRACE.getKey()));
-        assertEquals(true, XTraceOption.fromKey(XTraceOption.CUSTOM_KV_PREFIX + "abc").isCustomKv());
-        assertEquals(null, XTraceOption.fromKey("unknown"));
-        assertEquals(null, XTraceOption.fromKey("trigger trace"));
+        assertTrue(XTraceOption.fromKey(XTraceOption.CUSTOM_KV_PREFIX + "abc").isCustomKv());
+        assertNull(XTraceOption.fromKey("unknown"));
+        assertNull(XTraceOption.fromKey("trigger trace"));
     }
 }

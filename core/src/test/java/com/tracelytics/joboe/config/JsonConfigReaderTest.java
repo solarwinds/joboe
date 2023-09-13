@@ -1,8 +1,12 @@
 package com.tracelytics.joboe.config;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class JsonConfigReaderTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+
+public class JsonConfigReaderTest {
+    @Test
     public void testValidRead() throws InvalidConfigException {
         JsonConfigReader reader = new JsonConfigReader(getClass().getResourceAsStream("valid.json"));
         ConfigContainer container = new ConfigContainer();
@@ -10,11 +14,13 @@ public class JsonConfigReaderTest extends TestCase {
 
         assertEquals("info", container.get(ConfigProperty.AGENT_LOGGING));
         assertEquals("some key", container.get(ConfigProperty.AGENT_SERVICE_KEY));
+        assertEquals(false, container.get(ConfigProperty.AGENT_JDBC_INST_ALL));
     }
 
     /**
      * Even if some values are invalid, it should still read the rest
      */
+    @Test
     public void testPartialRead() {
         JsonConfigReader reader = new JsonConfigReader(getClass().getResourceAsStream("invalid.json"));
         ConfigContainer container = new ConfigContainer();

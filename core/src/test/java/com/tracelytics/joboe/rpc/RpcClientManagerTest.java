@@ -1,16 +1,19 @@
 package com.tracelytics.joboe.rpc;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RpcClientManagerTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class RpcClientManagerTest {
     private static final String TEST_SERVER_CERT_LOCATION = "src/test/java/com/tracelytics/joboe/rpc/test-collector-public.pem";
-    
-    
+
+
+    @Test
     public void testValidEnvironmentVariables() throws Exception {
         Map<String, String> testEnv = new HashMap<String, String>();
         
@@ -42,7 +45,8 @@ public class RpcClientManagerTest extends TestCase {
 
         RpcClientManager.init(null, null); //revert
     }
-    
+
+    @Test
     public void testInvalidEnvironmentVariables() throws Exception {
         RpcClientManager.init("unit-test-collector:not-a-number", null);
         
@@ -64,7 +68,8 @@ public class RpcClientManagerTest extends TestCase {
         
         RpcClientManager.init(null, null); //revert
     }
-    
+
+    @Test
     public void testDefaultEnviromentVariables() throws Exception {
         RpcClientManager.init(null, null);
         

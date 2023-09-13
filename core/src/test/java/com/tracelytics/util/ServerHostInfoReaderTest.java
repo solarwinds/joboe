@@ -2,15 +2,18 @@ package com.tracelytics.util;
 
 import com.tracelytics.joboe.HostId;
 import com.tracelytics.util.HostInfoUtils.NetworkAddressInfo;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.util.Map;
 
-public class ServerHostInfoReaderTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class ServerHostInfoReaderTest {
     private static final String TEST_FILE_FOLDER = "src/test/java/com/tracelytics/util/"; //using a rather static path. Using Class.getResourceAsStream does not work in test (vs main)
     private ServerHostInfoReader reader = ServerHostInfoReader.INSTANCE;
 
+    @Test
     public void testGetDistroParsing() throws IOException {
         assertEquals("Red Hat Enterprise Linux Server release 6.5 (Santiago)", ServerHostInfoReader.getRedHatBasedDistro(getFileReader(ServerHostInfoReader.DistroType.REDHAT_BASED)));
         assertEquals("Amzn Linux 2015.09", ServerHostInfoReader.getAmazonLinuxDistro(getFileReader(ServerHostInfoReader.DistroType.AMAZON)));
@@ -27,7 +30,8 @@ public class ServerHostInfoReaderTest extends TestCase {
         
         return new BufferedReader(new FileReader(TEST_FILE_FOLDER + fileName));
     }
-    
+
+    @Test
     public void testGetHostMetadata() {
         Map<String, Object> hostMetadata = reader.getHostMetadata();
         
@@ -44,7 +48,8 @@ public class ServerHostInfoReaderTest extends TestCase {
             }
         }
     }
-    
+
+    @Test
     public void testGetHostId() {
         HostId hostId = reader.getHostId();
         assertEquals(reader.getHostName(), hostId.getHostname());

@@ -2,13 +2,16 @@ package com.tracelytics.joboe.span.impl;
 
 import com.tracelytics.joboe.Metadata;
 import com.tracelytics.joboe.span.impl.Span.TraceProperty;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SpanTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class SpanTest {
+	@Test
 	public void testGeneral() {
 		final int START_TIME = 1;
 		Metadata metadata = new Metadata();
@@ -18,7 +21,7 @@ public class SpanTest extends TestCase {
 		baggages.put("baggage1", "1");
 		baggages.put("baggage2", "2");
 		
-		SpanContext spanContext = new SpanContext(metadata, 0l, 0l, null, (byte) 0, baggages, null);
+		SpanContext spanContext = new SpanContext(metadata, 0L, 0L, null, (byte) 0, baggages, null);
 		
 		Map<String, Object> tags = new HashMap<String, Object>();
 		tags.put("tag1", 1);
@@ -39,11 +42,12 @@ public class SpanTest extends TestCase {
 		assertEquals(spanContext, span.context());
 		assertEquals("1", span.getBaggageItem("baggage1"));
 		assertEquals("test", span.getOperationName());
-		assertEquals(true, (boolean)span.getTracePropertyValue(TraceProperty.HAS_ERROR));
+		assertEquals(true, span.getTracePropertyValue(TraceProperty.HAS_ERROR));
 		assertEquals(START_TIME, span.getStart());
 		assertEquals(3.0, span.getTags().get("tag3"));
 	}
-	
+
+	@Test
 	public void testTags() {
 		final int START_TIME = 1;
 		Metadata metadata = new Metadata();
@@ -53,7 +57,7 @@ public class SpanTest extends TestCase {
 		baggages.put("baggage1", "1");
 		baggages.put("baggage2", "2");
 		
-		SpanContext spanContext = new SpanContext(metadata, 0l, 0l, 0l, (byte) 0, baggages, null);
+		SpanContext spanContext = new SpanContext(metadata, 0L, 0L, 0L, (byte) 0, baggages, null);
 		
 		Map<String, Object> tags = new HashMap<String, Object>();
 		tags.put("tag1", 1);
@@ -76,7 +80,8 @@ public class SpanTest extends TestCase {
 		assertEquals("", span.getTags().get("string"));
 		assertEquals(object, span.getTags().get("object"));
 	}
-	
+
+	@Test
 	public void testBaggage() {
 		final int START_TIME = 1;
 		Metadata metadata = new Metadata();
@@ -86,7 +91,7 @@ public class SpanTest extends TestCase {
 		baggages.put("baggage1", "1");
 		baggages.put("baggage2", "2");
 		
-		SpanContext spanContext = new SpanContext(metadata, 0l, 0l, 0l, (byte) 0, baggages, null);
+		SpanContext spanContext = new SpanContext(metadata, 0L, 0L, 0L, (byte) 0, baggages, null);
 		
 		Map<String, Object> tags = new HashMap<String, Object>();
 		

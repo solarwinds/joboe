@@ -1,20 +1,13 @@
 package com.tracelytics.joboe.span.impl;
 
-import com.tracelytics.joboe.Constants;
-import com.tracelytics.joboe.Context;
-import com.tracelytics.joboe.Event;
-import com.tracelytics.joboe.EventImpl;
-import com.tracelytics.joboe.EventReporter;
-import com.tracelytics.joboe.Metadata;
-import com.tracelytics.joboe.OboeException;
-import com.tracelytics.joboe.ReporterFactory;
+import com.tracelytics.joboe.*;
 import com.tracelytics.joboe.TestReporter;
 import com.tracelytics.joboe.TestReporter.DeserializedEvent;
 import com.tracelytics.joboe.settings.TestSettingsReader;
 import com.tracelytics.joboe.span.impl.Span.SpanProperty;
 import com.tracelytics.joboe.span.impl.Tracer.SpanBuilder;
 import com.tracelytics.util.TestUtils;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.*;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -23,20 +16,21 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 /**
  * Tests on context management for new span/legacy event-based span 
  * @author Patson
  *
  */
-public class ContextTest extends TestCase {
+public class ContextTest {
     private EventReporter originalReporter;
     private static final TestReporter tracingReporter = TestUtils.initTraceReporter();
     protected static final TestSettingsReader testSettingsReader = TestUtils.initSettingsReader();
     
     
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
         originalReporter = EventImpl.setDefaultReporter(tracingReporter);
         testSettingsReader.reset();
         testSettingsReader.put(TestUtils.getDefaultSettings());
@@ -44,16 +38,16 @@ public class ContextTest extends TestCase {
         ScopeManager.INSTANCE.removeAllScopes();
     }
     
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         testSettingsReader.reset();
         EventImpl.setDefaultReporter(originalReporter);
         ScopeManager.INSTANCE.removeAllScopes();
         Context.clearMetadata(); //clear context
         tracingReporter.reset();
-        super.tearDown();
     }
-    
+
+    @Test
     public void testNestedSpans() throws Exception {
         Scope scope1 = startTraceScope("span1");
         Span span1 = scope1.span();
@@ -91,10 +85,11 @@ public class ContextTest extends TestCase {
         DeserializedEvent span1ExitEvent = getLastSentEvent();
         assertEdge(span1InfoEvent, span1ExitEvent);
         assertEdge(span2ExitEvent, span1ExitEvent);
-        
-        assertTrue(!Context.isValid()); //should clear all context
+
+        assertFalse(Context.isValid()); //should clear all context
     }
-    
+
+    @Test
     public void testSiblingSpans() throws Exception {
         Scope scope1 = startTraceScope("span1");
         Span span1 = scope1.span();
@@ -128,11 +123,12 @@ public class ContextTest extends TestCase {
         DeserializedEvent span1ExitEvent = getLastSentEvent();
         assertEdge(span3ExitEvent, span1ExitEvent);
         assertEdge(span1InfoEvent, span1ExitEvent);
-        
-        assertTrue(!Context.isValid()); //should clear all context
+
+        assertFalse(Context.isValid()); //should clear all context
     }
-    
-    
+
+
+    @Test
     public void testLegacySpanLegacy() throws Exception {
         Context.getMetadata().randomize(); //create valid metadata
         Event legacyRootEntry = Context.createEventWithContext(Context.getMetadata(), true); //a root span with legacy event-based approach
@@ -174,7 +170,8 @@ public class ContextTest extends TestCase {
         DeserializedEvent span1ExitEvent = getLastSentEvent();
         assertEdge(span1EntryEvent, span1ExitEvent);
     }
-    
+
+    @Test
     public void testSpanLegacySpan() throws Exception {
         Scope scope1 = startTraceScope("span1");
         Span span1 = scope1.span();
@@ -214,11 +211,12 @@ public class ContextTest extends TestCase {
         DeserializedEvent span1ExitEvent = getLastSentEvent();
         assertEdge(span2ExitEvent, span1ExitEvent); //span 1 exit should point to legacy span 2 exit, as span 2 is "inline" into span 1
         assertEdge(span3ExitEvent, span1ExitEvent); //span 1 exit should point to span 3 exit as span 3 is a child of span 1
-        
-        
-        assertTrue(!Context.isValid()); //should clear all context
+
+
+        assertFalse(Context.isValid()); //should clear all context
     }
-    
+
+    @Test
     public void testAsyncSpans() throws Throwable {
         final TestReporter threadLocalReporter = ReporterFactory.getInstance().buildTestReporter(true);
         Field field = EventImpl.class.getDeclaredField("DEFAULT_REPORTER");
@@ -322,7 +320,7 @@ public class ContextTest extends TestCase {
         scope1.close();
         DeserializedEvent span1ExitEvent = getLastSentEvent(threadLocalReporter);
         assertEdge(span1InfoEvent, span1ExitEvent);
-        assertTrue(!Context.isValid()); //should clear all context
+        assertFalse(Context.isValid()); //should clear all context
         
         thread1.join();
         thread2.join();
@@ -339,7 +337,8 @@ public class ContextTest extends TestCase {
         
         return sentEvents.isEmpty() ? null : sentEvents.get(sentEvents.size() - 1);
     }
-    
+
+    @Test
     public void testCreateEventWithGeneratedId() {
         Metadata contextMetadata = Context.getMetadata();
         contextMetadata.randomize(true);

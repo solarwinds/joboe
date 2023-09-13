@@ -2,15 +2,14 @@ package com.tracelytics.joboe.config;
 
 import com.tracelytics.joboe.SampleRateSource;
 import com.tracelytics.joboe.TraceConfig;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-public class TraceConfigsTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class TraceConfigsTest {
     private final ResourceMatcher resourceMatcherStub = url -> true;
 
     private final TraceConfig testConfig = new TraceConfig(0, SampleRateSource.DEFAULT, (short) 0);
@@ -56,11 +55,12 @@ public class TraceConfigsTest extends TestCase {
 
     private TraceConfigs tested;
 
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
         tested = new TraceConfigs(mapStub);
     }
 
+    @Test
     public void testVerifyThatSearchExitsOnFirstMatch() {
         tested.getTraceConfig(Arrays.asList("hello", "world"));
         assertEquals(1, entryStub.count);

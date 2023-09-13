@@ -2,7 +2,7 @@ package com.tracelytics.logging;
 
 import com.tracelytics.logging.setting.LogSetting;
 import com.tracelytics.util.HostInfoUtils;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -19,7 +19,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-public class FileLoggerStreamTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class FileLoggerStreamTest {
+    @Test
     public void testBasicOperation() throws IOException {
         Path logFilePath = getTestLogFilePath( "basic-test.log");
         Files.deleteIfExists(logFilePath);
@@ -52,6 +55,7 @@ public class FileLoggerStreamTest extends TestCase {
         assert(lines.get(3).contains(FileLoggerStreamTest.class.getName()));
     }
 
+    @Test
     public void testFileRolling() throws IOException, InterruptedException {
         Path logFilePath = getTestLogFilePath("file-rolling.log");
         Path backupPath = Paths.get(logFilePath.toString() + ".1");
@@ -100,6 +104,7 @@ public class FileLoggerStreamTest extends TestCase {
     /**
      * Test rolling by concurrent java processes
      */
+    @Test
     public void testConcurrentFileRolling() throws Exception {
         String testClassDirectory = getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
         String classDirectory = Logger.class.getProtectionDomain().getCodeSource().getLocation().getPath();
@@ -175,7 +180,7 @@ public class FileLoggerStreamTest extends TestCase {
                     matchingStringCount++;
                 }
             }
-            assertEquals("Failed at index [" + i + "]", iterationCount, matchingStringCount);
+            assertEquals(iterationCount, matchingStringCount,"Failed at index [" + i + "]");
         }
     }
 

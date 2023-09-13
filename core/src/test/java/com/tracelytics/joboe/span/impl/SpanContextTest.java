@@ -1,16 +1,19 @@
 package com.tracelytics.joboe.span.impl;
 
 import com.tracelytics.joboe.Metadata;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-public class SpanContextTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class SpanContextTest {
     private static final Random random = new Random();
-    
+
+	@Test
 	public void testConversion() {
 		Metadata metadata = new Metadata();
 		metadata.randomize();
@@ -19,7 +22,8 @@ public class SpanContextTest extends TestCase {
 		
 		assertEquals(sourceContext, SpanContext.contextFromString(sourceContext.contextAsString()));
 	}
-	
+
+	@Test
 	public void testBaggages() {
 		Metadata metadata = new Metadata();
 		metadata.randomize();
@@ -40,7 +44,8 @@ public class SpanContextTest extends TestCase {
 		assertEquals("3", sourceContext.getBaggageItem("baggage3"));
 		assertEquals(metadata, sourceContext.getMetadata());
 	}
-	
+
+	@Test
 	public void testFlags() {
 		Metadata metadata = new Metadata();
 		metadata.randomize();

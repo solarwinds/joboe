@@ -1,13 +1,15 @@
 package com.tracelytics.joboe.span.impl;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test the extra methods provided by ActiveSpan compared to Span
  * @author pluk
  *
  */
-public class ScopeTest extends TestCase {
+public class ScopeTest {
+
+    @Test
 	public void testContinuation() {
 //        final int START_TIME = 1;
 //        Metadata metadata = new Metadata();

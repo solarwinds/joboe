@@ -1,12 +1,16 @@
 package com.tracelytics.joboe;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
 import java.net.InetAddress;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ReporterFactoryTest extends TestCase {
+
+public class ReporterFactoryTest {
+
+    @Test
     public void testbuildDefaultUdpReporter() throws Exception {
         UDPReporter reporter = (UDPReporter) ReporterFactory.getInstance().buildUdpReporter();
         
@@ -20,8 +24,8 @@ public class ReporterFactoryTest extends TestCase {
         assertEquals(InetAddress.getByName(Constants.XTR_UDP_HOST), address);
         assertEquals(Constants.XTR_UDP_PORT, portField.get(reporter));
     }
-    
-    
+
+    @Test
     public void testbuildNonDefaultUdpReporter() throws Exception {
         UDPReporter reporter = (UDPReporter) ReporterFactory.getInstance().buildUdpReporter("localhost", 9999);
         

@@ -11,18 +11,19 @@ import com.tracelytics.metrics.MetricKey;
 import com.tracelytics.metrics.histogram.Histogram;
 import com.tracelytics.metrics.measurement.SummaryLongMeasurement;
 import com.tracelytics.util.TestUtils;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.*;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class InboundMetricSpanReporterTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class InboundMetricSpanReporterTest {
     protected static final TestSettingsReader testSettingsReader = TestUtils.initSettingsReader();
     
-    @Override
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
         Context.clearMetadata();
         ScopeManager.INSTANCE.removeAllScopes();
         TraceDecisionUtil.reset();
@@ -36,7 +37,7 @@ public class InboundMetricSpanReporterTest extends TestCase {
         TransactionNameManager.clearTransactionNames();
     }
     
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
         Context.clearMetadata();
         ScopeManager.INSTANCE.removeAllScopes();
@@ -46,7 +47,6 @@ public class InboundMetricSpanReporterTest extends TestCase {
         testSettingsReader.reset();
         MetricHistogramSpanReporter.REPORTER.consumeMetricEntries(); //clear data
         InboundMetricMeasurementSpanReporter.REPORTER.consumeMetricEntries(); //clear data
-        super.tearDown();
     }
     
     private SpanBuilder getSpanBuilder(String operationName) {
@@ -57,6 +57,7 @@ public class InboundMetricSpanReporterTest extends TestCase {
      * Test operation with the same name
      * @throws Exception
      */
+    @Test
     public void testSimpleSpan1() throws Exception {
         final int RUN_COUNT = 100;
         for (int i = 0 ; i < RUN_COUNT ; i ++) {
@@ -73,7 +74,8 @@ public class InboundMetricSpanReporterTest extends TestCase {
                                                , Collections.singletonMap(MetricMeasurementSpanReporter.TRANSACTION_NAME_TAG_KEY, TransactionNameManager.UNKNOWN_TRANSACTION_NAME))); //transaction level, transaction name "unknown"
         assertEquals(RUN_COUNT, histogram.getTotalCount());
     }
-    
+
+    @Test
     public void testSimpleSpanWithTimestamp() throws Exception {
         final long START_TIME = 10L;
         final long END_TIME = 20L;
@@ -108,6 +110,7 @@ public class InboundMetricSpanReporterTest extends TestCase {
      * Hits same endpoint with same controller/action/Status/Method
      * @throws Exception
      */
+    @Test
     public void testSpanWithActionController1() throws Exception {
         final int RUN_COUNT = 100;
         for (int i = 0 ; i < RUN_COUNT ; i ++) {
@@ -152,6 +155,7 @@ public class InboundMetricSpanReporterTest extends TestCase {
      * Hits different endpoints with different controller/action/status/method
      * @throws Exception
      */
+    @Test
     public void testSpanWithActionController2() throws Exception {
         final int RUN_COUNT = 100;
         for (int i = 0 ; i < RUN_COUNT ; i ++) {
@@ -177,6 +181,7 @@ public class InboundMetricSpanReporterTest extends TestCase {
      * Hits same endpoint with same URL
      * @throws Exception
      */
+    @Test
     public void testSpanWithURL1() throws Exception {
         final int RUN_COUNT = 100;
         for (int i = 0 ; i < RUN_COUNT ; i ++) {
@@ -201,6 +206,7 @@ public class InboundMetricSpanReporterTest extends TestCase {
      * Hits different endpoint with different URL
      * @throws Exception
      */
+    @Test
     public void testSpanWithURL2() throws Exception {
         final int RUN_COUNT = 100;
         for (int i = 0 ; i < RUN_COUNT ; i ++) {
@@ -225,6 +231,7 @@ public class InboundMetricSpanReporterTest extends TestCase {
      * Hits same endpoint with controller action but different URL
      * @throws Exception
      */
+    @Test
     public void testSpanWithControllerActionAndURL() throws Exception {
         final int RUN_COUNT = 1000;
         for (int i = 0 ; i < RUN_COUNT ; i ++) {
@@ -246,7 +253,8 @@ public class InboundMetricSpanReporterTest extends TestCase {
         Map<MetricKey, SummaryLongMeasurement> measurements = InboundMetricMeasurementSpanReporter.REPORTER.consumeMeasurements();
         assertEquals(1, measurements.size()); //1 entry for TransactionName = "a.c"
     }
-    
+
+    @Test
     public void testTransactionNameLimit() throws Exception {
         final int RUN_COUNT = 1000;
         for (int i = 0 ; i < RUN_COUNT ; i ++) {
@@ -274,14 +282,13 @@ public class InboundMetricSpanReporterTest extends TestCase {
         //(# other transactions with method) +
         //(# other transactions with error) +
         
-        assertEquals(TransactionNameManager.DEFAULT_MAX_NAME_COUNT + 
-                     TransactionNameManager.DEFAULT_MAX_NAME_COUNT +
-                     TransactionNameManager.DEFAULT_MAX_NAME_COUNT +
-                     100 + //has error 500-599, so 100 of them
-                     1 + 
-                     RUN_COUNT - TransactionNameManager.DEFAULT_MAX_NAME_COUNT +
-                     RUN_COUNT - TransactionNameManager.DEFAULT_MAX_NAME_COUNT +
-                     0, //600+ status code not considered as error
+        assertEquals(TransactionNameManager.DEFAULT_MAX_NAME_COUNT +
+                        TransactionNameManager.DEFAULT_MAX_NAME_COUNT +
+                        TransactionNameManager.DEFAULT_MAX_NAME_COUNT +
+                        100 + //has error 500-599, so 100 of them
+                        1 +
+                        RUN_COUNT - TransactionNameManager.DEFAULT_MAX_NAME_COUNT +
+                        RUN_COUNT - TransactionNameManager.DEFAULT_MAX_NAME_COUNT, //600+ status code not considered as error
                      measurements.size());  
     }
     
@@ -289,6 +296,7 @@ public class InboundMetricSpanReporterTest extends TestCase {
      * Verifies that invalid durations but exception should not be thrown by reporter
      * @throws Exception
      */
+    @Test
     public void testSpanWithInvalidDurations() throws Exception {
         Span span;
         
@@ -325,6 +333,7 @@ public class InboundMetricSpanReporterTest extends TestCase {
      * Test SDK span with Status, it should NOT flag error even if it's 5xx
      * @throws Exception
      */
+    @Test
     public void testSdkSpan() throws Exception {
         final int RUN_COUNT = 1000;
         for (int i = 0 ; i < RUN_COUNT ; i ++) {

@@ -1,6 +1,5 @@
 package com.tracelytics.joboe.rpc;
 
-import static org.junit.Assert.*;
 
 import com.tracelytics.ext.ebson.BsonDocument;
 import com.tracelytics.ext.ebson.BsonDocuments;
@@ -12,9 +11,10 @@ import com.tracelytics.joboe.rpc.RpcClient.TaskType;
 import com.tracelytics.joboe.settings.PollingSettingsFetcherTest;
 import com.tracelytics.joboe.settings.SettingsArg;
 import com.tracelytics.util.TimeUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -32,6 +32,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public abstract class RpcClientTest {
     private static final int TEST_SERVER_PORT_BASE = 10148;
@@ -52,7 +55,7 @@ public abstract class RpcClientTest {
 
     protected TestCollector testCollector;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         testServerPort = locateAvailablePort();
         testCollector = startCollector(testServerPort);
@@ -61,7 +64,7 @@ public abstract class RpcClientTest {
 
 
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         for (Entry<Field, Integer> originalFieldValue : originalFieldIntValues.entrySet()) {
             originalFieldValue.getKey().setInt(null, originalFieldValue.getValue().intValue());

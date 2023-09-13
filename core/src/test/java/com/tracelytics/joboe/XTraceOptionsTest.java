@@ -1,18 +1,22 @@
 package com.tracelytics.joboe;
 
+import com.tracelytics.joboe.XTraceOptions.HmacSignatureAuthenticator;
+import org.junit.jupiter.api.Test;
+
 import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 
-import com.tracelytics.joboe.XTraceOptions.HmacSignatureAuthenticator;
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class XTraceOptionsTest extends TestCase {
+public class XTraceOptionsTest {
 
 
+    @Test
     public void testGetXTraceOptions() throws Exception {
-        assertEquals(null, XTraceOptions.getXTraceOptions(null, null));
+        assertNull(XTraceOptions.getXTraceOptions(null, null));
 
         String swKeys = "lo:se";
         XTraceOptions options = XTraceOptions.getXTraceOptions(
@@ -44,6 +48,7 @@ public class XTraceOptionsTest extends TestCase {
         assertEquals(expectedCustomKvs, options.getCustomKvs());
     }
 
+    @Test
     public void testFormatting() {
         XTraceOptions options;
         String swKeys = "lo:se";
@@ -79,6 +84,7 @@ public class XTraceOptionsTest extends TestCase {
         assertEquals(customValue, options.getCustomKvs().values().iterator().next());
     }
 
+    @Test
     public void testDuplicatedOption() {
         XTraceOptions options = XTraceOptions.getXTraceOptions(
                 XTraceOption.SW_KEYS.getKey() + XTraceOptions.KEY_VALUE_SEPARATOR + "p1" + XTraceOptions.ENTRY_SEPARATOR +
@@ -93,6 +99,7 @@ public class XTraceOptionsTest extends TestCase {
         assertEquals(expectedCustomKvs, options.getCustomKvs());
     }
 
+    @Test
     public void testGetXTraceOptionsExceptions() throws Exception {
         XTraceOptions options = XTraceOptions.getXTraceOptions(
                 XTraceOption.TRIGGER_TRACE.getKey() + XTraceOptions.ENTRY_SEPARATOR +
@@ -169,6 +176,7 @@ public class XTraceOptionsTest extends TestCase {
 
     }
 
+    @Test
     public void testHmacAuthenticator() throws Exception {
         HmacSignatureAuthenticator authenticator = new XTraceOptions.HmacSignatureAuthenticator("8mZ98ZnZhhggcsUmdMbS".getBytes(Charset.forName("US-ASCII")));
 
@@ -176,6 +184,7 @@ public class XTraceOptionsTest extends TestCase {
         assertEquals(false, authenticator.authenticate("trigger-trace;sw-keys=lo:se,check-id:123;ts=1564597681", "2c1c398c3e6be898f47f74bf74f035903b48baaa"));
     }
 
+    @Test
     public void testAuthenticate() {
         HmacSignatureAuthenticator authenticator = new XTraceOptions.HmacSignatureAuthenticator("8mZ98ZnZhhggcsUmdMbS".getBytes(Charset.forName("US-ASCII")));
 

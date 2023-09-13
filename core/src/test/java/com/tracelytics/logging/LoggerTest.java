@@ -5,7 +5,7 @@ import com.tracelytics.joboe.config.ConfigProperty;
 import com.tracelytics.logging.Logger.Level;
 import com.tracelytics.logging.Logger.LoggerStream;
 import com.tracelytics.logging.setting.LogSetting;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -15,7 +15,9 @@ import java.util.Set;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
-public class LoggerTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class LoggerTest {
     
 
 
@@ -47,7 +49,7 @@ public class LoggerTest extends TestCase {
         
     }
     
-    
+    @Test
     public void testTrace() throws Exception {
         Logger logger = new Logger();
         
@@ -80,7 +82,8 @@ public class LoggerTest extends TestCase {
         assertEquals(2, countOccurence(errMessage, "fatal-message"));
         assertEquals(1, countOccurence(errMessage, "fatal-exception"));
     }
-    
+
+    @Test
     public void testDebug() throws Exception {
         Logger logger = new Logger();
         
@@ -113,7 +116,8 @@ public class LoggerTest extends TestCase {
         assertEquals(2, countOccurence(errMessage, "fatal-message"));
         assertEquals(1, countOccurence(errMessage, "fatal-exception"));
     }
-    
+
+    @Test
     public void testInfo() throws Exception {
         Logger logger = new Logger();
         
@@ -146,7 +150,8 @@ public class LoggerTest extends TestCase {
         assertEquals(2, countOccurence(errMessage, "fatal-message"));
         assertEquals(1, countOccurence(errMessage, "fatal-exception"));
     }
-    
+
+    @Test
     public void testWarn() throws Exception {
         Logger logger = new Logger();
         
@@ -179,7 +184,8 @@ public class LoggerTest extends TestCase {
         assertEquals(2, countOccurence(errMessage, "fatal-message"));
         assertEquals(1, countOccurence(errMessage, "fatal-exception"));
     }
-    
+
+    @Test
     public void testError() throws Exception {
         Logger logger = new Logger();
         
@@ -212,7 +218,8 @@ public class LoggerTest extends TestCase {
         assertEquals(2, countOccurence(errMessage, "fatal-message"));
         assertEquals(1, countOccurence(errMessage, "fatal-exception"));
     }
-    
+
+    @Test
     public void testFatal() throws Exception {
         Logger logger = new Logger();
         
@@ -245,7 +252,8 @@ public class LoggerTest extends TestCase {
         assertEquals(2, countOccurence(errMessage, "fatal-message"));
         assertEquals(1, countOccurence(errMessage, "fatal-exception"));
     }
-    
+
+    @Test
     public void testOff() throws Exception {
         Logger logger = new Logger();
         

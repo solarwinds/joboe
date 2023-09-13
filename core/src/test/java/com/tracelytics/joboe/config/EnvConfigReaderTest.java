@@ -1,11 +1,15 @@
 package com.tracelytics.joboe.config;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class EnvConfigReaderTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+
+public class EnvConfigReaderTest {
+    @Test
     public void testValidRead() throws InvalidConfigException {
         Map<String, String> vars = new HashMap<String, String>();
         vars.put(ConfigProperty.EnvPrefix.PRODUCT + "SERVICE_KEY", "some key");
@@ -19,6 +23,7 @@ public class EnvConfigReaderTest extends TestCase {
     /**
      * Even if some values are invalid, it should still read the rest
      */
+    @Test
     public void testPartialRead() {
         Map<String, String> vars = new HashMap<String, String>();
         vars.put(ConfigProperty.EnvPrefix.PRODUCT + "SERVICE_KEY", "some key");

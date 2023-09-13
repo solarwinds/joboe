@@ -1,10 +1,13 @@
 package com.tracelytics.joboe;
 
 import com.tracelytics.joboe.config.InvalidConfigException;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class TestReporterTest extends TestCase {
-    
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class TestReporterTest {
+
+    @Test
     public void testReporterSameThread() throws InvalidConfigException {
         final TestReporter threadLocalReporter = ReporterFactory.getInstance().buildTestReporter(true);
         final TestReporter nonThreadLocalReporter = ReporterFactory.getInstance().buildTestReporter(false);
@@ -21,7 +24,8 @@ public class TestReporterTest extends TestCase {
         assertEquals(1, threadLocalReporter.getSentEvents().size());
         assertEquals(1, nonThreadLocalReporter.getSentEvents().size());
     }
-    
+
+    @Test
     public void testReporterDifferentThread() throws InvalidConfigException, InterruptedException {
         final TestReporter threadLocalReporter = ReporterFactory.getInstance().buildTestReporter(true);
         final TestReporter nonThreadLocalReporter = ReporterFactory.getInstance().buildTestReporter(false);

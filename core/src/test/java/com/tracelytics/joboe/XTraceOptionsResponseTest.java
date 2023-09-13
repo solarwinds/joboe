@@ -1,11 +1,15 @@
 package com.tracelytics.joboe;
 
 import com.tracelytics.joboe.rpc.Settings;
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 
-public class XTraceOptionsResponseTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+public class XTraceOptionsResponseTest {
+    @Test
     public void testResponse() {
         TraceConfig traceConfig = new TraceConfig(TraceDecisionUtil.SAMPLE_RESOLUTION, SampleRateSource.OBOE_DEFAULT, TracingMode.ALWAYS.toFlags());
         XTraceOptions options;
@@ -13,7 +17,7 @@ public class XTraceOptionsResponseTest extends TestCase {
         XTraceOptionsResponse response;
         //no x-trace options
         response = XTraceOptionsResponse.computeResponse(XTraceOptions.getXTraceOptions(null, null), new TraceDecision(true, true, traceConfig, TraceDecisionUtil.RequestType.REGULAR), true);
-        assertEquals(null, response);
+        assertNull(response);
 
         //empty x-trace options
         response = XTraceOptionsResponse.computeResponse(XTraceOptions.getXTraceOptions("", null), new TraceDecision(true, true, traceConfig, TraceDecisionUtil.RequestType.REGULAR), true);
@@ -52,6 +56,7 @@ public class XTraceOptionsResponseTest extends TestCase {
         assertEquals("trigger-trace=trigger-tracing-disabled", response.toString());
     }
 
+    @Test
     public void testExceptionResponse() {
         TraceConfig traceConfig = new TraceConfig(TraceDecisionUtil.SAMPLE_RESOLUTION, SampleRateSource.OBOE_DEFAULT, TracingMode.ALWAYS.toFlags());
 
@@ -65,6 +70,7 @@ public class XTraceOptionsResponseTest extends TestCase {
         assertEquals("trigger-trace=not-requested;ignored=trigger-trace", response.toString());
     }
 
+    @Test
     public void testBadSignatureResponse() {
         TraceConfig traceConfig = new TraceConfig(TraceDecisionUtil.SAMPLE_RESOLUTION, SampleRateSource.OBOE_DEFAULT, TracingMode.ALWAYS.toFlags());
 

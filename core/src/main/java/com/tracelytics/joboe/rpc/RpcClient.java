@@ -5,6 +5,7 @@ import com.tracelytics.logging.Logger;
 import com.tracelytics.logging.Logger.Level;
 import com.tracelytics.logging.LoggerFactory;
 import com.tracelytics.util.DaemonThreadFactory;
+import com.tracelytics.util.HeartbeatSchedulerProvider;
 
 import java.util.HashMap;
 import java.util.List;
@@ -57,7 +58,7 @@ public class RpcClient implements com.tracelytics.joboe.rpc.Client {
 
     private final RetryParamConstants defaultRetryParamConstants; //defines various retry param constants such as init delay, max delay and max retry on various Result code
 
-    private KeepAliveMontior keepAliveMonitor;
+    private final HeartbeatScheduler heartbeatScheduler;
 
     /**
      *
@@ -99,7 +100,7 @@ public class RpcClient implements com.tracelytics.joboe.rpc.Client {
             }
         }
 
-        keepAliveMonitor = new KeepAliveMontior();
+        heartbeatScheduler = HeartbeatSchedulerProvider.createHeartbeatScheduler(protocolClient, serviceKey, this);
     }
 
     private <T extends Result> Future<T> submit(final Callable<T> clientCall, final TaskType taskType) throws RpcClientRejectedExecutionException {
@@ -163,7 +164,7 @@ public class RpcClient implements com.tracelytics.joboe.rpc.Client {
                             //update connection status
                             connectionStatus = result.getResultCode().isError() ? Status.FAILURE : Status.OK;
 
-                            keepAliveMonitor.updateKeepAlive(); //connection is healthy, update keep alive
+                            heartbeatScheduler.schedule(); //connection is healthy, update keep alive
 
                             return result;
                         } catch (Exception e) {
@@ -726,36 +727,4 @@ public class RpcClient implements com.tracelytics.joboe.rpc.Client {
      * @author pluk
      *
      */
-    private class KeepAliveMontior {
-        private ScheduledExecutorService keepAliveService;
-        private ScheduledFuture<?> keepAliveFuture;
-        private Runnable keepAliveRunnable;
-        private static final long KEEP_ALIVE_INTERVAL = 20; //in seconds
-
-        public KeepAliveMontior() {
-            keepAliveService = Executors.newScheduledThreadPool(1, DaemonThreadFactory.newInstance("keep-alive"));
-            keepAliveRunnable = new Runnable() {
-                public void run() {
-                    synchronized(RpcClient.this) {
-                        try {
-                            protocolClient.doPing(serviceKey);
-                            updateKeepAlive(); //reschedule another keep alive ping
-                        } catch (Exception e) {
-                            logger.debug("Keep alive ping failed [" + e.getMessage() + "]", e);
-                            //do not re-schedule another keep alive ping if it was having issues
-                        }
-                    }
-                }
-            };
-            updateKeepAlive();
-        }
-
-        private synchronized void updateKeepAlive() {
-            if (keepAliveFuture != null) {
-                keepAliveFuture.cancel(false);
-            }
-
-            keepAliveFuture = keepAliveService.schedule(keepAliveRunnable, KEEP_ALIVE_INTERVAL, TimeUnit.SECONDS);
-        }
-    }
 }

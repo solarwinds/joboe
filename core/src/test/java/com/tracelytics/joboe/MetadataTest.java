@@ -1,18 +1,21 @@
 package com.tracelytics.joboe;
 
-import com.tracelytics.util.TestUtils;
 import com.tracelytics.joboe.settings.SettingsArg;
 import com.tracelytics.joboe.settings.SettingsManager;
 import com.tracelytics.joboe.settings.SimpleSettingsFetcher;
 import com.tracelytics.joboe.settings.TestSettingsReader;
 import com.tracelytics.joboe.settings.TestSettingsReader.SettingsMockupBuilder;
-import junit.framework.TestCase;
+import com.tracelytics.util.TestUtils;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /** Tests for Metadata */
-public class MetadataTest extends TestCase {
+public class MetadataTest {
 
     private final TestSettingsReader testSettingsReader = TestUtils.initSettingsReader();
 
+    @Test
     public void testHexEncode()
         throws Exception {
         // Make sure we can encode and decode hex strings
@@ -26,7 +29,8 @@ public class MetadataTest extends TestCase {
 
         assertEquals(md1, md2);
     }
-    
+
+    @Test
     public void testRandomization() {
 
         // Make sure IDs are unique:
@@ -35,13 +39,13 @@ public class MetadataTest extends TestCase {
        
         Metadata md2 = new Metadata();
         md2.randomize();
-        
-        assertFalse(md1.toHexString().equals(md2.toHexString()));
+
+        assertNotEquals(md1.toHexString(), md2.toHexString());
     
         String hex2 = md2.toHexString();
         
         md2.randomizeOpID();
-        assertFalse(md2.toHexString().equals(hex2));
+        assertNotEquals(md2.toHexString(), hex2);
         
         Metadata md3 = new Metadata(md2);
         assertEquals(md2, md3);
@@ -55,7 +59,8 @@ public class MetadataTest extends TestCase {
         md5.randomize(false);
         assertFalse(md5.isSampled());
     }
-    
+
+    @Test
     public void testCompatibility() {
         //should not accept trace id from different version
         String v1Id = "01-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01";
@@ -64,7 +69,8 @@ public class MetadataTest extends TestCase {
         assertFalse(Metadata.isCompatible(v1Id));
         assertTrue(Metadata.isCompatible(v0Id));
     }
-    
+
+    @Test
     public void testSampled() throws OboeException {
         String sampledId = "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01";
         String notSampledId = "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-00";
@@ -78,7 +84,8 @@ public class MetadataTest extends TestCase {
         md.setSampled(false);
         assertFalse(md.isSampled());
     }
-    
+
+    @Test
     public void testInit() {
 
         // Test initialization
@@ -91,7 +98,8 @@ public class MetadataTest extends TestCase {
         md.randomizeTaskID();
         assertTrue(md.isValid());
     }
-    
+
+    @Test
     public void testTtlChange() {
         assertEquals(Metadata.DEFAULT_TTL, Metadata.getTtl());
         
@@ -106,7 +114,8 @@ public class MetadataTest extends TestCase {
         
         assertEquals(Metadata.DEFAULT_TTL, Metadata.getTtl());
     }
-    
+
+    @Test
     public void testMaxEventsChange() {
         assertEquals(Metadata.DEFAULT_MAX_EVENTS, Metadata.getMaxEvents());
         
@@ -121,8 +130,9 @@ public class MetadataTest extends TestCase {
         
         assertEquals(Metadata.DEFAULT_MAX_EVENTS, Metadata.getMaxEvents());
     }
-    
-    
+
+
+    @Test
     public void testMaxBacktracesChange() {
         assertEquals(Metadata.DEFAULT_MAX_BACKTRACES, Metadata.getMaxBacktraces());
         
@@ -137,7 +147,8 @@ public class MetadataTest extends TestCase {
         
         assertEquals(Metadata.DEFAULT_MAX_BACKTRACES, Metadata.getMaxBacktraces());
     }
-    
+
+    @Test
     public static String getXTraceid(int version, boolean sampled) {
         Metadata metadata = new Metadata();
         metadata.randomize(sampled);

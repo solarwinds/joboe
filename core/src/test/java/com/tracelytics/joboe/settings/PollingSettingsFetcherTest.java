@@ -1,29 +1,19 @@
 package com.tracelytics.joboe.settings;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-
 import com.tracelytics.joboe.Event;
 import com.tracelytics.joboe.TraceDecisionUtil;
-import com.tracelytics.joboe.rpc.Client;
-import com.tracelytics.joboe.rpc.ClientException;
-import com.tracelytics.joboe.rpc.Result;
-import com.tracelytics.joboe.rpc.ResultCode;
-import com.tracelytics.joboe.rpc.SettingsResult;
-import junit.framework.TestCase;
+import com.tracelytics.joboe.rpc.*;
+import org.junit.jupiter.api.Test;
+
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.*;
+import java.util.concurrent.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 
-public class PollingSettingsFetcherTest extends TestCase {
+public class PollingSettingsFetcherTest {
     private static final int SAMPLE_RATE_FOR_DEFAULT_LAYER = 400000;
     private static final List<Settings> MOCK_SETTINGS = new ArrayList<Settings>();
     public static final short DEFAULT_FLAGS =
@@ -67,9 +57,10 @@ public class PollingSettingsFetcherTest extends TestCase {
         
         MOCK_SETTINGS.add(new com.tracelytics.joboe.rpc.Settings(Settings.OBOE_SETTINGS_TYPE_DEFAULT_SAMPLE_RATE, DEFAULT_FLAGS_STRING, System.currentTimeMillis(), SAMPLE_RATE_FOR_DEFAULT_LAYER, TTL, "", ARGS));
     }
-    
-    
-    
+
+
+
+    @Test
     public void testSettings()
         throws Exception {
         Client client = new MockRpcClient(MOCK_SETTINGS);
@@ -103,6 +94,7 @@ public class PollingSettingsFetcherTest extends TestCase {
         fetcher.close();
     }
 
+    @Test
     public void testSettingsCache() throws Exception {
         Client client = new OneHitWonderClient(MOCK_SETTINGS);
         SettingsFetcher fetcher = getFetcher(client);
@@ -116,7 +108,8 @@ public class PollingSettingsFetcherTest extends TestCase {
         
         fetcher.close();
     }
-    
+
+    @Test
     public void testSettingsCacheExpired() throws Exception {
         Client client = new OneHitWonderClient(MOCK_SETTINGS);
         SettingsFetcher fetcher = getFetcher(client);
@@ -138,7 +131,8 @@ public class PollingSettingsFetcherTest extends TestCase {
         
         fetcher.close();
     }
-    
+
+    @Test
     public void testInvalidArgs() throws Exception {
         SettingsFetcher fetcher;
         Settings settings;
@@ -194,7 +188,8 @@ public class PollingSettingsFetcherTest extends TestCase {
         
         fetcher.close();
     }
-    
+
+    @Test
     public void testInvalidSampleRate() throws Exception {
         SettingsFetcher fetcher;
         Settings settings;
@@ -221,7 +216,8 @@ public class PollingSettingsFetcherTest extends TestCase {
         
         fetcher.close();
     }
-    
+
+    @Test
     public void testExecutionException()  throws Exception {
         Client client = new ExecutionExceptionClient();
         SettingsFetcher fetcher = getFetcher(client);
@@ -229,11 +225,12 @@ public class PollingSettingsFetcherTest extends TestCase {
         Settings settings = null;
         
         settings = fetcher.getSettings();
-        assertNull(null, settings);
+        assertNull(settings);
                 
         fetcher.close();
     }
-    
+
+    @Test
     public void testSettingsListener() throws InterruptedException {
         Settings settings;
         settings = new com.tracelytics.joboe.rpc.Settings(Settings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE, DEFAULT_FLAGS_STRING, System.currentTimeMillis(), 1, TTL, "", ARGS);

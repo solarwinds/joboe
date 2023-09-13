@@ -1,13 +1,16 @@
 package com.tracelytics.joboe;
 
-import com.tracelytics.util.TestUtils;
 import com.tracelytics.joboe.TestReporter.DeserializedEvent;
 import com.tracelytics.joboe.settings.SettingsArg;
 import com.tracelytics.joboe.settings.SettingsManager;
 import com.tracelytics.joboe.settings.SimpleSettingsFetcher;
 import com.tracelytics.joboe.settings.TestSettingsReader;
 import com.tracelytics.joboe.settings.TestSettingsReader.SettingsMockupBuilder;
-import junit.framework.TestCase;
+import com.tracelytics.util.TestUtils;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,18 +19,20 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class ContextTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.*;
+
+public class ContextTest {
     private static final TestSettingsReader testSettingsReader = TestUtils.initSettingsReader();
     private static final TestReporter tracingReporter = TestUtils.initTraceReporter();
 
-    @Override
+    @AfterEach
     protected void tearDown() throws Exception {
-        super.tearDown();
 
         testSettingsReader.reset();
         tracingReporter.reset();
     }
 
+    @Test
     public void testContext()
         throws Exception {
 
@@ -42,7 +47,7 @@ public class ContextTest extends TestCase {
         assertTrue(md.isValid());
 
         Metadata md2 = Context.getMetadata();
-        assertTrue(md == md2);
+        assertSame(md, md2);
 
         // Make sure we can set IDs:
         Metadata rndMd = new Metadata();
@@ -75,7 +80,8 @@ public class ContextTest extends TestCase {
             throw assertionError.get();
         }
     }
-    
+
+    @Test
     public void testInheritContext() throws InterruptedException {
         Metadata context = Context.getMetadata();
         context.randomize(); //make a valid context
@@ -117,7 +123,8 @@ public class ContextTest extends TestCase {
         assertEquals(context.toHexString(), thread.threadContext.toHexString()); //should have same xtrace id
         assertNotSame(context, thread.threadContext); //but they should not be the same object, the inherited context should be a clone
     }
-    
+
+    @Test
     public void testCreateEventWithContextTtl() throws InterruptedException {
         Context.clearMetadata(); //this triggers creation of new metadata
         Context.getMetadata().randomize(true); //make it a valid context
@@ -159,7 +166,8 @@ public class ContextTest extends TestCase {
         
         tracingReporter.reset();
     }
-    
+
+    @Test
     public void testCreateEventWithMaxEvents() throws InterruptedException {
         Context.clearMetadata(); //this triggers creation of new metadata
         Context.getMetadata().randomize(true); //make it a valid context
@@ -221,7 +229,8 @@ public class ContextTest extends TestCase {
         assertTrue(deserializedEvents.isEmpty()); //no events
         
     }
-    
+
+    @Test
     public void testMaxBacktraces() throws InterruptedException, ExecutionException {
         Context.clearMetadata(); //this triggers creation of new metadata
         Context.getMetadata().randomize(true); //make it a valid context
