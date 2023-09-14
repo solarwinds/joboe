@@ -14,36 +14,36 @@ public class DockerInfoReaderTest {
 
     @BeforeEach
     protected void tearDown() throws Exception {
-        DockerInfoReader.SINGLETON.initializeLinux(DockerInfoReader.DEFAULT_LINUX_DOCKER_FILE_LOCATION); //reset to default
+        DockerInfoReader.getInstance().initializeLinux(DockerInfoReader.DEFAULT_LINUX_DOCKER_FILE_LOCATION); //reset to default
     }
 
     @Test
     public void testReadDockerContainerId() throws IOException {
-        DockerInfoReader.SINGLETON.initializeLinux(TEST_FILE_PREFIX + "standard");
+        DockerInfoReader.getInstance().initializeLinux(TEST_FILE_PREFIX + "standard");
         assertEquals("0531ff3c6395131175507ac7e94fdf387f2a2dea81961e6c96f6ac5ccd7ede3f", DockerInfoReader.getDockerId());
         
-        DockerInfoReader.SINGLETON.initializeLinux(TEST_FILE_PREFIX + "standard-2");
+        DockerInfoReader.getInstance().initializeLinux(TEST_FILE_PREFIX + "standard-2");
         assertEquals("0531ff3c6395131175507ac7e94fdf387f2a2dea81961e6c96f6ac5ccd7ede3f", DockerInfoReader.getDockerId());
         
-        DockerInfoReader.SINGLETON.initializeLinux(TEST_FILE_PREFIX + "ce");
+        DockerInfoReader.getInstance().initializeLinux(TEST_FILE_PREFIX + "ce");
         assertEquals("93d377d55070d2463493706ba7194d119c3efb1c2e7929f36da183ffe71d72a8", DockerInfoReader.getDockerId());
         
-        DockerInfoReader.SINGLETON.initializeLinux(TEST_FILE_PREFIX + "ecs");
+        DockerInfoReader.getInstance().initializeLinux(TEST_FILE_PREFIX + "ecs");
         assertEquals("93d377d55070d2463493706ba7194d119c3efb1c2e7929f36da183ffe71d72a8", DockerInfoReader.getDockerId());
 
-        DockerInfoReader.SINGLETON.initializeLinux(TEST_FILE_PREFIX + "cri-containerd");
+        DockerInfoReader.getInstance().initializeLinux(TEST_FILE_PREFIX + "cri-containerd");
         assertEquals("0531ff3c6395131175507ac7e94fdf387f2a2dea81961e6c96f6ac5ccd7ede3f", DockerInfoReader.getDockerId());
 
-        DockerInfoReader.SINGLETON.initializeLinux(TEST_FILE_PREFIX + "kubepods");
+        DockerInfoReader.getInstance().initializeLinux(TEST_FILE_PREFIX + "kubepods");
         assertEquals("0531ff3c6395131175507ac7e94fdf387f2a2dea81961e6c96f6ac5ccd7ede3f", DockerInfoReader.getDockerId());
         
-        DockerInfoReader.SINGLETON.initializeLinux(TEST_FILE_PREFIX + "empty");
+        DockerInfoReader.getInstance().initializeLinux(TEST_FILE_PREFIX + "empty");
         assertNull(DockerInfoReader.getDockerId());
         
-        DockerInfoReader.SINGLETON.initializeLinux(TEST_FILE_PREFIX + "non-docker");
+        DockerInfoReader.getInstance().initializeLinux(TEST_FILE_PREFIX + "non-docker");
         assertNull(DockerInfoReader.getDockerId());
         
-        DockerInfoReader.SINGLETON.initializeLinux(TEST_FILE_PREFIX + "invalid");
+        DockerInfoReader.getInstance().initializeLinux(TEST_FILE_PREFIX + "invalid");
         assertNull(DockerInfoReader.getDockerId());
     }
 }

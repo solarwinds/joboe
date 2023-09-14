@@ -1,6 +1,5 @@
 package com.tracelytics.util;
 
-import com.google.auto.service.AutoService;
 import com.tracelytics.ext.json.JSONException;
 import com.tracelytics.joboe.Context;
 import com.tracelytics.joboe.HostId;
@@ -12,6 +11,7 @@ import com.tracelytics.joboe.span.impl.ScopeManager;
 import com.tracelytics.logging.Logger;
 import com.tracelytics.logging.LoggerFactory;
 import com.tracelytics.util.HostInfoUtils.NetworkAddressInfo;
+import lombok.Getter;
 import com.appoptics.ext.okhttp3.MediaType;
 import com.appoptics.ext.okhttp3.OkHttpClient;
 import com.appoptics.ext.okhttp3.Request;
@@ -57,10 +57,10 @@ import java.util.stream.Stream;
  *
  * @author pluk
  */
-@AutoService(HostInfoReader.class)
-public class ServerHostInfoReader implements HostInfoReader {
+public class ServerHostInfoReader implements HostInfoReader, AzureInstanceIdReader, HostMetadataReader, NetworkAddressInfoReader,
+        HostNameReader {
     public static final ServerHostInfoReader INSTANCE = new ServerHostInfoReader();
-    private static Logger logger = LoggerFactory.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger();
 
     private static final int HOST_ID_CHECK_INTERVAL = 60;
 
@@ -674,9 +674,9 @@ public class ServerHostInfoReader implements HostInfoReader {
                 .azureAppServiceInstanceId(AzureReader.getAppInstanceId())
                 .uamsClientId(UamsClientIdReader.getUamsClientId())
                 .uuid(getUuid())
-                .awsMetadata(Ec2InstanceReader.SINGLETON.awsMetadata)
-                .azureVmMetadata(AzureReader.SINGLETON.azureVmMetadata)
-                .k8sMetadata(K8sReader.INSTANCE.getK8sMetadata())
+                .awsMetadata(Ec2InstanceReader.getInstance().awsMetadata)
+                .azureVmMetadata(AzureReader.getInstance().azureVmMetadata)
+                .k8sMetadata(K8sReader.getInstance().getK8sMetadata())
                 .build();
     }
 
@@ -719,14 +719,15 @@ public class ServerHostInfoReader implements HostInfoReader {
 
         private HostId.AwsMetadata awsMetadata;
 
-        private static final Ec2InstanceReader SINGLETON = new Ec2InstanceReader();
+        @Getter(lazy = true)
+        private static final Ec2InstanceReader instance = new Ec2InstanceReader();
 
         public static String getInstanceId() {
-            return SINGLETON.instanceId;
+            return getInstance().instanceId;
         }
 
         public static String getAvailabilityZone() {
-            return SINGLETON.availabilityZone;
+            return getInstance().availabilityZone;
         }
 
         private Ec2InstanceReader() {
@@ -881,10 +882,11 @@ public class ServerHostInfoReader implements HostInfoReader {
 
         static final Pattern CONTAINER_ID_REGEX = Pattern.compile("[a-f0-9]{64}");
 
-        static final DockerInfoReader SINGLETON = new DockerInfoReader();
+        @Getter(lazy = true)
+        private static final DockerInfoReader instance = new DockerInfoReader();
 
         public static String getDockerId() {
-            return SINGLETON.dockerId;
+            return getInstance().dockerId;
         }
 
         private DockerInfoReader() {
@@ -969,12 +971,14 @@ public class ServerHostInfoReader implements HostInfoReader {
 
     public static class HerokuDynoReader {
         private static final String DYNO_ENV_VARIABLE = "DYNO";
-        private static final HerokuDynoReader SINGLETON = new HerokuDynoReader();
+
+        @Getter(lazy = true)
+        private static final HerokuDynoReader instance = new HerokuDynoReader();
 
         private final String dynoId;
 
         public static String getDynoId() {
-            return SINGLETON.dynoId;
+            return getInstance().dynoId;
         }
 
         private HerokuDynoReader() {
@@ -987,14 +991,16 @@ public class ServerHostInfoReader implements HostInfoReader {
 
     public static class AzureReader {
         private static final String INSTANCE_ID_ENV_VARIABLE = "WEBSITE_INSTANCE_ID";
-        private static final AzureReader SINGLETON = new AzureReader();
+
+        @Getter(lazy = true)
+        private static final AzureReader instance = new AzureReader();
         private static final String DEFAULT_METADATA_VERSION = "2021-12-13";
         private final String appInstanceId;
 
         private final HostId.AzureVmMetadata azureVmMetadata;
 
         public static String getAppInstanceId() {
-            return SINGLETON.appInstanceId;
+            return getInstance().appInstanceId;
         }
 
         private HostId.AzureVmMetadata getVmMetadata() {
@@ -1065,7 +1071,8 @@ public class ServerHostInfoReader implements HostInfoReader {
 
         private final HostId.K8sMetadata k8sMetadata;
 
-        public static K8sReader INSTANCE = new K8sReader();
+        @Getter(lazy = true)
+        private static final K8sReader instance = new K8sReader();
 
         public K8sReader() {
             HostId.K8sMetadata.K8sMetadataBuilder builder = HostId.K8sMetadata.builder();

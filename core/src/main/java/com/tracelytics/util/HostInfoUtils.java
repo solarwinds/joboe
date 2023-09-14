@@ -4,9 +4,7 @@ import com.tracelytics.joboe.HostId;
 import com.tracelytics.logging.Logger;
 import com.tracelytics.logging.LoggerFactory;
 
-import java.util.List;
-import java.util.Map;
-import java.util.ServiceLoader;
+import java.util.*;
 
 /**
  * Helper to extract information on the host this JVM runs on
@@ -29,7 +27,9 @@ public class HostInfoUtils {
     }
 
     public static String getAzureInstanceId() {
-        return reader.getAzureInstanceId();
+        if (reader instanceof AzureInstanceIdReader)
+            return ((AzureInstanceIdReader) reader).getAzureInstanceId();
+        return "unknown-azure-instance";
     }
 
     public enum OsType {
@@ -72,7 +72,10 @@ public class HostInfoUtils {
     }
 
     public static String getHostName() {
-        return reader.getHostName();
+        if (reader instanceof HostNameReader) {
+            return ((HostNameReader) reader).getHostName();
+        }
+        return "unknown-host";
     }
 
     public static HostId getHostId() {
@@ -85,11 +88,17 @@ public class HostInfoUtils {
      * @return
      */
     public static Map<String, Object> getHostMetadata() {
-        return reader.getHostMetadata();
+        if (reader instanceof HostMetadataReader) {
+            return ((HostMetadataReader) reader).getHostMetadata();
+        }
+        return new HashMap<>();
     }
 
     public static NetworkAddressInfo getNetworkAddressInfo() {
-        return reader.getNetworkAddressInfo();
+        if (reader instanceof NetworkAddressInfoReader) {
+            return ((NetworkAddressInfoReader) reader).getNetworkAddressInfo();
+        }
+        return new NetworkAddressInfo(Collections.emptyList(), Collections.emptyList());
     }
 
     public static class NetworkAddressInfo {

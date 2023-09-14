@@ -2,6 +2,8 @@ package com.tracelytics.util;
 
 import com.tracelytics.joboe.HostId;
 import com.tracelytics.util.HostInfoUtils.NetworkAddressInfo;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
@@ -12,6 +14,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class ServerHostInfoReaderTest {
     private static final String TEST_FILE_FOLDER = "src/test/java/com/tracelytics/util/"; //using a rather static path. Using Class.getResourceAsStream does not work in test (vs main)
     private ServerHostInfoReader reader = ServerHostInfoReader.INSTANCE;
+
+    @BeforeAll
+    static void setup(){
+        ServerHostInfoReader.DockerInfoReader.getInstance().initializeLinux(ServerHostInfoReader.DockerInfoReader.DEFAULT_LINUX_DOCKER_FILE_LOCATION); //reset to default
+    }
 
     @Test
     public void testGetDistroParsing() throws IOException {

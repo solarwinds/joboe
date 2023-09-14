@@ -100,7 +100,7 @@ public class RpcClient implements com.tracelytics.joboe.rpc.Client {
             }
         }
 
-        heartbeatScheduler = HeartbeatSchedulerProvider.createHeartbeatScheduler(protocolClient, serviceKey, this);
+        heartbeatScheduler = HeartbeatSchedulerProvider.createHeartbeatScheduler(() -> protocolClient, serviceKey, this);
     }
 
     private <T extends Result> Future<T> submit(final Callable<T> clientCall, final TaskType taskType) throws RpcClientRejectedExecutionException {

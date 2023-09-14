@@ -22,13 +22,13 @@ class HeartbeatSchedulerProviderTest {
     @ClearEnvironmentVariable(key = "LAMBDA_TASK_ROOT")
     @ClearEnvironmentVariable(key = "AWS_LAMBDA_FUNCTION_NAME")
     void testThatKeepAliveMonitorIsCreatedWhenNotLambda() {
-        assertTrue(HeartbeatSchedulerProvider.createHeartbeatScheduler(protocolClientStub, "some key", "locker") instanceof KeepAliveMonitor);
+        assertTrue(HeartbeatSchedulerProvider.createHeartbeatScheduler(() -> protocolClientStub, "some key", "locker") instanceof KeepAliveMonitor);
     }
 
     @Test
     @SetEnvironmentVariable(key = "LAMBDA_TASK_ROOT", value = "lambda eh!")
     @SetEnvironmentVariable(key = "AWS_LAMBDA_FUNCTION_NAME", value = "lambda Fn eh!")
     void testThatKeepAliveMonitorIsNotCreatedWhenLambda() {
-        assertFalse(HeartbeatSchedulerProvider.createHeartbeatScheduler(protocolClientStub, "some key", "locker") instanceof KeepAliveMonitor);
+        assertFalse(HeartbeatSchedulerProvider.createHeartbeatScheduler(() -> protocolClientStub, "some key", "locker") instanceof KeepAliveMonitor);
     }
 }
