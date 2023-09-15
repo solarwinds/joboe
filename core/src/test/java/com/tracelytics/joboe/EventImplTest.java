@@ -53,7 +53,7 @@ public class EventImplTest {
         log.info("Event Metadata: " + evt.getMetadata().toHexString());
 
         // Send it:
-        TestReporter reporter = ReporterFactory.getInstance().buildTestReporter();
+        TestReporter reporter = ReporterFactory.getInstance().createTestReporter();
         evt.report(md, reporter);
 
         // Decode what was "sent":
@@ -99,7 +99,7 @@ public class EventImplTest {
         final DatagramPacket pkt = new DatagramPacket(rcvBuf, rcvBuf.length);
 
         // Send something to ourselves
-        EventReporter reporter = ReporterFactory.getInstance().buildUdpReporter("127.0.0.1", udpPort);
+        EventReporter reporter = ReporterFactory.getInstance().createUdpReporter("127.0.0.1", udpPort);
         evt.report(md, reporter);
 
         // Did we get it?
@@ -181,7 +181,7 @@ public class EventImplTest {
     	testEdge.randomizeOpID();
     	testEvent.addEdge(testEdge.toHexString());
     	
-    	TestReporter reporter = ReporterFactory.getInstance().buildTestReporter();
+    	TestReporter reporter = ReporterFactory.getInstance().createTestReporter();
     	testEvent.report(reporter);
 
         // Decode what was "sent":
@@ -212,7 +212,7 @@ public class EventImplTest {
             testEvent.addInfo(String.valueOf(i), i);
         }
         
-        TestReporter reporter = ReporterFactory.getInstance().buildTestReporter();
+        TestReporter reporter = ReporterFactory.getInstance().createTestReporter();
         testEvent.report(reporter);
 
         // Decode what was "sent":
@@ -248,7 +248,7 @@ public class EventImplTest {
         Event testEvent = Context.startTrace();
         testEvent.addInfo("HugeArray", hugeArray);
         
-        TestReporter reporter = ReporterFactory.getInstance().buildTestReporter();
+        TestReporter reporter = ReporterFactory.getInstance().createTestReporter();
         testEvent.report(reporter);
 
         // Decode what was "sent":
@@ -283,7 +283,7 @@ public class EventImplTest {
         Event testEvent = Context.startTrace();
         testEvent.addInfo("LongString", longString.toString());
         
-        TestReporter reporter = ReporterFactory.getInstance().buildTestReporter();
+        TestReporter reporter = ReporterFactory.getInstance().createTestReporter();
         testEvent.report(reporter);
 
         // Decode what was "sent":
@@ -322,7 +322,7 @@ public class EventImplTest {
         }
         
         
-        TestReporter reporter = ReporterFactory.getInstance().buildTestReporter();
+        TestReporter reporter = ReporterFactory.getInstance().createTestReporter();
         testEvent.report(reporter);
 
         // Decode what was "sent":
@@ -360,7 +360,7 @@ public class EventImplTest {
         testEvent.addInfo("k2", "2");
 
 
-        TestReporter reporter = ReporterFactory.getInstance().buildTestReporter();
+        TestReporter reporter = ReporterFactory.getInstance().createTestReporter();
         testEvent.report(reporter);
 
         // Decode what was "sent":
@@ -402,7 +402,7 @@ public class EventImplTest {
         testEvent.addInfo("k2", "2");
 
 
-        TestReporter reporter = ReporterFactory.getInstance().buildTestReporter();
+        TestReporter reporter = ReporterFactory.getInstance().createTestReporter();
         testEvent.report(reporter);
 
         // Decode what was "sent":

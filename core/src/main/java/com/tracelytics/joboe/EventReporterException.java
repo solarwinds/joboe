@@ -1,6 +1,6 @@
 package com.tracelytics.joboe;
 
-class EventReporterException extends Exception {
+public class EventReporterException extends Exception {
 
     public EventReporterException(String message, Throwable cause) {
         super(message, cause);

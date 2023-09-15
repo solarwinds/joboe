@@ -1,4 +1,4 @@
-package com.tracelytics.util;
+package com.tracelytics.lambda;
 
 import com.tracelytics.joboe.HostId;
 import com.tracelytics.joboe.rpc.HostType;

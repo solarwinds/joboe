@@ -1,7 +1,10 @@
 package com.tracelytics.util;
 
 import com.tracelytics.joboe.rpc.HostType;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class HostTypeDetector {
     public static HostType getHostType() {
         boolean lambda = isLambda();

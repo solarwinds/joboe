@@ -9,8 +9,8 @@ public class TestReporterTest {
 
     @Test
     public void testReporterSameThread() throws InvalidConfigException {
-        final TestReporter threadLocalReporter = ReporterFactory.getInstance().buildTestReporter(true);
-        final TestReporter nonThreadLocalReporter = ReporterFactory.getInstance().buildTestReporter(false);
+        final TestReporter threadLocalReporter = ReporterFactory.getInstance().createTestReporter(true);
+        final TestReporter nonThreadLocalReporter = ReporterFactory.getInstance().createTestReporter(false);
         
         Event event;
         
@@ -27,8 +27,8 @@ public class TestReporterTest {
 
     @Test
     public void testReporterDifferentThread() throws InvalidConfigException, InterruptedException {
-        final TestReporter threadLocalReporter = ReporterFactory.getInstance().buildTestReporter(true);
-        final TestReporter nonThreadLocalReporter = ReporterFactory.getInstance().buildTestReporter(false);
+        final TestReporter threadLocalReporter = ReporterFactory.getInstance().createTestReporter(true);
+        final TestReporter nonThreadLocalReporter = ReporterFactory.getInstance().createTestReporter(false);
         
         Thread thread = new Thread() {
             public void run() {

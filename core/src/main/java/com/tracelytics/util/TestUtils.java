@@ -4,8 +4,6 @@ import com.tracelytics.joboe.ReporterFactory;
 import com.tracelytics.joboe.TestReporter;
 import com.tracelytics.joboe.TraceDecisionUtil;
 import com.tracelytics.joboe.TracingMode;
-import com.tracelytics.joboe.config.ConfigManager;
-import com.tracelytics.joboe.config.ConfigProperty;
 import com.tracelytics.joboe.config.ProfilerSetting;
 import com.tracelytics.joboe.settings.*;
 import com.tracelytics.profiler.Profiler;
@@ -24,7 +22,7 @@ public abstract class TestUtils {
 
     public static TestReporter initTraceReporter() {
         try {
-            TestReporter testTracingReporter = ReporterFactory.getInstance().buildTestReporter();
+            TestReporter testTracingReporter = ReporterFactory.getInstance().createTestReporter();
             return testTracingReporter;
         } catch (Exception e) {
             e.printStackTrace();
@@ -35,7 +33,7 @@ public abstract class TestUtils {
 
     public static TestReporter initProfilingReporter(ProfilerSetting profilerSetting) {
         try {
-            TestReporter testProfilingReporter = ReporterFactory.getInstance().buildTestReporter();
+            TestReporter testProfilingReporter = ReporterFactory.getInstance().createTestReporter();
             Profiler.initialize(profilerSetting, testProfilingReporter);
             return testProfilingReporter;
         } catch (Exception e) {

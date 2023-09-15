@@ -9,10 +9,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 
 import com.tracelytics.joboe.config.ConfigManager;
 import com.tracelytics.joboe.config.ConfigProperty;
+import com.tracelytics.joboe.rpc.Client;
+import com.tracelytics.joboe.rpc.ClientLoggingCallback;
 import com.tracelytics.joboe.rpc.Result;
 import com.tracelytics.joboe.rpc.ResultCode;
 import com.tracelytics.joboe.settings.SettingsArg;
@@ -24,22 +25,22 @@ import com.tracelytics.util.DaemonThreadFactory;
 
 /**
  * A reporter that accepts events into a queue w/o blocking but sends out events synchronously.
- *
+ * <p>
  * Accepts events are inserted into a queue and being consumed and sent out synchronously.
  * If sending rate is slower than the queuing rate, then this report will attempt to send out events in batches
  *
  * @author pluk
- *
  */
-public abstract class QueuingEventReporter implements EventReporter {
+public class QueuingEventReporter implements EventReporter {
     static final int QUEUE_CAPACITY = 10000;
     static final int SEND_CAPACITY;
-    private BlockingQueue<Event> eventQueue = new LinkedBlockingQueue<Event>(QUEUE_CAPACITY);
+    private final BlockingQueue<Event> eventQueue = new LinkedBlockingQueue<Event>(QUEUE_CAPACITY);
     protected ExecutorService executorService = Executors.newSingleThreadExecutor(DaemonThreadFactory.newInstance("queuing-event-reporter"));
 
+    private final ClientLoggingCallback<Result> loggingCallback = new ClientLoggingCallback<Result>("send events");
 
     protected static Logger logger = LoggerFactory.getLogger();
-    private AtomicEventReporterStats stats = new AtomicEventReporterStats();
+    private final AtomicEventReporterStats stats = new AtomicEventReporterStats(eventQueue::size);
 
     private static final long REPORT_QUEUE_FULL_INTERVAL = 60 * 1000; //1 minute
     static final int DEFAULT_FLUSH_INTERVAL = 2; //2 second
@@ -69,6 +70,8 @@ public abstract class QueuingEventReporter implements EventReporter {
 
     private final SendRunnable sendRunnable;
 
+    protected final Client client;
+
     static void setFlushInterval(int eventsFlushInterval) {
         if (eventsFlushInterval >= 0) {
             flushInterval = eventsFlushInterval;
@@ -78,7 +81,8 @@ public abstract class QueuingEventReporter implements EventReporter {
         }
     }
 
-    protected QueuingEventReporter() {
+    public QueuingEventReporter(Client client) {
+        this.client = client;
         sendRunnable = new SendRunnable();
         executorService.execute(sendRunnable);
     }
@@ -86,7 +90,8 @@ public abstract class QueuingEventReporter implements EventReporter {
     private class SendRunnable implements Runnable {
         private boolean exitSignalled = false;
         private CountDownLatch countDownLatch = new CountDownLatch(1);
-        private ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1, DaemonThreadFactory.newInstance("send-event-delay"));
+        private final ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1, DaemonThreadFactory.newInstance("send-event-delay"));
+
         public void run() {
             while (!exitSignalled || !eventQueue.isEmpty()) {
                 List<Event> sendingEvents = new ArrayList<Event>();
@@ -141,13 +146,7 @@ public abstract class QueuingEventReporter implements EventReporter {
          */
         private void waitForNextSend() throws InterruptedException {
             countDownLatch = new CountDownLatch(1);
-            scheduledExecutorService.schedule(new Runnable() {
-               @Override
-                public void run() {
-                   countDownLatch.countDown();
-                }
-            }, flushInterval, TimeUnit.SECONDS);
-
+            scheduledExecutorService.schedule(() -> countDownLatch.countDown(), flushInterval, TimeUnit.SECONDS);
             countDownLatch.await();
         }
 
@@ -156,7 +155,7 @@ public abstract class QueuingEventReporter implements EventReporter {
     /**
      * Signals to sends an event via this reporter. Take note that the actual outbound request might be sent later on
      *
-     * @throws EventReporterException   if the reporter cannot accepts this event, for example the queue is full
+     * @throws EventReporterException if the reporter cannot accepts this event, for example the queue is full
      */
     public void send(Event event) throws EventReporterException {
         if (!eventQueue.offer(event)) {
@@ -191,6 +190,7 @@ public abstract class QueuingEventReporter implements EventReporter {
 
     /**
      * Gets and clears the current reporter stats
+     *
      * @return
      */
     public EventReporterStats consumeStats() {
@@ -203,72 +203,31 @@ public abstract class QueuingEventReporter implements EventReporter {
      */
     public void close() {
         logger.debug("Closing queueing event reporter, signaling shut down after sending all events");
+        if (client.getStatus() != Client.Status.OK) {
+            logger.debug("RPC client is not OK. Shutting down the service now");
+            executorService.shutdownNow();
+        } else {
+            executorService.shutdown();
+        }
+
         sendRunnable.exitSignalled = true;
-        executorService.shutdown();
         try {
-            executorService.awaitTermination(5, TimeUnit.SECONDS);
-            logger.debug("Event reporter service shut down");
-        } catch (InterruptedException e) {
-            //ok, it's shutting down anyway
+            client.close();
+            boolean termination = executorService.awaitTermination(5, TimeUnit.SECONDS);
+            logger.debug(String.format("Event reporter service shut down: [%s]", termination));
+        } catch (InterruptedException ignore) {
         }
 
     }
 
     /**
-     * This should only returns upon completion of sending all the provided events (success or failure)
+     * This should only return upon completion of sending all the provided events (success or failure)
+     *
      * @param events
      * @return
      * @throws Exception
      */
-    public abstract Result synchronousSend(List<Event> events) throws Exception;
-
-    /**
-     * Stats on reporter
-     * @author pluk
-     *
-     */
-    private class AtomicEventReporterStats {
-        private final AtomicLong sentCount = new AtomicLong();
-        private final AtomicLong overflowedCount = new AtomicLong();
-        private final AtomicLong failedCount = new AtomicLong();
-        private final AtomicLong queueLargestCount = new AtomicLong();
-        private final AtomicLong processedCount = new AtomicLong();
-
-        public AtomicEventReporterStats() {
-            super();
-        }
-
-        private void incrementSentCount(long increment) {
-            sentCount.addAndGet(increment);
-        }
-
-        private void incrementOverflowedCount(long increment) {
-            overflowedCount.addAndGet(increment);
-        }
-
-        private void incrementFailedCount(long increment) {
-            failedCount.addAndGet(increment);
-        }
-
-        private void incrementProcessedCount(long increment) {
-            processedCount.addAndGet(increment);
-        }
-
-        private void setQueueCount(long currentCount) {
-            synchronized(queueLargestCount) {
-                if (currentCount > queueLargestCount.get()) {
-                    queueLargestCount.set(currentCount);
-                }
-            }
-        }
-
-        private EventReporterStats consumeStats() {
-            long sentCount = this.sentCount.getAndSet(0);
-            long overflowedCount = this.overflowedCount.getAndSet(0);
-            long failedCount = this.failedCount.getAndSet(0);
-            long queueLargestCount = this.queueLargestCount.getAndSet(eventQueue.size()); //reset to current queue size as the largest
-            long processedCount = this.processedCount.getAndSet(0);
-            return new EventReporterStats(sentCount, overflowedCount, failedCount, processedCount, queueLargestCount);
-        }
+    public Result synchronousSend(List<Event> events) throws Exception {
+        return client.postEvents(events, loggingCallback).get(); //block until the client has finished the request
     }
 }

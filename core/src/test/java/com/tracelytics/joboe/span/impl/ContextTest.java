@@ -218,7 +218,7 @@ public class ContextTest {
 
     @Test
     public void testAsyncSpans() throws Throwable {
-        final TestReporter threadLocalReporter = ReporterFactory.getInstance().buildTestReporter(true);
+        final TestReporter threadLocalReporter = ReporterFactory.getInstance().createTestReporter(true);
         Field field = EventImpl.class.getDeclaredField("DEFAULT_REPORTER");
         field.setAccessible(true);
         

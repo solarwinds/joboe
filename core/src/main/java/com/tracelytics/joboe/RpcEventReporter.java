@@ -12,12 +12,12 @@ import com.tracelytics.joboe.rpc.Client.Status;
  * @author pluk
  *
  */
+@Deprecated
 public class RpcEventReporter extends QueuingEventReporter {
-    private final Client client;
-    private ClientLoggingCallback<Result> loggingCallback = new ClientLoggingCallback<Result>("send events");
+    private final ClientLoggingCallback<Result> loggingCallback = new ClientLoggingCallback<Result>("send events");
     
     public RpcEventReporter(Client rpcClient) throws IOException {
-        client = rpcClient;
+        super(rpcClient);
     }
     
     @Override
@@ -38,10 +38,7 @@ public class RpcEventReporter extends QueuingEventReporter {
     public static RpcEventReporter buildReporter(RpcClientManager.OperationType operationType) {
         try {
             return new RpcEventReporter(RpcClientManager.getClient(operationType));
-        } catch (IOException e) {
-            logger.warn("Failed to initialize Event reporter for event: " + e.getMessage(), e);
-            return null;
-        } catch (ClientException e) {
+        } catch (IOException | ClientException e) {
             logger.warn("Failed to initialize Event reporter for event: " + e.getMessage(), e);
             return null;
         }

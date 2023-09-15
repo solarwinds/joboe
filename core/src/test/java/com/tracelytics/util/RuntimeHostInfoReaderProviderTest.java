@@ -1,5 +1,6 @@
 package com.tracelytics.util;
 
+import com.tracelytics.lambda.AwsLambdaHostInfoReader;
 import org.junit.jupiter.api.Test;
 import org.junitpioneer.jupiter.ClearEnvironmentVariable;
 import org.junitpioneer.jupiter.SetEnvironmentVariable;

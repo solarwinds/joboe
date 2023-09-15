@@ -7,7 +7,7 @@ public class TraceTest {
     @Test
     public void testTrace() 
         throws Exception {
-        EventReporter reporter = ReporterFactory.getInstance().buildUdpReporter();
+        EventReporter reporter = ReporterFactory.getInstance().createUdpReporter();
 
         Event event = Context.startTrace();
         event.addInfo("Layer", "JavaTest",

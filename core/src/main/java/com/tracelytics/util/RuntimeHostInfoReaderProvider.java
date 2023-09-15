@@ -1,6 +1,7 @@
 package com.tracelytics.util;
 
 import com.google.auto.service.AutoService;
+import com.tracelytics.lambda.AwsLambdaHostInfoReader;
 
 import static com.tracelytics.util.HostTypeDetector.isLambda;
 
