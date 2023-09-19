@@ -93,6 +93,17 @@ public class GrpcClient implements ProtocolClient {
         }
     }
 
+    SettingsResult transformToLocalSettings(Collector.SettingsResult result){
+        List<Settings> settings = new ArrayList<Settings>();
+        if (result.getResult() == Collector.ResultCode.OK) {
+            for (Collector.OboeSetting oboeSetting : result.getSettingsList()) {
+                settings.add(convertSetting(oboeSetting));
+            }
+        }
+
+        return new SettingsResult(ResultCode.valueOf(result.getResult().name()), result.getArg(), result.getWarning(), settings);
+    }
+
     @Override
     public void doPing(String serviceKey) throws ClientException {
         try {
@@ -271,7 +282,7 @@ public class GrpcClient implements ProtocolClient {
                 stub = stub.withCompression(compression);
             }
 
-            return new GrpcClient(stub);
+            return new FileSettingsGrpcClient(new GrpcClient(stub), "/tmp/solarwinds-apm-settings-raw");
         }
     }
 
