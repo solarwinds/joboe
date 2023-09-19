@@ -89,18 +89,22 @@ public class GrpcClient implements ProtocolClient {
         try {
             Collector.SettingsResult result = client.withDeadlineAfter(deadlineSeconds, TimeUnit.SECONDS)
                     .getSettings(request);
+            return transformToLocalSettings(result);
 
-            List<Settings> settings = new ArrayList<Settings>();
-            if (result.getResult() != null && result.getResult() == Collector.ResultCode.OK) {
-                for (Collector.OboeSetting oboeSetting : result.getSettingsList()) {
-                    settings.add(convertSetting(oboeSetting));
-                }
-            }
-
-            return new SettingsResult(ResultCode.valueOf(result.getResult().name()), result.getArg(), result.getWarning(), settings);
         } catch (StatusRuntimeException e) {
             throw new ClientRecoverableException("gRPC Operation failed : [get settings] status [" + e.getStatus() + "]", e);
         }
+    }
+
+    SettingsResult transformToLocalSettings(Collector.SettingsResult result){
+        List<Settings> settings = new ArrayList<Settings>();
+        if (result.getResult() == Collector.ResultCode.OK) {
+            for (Collector.OboeSetting oboeSetting : result.getSettingsList()) {
+                settings.add(convertSetting(oboeSetting));
+            }
+        }
+
+        return new SettingsResult(ResultCode.valueOf(result.getResult().name()), result.getArg(), result.getWarning(), settings);
     }
 
     @Override
@@ -251,7 +255,7 @@ public class GrpcClient implements ProtocolClient {
         }
     };
 
-    static class GrpcProtocolClientFactory implements ProtocolClientFactory<GrpcClient> {
+    static class GrpcProtocolClientFactory implements ProtocolClientFactory<ProtocolClient> {
         private final TrustManagerFactory trustManagerFactory;
         private final ProxyConfig proxyConfig = (ProxyConfig) ConfigManager.getConfig(ConfigProperty.AGENT_PROXY);
         private static final String compression;
@@ -281,7 +285,7 @@ public class GrpcClient implements ProtocolClient {
 
 
         @Override
-        public GrpcClient buildClient(String host, int port) throws ClientFatalException {
+        public ProtocolClient buildClient(String host, int port) throws ClientFatalException {
             //netty
             NettyChannelBuilder channelBuilder = NettyChannelBuilder.forAddress(host, port);
 
@@ -316,7 +320,7 @@ public class GrpcClient implements ProtocolClient {
                 stub = stub.withCompression(compression);
             }
 
-            return new GrpcClient(stub);
+            return new FileSettingsGrpcClient(new GrpcClient(stub), "/tmp/solarwinds-apm-settings-raw");
         }
     }
 
