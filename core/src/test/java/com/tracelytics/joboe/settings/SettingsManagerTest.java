@@ -2,20 +2,24 @@ package com.tracelytics.joboe.settings;
 
 import com.tracelytics.joboe.TraceDecisionUtil;
 import com.tracelytics.joboe.TracingMode;
+import com.tracelytics.joboe.rpc.ClientException;
 import com.tracelytics.joboe.settings.TestSettingsReader.SettingsMockupBuilder;
 import com.tracelytics.util.TestUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.ClearEnvironmentVariable;
+import org.junitpioneer.jupiter.SetEnvironmentVariable;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
 
 public class SettingsManagerTest {
     private static final TestSettingsReader testSettingsReader = TestUtils.initSettingsReader();
@@ -113,6 +117,23 @@ public class SettingsManagerTest {
         
         assert(SettingsManager.getSettings(2, TimeUnit.SECONDS) == null); //should give null, as 2 sec < 5 sec
         assert(SettingsManager.getSettings(4, TimeUnit.SECONDS) != null); //should not be null as 6 sec > 5 sec
+    }
+
+    @Test
+    @SetEnvironmentVariable(key = "LAMBDA_TASK_ROOT", value = "lambda eh!")
+    @SetEnvironmentVariable(key = "AWS_LAMBDA_FUNCTION_NAME", value = "lambda Fn eh!")
+    void returnZeroCountDownWhenInLambda() throws ClientException {
+        CountDownLatch initialize = SettingsManager.initialize(new File("src/test/resources/solarwinds-apm-settings-raw").getPath());
+        assertEquals(0, initialize.getCount());
+    }
+
+
+    @Test
+    @ClearEnvironmentVariable(key = "LAMBDA_TASK_ROOT")
+    @ClearEnvironmentVariable(key = "AWS_LAMBDA_FUNCTION_NAME")
+    void returnOneCountDownWhenNotInLambda() throws ClientException {
+        CountDownLatch initialize = SettingsManager.initialize(new File("src/test/resources/solarwinds-apm-settings-raw").getPath());
+        assertEquals(1, initialize.getCount());
     }
     
     private static class TestArgChangeListener<T> extends SettingsArgChangeListener<T> {

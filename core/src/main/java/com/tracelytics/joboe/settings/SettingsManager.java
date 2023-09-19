@@ -14,6 +14,8 @@ import com.tracelytics.joboe.rpc.RpcClientManager.OperationType;
 import com.tracelytics.logging.Logger;
 import com.tracelytics.logging.LoggerFactory;
 
+import static com.tracelytics.util.HostTypeDetector.isLambda;
+
 /**
  * Manages {@link Settings} of per jvm process. All <code>Settings</code> should be retrieved via this manager.
  * 
@@ -31,7 +33,7 @@ import com.tracelytics.logging.LoggerFactory;
 public class SettingsManager {
     private static SettingsFetcher fetcher;
     private static Map<SettingsArg<?>, Set<SettingsArgChangeListener<?>>> listeners = new ConcurrentHashMap<SettingsArg<?>, Set<SettingsArgChangeListener<?>>>();   
-    private static Logger logger = LoggerFactory.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger();
     
     /**
      * Initializes this manager with a {@link RpcSettingsReader} and {@link PollingSettingsFetcher}. 
@@ -45,12 +47,18 @@ public class SettingsManager {
      * @throws ClientException
      */
     public static CountDownLatch initialize() throws ClientException {
-        SettingsReader reader = new RpcSettingsReader(RpcClientManager.getClient(OperationType.SETTINGS));
-        
-        fetcher = new PollingSettingsFetcher(reader);
-        
+        return initialize("/tmp/solarwinds-apm-settings-raw");
+    }
+
+    public static CountDownLatch initialize(String filePath) throws ClientException {
+        if (isLambda()) {
+            fetcher = new PollingSettingsFetcher(new FileSettingsReader(filePath));
+            initializeFetcher(fetcher);
+            return new CountDownLatch(0);
+        }
+
+        fetcher = new PollingSettingsFetcher(new RpcSettingsReader(RpcClientManager.getClient(OperationType.SETTINGS)));
         initializeFetcher(fetcher);
-        
         return fetcher.isSettingsAvailableLatch();
     }
             

@@ -13,7 +13,6 @@ import com.tracelytics.joboe.config.ConfigManager;
 import com.tracelytics.joboe.config.ConfigProperty;
 import com.tracelytics.joboe.config.ProxyConfig;
 import com.tracelytics.joboe.rpc.*;
-import com.tracelytics.joboe.settings.Settings;
 import com.tracelytics.logging.Logger;
 import com.tracelytics.logging.LoggerFactory;
 import com.tracelytics.util.BsonUtils;
@@ -26,15 +25,13 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.net.URL;
-import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
+import static com.tracelytics.joboe.settings.SettingsUtil.transformToLocalSettings;
 import static com.tracelytics.util.HostInfoUtils.getHostId;
 import static com.tracelytics.util.ServerHostInfoReader.setIfNotNull;
 
@@ -96,58 +93,12 @@ public class GrpcClient implements ProtocolClient {
         }
     }
 
-    SettingsResult transformToLocalSettings(Collector.SettingsResult result){
-        List<Settings> settings = new ArrayList<Settings>();
-        if (result.getResult() == Collector.ResultCode.OK) {
-            for (Collector.OboeSetting oboeSetting : result.getSettingsList()) {
-                settings.add(convertSetting(oboeSetting));
-            }
-        }
-
-        return new SettingsResult(ResultCode.valueOf(result.getResult().name()), result.getArg(), result.getWarning(), settings);
-    }
-
     @Override
     public void doPing(String serviceKey) throws ClientException {
         try {
             client.ping(Collector.PingRequest.newBuilder().setApiKey(serviceKey).build());
         } catch (StatusRuntimeException e) {
             throw new ClientRecoverableException("gRPC Operation failed : [ping] status [" + e.getStatus() + "]", e);
-        }
-    }
-
-    private Settings convertSetting(Collector.OboeSetting grpcOboeSetting) {
-        Map<String, ByteBuffer> convertedArguments = new HashMap<String, ByteBuffer>();
-
-        for (Entry<String, ByteString> argumentEntry : grpcOboeSetting.getArgumentsMap().entrySet()) {
-            convertedArguments.put(argumentEntry.getKey(), argumentEntry.getValue().asReadOnlyByteBuffer());
-        }
-
-        com.tracelytics.joboe.rpc.Settings settings = new com.tracelytics.joboe.rpc.Settings(
-                convertType(grpcOboeSetting.getType()),
-                grpcOboeSetting.getFlags().toStringUtf8(),
-                //oboeSetting.getTimestamp(),
-                System.currentTimeMillis(), //use local timestamp for now, as it is easier to compare ttl with it
-                grpcOboeSetting.getValue(),
-                grpcOboeSetting.getTtl(),
-                grpcOboeSetting.getLayer().toStringUtf8(),
-                convertedArguments);
-
-        return settings;
-    }
-
-    private short convertType(Collector.OboeSettingType grpcType) {
-        switch (grpcType) {
-            case DEFAULT_SAMPLE_RATE:
-                return Settings.OBOE_SETTINGS_TYPE_DEFAULT_SAMPLE_RATE;
-            case LAYER_SAMPLE_RATE:
-                return Settings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE;
-            case LAYER_APP_SAMPLE_RATE:
-                return Settings.OBOE_SETTINGS_TYPE_LAYER_APP_SAMPLE_RATE;
-            case LAYER_HTTPHOST_SAMPLE_RATE:
-                return Settings.OBOE_SETTINGS_TYPE_LAYER_HTTPHOST_SAMPLE_RATE;
-            default:
-                return -1;
         }
     }
 
@@ -320,7 +271,7 @@ public class GrpcClient implements ProtocolClient {
                 stub = stub.withCompression(compression);
             }
 
-            return new FileSettingsGrpcClient(new GrpcClient(stub), "/tmp/solarwinds-apm-settings-raw");
+            return new GrpcClient(stub);
         }
     }
 
