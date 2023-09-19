@@ -32,6 +32,11 @@
 
   <dependencies>
     <dependency>
+      <groupId>com.squareup.okhttp3</groupId>
+      <artifactId>okhttp</artifactId>
+      <version>4.10.0</version>
+    </dependency>
+    <dependency>
       <groupId>cloud.solarwindscloud</groupId>
       <artifactId>apm-proto</artifactId>
       <version>1.0.1</version>
@@ -145,7 +150,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
-        <version>3.2.0</version>
+        <version>3.5.0</version>
         <executions>
           <execution>
             <phase>package</phase>
@@ -164,6 +169,14 @@
                 </filter>
               </filters>
               <relocations>
+                <relocation>
+                  <pattern>okhttp3</pattern>
+                  <shadedPattern>com.appoptics.ext.okhttp3</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>kotlin</pattern>
+                  <shadedPattern>com.appoptics.ext.kotlin</shadedPattern>
+                </relocation>
                 <relocation>
                   <pattern>io</pattern>
                   <shadedPattern>com.appoptics.ext.io</shadedPattern>
@@ -210,6 +223,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>flatten-maven-plugin</artifactId>
+        <version>1.5.0</version>
         <executions>
           <execution>
             <id>flatten</id>
