@@ -58,7 +58,8 @@ jobs:
           command: |
             VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
             BRANCH=$(echo -n "${CIRCLE_BRANCH}" | sed -e 's/[^0-9a-zA-Z\._\-]/./g' | tr '[:upper:]' '[:lower:]')
-            NEW_VERSION=${VERSION%%-SNAPSHOT}-$BRANCH-SNAPSHOT
+            COMMIT_HASH="${CIRCLE_SHA1:0:7}"
+            NEW_VERSION=${VERSION%%-SNAPSHOT}-$BRANCH-$COMMIT_HASH-SNAPSHOT
             
             mvn versions:set -DnewVersion=$NEW_VERSION
             mvn -s .circleci/m2/settings.xml -T 8 deploy -DskipTests            
