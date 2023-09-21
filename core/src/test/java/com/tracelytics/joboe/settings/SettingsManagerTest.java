@@ -135,7 +135,31 @@ public class SettingsManagerTest {
         CountDownLatch initialize = SettingsManager.initialize(new File("src/test/resources/solarwinds-apm-settings-raw").getPath());
         assertEquals(1, initialize.getCount());
     }
-    
+
+    @Test
+    void verifyDefaultSettings() {
+        Double bucketCap = SettingsManager.DEFAULT_SETTINGS.getArgValue(SettingsArg.BUCKET_CAPACITY);
+        assertEquals(8, bucketCap);
+
+        Double bucketRate = SettingsManager.DEFAULT_SETTINGS.getArgValue(SettingsArg.BUCKET_RATE);
+        assertEquals(0.17, bucketRate);
+
+        Integer metricFlushInterval = SettingsManager.DEFAULT_SETTINGS.getArgValue(SettingsArg.METRIC_FLUSH_INTERVAL);
+        assertEquals(60, metricFlushInterval);
+
+        Double triggerStrictRate = SettingsManager.DEFAULT_SETTINGS.getArgValue(SettingsArg.STRICT_BUCKET_RATE);
+        assertEquals(0.1, triggerStrictRate);
+
+        Double triggerStrictCap = SettingsManager.DEFAULT_SETTINGS.getArgValue(SettingsArg.STRICT_BUCKET_CAPACITY);
+        assertEquals(6, triggerStrictCap);
+
+        Double triggerRelaxedCap = SettingsManager.DEFAULT_SETTINGS.getArgValue(SettingsArg.RELAXED_BUCKET_CAPACITY);
+        assertEquals(20, triggerRelaxedCap);
+
+        Double triggerRelaxedRate = SettingsManager.DEFAULT_SETTINGS.getArgValue(SettingsArg.RELAXED_BUCKET_RATE);
+        assertEquals(1, triggerRelaxedRate);
+    }
+
     private static class TestArgChangeListener<T> extends SettingsArgChangeListener<T> {
         private T newValue;
         public TestArgChangeListener(SettingsArg<T> type) {

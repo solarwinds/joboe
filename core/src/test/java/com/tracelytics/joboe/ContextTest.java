@@ -8,8 +8,6 @@ import com.tracelytics.joboe.settings.TestSettingsReader;
 import com.tracelytics.joboe.settings.TestSettingsReader.SettingsMockupBuilder;
 import com.tracelytics.util.TestUtils;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

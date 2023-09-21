@@ -1,5 +1,8 @@
 package com.tracelytics.joboe.settings;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -32,32 +35,58 @@ import static com.tracelytics.util.HostTypeDetector.isLambda;
  */
 public class SettingsManager {
     private static SettingsFetcher fetcher;
-    private static Map<SettingsArg<?>, Set<SettingsArgChangeListener<?>>> listeners = new ConcurrentHashMap<SettingsArg<?>, Set<SettingsArgChangeListener<?>>>();   
+    private static final Map<SettingsArg<?>, Set<SettingsArgChangeListener<?>>> listeners = new ConcurrentHashMap<SettingsArg<?>, Set<SettingsArgChangeListener<?>>>();
     private static final Logger logger = LoggerFactory.getLogger();
-    
-    /**
-     * Initializes this manager with a {@link RpcSettingsReader} and {@link PollingSettingsFetcher}. 
-     * 
-     * This is the default initialization
-     *  
-     * @param hostName
-     * @param addresses
-     * @param uuid
-     * @return
-     * @throws ClientException
-     */
+
+    public static final Settings DEFAULT_SETTINGS = new com.tracelytics.joboe.rpc.Settings(
+            (short) 0,
+            "SAMPLE_START,SAMPLE_THROUGH_ALWAYS",
+            System.currentTimeMillis(),
+            1_000_000,
+            1,
+            "",
+            new HashMap<String, ByteBuffer>() {{
+                ByteBuffer bucketCap = ByteBuffer.allocate(Double.BYTES).order(ByteOrder.LITTLE_ENDIAN).putDouble(8);
+                bucketCap.rewind();
+                put("BucketCapacity", bucketCap);
+
+                ByteBuffer bucketRate = ByteBuffer.allocate(Double.BYTES).order(ByteOrder.LITTLE_ENDIAN).putDouble(0.17);
+                bucketRate.rewind();
+                put("BucketRate", bucketRate);
+
+                ByteBuffer metricFlush = ByteBuffer.allocate(Integer.BYTES).order(ByteOrder.LITTLE_ENDIAN).putInt(60);
+                metricFlush.rewind();
+                put("MetricsFlushInterval", metricFlush);
+
+                ByteBuffer triggerStrictRate = ByteBuffer.allocate(Double.BYTES).order(ByteOrder.LITTLE_ENDIAN).putDouble(0.1);
+                triggerStrictRate.rewind();
+                put("TriggerStrictBucketRate", triggerStrictRate);
+
+                ByteBuffer triggerStrictCap = ByteBuffer.allocate(Double.BYTES).order(ByteOrder.LITTLE_ENDIAN).putDouble(6);
+                triggerStrictCap.rewind();
+                put("TriggerStrictBucketCapacity", triggerStrictCap);
+
+                ByteBuffer triggerRelaxedCap = ByteBuffer.allocate(Double.BYTES).order(ByteOrder.LITTLE_ENDIAN).putDouble(20);
+                triggerRelaxedCap.rewind();
+                put("TriggerRelaxedBucketCapacity", triggerRelaxedCap);
+
+                ByteBuffer triggerRelaxedRate = ByteBuffer.allocate(Double.BYTES).order(ByteOrder.LITTLE_ENDIAN).putDouble(1);
+                triggerRelaxedRate.rewind();
+                put("TriggerRelaxedBucketRate", triggerRelaxedRate);
+            }});
+
+
     public static CountDownLatch initialize() throws ClientException {
         return initialize("/tmp/solarwinds-apm-settings-raw");
     }
 
     public static CountDownLatch initialize(String filePath) throws ClientException {
         if (isLambda()) {
-            fetcher = new PollingSettingsFetcher(new FileSettingsReader(filePath));
-            initializeFetcher(fetcher);
-            return new CountDownLatch(0);
+            fetcher = new AwsLambdaSettingsFetcher(new FileSettingsReader(filePath), DEFAULT_SETTINGS);
+        } else {
+            fetcher = new PollingSettingsFetcher(new RpcSettingsReader(RpcClientManager.getClient(OperationType.SETTINGS)));
         }
 
-        fetcher = new PollingSettingsFetcher(new RpcSettingsReader(RpcClientManager.getClient(OperationType.SETTINGS)));
         initializeFetcher(fetcher);
         return fetcher.isSettingsAvailableLatch();
     }
