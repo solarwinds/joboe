@@ -116,7 +116,7 @@ class AwsLambdaSettingsFetcherTest {
         assertEquals(0, actual.getType());
         assertEquals(20, actual.getFlags());
 
-        assertEquals(1, actual.getTtl());
+        assertEquals(0, actual.getTtl());
         assertEquals("", actual.getLayer());
         assertEquals(1_000_000, actual.getValue());
     }
@@ -129,7 +129,7 @@ class AwsLambdaSettingsFetcherTest {
         assertEquals(0, actual.getType());
         assertEquals(20, actual.getFlags());
 
-        assertEquals(1, actual.getTtl());
+        assertEquals(0, actual.getTtl());
         assertEquals("", actual.getLayer());
         assertEquals(1_000_000, actual.getValue());
     }

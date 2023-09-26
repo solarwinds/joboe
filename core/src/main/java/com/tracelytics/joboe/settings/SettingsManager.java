@@ -43,7 +43,7 @@ public class SettingsManager {
             "SAMPLE_START,SAMPLE_THROUGH_ALWAYS",
             System.currentTimeMillis(),
             1_000_000,
-            1,
+            0,
             "",
             new HashMap<String, ByteBuffer>() {{
                 ByteBuffer bucketCap = ByteBuffer.allocate(Double.BYTES).order(ByteOrder.LITTLE_ENDIAN).putDouble(8);
