@@ -69,6 +69,7 @@ public enum ConfigProperty {
     AGENT_GRPC_COMPRESSION(new ConfigKey(null, EnvPrefix.PRODUCT + "GRPC_COMPRESSION", "grpc_compression"), ConfigGroup.AGENT, String.class), //not advertised
     AGENT_DISALLOW_UNSAFE(new ConfigKey("agent.disallowUnsafe"), ConfigGroup.AGENT, Boolean.class),
     AGENT_SQL_TAG(new ConfigKey("agent.sqlTag", EnvPrefix.PRODUCT + "SQL_TAG", "sql_tag"), ConfigGroup.AGENT, Boolean.class),
+    AGENT_SQL_TAG_PREPARED(new ConfigKey("agent.sqlTagPrepared", EnvPrefix.PRODUCT + "SQL_TAG_PREPARED"), ConfigGroup.AGENT, Boolean.class),
     MONITOR_JMX_SCOPES (new ConfigKey("monitor.jmx.scopes"), ConfigGroup.MONITOR, String.class),
     MONITOR_JMX_ENABLE (new ConfigKey("monitor.jmx.enable"), ConfigGroup.MONITOR, Boolean.class),
     MONITOR_JMX_MAX_ENTRY (new ConfigKey("monitor.jmx.maxEntry"), ConfigGroup.MONITOR, Integer.class),
