@@ -1,10 +1,10 @@
 package com.tracelytics.joboe.rpc.grpc;
 
+import com.appoptics.ext.com.solarwinds.trace.ingestion.proto.Collector;
+import com.appoptics.ext.com.solarwinds.trace.ingestion.proto.TraceCollectorGrpc;
 import com.appoptics.ext.io.grpc.*;
 import com.appoptics.ext.io.grpc.netty.GrpcSslContexts;
 import com.appoptics.ext.io.grpc.netty.NettyChannelBuilder;
-import com.solarwinds.trace.ingestion.proto.Collector;
-import com.solarwinds.trace.ingestion.proto.TraceCollectorGrpc;
 import com.tracelytics.ext.google.protobuf.ByteString;
 import com.tracelytics.joboe.BsonBufferException;
 import com.tracelytics.joboe.Event;

@@ -1,6 +1,6 @@
 package com.tracelytics.joboe;
 
-import com.solarwinds.trace.ingestion.proto.Collector;
+import com.appoptics.ext.com.solarwinds.trace.ingestion.proto.Collector;
 import com.tracelytics.ext.json.JSONException;
 import com.tracelytics.ext.json.JSONObject;
 import com.tracelytics.joboe.rpc.HostType;

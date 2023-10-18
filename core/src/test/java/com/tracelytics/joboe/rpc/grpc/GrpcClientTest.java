@@ -1,8 +1,8 @@
 package com.tracelytics.joboe.rpc.grpc;
 
 
-import com.solarwinds.trace.ingestion.proto.Collector;
-import com.solarwinds.trace.ingestion.proto.TraceCollectorGrpc;
+import com.appoptics.ext.com.solarwinds.trace.ingestion.proto.Collector;
+import com.appoptics.ext.com.solarwinds.trace.ingestion.proto.TraceCollectorGrpc;
 import com.appoptics.ext.io.grpc.Server;
 import com.appoptics.ext.io.grpc.ServerBuilder;
 import com.appoptics.ext.io.grpc.Status;

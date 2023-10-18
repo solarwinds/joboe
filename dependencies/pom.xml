@@ -94,12 +94,6 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>javax.annotation</groupId>
-      <artifactId>javax.annotation-api</artifactId>
-      <version>1.2</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>io.grpc</groupId>
       <artifactId>grpc-protobuf</artifactId>
       <version>${grpc.version}</version>
@@ -172,6 +166,14 @@
                 <relocation>
                   <pattern>okhttp3</pattern>
                   <shadedPattern>com.appoptics.ext.okhttp3</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>com.solarwinds</pattern>
+                  <shadedPattern>com.appoptics.ext.com.solarwinds</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>okio</pattern>
+                  <shadedPattern>com.appoptics.ext.okio</shadedPattern>
                 </relocation>
                 <relocation>
                   <pattern>kotlin</pattern>
