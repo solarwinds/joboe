@@ -219,11 +219,19 @@ public class TraceDecisionUtil {
             Map<TokenBucketType, Double> bucketCapacities = getBucketSettings(settings, SettingsArg.BUCKET_CAPACITY, SettingsArg.RELAXED_BUCKET_CAPACITY, SettingsArg.STRICT_BUCKET_CAPACITY);
             Map<TokenBucketType, Double> bucketRates = getBucketSettings(settings, SettingsArg.BUCKET_RATE, SettingsArg.RELAXED_BUCKET_RATE, SettingsArg.STRICT_BUCKET_RATE);
 
-            config = new TraceConfig((int)settings.getValue(),
-                                          settings.isDefault() ? SampleRateSource.OBOE_DEFAULT : SampleRateSource.OBOE,
-                                          settings.getFlags(),
-                                          bucketCapacities,
-                                          bucketRates);
+            if (settings.getType() == 0) {
+                config = new TraceConfig((int) settings.getValue(),
+                        SampleRateSource.DEFAULT,
+                        settings.getFlags(),
+                        bucketCapacities,
+                        bucketRates);
+            } else {
+                config = new TraceConfig((int) settings.getValue(),
+                        settings.isDefault() ? SampleRateSource.OBOE_DEFAULT : SampleRateSource.OBOE,
+                        settings.getFlags(),
+                        bucketCapacities,
+                        bucketRates);
+            }
         }
 
         return config;

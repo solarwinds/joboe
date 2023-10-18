@@ -7,12 +7,15 @@ import com.tracelytics.joboe.config.ResourceMatcher;
 import com.tracelytics.joboe.config.TraceConfigs;
 import com.tracelytics.joboe.settings.Settings;
 import com.tracelytics.joboe.settings.SettingsArg;
+import com.tracelytics.joboe.settings.SettingsManager;
 import com.tracelytics.joboe.settings.TestSettingsReader;
 import com.tracelytics.joboe.settings.TestSettingsReader.SettingsMockupBuilder;
 import com.tracelytics.util.TestUtils;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
-import java.lang.reflect.Field;
 import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -20,6 +23,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mockStatic;
 
 
 public class TraceDecisionUtilTest {
@@ -741,6 +745,15 @@ public class TraceDecisionUtilTest {
         traceDecision = TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, badSignatureOptions, null);
         assertFalse(traceDecision.isSampled());
         assertTrue(traceDecision.isReportMetrics());
+    }
+
+    @Test
+    public void returnDefaultSampleRateSourceWhenDefaultSettingsIsUsed() {
+        try(MockedStatic<SettingsManager> settingsManagerMock = mockStatic(SettingsManager.class)) {
+            settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsManager.DEFAULT_SETTINGS);
+            TraceConfig remoteTraceConfig = TraceDecisionUtil.getRemoteTraceConfig();
+            assertEquals(SampleRateSource.DEFAULT, remoteTraceConfig.getSampleRateSource());
+        }
     }
 
     private static Map.Entry<String, Object> getLayerTag(String layer) {
