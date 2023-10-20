@@ -42,23 +42,6 @@ public class SystemMonitorController {
         configs = ConfigManager.getConfigs(ConfigGroup.MONITOR);
     }
 
-    /**
-     *  Starts up the system monitoring if some particular prerequisites are met.
-     */
-    public static synchronized void conditionalStart(String appServerName) {
-        // We'll try to start up the system monitor daemon earlier in the premain if AGENT_SYSMON_EARLY_START is set
-        // to true. However, due to possible classloading deadlock issues, the environment with JBoss or old JDK
-        // versions (<1.7) are excluded.
-        Boolean sysMonEarlyStart = (Boolean) ConfigManager.getConfig(ConfigProperty.AGENT_SYSMON_EARLY_START);
-        sysMonEarlyStart = sysMonEarlyStart == null?false:sysMonEarlyStart;
-        String javaVersion = System.getProperty("java.version");
-
-        if(sysMonEarlyStart
-                && !"jboss".equals(appServerName)
-                && !javaVersion.startsWith("1.6")) { // >= Java 7
-            SystemMonitorController.start();
-        }
-    }
 
     /**
      * Starts the System monitoring. Should only be called once. If more than once has been called, the other calls would be ignored

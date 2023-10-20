@@ -42,12 +42,9 @@ class FrameworkInfoReporter extends SystemReporter<String, Object> {
     @Override
     public void postReportData() {
         if (!frameworkKvs.isEmpty()) {
-            String layerName = (String) ConfigManager.getConfig(ConfigProperty.AGENT_LAYER);
-            
+
             Map<String, Object> frameworkInfo = new HashMap<String, Object>();
             frameworkInfo.put("__Init", true);
-            frameworkInfo.put("Layer", layerName);
-            
             frameworkInfo.putAll(frameworkKvs);
             
             try {

@@ -15,43 +15,26 @@ import java.util.Map;
  *
  */
 public enum ConfigProperty {
-    AGENT_CONFIG (new ConfigKey(null, EnvPrefix.PRODUCT + "CONFIG_FILE", "config"), ConfigGroup.AGENT, String.class),
+    AGENT_CONFIG (new ConfigKey(null, EnvPrefix.PRODUCT + "CONFIG_FILE"), ConfigGroup.AGENT, String.class),
     AGENT_CONFIG_FILE_WATCH_PERIOD (new ConfigKey("agent.configFileWatchPeriod"), ConfigGroup.AGENT, Long.class),
-    AGENT_ATTR_RENAME (new ConfigKey("agent.attrRename", EnvPrefix.PRODUCT + "ATTR_RENAME"), ConfigGroup.AGENT, String.class),
-    AGENT_DEBUG (new ConfigKey(null, null, "debug"), ConfigGroup.AGENT, Boolean.class),
-    AGENT_LOGGING (new ConfigKey("agent.logging", EnvPrefix.PRODUCT + "DEBUG_LEVEL", "logging"), ConfigGroup.AGENT, String.class),
-    AGENT_LOGGING_TRACE_ID (new ConfigKey("agent.logging.traceId"), ConfigGroup.AGENT, String.class),
-    AGENT_TRACING_MODE (new ConfigKey("agent.tracingMode", null, "tracing_mode"), ConfigGroup.AGENT, String.class),
-    AGENT_SAMPLE_RATE (new ConfigKey("agent.sampleRate", null, "sampling_rate", "sample_rate"), ConfigGroup.AGENT, Integer.class),
-    AGENT_SERVICE_KEY (new ConfigKey("agent.serviceKey", EnvPrefix.PRODUCT + "SERVICE_KEY", "service_key"), ConfigGroup.AGENT, String.class),
-    AGENT_LAYER (new ConfigKey("agent.layer", null, "layer"), ConfigGroup.AGENT, String.class),
-    AGENT_JDBC_INST_ALL (new ConfigKey("agent.jdbcInstAll", null, "jdbc_inst_all"), ConfigGroup.AGENT, Boolean.class),
-    AGENT_SQL_SANITIZE (new ConfigKey("agent.sqlSanitize", EnvPrefix.PRODUCT + "SQL_SANITIZE", "sql_sanitize") , ConfigGroup.AGENT, Integer.class),
+    AGENT_DEBUG (new ConfigKey(null, null), ConfigGroup.AGENT, Boolean.class),
+    AGENT_LOGGING (new ConfigKey("agent.logging", EnvPrefix.PRODUCT + "DEBUG_LEVEL"), ConfigGroup.AGENT, String.class),
+    AGENT_TRACING_MODE (new ConfigKey("agent.tracingMode", null), ConfigGroup.AGENT, String.class),
+    AGENT_SAMPLE_RATE (new ConfigKey("agent.sampleRate", null), ConfigGroup.AGENT, Integer.class),
+    AGENT_SERVICE_KEY (new ConfigKey("agent.serviceKey", EnvPrefix.PRODUCT + "SERVICE_KEY"), ConfigGroup.AGENT, String.class),
     AGENT_SQL_QUERY_MAX_LENGTH(new ConfigKey("agent.sqlQueryMaxLength", EnvPrefix.PRODUCT + "MAX_SQL_QUERY_LENGTH"), ConfigGroup.AGENT, Integer.class),
-    AGENT_MONGO_SANITIZE (new ConfigKey("agent.mongoSanitize", EnvPrefix.PRODUCT + "MONGO_SANITIZE", "mongo_sanitize") , ConfigGroup.AGENT, Boolean.class),
-    AGENT_KAFKA_PROPAGATION(new ConfigKey("agent.kafkaPropagation", EnvPrefix.PRODUCT + "KAFKA_PROPAGATION", "kafka_propagation"), ConfigGroup.AGENT, Boolean.class),
-    AGENT_EXCLUDE_CLASSES (new ConfigKey("agent.excludeClasses"), ConfigGroup.AGENT, String.class),
-    AGENT_EXCLUDE_MODULES (new ConfigKey("agent.excludeModules"), ConfigGroup.AGENT, String.class),
     AGENT_URL_SAMPLE_RATE (new ConfigKey("agent.urlSampleRates"), ConfigGroup.AGENT, String.class),
-    AGENT_BACKTRACE_MODULES (new ConfigKey("agent.backtraceModules"), ConfigGroup.AGENT, String[].class),
-    AGENT_EXTENDED_BACK_TRACES (new ConfigKey("agent.extendedBackTraces"), ConfigGroup.AGENT, Boolean.class),
-    AGENT_EXTENDED_BACK_TRACES_BY_MODULE (new ConfigKey("agent.extendedBackTracesByModule"), ConfigGroup.AGENT, String[].class),
-    AGENT_HBASE_SCANNER_NEXT (new ConfigKey("agent.hbaseScannerNext"), ConfigGroup.AGENT, Boolean.class),
-    AGENT_HIDE_PARAMS (new ConfigKey("agent.hideParams"), ConfigGroup.AGENT, String.class),
-    AGENT_AKKA_ACTORS (new ConfigKey("agent.akkaActors"), ConfigGroup.AGENT, String[].class),
     AGENT_TIME_ADJUST_INTERVAL (new ConfigKey("agent.timeAdjustInterval"), ConfigGroup.AGENT, Integer.class),
     AGENT_CONTEXT_TTL(new ConfigKey("agent.contextTtl"), ConfigGroup.AGENT, Integer.class),
     AGENT_CONTEXT_MAX_EVENTS(new ConfigKey("agent.contextMaxEvents"), ConfigGroup.AGENT, Integer.class),
     AGENT_CONTEXT_MAX_BACKTRACES(new ConfigKey("agent.contextMaxBacktraces"), ConfigGroup.AGENT, Integer.class),
-    AGENT_HOSTNAME_ALIAS (new ConfigKey("agent.hostnameAlias", EnvPrefix.PRODUCT + "HOSTNAME_ALIAS", "hostname_alias"), ConfigGroup.AGENT, String.class),
-    AGENT_LOG_FILE(new ConfigKey(null, EnvPrefix.PRODUCT + "JAVA_LOG_FILE", "log_file"), ConfigGroup.AGENT, String.class),
+    AGENT_HOSTNAME_ALIAS (new ConfigKey("agent.hostnameAlias", EnvPrefix.PRODUCT + "HOSTNAME_ALIAS"), ConfigGroup.AGENT, String.class),
+    AGENT_LOG_FILE(new ConfigKey(null, EnvPrefix.PRODUCT + "JAVA_LOG_FILE"), ConfigGroup.AGENT, String.class),
     AGENT_COLLECTOR(new ConfigKey("agent.collector", EnvPrefix.PRODUCT + "COLLECTOR"), ConfigGroup.AGENT, String.class),
     AGENT_COLLECTOR_SERVER_CERT_LOCATION(new ConfigKey(null, EnvPrefix.PRODUCT + "TRUSTEDPATH"), ConfigGroup.AGENT, String.class),
     AGENT_EVENTS_FLUSH_INTERVAL(new ConfigKey(null, EnvPrefix.PRODUCT + "EVENTS_FLUSH_INTERVAL"), ConfigGroup.AGENT, Integer.class),
     AGENT_TRANSACTION_NAME_PATTERN (new ConfigKey("transaction.namePattern"), ConfigGroup.AGENT, String.class),
     AGENT_DOMAIN_PREFIXED_TRANSACTION_NAME(new ConfigKey("transaction.prependDomain"), ConfigGroup.AGENT, Boolean.class),
-    AGENT_SYSMON_EARLY_START(new ConfigKey("agent.sysMonEarlyStart", EnvPrefix.PRODUCT + "SYSMON_EARLY_START"), ConfigGroup.AGENT, Boolean.class),
-    AGENT_INIT_TIMEOUT(new ConfigKey("agent.initTimeout", EnvPrefix.PRODUCT + "INIT_TIMEOUT"), ConfigGroup.AGENT, Integer.class),
     AGENT_TRANSACTION_SETTINGS(new ConfigKey("agent.transactionSettings"), ConfigGroup.AGENT, String.class),
     AGENT_TRANSACTION_NAMING_SCHEMES(new ConfigKey("agent.transactionNameSchemes"), ConfigGroup.AGENT, String.class),
     //AGENT_INTERNAL_TRANSACTION_SETTINGS should NOT be specified directly in the json file. This is used to store the result after comparing AGENT_TRANSACTION_SETTINGS and AGENT_URL_SAMPLE_RATE - not an ideal solution as this is confusing
@@ -64,11 +47,9 @@ public enum ConfigProperty {
     AGENT_COLLECTOR_TIMEOUT(new ConfigKey("agent.collectorTimeout", EnvPrefix.PRODUCT +
             "COLLECTOR_TIMEOUT"), ConfigGroup.AGENT, Integer.class),
     AGENT_TRIGGER_TRACE_ENABLED(new ConfigKey("agent.triggerTrace", EnvPrefix.PRODUCT + "TRIGGER_TRACE"), ConfigGroup.AGENT, String.class),
-    AGENT_PROXY(new ConfigKey("agent.proxy",EnvPrefix.PRODUCT + "PROXY", "proxy"), ConfigGroup.AGENT, String.class),
-    AGENT_RPC_CLIENT_TYPE(new ConfigKey("agent.rpcType", EnvPrefix.PRODUCT + "RPC_TYPE", "rpc_type"), ConfigGroup.AGENT, String.class), //not advertised
-    AGENT_GRPC_COMPRESSION(new ConfigKey(null, EnvPrefix.PRODUCT + "GRPC_COMPRESSION", "grpc_compression"), ConfigGroup.AGENT, String.class), //not advertised
-    AGENT_DISALLOW_UNSAFE(new ConfigKey("agent.disallowUnsafe"), ConfigGroup.AGENT, Boolean.class),
-    AGENT_SQL_TAG(new ConfigKey("agent.sqlTag", EnvPrefix.PRODUCT + "SQL_TAG", "sql_tag"), ConfigGroup.AGENT, Boolean.class),
+    AGENT_PROXY(new ConfigKey("agent.proxy",EnvPrefix.PRODUCT + "PROXY"), ConfigGroup.AGENT, String.class),
+    AGENT_GRPC_COMPRESSION(new ConfigKey(null, EnvPrefix.PRODUCT + "GRPC_COMPRESSION"), ConfigGroup.AGENT, String.class), //not advertised
+    AGENT_SQL_TAG(new ConfigKey("agent.sqlTag", EnvPrefix.PRODUCT + "SQL_TAG"), ConfigGroup.AGENT, Boolean.class),
     AGENT_SQL_TAG_PREPARED(new ConfigKey("agent.sqlTagPrepared", EnvPrefix.PRODUCT + "SQL_TAG_PREPARED"), ConfigGroup.AGENT, Boolean.class),
     MONITOR_JMX_SCOPES (new ConfigKey("monitor.jmx.scopes"), ConfigGroup.MONITOR, String.class),
     MONITOR_JMX_ENABLE (new ConfigKey("monitor.jmx.enable"), ConfigGroup.MONITOR, Boolean.class),
@@ -78,7 +59,7 @@ public enum ConfigProperty {
     MONITOR_SPAN_METRICS_ENABLE (new ConfigKey("monitor.spanMetrics.enable", EnvPrefix.PRODUCT + "SPAN_METRICS_ENABLE"), ConfigGroup.MONITOR, Boolean.class),
 
     PROFILER(new ConfigKey("profiler"), ConfigGroup.PROFILER, String.class),
-    PROFILER_ENABLED_ENV_VAR(new ConfigKey(null, EnvPrefix.PRODUCT + "PROFILER_ENABLED", "profiler"), ConfigGroup.PROFILER, Boolean.class),
+    PROFILER_ENABLED_ENV_VAR(new ConfigKey(null, EnvPrefix.PRODUCT + "PROFILER_ENABLED"), ConfigGroup.PROFILER, Boolean.class),
     PROFILER_INTERVAL_ENV_VAR(new ConfigKey(null, EnvPrefix.PRODUCT + "PROFILER_INTERVAL"), ConfigGroup.PROFILER, Integer.class);
     private final ConfigKey configKey;
     private Class<? extends Serializable> typeClass;
@@ -92,17 +73,15 @@ public enum ConfigProperty {
     private static class ConfigKey {
         private final String configFileKey;
         private final String environmentVariableKey;
-        private final String[] agentArgumentKeys;
 
         public ConfigKey(String configFileKey) {
             this(configFileKey, null);
         }
 
-        public ConfigKey(String configFileKey, String environmentVariableKey, String...agentArgumentKeys) {
+        public ConfigKey(String configFileKey, String environmentVariableKey) {
             super();
             this.configFileKey = configFileKey;
             this.environmentVariableKey = environmentVariableKey;
-            this.agentArgumentKeys = agentArgumentKeys;
         }
     }
 
@@ -135,11 +114,6 @@ public enum ConfigProperty {
             //put the key into the lookup map
             ConfigPropertyRegistry.ENVIRONMENT_VARIABLE_KEY_TO_PARAMETER.put(environmentVariableKey, property);
         }
-
-        String[] agentArgumentKeys = property.configKey.agentArgumentKeys;
-        for (String agentArgumentKey : agentArgumentKeys) { //put the argument name into the lookup map
-            ConfigPropertyRegistry.AGENT_ARGUMENT_KEY_TO_PARAMETER.put(agentArgumentKey, property);
-        }
     }
 
     /**
@@ -157,10 +131,6 @@ public enum ConfigProperty {
 
     public String getEnvironmentVariableKey() {
         return configKey.environmentVariableKey;
-    }
-
-    public String[] getAgentArgumentKeys() {
-        return configKey.agentArgumentKeys;
     }
 
     /**

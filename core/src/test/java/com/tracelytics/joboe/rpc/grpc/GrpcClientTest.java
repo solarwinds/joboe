@@ -8,13 +8,12 @@ import com.appoptics.ext.io.grpc.ServerBuilder;
 import com.appoptics.ext.io.grpc.Status;
 import com.appoptics.ext.io.grpc.stub.StreamObserver;
 import com.tracelytics.ext.google.protobuf.ByteString;
-import com.tracelytics.joboe.Event;
 import com.tracelytics.joboe.rpc.*;
 import com.tracelytics.joboe.rpc.RpcClient.TaskType;
 import com.tracelytics.joboe.settings.PollingSettingsFetcherTest;
 import com.tracelytics.joboe.settings.SettingsArg;
-import org.junit.Test;
 import com.tracelytics.util.TimeUtils;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;

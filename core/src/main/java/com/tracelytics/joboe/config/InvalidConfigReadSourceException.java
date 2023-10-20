@@ -49,17 +49,6 @@ public class InvalidConfigReadSourceException extends InvalidConfigException {
     private static String getConfigPropertyLabel(ConfigSourceType configSourceType, ConfigProperty configProperty) {
         switch (configSourceType) {
             case ENV_VAR: return configProperty.getEnvironmentVariableKey();
-            case JVM_ARG: //cannot use String.join due to 1.6 compatibility
-                boolean isFirstKey = true;
-                StringBuilder argumentList = new StringBuilder();
-                for (String key : configProperty.getAgentArgumentKeys()) {
-                    if (!isFirstKey) {
-                        argumentList.append("/");
-                    }
-                    argumentList.append(key);
-                    isFirstKey = false;
-                }
-                return argumentList.toString();
             case JSON_FILE: return  configProperty.getConfigFileKey();
             default: return configProperty.name();
         }
@@ -68,7 +57,6 @@ public class InvalidConfigReadSourceException extends InvalidConfigException {
     private static String getLocation(ConfigSourceType configSourceType, String physicalLocation) {
         switch (configSourceType) {
             case ENV_VAR: return "Environment variable";
-            case JVM_ARG: return "JVM agent argument";
             case JSON_FILE: return "JSON config file at " + physicalLocation;
             default: return "Unknown location";
         }

@@ -37,19 +37,12 @@ public abstract class RpcClientManager {
     protected static String collectorHost;
     protected static int collectorPort;
     protected static URL collectorCertLocation;
-    private static ClientType configuredClientType;
-    private static Boolean alpnAvailable = null;
 
     static {
-        init((String) ConfigManager.getConfig(ConfigProperty.AGENT_COLLECTOR), (String) ConfigManager.getConfig(ConfigProperty.AGENT_COLLECTOR_SERVER_CERT_LOCATION), (String) ConfigManager.getConfig(ConfigProperty.AGENT_RPC_CLIENT_TYPE));
+        init((String) ConfigManager.getConfig(ConfigProperty.AGENT_COLLECTOR), (String) ConfigManager.getConfig(ConfigProperty.AGENT_COLLECTOR_SERVER_CERT_LOCATION));
     }
 
-    //for existing unit test
     static void init(String collector, String collectorCertValue) {
-        init(collector, collectorCertValue, null);
-    }
-
-    static void init(String collector, String collectorCertValue, String rpcType) {
         if (collector != null) { //use system env if defined
             setHostAndPortByVariable(collector);
         } else {
@@ -77,15 +70,6 @@ public abstract class RpcClientManager {
         } else {
             logger.info(String.format("Setting RPC Client to use bundled Certificate: %s", defaultCertLocation));
             collectorCertLocation = defaultCertLocation;
-        }
-
-        if (rpcType != null) {
-            try {
-                configuredClientType = ClientType.valueOf(rpcType.toUpperCase());
-                logger.info("Using RPC client type " + configuredClientType.name());
-            } catch (IllegalArgumentException e) {
-                logger.warn("rpc type [" + rpcType + "] does not map to any known RPC client type");
-            }
         }
     }
 

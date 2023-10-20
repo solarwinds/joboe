@@ -555,7 +555,6 @@ java -Xms512M -Xmx1024M -Xss1M -XX:+CMSClassUnloadingEnabled -XX:MaxPermSize=256
 [Loaded com.tracelytics.agent.AgentInfo from C:\Users\pluk\git\joboe\core\target\tracelyticsagent_proguard_base.jar]
 [Loaded com.tracelytics.agent.NativeAgentInfo from C:\Users\pluk\git\joboe\core\target\tracelyticsagent_proguard_base.jar]
 [Loaded com.tracelytics.joboe.config.ConfigReader from C:\Users\pluk\git\joboe\core\target\tracelyticsagent_proguard_base.jar]
-[Loaded com.tracelytics.joboe.config.JavaAgentArgumentConfigReader from C:\Users\pluk\git\joboe\core\target\tracelyticsagent_proguard_base.jar]
 [Loaded java.util.ArrayList$SubList from C:\Program Files\Java\jdk1.7.0_09\jre\lib\rt.jar]
 [Loaded java.util.ListIterator from C:\Program Files\Java\jdk1.7.0_09\jre\lib\rt.jar]
 [Loaded java.util.ArrayList$SubList$1 from C:\Program Files\Java\jdk1.7.0_09\jre\lib\rt.jar]

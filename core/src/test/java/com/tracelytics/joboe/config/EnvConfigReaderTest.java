@@ -9,13 +9,11 @@ public class EnvConfigReaderTest extends TestCase {
     public void testValidRead() throws InvalidConfigException {
         Map<String, String> vars = new HashMap<String, String>();
         vars.put(ConfigProperty.EnvPrefix.PRODUCT + "SERVICE_KEY", "some key");
-        vars.put(ConfigProperty.EnvPrefix.PRODUCT + "SQL_SANITIZE", "2");
         EnvConfigReader reader = new EnvConfigReader(vars);
         ConfigContainer container = new ConfigContainer();
         reader.read(container);
 
         assertEquals("some key", container.get(ConfigProperty.AGENT_SERVICE_KEY));
-        assertEquals(2, container.get(ConfigProperty.AGENT_SQL_SANITIZE));
     }
 
     /**
@@ -24,7 +22,7 @@ public class EnvConfigReaderTest extends TestCase {
     public void testPartialRead() {
         Map<String, String> vars = new HashMap<String, String>();
         vars.put(ConfigProperty.EnvPrefix.PRODUCT + "SERVICE_KEY", "some key");
-        vars.put(ConfigProperty.EnvPrefix.PRODUCT + "SQL_SANITIZE", "2.1");
+        vars.put(ConfigProperty.EnvPrefix.PRODUCT + "MAX_SQL_QUERY_LENGTH", "2.1");
         EnvConfigReader reader = new EnvConfigReader(vars);
         ConfigContainer container = new ConfigContainer();
         try {

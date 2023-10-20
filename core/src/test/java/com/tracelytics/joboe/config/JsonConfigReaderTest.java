@@ -1,7 +1,5 @@
 package com.tracelytics.joboe.config;
 
-import com.tracelytics.logging.Logger;
-import com.tracelytics.logging.setting.LogSetting;
 import junit.framework.TestCase;
 
 public class JsonConfigReaderTest extends TestCase {
@@ -12,7 +10,6 @@ public class JsonConfigReaderTest extends TestCase {
 
         assertEquals("info", container.get(ConfigProperty.AGENT_LOGGING));
         assertEquals("some key", container.get(ConfigProperty.AGENT_SERVICE_KEY));
-        assertEquals(false, container.get(ConfigProperty.AGENT_JDBC_INST_ALL));
     }
 
     /**
@@ -31,6 +28,5 @@ public class JsonConfigReaderTest extends TestCase {
         //the rest of the values should be read
         assertEquals("info", container.get(ConfigProperty.AGENT_LOGGING));
         assertEquals("some key", container.get(ConfigProperty.AGENT_SERVICE_KEY));
-        assertEquals(false, container.get(ConfigProperty.AGENT_JDBC_INST_ALL));
     }
 }

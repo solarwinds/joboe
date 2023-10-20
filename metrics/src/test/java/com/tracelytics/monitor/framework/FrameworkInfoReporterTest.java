@@ -1,8 +1,6 @@
 package com.tracelytics.monitor.framework;
 
 import com.tracelytics.joboe.TestRpcClient;
-import com.tracelytics.joboe.config.ConfigManager;
-import com.tracelytics.joboe.config.ConfigProperty;
 import com.tracelytics.monitor.SystemReporterException;
 import junit.framework.TestCase;
 
@@ -50,7 +48,6 @@ public class FrameworkInfoReporterTest extends TestCase {
         Map<String, Object> sentStatusMessage = testRpcClient.getPostedStatus().get(0);
 
         assertEquals(true, sentStatusMessage.get("__Init"));
-        assertEquals(ConfigManager.getConfig(ConfigProperty.AGENT_LAYER), sentStatusMessage.get("Layer"));
 
         for (Entry<String, Object> infoEntry : info.entrySet()) {
             assertEquals(infoEntry.getValue(), sentStatusMessage.get(infoEntry.getKey()));
