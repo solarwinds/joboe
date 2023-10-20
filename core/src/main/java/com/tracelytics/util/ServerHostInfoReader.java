@@ -787,7 +787,7 @@ public class ServerHostInfoReader implements HostInfoReader {
                     .build();
 
             Request request = new Request.Builder()
-                    .url(getMetadataHost() + "/" + "/latest/api/token")
+                    .url(getMetadataHost() + "/latest/api/token")
                     .put(RequestBody.create("{}", MediaType.parse("application/json")))
                     .addHeader("X-aws-ec2-metadata-token-ttl-seconds", "3600")
                     .build();
