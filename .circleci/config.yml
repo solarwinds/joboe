@@ -48,6 +48,20 @@ jobs:
       - store_test_results: # uploads the test metadata from the `target/surefire-reports` directory so that it can show up in the CircleCI dashboard. 
           # Upload test results for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
           path: target/surefire-reports
+      - run:
+          name: Check shading
+          command: |
+            VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+            code=0
+            for path in $(jar -tf "core/target/core-$VERSION.jar" | grep -E -v '^((com/tracelytics|com/appoptics|inst|io/open|META))')
+            do
+              PACKAGE=$(echo "$path" | awk -F/ '{print $2}')
+              if [ -n "$PACKAGE" ]; then
+                echo "Package ($path) is not shaded"
+                code=1
+              fi
+            done
+            exit $code
   deploy:
     executor: java
     steps:
