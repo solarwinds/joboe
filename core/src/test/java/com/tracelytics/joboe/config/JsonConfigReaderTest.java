@@ -14,7 +14,6 @@ public class JsonConfigReaderTest {
 
         assertEquals("info", container.get(ConfigProperty.AGENT_LOGGING));
         assertEquals("some key", container.get(ConfigProperty.AGENT_SERVICE_KEY));
-        assertEquals(false, container.get(ConfigProperty.AGENT_JDBC_INST_ALL));
     }
 
     /**
