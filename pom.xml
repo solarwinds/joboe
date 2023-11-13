@@ -118,9 +118,9 @@
 
     <distributionManagement>
         <repository>
-            <id>librato</id>
+            <id>github-write</id>
             <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/librato/joboe</url>
+            <url>https://maven.pkg.github.com/solarwinds-cloud/maven-releases</url>
         </repository>
     </distributionManagement>
 

@@ -130,11 +130,12 @@ workflows:
       - test:
           context:
             - AWS_CIRCLE_CI_BUILD
+            - github-read-access
       - deploy:
           context:
+            - github-read-access
+            - github-write-access
             - AWS_CIRCLE_CI_BUILD
-            - GH_LIBRATO_CI_PKG_READ
-            - GH_LIBRATO_CI_PKG_WRITE
             - SLACK_HOOK
           filters:
             branches:
@@ -149,8 +150,8 @@ workflows:
       - release:
           context:
             - AWS_CIRCLE_CI_BUILD
-            - GH_LIBRATO_CI_PKG_READ
-            - GH_LIBRATO_CI_PKG_WRITE
+            - github-read-access
+            - github-write-access
             - SLACK_HOOK
           requires:
             - approve_me

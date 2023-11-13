@@ -19,8 +19,8 @@
 
   <repositories>
     <repository>
-      <id>solarwinds-apm</id>
-      <url>https://maven.pkg.github.com/solarwindscloud/apm-proto</url>
+      <id>github-read</id>
+      <url>https://maven.pkg.github.com/solarwinds/apm-proto</url>
       <releases>
         <enabled>true</enabled>
       </releases>

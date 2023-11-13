@@ -165,12 +165,4 @@
       </plugin>
     </plugins>
   </build>
-
-  <distributionManagement>
-    <repository>
-      <id>librato</id>
-      <name>GitHub Packages</name>
-      <url>https://maven.pkg.github.com/librato/joboe</url>
-    </repository>
-  </distributionManagement>
 </project>
