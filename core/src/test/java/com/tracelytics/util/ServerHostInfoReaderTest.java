@@ -15,8 +15,8 @@ public class ServerHostInfoReaderTest {
     private static final String TEST_FILE_FOLDER = "src/test/java/com/tracelytics/util/"; //using a rather static path. Using Class.getResourceAsStream does not work in test (vs main)
     private ServerHostInfoReader reader = ServerHostInfoReader.INSTANCE;
 
-    @BeforeAll
-    static void setup(){
+    @BeforeEach
+    void setup(){
         ServerHostInfoReader.DockerInfoReader.getInstance().initializeLinux(ServerHostInfoReader.DockerInfoReader.DEFAULT_LINUX_DOCKER_FILE_LOCATION); //reset to default
     }
 
