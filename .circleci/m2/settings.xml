@@ -6,7 +6,7 @@
         <server>
             <id>github-write</id>
             <username>lt-global-circleci</username>
-            <password>${env.GITHUB_SWI_CLOUD_EMU_WRITE_TOKEN}</password>
+            <password>${env.GITHUB_TOKEN}</password>
         </server>
         <server>
             <id>github-read</id>
