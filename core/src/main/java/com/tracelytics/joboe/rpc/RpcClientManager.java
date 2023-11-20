@@ -31,7 +31,7 @@ public abstract class RpcClientManager {
         return url;
     }
 
-    static final String DEFAULT_HOST = "apm.collector.cloud.solarwinds.com"; //default collector host: NH production
+    static final String DEFAULT_HOST = "apm.collector.na-01.cloud.solarwinds.com"; //default collector host: NH production
     static final int DEFAULT_PORT = 443; //default collector port
 
     protected static String collectorHost;
