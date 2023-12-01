@@ -1,7 +1,8 @@
 package com.tracelytics.joboe;
 
-import com.tracelytics.ext.ebson.BsonDocument;
-import com.tracelytics.ext.ebson.BsonDocuments;
+
+import com.tracelytics.joboe.ebson.BsonDocument;
+import com.tracelytics.joboe.ebson.BsonDocuments;
 import com.tracelytics.logging.Logger;
 import com.tracelytics.logging.LoggerFactory;
 

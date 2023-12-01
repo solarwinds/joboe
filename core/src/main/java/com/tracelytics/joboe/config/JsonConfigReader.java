@@ -1,12 +1,13 @@
 package com.tracelytics.joboe.config;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.tracelytics.ext.json.JSONException;
-import com.tracelytics.ext.json.JSONObject;
-import com.tracelytics.ext.json.JSONTokener;
 
 /**
  * A Reader that reads the input config file in JSON

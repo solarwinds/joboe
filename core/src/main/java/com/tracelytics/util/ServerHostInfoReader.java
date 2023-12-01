@@ -1,6 +1,5 @@
 package com.tracelytics.util;
 
-import com.tracelytics.ext.json.JSONException;
 import com.tracelytics.joboe.Context;
 import com.tracelytics.joboe.HostId;
 import com.tracelytics.joboe.Metadata;
@@ -12,12 +11,14 @@ import com.tracelytics.logging.Logger;
 import com.tracelytics.logging.LoggerFactory;
 import com.tracelytics.util.HostInfoUtils.NetworkAddressInfo;
 import lombok.Getter;
-import com.appoptics.ext.okhttp3.MediaType;
-import com.appoptics.ext.okhttp3.OkHttpClient;
-import com.appoptics.ext.okhttp3.Request;
-import com.appoptics.ext.okhttp3.RequestBody;
-import com.appoptics.ext.okhttp3.Response;
-import com.appoptics.ext.okhttp3.ResponseBody;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
+import org.json.JSONException;
+
 
 import java.io.BufferedReader;
 import java.io.File;

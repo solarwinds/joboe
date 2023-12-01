@@ -1,7 +1,8 @@
 package com.tracelytics.joboe.config;
 
-import com.tracelytics.ext.google.common.cache.Cache;
-import com.tracelytics.ext.google.common.cache.CacheBuilder;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.tracelytics.joboe.TraceConfig;
 import com.tracelytics.logging.Logger;
 import com.tracelytics.logging.LoggerFactory;

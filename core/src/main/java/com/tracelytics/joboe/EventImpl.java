@@ -3,8 +3,11 @@
  */
 package com.tracelytics.joboe;
 
-import com.tracelytics.ext.ebson.*;
-import com.tracelytics.ext.ebson.BsonDocument.Builder;
+import com.tracelytics.joboe.ebson.BsonDocument;
+import com.tracelytics.joboe.ebson.BsonDocuments;
+import com.tracelytics.joboe.ebson.BsonToken;
+import com.tracelytics.joboe.ebson.BsonWriter;
+import com.tracelytics.joboe.ebson.MultiValList;
 import com.tracelytics.logging.Logger;
 import com.tracelytics.logging.LoggerFactory;
 import com.tracelytics.util.HostInfoUtils;
@@ -343,7 +346,7 @@ public class EventImpl extends Event {
      * @return trimmed BsonDocument
      */
     private BsonDocument trimDoc(BsonDocument doc) {
-    	Builder newBuilder = BsonDocuments.builder();
+    	BsonDocument.Builder newBuilder = BsonDocuments.builder();
     	
     	int bytesAllowed = MAX_EVENT_BUFFER_SIZE; //bytes allowed to build the new doc(event)
     	
@@ -438,7 +441,7 @@ public class EventImpl extends Event {
     		//try to serialize it to ensure it would not throw exception, take note that the test buffer accumulates each KV as a separate test document
             //and each test document is just a single KV bson
             //This comparison should work as the size of the actual bson document which contains all KVs should be slightly smaller than many single KV bson documents combined
-            Builder testBuilder = BsonDocuments.builder();
+            BsonDocument.Builder testBuilder = BsonDocuments.builder();
     		testBuilder.put(entry.getKey(), value);
     		int lastPosition = testBuffer.position();
     		try {

@@ -1,9 +1,11 @@
 package com.tracelytics.metrics.histogram;
 
+import com.tracelytics.metrics.hdrHistogram.ConcurrentHistogram;
+
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.util.Base64;
 
-import com.tracelytics.ext.base64.Base64;
 
 /**
  * Adaptor to HDR histogram https://github.com/HdrHistogram/HdrHistogram
@@ -11,13 +13,13 @@ import com.tracelytics.ext.base64.Base64;
  *
  */
 public class HdrHistogramAdapter implements Histogram {
-    private com.tracelytics.ext.hdrHistogram.Histogram hdrHistogram;
+    private com.tracelytics.metrics.hdrHistogram.Histogram hdrHistogram;
     private Long lastValue;
     private final long MAX_VALUE;
     private final long MIN_VALUE = 0;
     
     HdrHistogramAdapter(long highestTrackableValue, int numberOfSignificantValueDigits) {
-        hdrHistogram = new com.tracelytics.ext.hdrHistogram.ConcurrentHistogram(highestTrackableValue, numberOfSignificantValueDigits);
+        hdrHistogram = new ConcurrentHistogram(highestTrackableValue, numberOfSignificantValueDigits);
         this.MAX_VALUE = highestTrackableValue;
     }
     
@@ -72,8 +74,8 @@ public class HdrHistogramAdapter implements Histogram {
     public Long getCountHigherThanValue(long value) {
         return hdrHistogram.getCountBetweenValues(value, hdrHistogram.getMaxValue());
     }
-    
-    com.tracelytics.ext.hdrHistogram.Histogram getUnderlyingHistogram() {
+
+    com.tracelytics.metrics.hdrHistogram.Histogram getUnderlyingHistogram() {
          return hdrHistogram;
     }
     
@@ -88,6 +90,6 @@ public class HdrHistogramAdapter implements Histogram {
         
         buffer.get(serializedArray);
         
-        return Base64.encodeBytesToBytes(serializedArray);
+        return Base64.getEncoder().encode(serializedArray);
     }
 }

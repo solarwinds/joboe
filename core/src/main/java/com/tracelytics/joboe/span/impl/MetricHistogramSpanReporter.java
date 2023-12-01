@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.tracelytics.ext.google.common.cache.CacheBuilder;
-import com.tracelytics.ext.google.common.cache.CacheLoader;
-import com.tracelytics.ext.google.common.cache.LoadingCache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.tracelytics.joboe.span.impl.Span.TraceProperty;
 import com.tracelytics.metrics.MetricKey;
 import com.tracelytics.metrics.MetricsEntry;
@@ -38,7 +38,7 @@ public class MetricHistogramSpanReporter extends MetricSpanReporter {
     }
     
     private static LoadingCache<MetricKey, Histogram> createHistogramCache() {
-        return CacheBuilder.newBuilder().build(new CacheLoader<MetricKey, Histogram> () {
+        return CacheBuilder.newBuilder().build(new CacheLoader<MetricKey, Histogram>() {
                     @Override
                     public Histogram load(MetricKey key) throws Exception {
                         return HistogramFactory.buildHistogram(HISTOGRAM_TYPE, MAX_DURATION);

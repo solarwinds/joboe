@@ -1,7 +1,8 @@
 package com.tracelytics.util;
 
-import com.tracelytics.ext.google.common.cache.Cache;
-import com.tracelytics.ext.google.common.cache.CacheBuilder;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;

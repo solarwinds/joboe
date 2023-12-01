@@ -1,11 +1,9 @@
 package com.tracelytics.joboe.span.impl;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+
 import java.util.concurrent.TimeUnit;
-
-import com.tracelytics.ext.google.common.cache.Cache;
-import com.tracelytics.ext.google.common.cache.CacheBuilder;
-
-import com.tracelytics.joboe.span.impl.Span;
 /**
  * Provides lookup of span with span ID, take note that the entry expires 10 minutes after it's inserted into the dictionary
  * @author pluk

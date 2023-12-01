@@ -1,6 +1,6 @@
 package com.tracelytics.benchmarking;
 
-import com.tracelytics.ext.hdrHistogram.Histogram;
+import com.tracelytics.metrics.hdrHistogram.Histogram;
 import com.tracelytics.util.DaemonThreadFactory;
 
 import java.util.Map;

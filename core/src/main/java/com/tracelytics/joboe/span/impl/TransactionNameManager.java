@@ -7,8 +7,9 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
-import com.tracelytics.ext.google.common.cache.Cache;
-import com.tracelytics.ext.google.common.cache.CacheBuilder;
+
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.tracelytics.joboe.config.ConfigManager;
 import com.tracelytics.joboe.config.ConfigProperty;
 import com.tracelytics.joboe.settings.SettingsArg;

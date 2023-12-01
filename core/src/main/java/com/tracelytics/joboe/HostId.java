@@ -1,12 +1,12 @@
 package com.tracelytics.joboe;
 
-import com.appoptics.ext.com.solarwinds.trace.ingestion.proto.Collector;
-import com.tracelytics.ext.json.JSONException;
-import com.tracelytics.ext.json.JSONObject;
+import com.solarwinds.trace.ingestion.proto.Collector;
 import com.tracelytics.joboe.rpc.HostType;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Value;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Collections;
 import java.util.List;

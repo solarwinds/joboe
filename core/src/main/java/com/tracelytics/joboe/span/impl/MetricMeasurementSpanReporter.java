@@ -6,9 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.tracelytics.ext.google.common.cache.CacheBuilder;
-import com.tracelytics.ext.google.common.cache.CacheLoader;
-import com.tracelytics.ext.google.common.cache.LoadingCache;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.tracelytics.metrics.MetricKey;
 import com.tracelytics.metrics.MetricsEntry;
 import com.tracelytics.metrics.measurement.SummaryLongMeasurement;
@@ -35,7 +36,7 @@ public abstract class MetricMeasurementSpanReporter extends MetricSpanReporter {
     }
     
     private static LoadingCache<MetricKey, SummaryLongMeasurement> createMeasurementCache() {
-        return CacheBuilder.newBuilder().build(new CacheLoader<MetricKey, SummaryLongMeasurement> () {
+        return CacheBuilder.newBuilder().build(new CacheLoader<MetricKey, SummaryLongMeasurement>() {
                     @Override
                     public SummaryLongMeasurement load(MetricKey key) throws Exception {
                         return new SummaryLongMeasurement();

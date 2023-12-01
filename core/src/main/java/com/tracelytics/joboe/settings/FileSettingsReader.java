@@ -1,6 +1,6 @@
 package com.tracelytics.joboe.settings;
 
-import com.appoptics.ext.com.solarwinds.trace.ingestion.proto.Collector;
+import com.solarwinds.trace.ingestion.proto.Collector;
 import com.tracelytics.logging.Logger;
 import com.tracelytics.logging.LoggerFactory;
 

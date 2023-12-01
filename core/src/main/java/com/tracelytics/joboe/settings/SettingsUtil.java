@@ -1,7 +1,7 @@
 package com.tracelytics.joboe.settings;
 
-import com.appoptics.ext.com.solarwinds.trace.ingestion.proto.Collector;
-import com.tracelytics.ext.google.protobuf.ByteString;
+import com.google.protobuf.ByteString;
+import com.solarwinds.trace.ingestion.proto.Collector;
 import com.tracelytics.joboe.rpc.ResultCode;
 import com.tracelytics.joboe.rpc.SettingsResult;
 import com.tracelytics.logging.LoggerFactory;

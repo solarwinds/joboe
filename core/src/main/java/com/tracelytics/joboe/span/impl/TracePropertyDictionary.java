@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import com.tracelytics.ext.google.common.cache.CacheBuilder;
-import com.tracelytics.ext.google.common.cache.CacheLoader;
-import com.tracelytics.ext.google.common.cache.LoadingCache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.tracelytics.joboe.span.impl.Span.TraceProperty;
 
 public class TracePropertyDictionary {

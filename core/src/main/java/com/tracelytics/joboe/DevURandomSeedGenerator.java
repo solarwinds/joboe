@@ -4,9 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import com.tracelytics.ext.uncommons.maths.random.SeedException;
-import com.tracelytics.ext.uncommons.maths.random.SeedGenerator;
-
 /**
  * Copied from <code>com.tracelytics.ext.uncommons.maths.random.DevRandomSeedGenerator</code>, but use /dev/urandom instead of 
  * /dev/random

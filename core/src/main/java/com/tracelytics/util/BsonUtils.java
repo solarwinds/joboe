@@ -1,10 +1,11 @@
 package com.tracelytics.util;
 
-import com.tracelytics.ext.ebson.BsonDocument;
-import com.tracelytics.ext.ebson.BsonDocuments;
-import com.tracelytics.ext.ebson.BsonToken;
-import com.tracelytics.ext.ebson.BsonWriter;
+
 import com.tracelytics.joboe.BsonBufferException;
+import com.tracelytics.joboe.ebson.BsonDocument;
+import com.tracelytics.joboe.ebson.BsonDocuments;
+import com.tracelytics.joboe.ebson.BsonToken;
+import com.tracelytics.joboe.ebson.BsonWriter;
 
 import java.nio.Buffer;
 import java.nio.BufferOverflowException;

@@ -1,10 +1,11 @@
 package com.tracelytics.joboe;
 
-import com.tracelytics.ext.ebson.BsonDocument;
-import com.tracelytics.ext.ebson.BsonReader;
-import com.tracelytics.ext.ebson.BsonToken;
+
 import com.tracelytics.joboe.TestReporter.DeserializedEvent;
 import com.tracelytics.joboe.config.InvalidConfigException;
+import com.tracelytics.joboe.ebson.BsonDocument;
+import com.tracelytics.joboe.ebson.BsonReader;
+import com.tracelytics.joboe.ebson.BsonToken;
 import com.tracelytics.util.TestUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;

@@ -1,12 +1,13 @@
 package com.tracelytics.joboe.rpc;
 
 
-import com.tracelytics.ext.ebson.BsonDocument;
-import com.tracelytics.ext.ebson.BsonDocuments;
+
 import com.tracelytics.joboe.BsonBufferException;
 import com.tracelytics.joboe.Constants;
 import com.tracelytics.joboe.Context;
 import com.tracelytics.joboe.Event;
+import com.tracelytics.joboe.ebson.BsonDocument;
+import com.tracelytics.joboe.ebson.BsonDocuments;
 import com.tracelytics.joboe.rpc.RpcClient.TaskType;
 import com.tracelytics.joboe.settings.PollingSettingsFetcherTest;
 import com.tracelytics.joboe.settings.SettingsArg;

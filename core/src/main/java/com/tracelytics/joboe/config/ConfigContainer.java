@@ -7,10 +7,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.tracelytics.ext.json.JSONArray;
-import com.tracelytics.ext.json.JSONException;
+
 import com.tracelytics.logging.Logger;
 import com.tracelytics.logging.LoggerFactory;
+import org.json.JSONArray;
+import org.json.JSONException;
 
 /**
  * This container serves several purposes

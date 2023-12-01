@@ -1,20 +1,25 @@
 package com.tracelytics.joboe.rpc.grpc;
 
 
-import com.appoptics.ext.com.solarwinds.trace.ingestion.proto.Collector;
-import com.appoptics.ext.com.solarwinds.trace.ingestion.proto.TraceCollectorGrpc;
-import com.appoptics.ext.io.grpc.Server;
-import com.appoptics.ext.io.grpc.ServerBuilder;
-import com.appoptics.ext.io.grpc.Status;
-import com.appoptics.ext.io.grpc.stub.StreamObserver;
-import com.tracelytics.ext.google.protobuf.ByteString;
-import com.tracelytics.joboe.Event;
-import com.tracelytics.joboe.rpc.*;
+import com.google.protobuf.ByteString;
+import com.solarwinds.trace.ingestion.proto.Collector;
+import com.solarwinds.trace.ingestion.proto.TraceCollectorGrpc;
+import com.tracelytics.joboe.rpc.Client;
+import com.tracelytics.joboe.rpc.ClientFatalException;
+import com.tracelytics.joboe.rpc.ProtocolClient;
+import com.tracelytics.joboe.rpc.ProtocolClientFactory;
+import com.tracelytics.joboe.rpc.ResultCode;
+import com.tracelytics.joboe.rpc.RpcClient;
 import com.tracelytics.joboe.rpc.RpcClient.TaskType;
+import com.tracelytics.joboe.rpc.RpcClientTest;
+import com.tracelytics.joboe.rpc.Settings;
 import com.tracelytics.joboe.settings.PollingSettingsFetcherTest;
 import com.tracelytics.joboe.settings.SettingsArg;
-
 import com.tracelytics.util.TimeUtils;
+import io.grpc.Server;
+import io.grpc.ServerBuilder;
+import io.grpc.Status;
+import io.grpc.stub.StreamObserver;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -22,7 +27,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
