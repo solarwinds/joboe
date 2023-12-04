@@ -1,8 +1,8 @@
 package com.tracelytics.monitor.metrics;
 
-import com.tracelytics.ext.google.common.cache.CacheBuilder;
-import com.tracelytics.ext.google.common.cache.CacheLoader;
-import com.tracelytics.ext.google.common.cache.LoadingCache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.tracelytics.joboe.settings.SettingsArg;
 import com.tracelytics.joboe.settings.SettingsArgChangeListener;
 import com.tracelytics.joboe.settings.SettingsManager;
@@ -125,7 +125,7 @@ public class CustomMetricsCollector extends AbstractMetricsEntryCollector {
     }
     
     private static LoadingCache<MetricKey, SummaryDoubleMeasurement> createSummaryMeasurementCache() {
-        return CacheBuilder.newBuilder().build(new CacheLoader<MetricKey, SummaryDoubleMeasurement> () {
+        return CacheBuilder.newBuilder().build(new CacheLoader<MetricKey, SummaryDoubleMeasurement>() {
                     @Override
                     public SummaryDoubleMeasurement load(MetricKey key) throws Exception {
                         return new SummaryDoubleMeasurement();

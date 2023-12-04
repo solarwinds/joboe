@@ -1,9 +1,9 @@
 package com.tracelytics.metrics.histogram;
 
-import com.tracelytics.ext.base64.Base64;
 import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
+import java.util.Base64;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -27,10 +27,10 @@ public class HdrHistrogramAdapterTest {
         assertEquals(expectedEncodedString, new String(encoded));
         
         ByteBuffer buffer = ByteBuffer.allocate(encoded.length);
-        buffer.put(Base64.decode(encoded));
+        buffer.put(Base64.getDecoder().decode(encoded));
         buffer.rewind();
         
-        com.tracelytics.ext.hdrHistogram.Histogram readHistogram = com.tracelytics.ext.hdrHistogram.Histogram.decodeFromCompressedByteBuffer(buffer, 0);
+        com.tracelytics.metrics.hdrHistogram.Histogram readHistogram = com.tracelytics.metrics.hdrHistogram.Histogram.decodeFromCompressedByteBuffer(buffer, 0);
         
         assertEquals(testHistogram.getUnderlyingHistogram(), readHistogram);
     }

@@ -62,13 +62,11 @@
       <artifactId>grpc-stub</artifactId>
       <version>${grpc.version}</version>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/org.json/json -->
     <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
       <version>20231013</version>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>

@@ -16,9 +16,6 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 
-import com.tracelytics.ext.json.JSONArray;
-import com.tracelytics.ext.json.JSONException;
-import com.tracelytics.ext.json.JSONObject;
 import com.tracelytics.joboe.config.ConfigContainer;
 import com.tracelytics.joboe.config.ConfigProperty;
 import com.tracelytics.joboe.config.InvalidConfigException;
@@ -27,6 +24,9 @@ import com.tracelytics.metrics.MetricsEntry;
 import com.tracelytics.metrics.measurement.SimpleMeasurementMetricsEntry;
 import com.tracelytics.monitor.jmx.processor.AttributeProcessor;
 import com.tracelytics.monitor.jmx.processor.AttributeProcessorLocator;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Sub metrics collector that collects metrics from JMX's mBeans. Take note that each {@link #collect()} call would return information collected from each of the {@link JMXScope} passed in via the constructor

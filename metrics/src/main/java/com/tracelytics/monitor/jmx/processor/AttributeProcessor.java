@@ -10,7 +10,7 @@ import javax.management.ObjectName;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.TabularData;
 
-import com.tracelytics.ext.google.common.primitives.Primitives;
+import com.google.common.primitives.Primitives;
 import com.tracelytics.logging.Logger;
 import com.tracelytics.logging.LoggerFactory;
 
