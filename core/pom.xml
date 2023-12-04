@@ -48,28 +48,13 @@
     </dependency>
     <dependency>
       <groupId>io.grpc</groupId>
-      <artifactId>grpc-protobuf</artifactId>
-      <version>${grpc.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.grpc</groupId>
       <artifactId>grpc-netty</artifactId>
-      <version>${grpc.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>io.grpc</groupId>
-      <artifactId>grpc-stub</artifactId>
       <version>${grpc.version}</version>
     </dependency>
     <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
       <version>20231013</version>
-    </dependency>
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <version>32.1.3-jre</version>
     </dependency>
     <dependency>
       <groupId>org.projectlombok</groupId>
@@ -108,6 +93,16 @@
           <groupId>io.grpc</groupId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>io.grpc</groupId>
+      <artifactId>grpc-stub</artifactId>
+      <version>${grpc.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.grpc</groupId>
+      <artifactId>grpc-protobuf</artifactId>
+      <version>${grpc.version}</version>
     </dependency>
   </dependencies>
   <build>
@@ -246,7 +241,7 @@
                 </relocation>
                 <relocation>
                   <pattern>com.google</pattern>
-                  <!-- use com.tracelytics as some of the existing code uses guava too-->
+                  <!-- some of the dependencies include guava too-->
                   <shadedPattern>com.solarwinds.shaded.google</shadedPattern>
                 </relocation>
               </relocations>
