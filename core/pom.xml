@@ -41,7 +41,6 @@
     </dependencies>
   </dependencyManagement>
   <dependencies>
-    <!-- https://mvnrepository.com/artifact/com.google.code.findbugs/jsr305 -->
     <dependency>
       <groupId>com.google.code.findbugs</groupId>
       <artifactId>jsr305</artifactId>
@@ -111,6 +110,12 @@
       </exclusions>
     </dependency>
     <dependency>
+      <groupId>com.google.auto.service</groupId>
+      <artifactId>auto-service</artifactId>
+      <version>1.1.1</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
       <groupId>org.junit-pioneer</groupId>
       <artifactId>junit-pioneer</artifactId>
       <version>1.9.1</version>
@@ -145,12 +150,6 @@
       <artifactId>mockito-inline</artifactId>
       <version>3.12.4</version>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.google.auto.service</groupId>
-      <artifactId>auto-service</artifactId>
-      <version>1.1.1</version>
-      <optional>true</optional>
     </dependency>
   </dependencies>
   <build>
@@ -260,6 +259,10 @@
               <shadeSourcesContent>true</shadeSourcesContent>
               <relocations>
                 <relocation>
+                  <pattern>cloud</pattern>
+                  <shadedPattern>com.solarwinds.shaded.cloud</shadedPattern>
+                </relocation>
+                <relocation>
                   <pattern>okhttp3</pattern>
                   <shadedPattern>com.solarwinds.shaded.okhttp3</shadedPattern>
                 </relocation>
@@ -289,6 +292,22 @@
                   <shadedPattern>com.solarwinds.shaded.google</shadedPattern>
                 </relocation>
               </relocations>
+              <transformers>
+                <!-- have to define DontIncludeResourceTransformer one at a time, otherwise it does not work -->
+                <transformer implementation="org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer">
+                  <resource>NOTICE</resource>
+                </transformer>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer">
+                  <resource>DEPENDENCIES</resource>
+                </transformer>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer">
+                  <resource>LICENSE</resource>
+                </transformer>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.DontIncludeResourceTransformer">
+                  <resource>.txt</resource>
+                </transformer>
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+              </transformers>
             </configuration>
           </execution>
         </executions>
