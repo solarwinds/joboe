@@ -210,7 +210,28 @@
             <configuration>
               <createSourcesJar>true</createSourcesJar>
               <shadeSourcesContent>true</shadeSourcesContent>
+              <minimizeJar>true</minimizeJar>
+              <filters>
+                <filter>
+                  <artifact>com.google.auto.service:auto-service</artifact>
+                  <includes>
+                    <include>com/google/auto/service/auto-service/*</include>
+                  </includes>
+                </filter>
+              </filters>
               <relocations>
+                <relocation>
+                  <pattern>com.solarwinds.trace</pattern>
+                  <shadedPattern>com.solarwinds.shaded.trace</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>android.annotation</pattern>
+                  <shadedPattern>com.solarwinds.shaded.android.annotation</shadedPattern>
+                </relocation>
+                <relocation>
+                  <pattern>javax.annotation</pattern>
+                  <shadedPattern>com.solarwinds.shaded.javax.annotation</shadedPattern>
+                </relocation>
                 <relocation>
                   <pattern>cloud</pattern>
                   <shadedPattern>com.solarwinds.shaded.cloud</shadedPattern>

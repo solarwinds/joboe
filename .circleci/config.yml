@@ -53,11 +53,25 @@ jobs:
       - store_test_results:
           path: core/target/surefire-reports
       - run:
-          name: Check shading
+          name: Check shading(core)
           command: |
             VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
             code=0
-            for path in $(jar tf "core/target/core-$VERSION.jar" | grep -E -v '^((com/tracelytics|com/solarwinds|inst|META))')
+            for path in $(jar tf "core/target/core-$VERSION.jar" | grep -E -v '^((com/tracelytics|com/solarwinds|META))')
+            do
+              PACKAGE=$(echo "$path" | awk -F/ '{print $2}')
+              if [ -n "$PACKAGE" ]; then
+                echo "Package ($path) is not shaded"
+                code=1
+              fi
+            done
+            exit $code
+      - run:
+          name: Check shading(metric)
+          command: |
+            VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+            code=0
+            for path in $(jar tf "metrics/target/metrics-$VERSION.jar" | grep -E -v '^((com/tracelytics|com/solarwinds|META))')
             do
               PACKAGE=$(echo "$path" | awk -F/ '{print $2}')
               if [ -n "$PACKAGE" ]; then

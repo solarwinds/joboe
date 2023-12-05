@@ -1,8 +1,8 @@
 package com.tracelytics.monitor.metrics;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.solarwinds.shaded.google.common.cache.CacheBuilder;
+import com.solarwinds.shaded.google.common.cache.CacheLoader;
+import com.solarwinds.shaded.google.common.cache.LoadingCache;
 import com.tracelytics.joboe.settings.SettingsArg;
 import com.tracelytics.joboe.settings.SettingsArgChangeListener;
 import com.tracelytics.joboe.settings.SettingsManager;

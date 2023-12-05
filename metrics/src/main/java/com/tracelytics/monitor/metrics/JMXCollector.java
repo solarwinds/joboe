@@ -24,9 +24,9 @@ import com.tracelytics.metrics.MetricsEntry;
 import com.tracelytics.metrics.measurement.SimpleMeasurementMetricsEntry;
 import com.tracelytics.monitor.jmx.processor.AttributeProcessor;
 import com.tracelytics.monitor.jmx.processor.AttributeProcessorLocator;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.solarwinds.shaded.org.json.JSONArray;
+import com.solarwinds.shaded.org.json.JSONException;
+import com.solarwinds.shaded.org.json.JSONObject;
 
 /**
  * Sub metrics collector that collects metrics from JMX's mBeans. Take note that each {@link #collect()} call would return information collected from each of the {@link JMXScope} passed in via the constructor

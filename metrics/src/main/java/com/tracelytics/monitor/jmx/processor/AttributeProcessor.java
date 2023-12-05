@@ -10,7 +10,6 @@ import javax.management.ObjectName;
 import javax.management.openmbean.CompositeData;
 import javax.management.openmbean.TabularData;
 
-import com.google.common.primitives.Primitives;
 import com.tracelytics.logging.Logger;
 import com.tracelytics.logging.LoggerFactory;
 
@@ -79,7 +78,7 @@ public abstract class AttributeProcessor {
 //                System.out.println("Index : " + i);
                 appendAttribute(element, prefix + "[" + i + "]", values);
             }
-        } else if (Primitives.isWrapperType(attributeObj.getClass())){ //simple data type
+        } else if (attributeObj instanceof Number){ //simple data type
             values.put(prefix, attributeObj);
         } else {
             values.put(prefix, attributeObj.toString());
