@@ -1,4 +1,4 @@
-package com.tracelytics.monitor.metrics;
+package com.tracelytics.monitor;
 
 import com.solarwinds.shaded.google.common.cache.CacheBuilder;
 import com.solarwinds.shaded.google.common.cache.CacheLoader;

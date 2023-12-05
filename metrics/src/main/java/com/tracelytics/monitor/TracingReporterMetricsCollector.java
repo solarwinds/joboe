@@ -1,4 +1,4 @@
-package com.tracelytics.monitor.metrics;
+package com.tracelytics.monitor;
 
 import java.util.ArrayList;
 import java.util.List;

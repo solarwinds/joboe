@@ -4,7 +4,6 @@ import com.tracelytics.joboe.config.ConfigContainer;
 import com.tracelytics.logging.Logger;
 import com.tracelytics.logging.LoggerFactory;
 import com.tracelytics.monitor.framework.FrameworkInfoMonitor;
-import com.tracelytics.monitor.metrics.MetricsMonitor;
 
 import java.util.ArrayList;
 import java.util.Collections;

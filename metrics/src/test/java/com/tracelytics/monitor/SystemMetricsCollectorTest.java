@@ -1,4 +1,4 @@
-package com.tracelytics.monitor.metrics;
+package com.tracelytics.monitor;
 
 import com.tracelytics.metrics.measurement.SimpleMeasurementMetricsEntry;
 import org.junit.jupiter.api.Test;

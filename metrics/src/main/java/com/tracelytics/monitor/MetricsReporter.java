@@ -1,4 +1,4 @@
-package com.tracelytics.monitor.metrics;
+package com.tracelytics.monitor;
 
 import com.tracelytics.joboe.rpc.Client;
 import com.tracelytics.joboe.rpc.ClientException;
@@ -6,8 +6,6 @@ import com.tracelytics.joboe.rpc.ClientLoggingCallback;
 import com.tracelytics.joboe.rpc.Result;
 import com.tracelytics.metrics.MetricsEntry;
 import com.tracelytics.metrics.MetricsEntry.MetricsEntryType;
-import com.tracelytics.monitor.SystemReporter;
-import com.tracelytics.monitor.SystemReporterException;
 import com.tracelytics.util.HostInfoUtils;
 import com.tracelytics.util.TimeUtils;
 

@@ -1,4 +1,4 @@
-package com.tracelytics.monitor.metrics;
+package com.tracelytics.monitor;
 
 import java.util.List;
 
@@ -12,7 +12,6 @@ import com.tracelytics.joboe.settings.SettingsArg;
 import com.tracelytics.joboe.settings.SettingsArgChangeListener;
 import com.tracelytics.joboe.settings.SettingsManager;
 import com.tracelytics.metrics.MetricsEntry;
-import com.tracelytics.monitor.SystemMonitorWithFrequency;
 
 /**
  * {@code SystemMonitor} for various metrics. The the list of supported metrics, please refer to {@link MetricsCollector} 

@@ -1,4 +1,4 @@
-package com.tracelytics.monitor.metrics;
+package com.tracelytics.monitor;
 
 import com.tracelytics.joboe.span.impl.InboundMetricMeasurementSpanReporter;
 import com.tracelytics.joboe.span.impl.MetricHistogramSpanReporter;

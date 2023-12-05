@@ -3,20 +3,20 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-	<groupId>com.appoptics.agent.java</groupId>
-	<artifactId>appoptics-parent</artifactId>
+	<groupId>com.solarwinds.joboe</groupId>
+	<artifactId>joboe</artifactId>
 	<version>${revision}</version>
   </parent>
 
   <artifactId>metrics</artifactId>
   <packaging>jar</packaging>
 
-  <name>Agent Metrics</name>
+  <name>metrics</name>
   <url>https://maven.apache.org</url>
 
   <dependencies>
     <dependency>
-      <groupId>com.appoptics.agent.java</groupId>
+      <groupId>com.solarwinds.joboe</groupId>
       <artifactId>core</artifactId>
       <version>${revision}</version>
     </dependency>

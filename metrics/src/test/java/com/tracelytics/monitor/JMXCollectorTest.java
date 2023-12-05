@@ -1,9 +1,10 @@
-package com.tracelytics.monitor.metrics;
+package com.tracelytics.monitor;
 
 import com.tracelytics.joboe.config.ConfigContainer;
 import com.tracelytics.joboe.config.ConfigProperty;
 import com.tracelytics.joboe.config.InvalidConfigException;
 import com.tracelytics.metrics.MetricKey;
+import com.tracelytics.monitor.JMXCollector;
 import org.junit.jupiter.api.Test;
 
 import javax.management.*;

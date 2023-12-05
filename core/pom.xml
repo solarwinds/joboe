@@ -3,8 +3,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>com.appoptics.agent.java</groupId>
-    <artifactId>appoptics-parent</artifactId>
+    <groupId>com.solarwinds.joboe</groupId>
+    <artifactId>joboe</artifactId>
     <version>${revision}</version>
   </parent>
 

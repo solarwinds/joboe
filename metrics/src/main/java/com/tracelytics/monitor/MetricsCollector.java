@@ -1,4 +1,4 @@
-package com.tracelytics.monitor.metrics;
+package com.tracelytics.monitor;
 
 import java.util.HashMap;
 import java.util.List;
@@ -10,7 +10,6 @@ import com.tracelytics.joboe.config.ConfigContainer;
 import com.tracelytics.joboe.config.ConfigProperty;
 import com.tracelytics.joboe.config.InvalidConfigException;
 import com.tracelytics.metrics.MetricsEntry;
-import com.tracelytics.monitor.SystemCollector;
 import com.tracelytics.util.DaemonThreadFactory;
 
 /**
