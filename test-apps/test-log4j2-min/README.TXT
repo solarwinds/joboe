@@ -1,1 +1,0 @@
-Test app for log4j2 context injection with MDC (min version 2.0)

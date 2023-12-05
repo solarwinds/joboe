@@ -1,8 +1,0 @@
-Manifest-Version: 1.0
-Premain-Class: com.tracelytics.agent.BootstrapAgent
-Can-Redefine-Classes: true
-Can-Retransform-Classes: true
-Can-Set-Native-Method-Prefix: true
-Implementation-Title: ${project.name}
-Implementation-Version: ${project.version}
-Implementation-Vendor-Id: ${project.groupId} 

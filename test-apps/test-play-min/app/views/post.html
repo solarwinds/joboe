@@ -1,9 +1,0 @@
-#{extends 'main.html' /}
-#{set title:'Home' /}
-
-<form action="/post" id="testForm" method="POST">
-	Input: <input type="text" name="test"/>
-</form>
-
-<div>Received ${request.params.get("test")}</div>
-
