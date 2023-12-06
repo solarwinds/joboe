@@ -26,7 +26,6 @@ class TraceDecisionMetricsCollector extends AbstractMetricsEntryCollector {
         layerMetricsEntries.add(getMetricEntry(MetricType.TRACE_COUNT, "TraceCount"));
         layerMetricsEntries.add(getMetricEntry(MetricType.SAMPLE_COUNT, "SampleCount"));
         layerMetricsEntries.add(getMetricEntry(MetricType.THROUGH_TRACE_COUNT, "ThroughTraceCount"));
-        layerMetricsEntries.add(getMetricEntry(MetricType.THROUGH_IGNORED_COUNT, "ThroughIgnoredCount"));
         layerMetricsEntries.add(getMetricEntry(MetricType.TRIGGERED_TRACE_COUNT, "TriggeredTraceCount"));
 
         Map<String, TraceConfig> layerConfigs = TraceDecisionUtil.consumeLastTraceConfigs();

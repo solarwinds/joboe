@@ -538,33 +538,6 @@ public class TraceDecisionUtilTest {
     }
 
     @Test
-    public void testThroughIgnoredCount() throws Exception {
-        int data;
-        TraceDecisionUtil.consumeMetricsData(MetricType.THROUGH_IGNORED_COUNT); //clear it
-
-        //Take note that THROUGH_IGNORED refer to non upstream request (ie traffic that is NOT initiated by an instrumented entity, for example external traffic) that got rejected tracing
-        //because the trace mode is THROUGH
-
-        testSettingsReader.put(new SettingsMockupBuilder().withFlags(true, false, true, true, false).withSampleRate(1000000).build()); //ALWAYS sample rate = 100%
-        TraceDecisionUtil.shouldTraceRequest("LayerA", null, null, null);  //not rejected due to TraceMode.THROUGH, don't count
-        TraceDecisionUtil.shouldTraceRequest("LayerA", X_TRACE_ID_SAMPLED, null, null); //upstream request, don't count
-        testSettingsReader.put(new SettingsMockupBuilder().withFlags(true, false, true, true, false).withSampleRate(500000).build()); //ALWAYS. sample rate = 50%
-        TraceDecisionUtil.shouldTraceRequest("LayerB", null, null, null); //not rejected due to TraceMode.THROUGH, don't count
-        TraceDecisionUtil.shouldTraceRequest("LayerB", X_TRACE_ID_SAMPLED, null, null); //upstream request, don't count
-        testSettingsReader.put(new SettingsMockupBuilder().withFlags(false, false, true, false, false).withSampleRate(1000000).build()); //THROUGH. sample rate = 100% (not used anyway for THROUGH traces)
-        TraceDecisionUtil.shouldTraceRequest("LayerC", null, null, null); //rejected due to TraceMode.THROUGH. THROUGH_IGNORED_COUNT + 1
-        TraceDecisionUtil.shouldTraceRequest("LayerC", X_TRACE_ID_SAMPLED, null, null); //upstream request, don't count
-        testSettingsReader.put(new SettingsMockupBuilder().withFlags(false, false, false, false, false).withSampleRate(1000000).build()); //NEVER. sample rate = 100% (not used anyway as no traces get through)
-        TraceDecisionUtil.shouldTraceRequest("LayerD", null, null, null); //not rejected due to TraceMode.THROUGH, don't count
-        TraceDecisionUtil.shouldTraceRequest("LayerD", X_TRACE_ID_SAMPLED, null, null); //not rejected due to TraceMode.THROUGH, don't count
-        
-
-        data = TraceDecisionUtil.consumeMetricsData(MetricType.THROUGH_IGNORED_COUNT);
-
-        assertEquals(1, data);
-    }
-
-    @Test
     public void testTriggerTraceCount() throws Exception {
         int data;
         TraceDecisionUtil.consumeMetricsData(MetricType.TRIGGERED_TRACE_COUNT); //clear it

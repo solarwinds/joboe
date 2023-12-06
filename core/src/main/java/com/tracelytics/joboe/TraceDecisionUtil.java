@@ -59,15 +59,6 @@ public class TraceDecisionUtil {
             RequestType requestType = getRequestType(inXTraceID, xTraceOptions);
             isTriggerTrace = requestType.isTriggerTrace();
 
-            //metrics for signature, disabled for now
-//            if (xTraceOptions != null) {
-//                if (xTraceOptions.getAuthenticationStatus().isAuthenticated()) {
-//                    incrementMetricsByTag(MetricType.SIGNED_REQUEST_COUNT, getTagEntry("Authenticated", true));
-//                } else if (xTraceOptions.getAuthenticationStatus().isFailure()) {
-//                    incrementMetricsByTag(MetricType.SIGNED_REQUEST_COUNT, getTagEntry("Authenticated", false));
-//                }
-//            }
-
             //First get the config from remote source (SRv1)
             TraceConfig remoteConfig = getRemoteTraceConfig();
 
@@ -105,7 +96,7 @@ public class TraceDecisionUtil {
             if (inXTraceID != null) {
                 inMetadata = validateMetadata(inXTraceID);
             }
-            boolean isSampled = isSampledByConfig(inMetadata, config, isTriggerTrace, layer);
+            boolean isSampled = isSampledByConfig(inMetadata, config, isTriggerTrace);
             boolean bucketExhausted = false;
             
             //perform token bucket check if it is a new trace
@@ -121,21 +112,17 @@ public class TraceDecisionUtil {
                         logger.trace("No Tokens available in the Token Bucket. Not tracing this request");
                         
                         incrementMetrics(MetricType.TOKEN_BUCKET_EXHAUSTION);
-//                        incrementMetricsByTag(MetricType.TOKEN_BUCKET_EXHAUSTION, getTagEntry("Bucket", requestType.bucketType.getLabel()));
-
                         isSampled = false; //flip it to false due to exhausted bucket
                         bucketExhausted = true;
                     }
                 } else {
                     incrementMetrics(MetricType.TRACE_COUNT); //count all through traffic that will be traced
-//                    incrementMetricsByTag(MetricType.TRACE_COUNT, getTagEntry("TriggerTrace", isTriggerTrace));
                 }
             }
             
             return new TraceDecision(isSampled, isReportMetrics, bucketExhausted, config, requestType, inMetadata);
         } finally {
             incrementMetrics(MetricType.THROUGHPUT);
-//            incrementMetricsByTag(MetricType.THROUGHPUT, getTagEntry("TriggerTrace",isTriggerTrace));
         }
     }
 
@@ -365,10 +352,9 @@ public class TraceDecisionUtil {
      * Checks whether we should sample based on the TraceConfig and various criteria
      * @param inMetadata
      * @param config
-     * @param layer             not really used in the logic but required for metrics reporting
      * @return whether we should trace
      */
-    private static boolean isSampledByConfig(Metadata inMetadata, TraceConfig config, boolean isTriggerTrace, String layer) {
+    private static boolean isSampledByConfig(Metadata inMetadata, TraceConfig config, boolean isTriggerTrace) {
         if (inMetadata == null) { //new trace
             if (isTriggerTrace) { //trigger trace only matters for new traces
                 if (config.hasSampleTriggerTraceFlag()) {
@@ -381,9 +367,6 @@ public class TraceDecisionUtil {
                     incrementMetrics(MetricType.SAMPLE_COUNT);
                     return sampled(config.getSampleRate());
                 } else {
-                    if (config.hasSampleThroughAlwaysFlag()) { //to identify non-upstream trace rejected when only through flag is on (TraceMode.THROUGH), does not affect sample decision
-                        incrementMetrics(MetricType.THROUGH_IGNORED_COUNT);
-                    }
                     return false;
                 }
             }
@@ -465,7 +448,7 @@ public class TraceDecisionUtil {
     }
     
     public enum MetricType {
-        THROUGHPUT, TOKEN_BUCKET_EXHAUSTION, TRACE_COUNT, SAMPLE_COUNT, THROUGH_TRACE_COUNT, THROUGH_IGNORED_COUNT, TRIGGERED_TRACE_COUNT// ,SIGNED_REQUEST_COUNT
+        THROUGHPUT, TOKEN_BUCKET_EXHAUSTION, TRACE_COUNT, SAMPLE_COUNT, THROUGH_TRACE_COUNT, TRIGGERED_TRACE_COUNT// ,SIGNED_REQUEST_COUNT
     }
 
     public enum RequestType {
