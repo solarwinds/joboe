@@ -10,7 +10,7 @@ import java.io.InputStreamReader;
 import java.util.concurrent.*;
 
 public class ExecUtils {
-    private static Logger logger = LoggerFactory.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger();
     private static final int EXEC_TIMEOUT = 5000; //5 seconds for exec
     /**
      * Executes the command and returns the result as string
@@ -46,7 +46,7 @@ public class ExecUtils {
     }
 
     private static class ReadStreamCallable implements Callable<String> {
-        private InputStream inputStream;
+        private final InputStream inputStream;
         private String newLine;
         private ReadStreamCallable(InputStream inputStream) {
             this.inputStream = inputStream;

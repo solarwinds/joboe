@@ -15,6 +15,7 @@ import com.solarwinds.joboe.settings.SettingsArgChangeListener;
 import com.solarwinds.joboe.settings.SettingsManager;
 import com.solarwinds.logging.Logger;
 import com.solarwinds.logging.LoggerFactory;
+import lombok.Getter;
 
 /**
  * Oboe Metadata: Task and Op IDs
@@ -24,14 +25,17 @@ import com.solarwinds.logging.LoggerFactory;
 public class Metadata {
     private static final Logger logger = LoggerFactory.getLogger();
 
-    private byte taskID[];
-    private byte opID[];
+    @Getter
+    private byte[] taskID;
+    @Getter
+    private byte[] opID;
     
     private int taskLen = TASK_ID_LEN;
     private int opLen = OP_ID_LEN;
     public static final int METADATA_BUF_SIZE = 1 + TASK_ID_LEN + OP_ID_LEN + 1 + 3;
     public static final int METADATA_HEX_STRING_SIZE = (1 + TASK_ID_LEN + OP_ID_LEN + 1) * 2 + 3;
 
+    @Getter
     private byte flags;
     
     private boolean isAsync;
@@ -52,9 +56,11 @@ public class Metadata {
     public static final String HEXSTRING_DELIMETER = "-";
 
     private long creationTimestamp; //creation timestamp in millisec
+    @Getter
     private Long traceId;
     private AtomicInteger numEvents = new AtomicInteger();
     private AtomicInteger numBacktraces = new AtomicInteger();
+    @Getter
     private boolean reportMetrics = false;
 
     static {
@@ -218,10 +224,6 @@ public class Metadata {
         return (flags & flag.mask) == flag.mask;
     }
 
-    public byte getFlags() {
-        return flags;
-    }
-
     public void setSampled(boolean sampled) {
         setFlag(Flag.SAMPLED, sampled);
     }
@@ -370,14 +372,6 @@ public class Metadata {
         return bytesToHex(getPackedMetadata(versionOverride));
     }
 
-    public byte[] getOpID() {
-        return opID;
-    }
-
-    public byte[] getTaskID() {
-        return taskID;
-    }
-
     public String opHexString() {
         return bytesToHex(opID, opLen);
     }
@@ -424,9 +418,7 @@ public class Metadata {
             return false;
         if (!Arrays.equals(taskID, other.taskID))
             return false;
-        if (taskLen != other.taskLen)
-            return false;
-        return true;
+        return taskLen == other.taskLen;
     }
 
     public static String bytesToHex(byte[] bytes) {
@@ -496,19 +488,11 @@ public class Metadata {
     public void setTraceId(Long traceId) {
         this.traceId = traceId;
     }
-    
-    public Long getTraceId() {
-        return traceId;
-    }
-   
+
     public void setReportMetrics(boolean reportMetrics) {
         this.reportMetrics = reportMetrics;
     }
-    
-    public boolean isReportMetrics() {
-        return reportMetrics;
-    }
-    
+
     /**
      * Checks if the xTraceId is compatible with this current agent  
      * @param xTraceId
@@ -601,7 +585,7 @@ public class Metadata {
         
         private final byte mask;
         
-        private Flag(byte mask) {
+        Flag(byte mask) {
             this.mask = mask;
         }
     }

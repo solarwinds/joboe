@@ -137,7 +137,7 @@ public class CustomMetricsCollector extends AbstractMetricsEntryCollector {
         return CacheBuilder.newBuilder().build(new CacheLoader<MetricKey, Long> () {
                     @Override
                     public Long load(MetricKey key) throws Exception {
-                        return 0l;
+                        return 0L;
                     }
                 }); 
     }

@@ -1,11 +1,14 @@
 package com.solarwinds.joboe;
 
+import lombok.Getter;
+
 /**
  * @deprecated Use {@link TraceConfig} instead. Kept for backward compatibility with TraceView API usage
  * @author pluk
  *
  */
 public class SampleRateConfig {
+    @Getter
     private final int sampleRate;
     private final SampleRateSource sampleRateSource;
     
@@ -15,10 +18,6 @@ public class SampleRateConfig {
         this.sampleRateSource = traceConfig.getSampleRateSource();
     }
 
-    public int getSampleRate() {
-        return sampleRate;
-    }
-    
     public int getSampleRateSourceValue() {
         return sampleRateSource.value();
     }

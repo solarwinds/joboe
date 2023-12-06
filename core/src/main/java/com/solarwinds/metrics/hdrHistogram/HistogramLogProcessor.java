@@ -58,7 +58,7 @@ public class HistogramLogProcessor extends Thread {
 
     private final HistogramLogProcessorConfiguration config;
 
-    private HistogramLogReader logReader;
+    private final HistogramLogReader logReader;
 
     private static class HistogramLogProcessorConfiguration {
         public boolean verbose = false;
@@ -172,7 +172,7 @@ public class HistogramLogProcessor extends Thread {
 
     private void outputStartTime(final PrintStream log, final Double startTime) {
         log.format(Locale.US, "#[StartTime: %.3f (seconds since epoch), %s]\n",
-                startTime, (new Date((long) (startTime * 1000))).toString());
+                startTime, (new Date((long) (startTime * 1000))));
     }
 
     int lineNumber = 0;

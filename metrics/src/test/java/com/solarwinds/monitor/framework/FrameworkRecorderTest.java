@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import java.util.jar.Attributes;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class FrameworkRecorderTest {
 
@@ -20,7 +21,7 @@ public class FrameworkRecorderTest {
         attributes.putValue("Build-Jdk", "1.6.0_37");
 
         FrameworkInfo frameworkInfo = FrameworkRecorder.extractInfoFromAttributes(attributes);
-        assertEquals(null, frameworkInfo);
+        assertNull(frameworkInfo);
     }
 
     @Test

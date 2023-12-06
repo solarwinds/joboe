@@ -69,7 +69,7 @@ public abstract class AttributeProcessor {
                 }
 
                 CompositeData compositeData = tabularData.get(indices);
-                handleCompositeData(compositeData, prefix + "[" + indexString.toString() + "]", values);
+                handleCompositeData(compositeData, prefix + "[" + indexString + "]", values);
             }
         } else if (attributeObj.getClass().isArray()) {
             //for array data, we will insert the key as [arrayIndex] for example Threading.thread[2].id = 2

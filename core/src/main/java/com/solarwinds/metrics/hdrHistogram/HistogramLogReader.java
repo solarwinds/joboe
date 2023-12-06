@@ -7,6 +7,8 @@
 
 package com.solarwinds.metrics.hdrHistogram;
 
+import lombok.Getter;
+
 import javax.xml.bind.DatatypeConverter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -60,6 +62,17 @@ import java.util.zip.DataFormatException;
 public class HistogramLogReader {
 
     private final Scanner scanner;
+    /**
+     * -- GETTER --
+     *  get the latest start time found in the file so far (or 0.0),
+     *  per the log file format explained above. Assuming the "#[StartTime:" comment
+     *  line precedes the actual intervals recorded in the file, getStartTimeSec() can
+     *  be safely used after each interval is read to determine's the offset of that
+     *  interval's timestamp from the epoch.
+     *
+     * @return latest Start Time found in the file (or 0.0 if non found)
+     */
+    @Getter
     private double startTimeSec = 0.0;
     private boolean observedStartTime = false;
     private double baseTimeSec = 0.0;
@@ -98,18 +111,6 @@ public class HistogramLogReader {
     private void initScanner() {
         scanner.useLocale(Locale.US);
         scanner.useDelimiter("[, \\r\\n]");
-    }
-
-    /**
-     * get the latest start time found in the file so far (or 0.0),
-     * per the log file format explained above. Assuming the "#[StartTime:" comment
-     * line precedes the actual intervals recorded in the file, getStartTimeSec() can
-     * be safely used after each interval is read to determine's the offset of that
-     * interval's timestamp from the epoch.
-     * @return latest Start Time found in the file (or 0.0 if non found)
-     */
-    public double getStartTimeSec() {
-        return startTimeSec;
     }
 
     /**

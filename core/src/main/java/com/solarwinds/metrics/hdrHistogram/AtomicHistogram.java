@@ -209,7 +209,7 @@ public class AtomicHistogram extends Histogram {
      */
     public static AtomicHistogram decodeFromByteBuffer(final ByteBuffer buffer,
                                                        final long minBarForHighestTrackableValue) {
-        return (AtomicHistogram) decodeFromByteBuffer(buffer, AtomicHistogram.class,
+        return decodeFromByteBuffer(buffer, AtomicHistogram.class,
                 minBarForHighestTrackableValue);
     }
 

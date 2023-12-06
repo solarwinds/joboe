@@ -12,16 +12,20 @@ import com.solarwinds.joboe.rpc.Result;
 import com.solarwinds.joboe.rpc.ResultCode;
 import com.solarwinds.joboe.rpc.SettingsResult;
 import com.solarwinds.joboe.settings.Settings;
+import lombok.Getter;
 
 public class TestRpcClient implements Client {
-    private long delay;
+    private final long delay;
     
-    private List<Event> postedEvents = new ArrayList<Event>();
-    private List<Map<String, Object>> postedMetrics = new ArrayList<Map<String, Object>>();
-    private List<Map<String, Object>> postedStatus = new ArrayList<Map<String, Object>>();
+    @Getter
+    private final List<Event> postedEvents = new ArrayList<Event>();
+    @Getter
+    private final List<Map<String, Object>> postedMetrics = new ArrayList<Map<String, Object>>();
+    @Getter
+    private final List<Map<String, Object>> postedStatus = new ArrayList<Map<String, Object>>();
     
-    private Result stringResult;
-    private SettingsResult settingsResult;
+    private final Result stringResult;
+    private final SettingsResult settingsResult;
     
     public TestRpcClient(long delay) {
         this(delay, ResultCode.OK);
@@ -31,7 +35,7 @@ public class TestRpcClient implements Client {
         super();
         this.delay = delay;
         stringResult = new Result(resultCode, "", "");
-        settingsResult = new SettingsResult(resultCode, "", "", Collections.<Settings>emptyList());
+        settingsResult = new SettingsResult(resultCode, "", "", Collections.emptyList());
     }
 
     public Future<Result> postEvents(List<Event> events, Callback<Result> callback) {
@@ -63,20 +67,8 @@ public class TestRpcClient implements Client {
     public Status getStatus() {
         return Status.OK;
     }
-    
-    
-    public List<Event> getPostedEvents() {
-        return postedEvents;
-    }
-    
-    public List<Map<String, Object>> getPostedMetrics() {
-        return postedMetrics;
-    }
-    
-    public List<Map<String, Object>> getPostedStatus() {
-        return postedStatus;
-    }
-    
+
+
     private void sleep() {
         if (delay > 0) {
             try {

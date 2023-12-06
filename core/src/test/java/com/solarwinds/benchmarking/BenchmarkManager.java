@@ -11,12 +11,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 public class BenchmarkManager {
-    private static ExecutorService service = Executors.newSingleThreadExecutor(DaemonThreadFactory.newInstance("benchmarking"));
+    private static final ExecutorService service = Executors.newSingleThreadExecutor(DaemonThreadFactory.newInstance("benchmarking"));
     static {
         start();
     }
 
-    private static ConcurrentHashMap<String, Histogram> histograms = new ConcurrentHashMap<String, Histogram>();
+    private static final ConcurrentHashMap<String, Histogram> histograms = new ConcurrentHashMap<String, Histogram>();
 
     private static final int REPORT_INTERVAL = 10;
     private static final void start() {

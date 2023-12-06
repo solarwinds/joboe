@@ -53,7 +53,7 @@ import static com.solarwinds.util.ServerHostInfoReader.setIfNotNull;
  * Wraps the gRPC client generated from the collector.proto definition
  */
 public class GrpcClient implements ProtocolClient {
-    private static Logger logger = LoggerFactory.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger();
     private final TraceCollectorGrpc.TraceCollectorBlockingStub client;
     private final GrpcHostIdManager hostIdManager = new GrpcHostIdManager();
 

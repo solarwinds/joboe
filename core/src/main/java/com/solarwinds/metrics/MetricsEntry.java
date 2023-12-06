@@ -1,5 +1,7 @@
 package com.solarwinds.metrics;
 
+import lombok.Getter;
+
 import java.util.Map;
 
 
@@ -12,8 +14,9 @@ import java.util.Map;
  *
  * @param <T>   Type of the metric value
  */
+@Getter
 public abstract class MetricsEntry<T> {
-    private MetricKey key;
+    private final MetricKey key;
     protected T value;
     
     public MetricsEntry(MetricKey key, T value) {
@@ -29,15 +32,7 @@ public abstract class MetricsEntry<T> {
     public Map<String, ?> getTags() {
         return key.getTags();
     }
-    
-    public MetricKey getKey() {
-        return key;
-    }
-    
-    public T getValue() {
-        return value;
-    }
-    
+
     /**
      * Generate a map of key/values on the stored value in this metrics entry
      * @return
@@ -47,8 +42,8 @@ public abstract class MetricsEntry<T> {
     
     public abstract MetricsEntryType getType();
     
-    public static enum MetricsEntryType {
-        MEASUREMENT, HISTOGRAM, TOP_LEVEL;
+    public enum MetricsEntryType {
+        MEASUREMENT, HISTOGRAM, TOP_LEVEL
     }
     
     @Override
@@ -80,10 +75,7 @@ public abstract class MetricsEntry<T> {
         } else if (!key.equals(other.key))
             return false;
         if (value == null) {
-            if (other.value != null)
-                return false;
-        } else if (!value.equals(other.value))
-            return false;
-        return true;
+            return other.value == null;
+        } else return value.equals(other.value);
     }
 }

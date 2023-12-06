@@ -166,7 +166,7 @@ public class ConfigContainer {
                 javaValue = new Integer(valueString);
             } else if (typeClass == Boolean.class) {
                 if ("true".equalsIgnoreCase(valueString) || "false".equalsIgnoreCase(valueString)) { //use strict handling, do not allow unexpected/invalid values 
-                    javaValue = new Boolean(valueString);
+                    javaValue = Boolean.valueOf(valueString);
                 } else {
                     throw new InvalidConfigException(configProperty, "[" + valueString + "] is not valid boolean value");
                 }

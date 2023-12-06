@@ -25,7 +25,7 @@ public class BsonUtils {
         RuntimeException bufferException;
         try {
             writer.writeTo(buffer, doc);
-            ((Buffer) buffer).flip();  //cast for JDK 8- runtime compatibility
+            buffer.flip();  //cast for JDK 8- runtime compatibility
             return buffer;
         } catch (BufferOverflowException e) { //cannot use multi-catch due to 1.6 compatibility
             bufferException = e;
@@ -34,7 +34,7 @@ public class BsonUtils {
         }
 
         if (bufferException != null) {
-            ((Buffer) buffer).clear();  //cast for JDK 8- runtime compatibility
+            buffer.clear();  //cast for JDK 8- runtime compatibility
             if (bufferSize * 2 <= maxBufferSize) {
                 return convertMapToBson(map, bufferSize * 2, maxBufferSize);
             } else {

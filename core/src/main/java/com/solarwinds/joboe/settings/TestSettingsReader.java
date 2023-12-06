@@ -7,7 +7,7 @@ import java.util.concurrent.CountDownLatch;
 import com.solarwinds.joboe.TracingMode;
 
 public class TestSettingsReader implements SettingsReader {
-    private Map<String, Settings> layerSettings = new ConcurrentHashMap<String, Settings>();
+    private final Map<String, Settings> layerSettings = new ConcurrentHashMap<String, Settings>();
     private SettingsChangeCallback settingsChangeCallback;
     
     public Map<String, Settings> getSettings() throws OboeSettingsException {
@@ -55,14 +55,14 @@ public class TestSettingsReader implements SettingsReader {
         }
     }
     
-    public static interface SettingsChangeCallback {
+    public interface SettingsChangeCallback {
         void settingsChanged();
     }
     
     public static class SettingsMockupBuilder {
         private short flags = 0;
         private Integer sampleRate = null;
-        private Map<SettingsArg<?>, Object> args = new HashMap<SettingsArg<?>, Object>();
+        private final Map<SettingsArg<?>, Object> args = new HashMap<SettingsArg<?>, Object>();
         
         public static final double DEFAULT_TOKEN_BUCKET_RATE = 8.0;
         public static final double DEFAULT_TOKEN_BUCKET_CAPACITY = 16.0;

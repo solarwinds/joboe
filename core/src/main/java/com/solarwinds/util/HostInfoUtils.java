@@ -3,6 +3,7 @@ package com.solarwinds.util;
 import com.solarwinds.joboe.HostId;
 import com.solarwinds.logging.Logger;
 import com.solarwinds.logging.LoggerFactory;
+import lombok.Getter;
 
 import java.util.*;
 
@@ -32,17 +33,15 @@ public class HostInfoUtils {
         return "unknown-azure-instance";
     }
 
+    @Getter
     public enum OsType {
         LINUX("Linux"), WINDOWS("Windows"), MAC("Mac"), UNKNOWN("Unknown");
         private final String label;
 
-        private OsType(String label) {
+        OsType(String label) {
             this.label = label;
         }
-        
-        public String getLabel() {
-            return label;
-        }
+
     }
 
     private HostInfoUtils() {
@@ -101,6 +100,7 @@ public class HostInfoUtils {
         return new NetworkAddressInfo(Collections.emptyList(), Collections.emptyList());
     }
 
+    @Getter
     public static class NetworkAddressInfo {
         public NetworkAddressInfo(List<String> ipAddresses, List<String> macAddresses) {
             super();
@@ -110,12 +110,5 @@ public class HostInfoUtils {
         private final List<String> ipAddresses;
         private final List<String> macAddresses;
 
-        public List<String> getIpAddresses() {
-            return ipAddresses;
-        }
-
-        public List<String> getMacAddresses() {
-            return macAddresses;
-        }
     }
 }

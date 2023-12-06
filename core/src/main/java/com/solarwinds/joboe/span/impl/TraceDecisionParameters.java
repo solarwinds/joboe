@@ -3,7 +3,9 @@ package com.solarwinds.joboe.span.impl;
 import java.util.Map;
 
 import com.solarwinds.joboe.XTraceHeader;
+import lombok.Getter;
 
+@Getter
 public class TraceDecisionParameters {
     private final Map<XTraceHeader, String> headers;
     private final String resource;
@@ -13,14 +15,6 @@ public class TraceDecisionParameters {
         this.headers = headers;
         this.resource = resource;
     }
-    
-    public Map<XTraceHeader, String> getHeaders() {
-        return headers;
-    }
-    
-    public String getResource() {
-        return resource;
-    } 
-    
-    
+
+
 }

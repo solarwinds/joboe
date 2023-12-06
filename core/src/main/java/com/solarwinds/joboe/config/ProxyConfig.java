@@ -1,5 +1,8 @@
 package com.solarwinds.joboe.config;
 
+import lombok.Getter;
+
+@Getter
 public class ProxyConfig {
     private final String host;
     private final int port;
@@ -13,19 +16,4 @@ public class ProxyConfig {
         this.password = password;
     }
 
-    public String getHost() {
-        return host;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
 }

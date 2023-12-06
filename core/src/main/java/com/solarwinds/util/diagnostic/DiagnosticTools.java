@@ -128,7 +128,7 @@ public class DiagnosticTools {
             }
         }
         
-        private ParameterKey(String key) {
+        ParameterKey(String key) {
             this.key = key;
         }
         
@@ -260,7 +260,7 @@ public class DiagnosticTools {
         
         private final int exitCode;
         
-        private ResultType(int exitCode) {
+        ResultType(int exitCode) {
             this.exitCode = exitCode;
         }
     }

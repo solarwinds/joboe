@@ -25,12 +25,12 @@ public enum BsonToken {
   private BsonReader reader;
   private BsonWriter writer;
 
-  private BsonToken(BsonReader reader, BsonWriter writer) {
+  BsonToken(BsonReader reader, BsonWriter writer) {
     this.reader = reader;
     this.writer = writer;
   }
 
-  private BsonToken() {}
+  BsonToken() {}
 
   /**
    * Returns this token's associated {@linkplain BsonReader reader}.

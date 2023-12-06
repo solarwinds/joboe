@@ -1,18 +1,21 @@
 package com.solarwinds.joboe;
 
+import lombok.Getter;
+
 import static com.solarwinds.joboe.settings.Settings.OBOE_SETTINGS_FLAG_SAMPLE_START;
 import static com.solarwinds.joboe.settings.Settings.OBOE_SETTINGS_FLAG_SAMPLE_THROUGH_ALWAYS;
 import static com.solarwinds.joboe.settings.Settings.OBOE_SETTINGS_FLAG_TRIGGER_TRACE_ENABLED;
 
+@Getter
 public enum TracingMode {
     ALWAYS ("always"), //deprecated
     ENABLED ("enabled"),
     NEVER ("never"), //deprecated
     DISABLED ("disabled");
     
-    private String stringValue;
+    private final String stringValue;
     
-    private TracingMode(String stringValue) {
+    TracingMode(String stringValue) {
         this.stringValue = stringValue;
     }
     
@@ -25,11 +28,7 @@ public enum TracingMode {
         
         return null;
     }
-    
-    public String getStringValue() {
-        return stringValue;
-    }
-    
+
     // convert agent tracing mode to settings flags
     // XXX: Using THROUGH_ALWAYS to maintain previous behaviour when setting sample rate from command line/config
     public short toFlags() {

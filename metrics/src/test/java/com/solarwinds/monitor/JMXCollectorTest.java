@@ -44,7 +44,7 @@ public class JMXCollectorTest {
         assertEquals(2, scopesByObjectName.size());
         
         assertTrue(scopesByObjectName.containsKey("java.lang:type=MemoryPool,*"));
-        assertEquals(Arrays.asList("Usage"), scopesByObjectName.get("java.lang:type=MemoryPool,*"));
+        assertEquals(Collections.singletonList("Usage"), scopesByObjectName.get("java.lang:type=MemoryPool,*"));
         
         assertTrue(scopesByObjectName.containsKey("java.lang:type=Memory"));
         assertEquals(Arrays.asList("HeapMemoryUsage", "NonHeapMemoryUsage"), scopesByObjectName.get("java.lang:type=Memory"));
@@ -263,9 +263,10 @@ public class JMXCollectorTest {
                     
                     String expectedPrefix = JMXCollector.JMX_LABEL + ".";
                     stringKey = stringKey.substring(expectedPrefix.length()); //trim the first part out
-                    
+
                     if (stringKey.contains(definedAttribute)) {
                         found = true;
+                        break;
                     }
                 }
                 assertTrue(found);
@@ -274,8 +275,8 @@ public class JMXCollectorTest {
     }
     
     private class MetricsInfo {
-        private String type;
-        private String[] attributes;
+        private final String type;
+        private final String[] attributes;
         
         private MetricsInfo(String type, String...attributes) {
             this.type = type;
@@ -285,28 +286,28 @@ public class JMXCollectorTest {
     }
     
     private class TestMBeanServer implements MBeanServer {
-        private int entriesPerObjectName;
+        private final int entriesPerObjectName;
         public TestMBeanServer(int entriesPerObjectName) {
             this.entriesPerObjectName = entriesPerObjectName;
         }
         
 
-        public ObjectInstance createMBean(String className, ObjectName name) throws ReflectionException, InstanceAlreadyExistsException, MBeanRegistrationException, MBeanException, NotCompliantMBeanException {
+        public ObjectInstance createMBean(String className, ObjectName name) throws ReflectionException, InstanceAlreadyExistsException, MBeanException, NotCompliantMBeanException {
             // TODO Auto-generated method stub
             return null;
         }
 
-        public ObjectInstance createMBean(String className, ObjectName name, ObjectName loaderName) throws ReflectionException, InstanceAlreadyExistsException, MBeanRegistrationException, MBeanException, NotCompliantMBeanException, InstanceNotFoundException {
+        public ObjectInstance createMBean(String className, ObjectName name, ObjectName loaderName) throws ReflectionException, InstanceAlreadyExistsException, MBeanException, NotCompliantMBeanException, InstanceNotFoundException {
             // TODO Auto-generated method stub
             return null;
         }
 
-        public ObjectInstance createMBean(String className, ObjectName name, Object[] params, String[] signature) throws ReflectionException, InstanceAlreadyExistsException, MBeanRegistrationException, MBeanException, NotCompliantMBeanException {
+        public ObjectInstance createMBean(String className, ObjectName name, Object[] params, String[] signature) throws ReflectionException, InstanceAlreadyExistsException, MBeanException, NotCompliantMBeanException {
             // TODO Auto-generated method stub
             return null;
         }
 
-        public ObjectInstance createMBean(String className, ObjectName name, ObjectName loaderName, Object[] params, String[] signature) throws ReflectionException, InstanceAlreadyExistsException, MBeanRegistrationException, MBeanException, NotCompliantMBeanException, InstanceNotFoundException {
+        public ObjectInstance createMBean(String className, ObjectName name, ObjectName loaderName, Object[] params, String[] signature) throws ReflectionException, InstanceAlreadyExistsException, MBeanException, NotCompliantMBeanException, InstanceNotFoundException {
             // TODO Auto-generated method stub
             return null;
         }
@@ -442,7 +443,7 @@ public class JMXCollectorTest {
             return null;
         }
 
-        public ObjectInputStream deserialize(ObjectName name, byte[] data) throws InstanceNotFoundException, OperationsException {
+        public ObjectInputStream deserialize(ObjectName name, byte[] data) throws OperationsException {
             // TODO Auto-generated method stub
             return null;
         }
@@ -452,7 +453,7 @@ public class JMXCollectorTest {
             return null;
         }
 
-        public ObjectInputStream deserialize(String className, ObjectName loaderName, byte[] data) throws InstanceNotFoundException, OperationsException, ReflectionException {
+        public ObjectInputStream deserialize(String className, ObjectName loaderName, byte[] data) throws OperationsException, ReflectionException {
             // TODO Auto-generated method stub
             return null;
         }

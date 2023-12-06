@@ -23,7 +23,7 @@ public class ServiceKeyUtils {
                 mask.append(maskCharacter);
             }
             
-            customerKey = customerKey.substring(0, headCharacterCount) + mask.toString() + customerKey.substring(customerKey.length() - tailCharacterCount);
+            customerKey = customerKey.substring(0, headCharacterCount) + mask + customerKey.substring(customerKey.length() - tailCharacterCount);
         }
         
         return serviceName != null ? customerKey + SEPARATOR_CHARACTER + serviceName : customerKey; 

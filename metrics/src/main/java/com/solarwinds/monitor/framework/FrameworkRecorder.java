@@ -28,10 +28,10 @@ import java.util.jar.Manifest;
  *
  */
 public class FrameworkRecorder {
-    private static Logger logger = LoggerFactory.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger();
     private static final VersionExtractor[] EXTRACTORS = new VersionExtractor[] { new BundleVersionExtractor(), new ImplementationVersionExtractor(), new SpecificationVersionExtractor() };
-    private static Set<FrameworkInfo> pendingFrameworks = new HashSet<FrameworkInfo>();
-    private static Map<URL, Boolean> processedSources = Collections.synchronizedMap(new WeakHashMap()); //synchronize it as it might hang indefinitely sometimes on docker instance, could be related to https://bugs.openjdk.java.net/browse/JDK-8075006
+    private static final Set<FrameworkInfo> pendingFrameworks = new HashSet<FrameworkInfo>();
+    private static final Map<URL, Boolean> processedSources = Collections.synchronizedMap(new WeakHashMap()); //synchronize it as it might hang indefinitely sometimes on docker instance, could be related to https://bugs.openjdk.java.net/browse/JDK-8075006
     
     /**
      * Extract and report the framework by reading the source jar of this ctClass
@@ -220,22 +220,15 @@ public class FrameworkRecorder {
         }
     }
 
+    @lombok.Getter
     public static class FrameworkInfo {
-        private String id;
+        private final String id;
         public FrameworkInfo(String id, String version) {
             this.id = id;
             this.version = version;
         }
-        private String version;
+        private final String version;
 
-
-        public String getId() {
-            return id;
-        }
-
-        public String getVersion() {
-            return version;
-        }
 
         @Override
         public String toString() {

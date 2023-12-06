@@ -13,9 +13,7 @@ enum DefaultPredicate implements Predicate<Class<?>> {
 
     @Override
     public boolean apply(Class<?> input) {
-      return input == null
-          ? false
-          : Double.class.isAssignableFrom(input);
+      return input != null && Double.class.isAssignableFrom(input);
     }
   },
 
@@ -23,9 +21,7 @@ enum DefaultPredicate implements Predicate<Class<?>> {
 
     @Override
     public boolean apply(Class<?> input) {
-      return input == null
-          ? false
-          : String.class.isAssignableFrom(input);
+      return input != null && String.class.isAssignableFrom(input);
     }
   },
 
@@ -33,9 +29,7 @@ enum DefaultPredicate implements Predicate<Class<?>> {
 
     @Override
     public boolean apply(Class<?> input) {
-      return input == null
-          ? false
-          : Map.class.isAssignableFrom(input);
+      return input != null && Map.class.isAssignableFrom(input);
     }
   },
 
@@ -43,11 +37,7 @@ enum DefaultPredicate implements Predicate<Class<?>> {
 
     @Override
     public boolean apply(Class<?> input) {
-      return input == null
-          ? false
-          : byte[].class.isAssignableFrom(input)
-              ? false
-              : Collection.class.isAssignableFrom(input) || input.isArray();
+      return input != null && !byte[].class.isAssignableFrom(input) && (Collection.class.isAssignableFrom(input) || input.isArray());
     }
   },
 
@@ -63,9 +53,7 @@ enum DefaultPredicate implements Predicate<Class<?>> {
 
     @Override
     public boolean apply(Class<?> input) {
-      return input == null
-          ? false
-          : byte[].class.isAssignableFrom(input);
+      return input != null && byte[].class.isAssignableFrom(input);
     }
   },
 
@@ -73,9 +61,7 @@ enum DefaultPredicate implements Predicate<Class<?>> {
 
     @Override
     public boolean apply(Class<?> input) {
-      return input == null
-          ? false
-          : BsonObjectId.class.isAssignableFrom(input);
+      return input != null && BsonObjectId.class.isAssignableFrom(input);
     }
   },
 
@@ -83,9 +69,7 @@ enum DefaultPredicate implements Predicate<Class<?>> {
 
     @Override
     public boolean apply(Class<?> input) {
-      return input == null
-          ? false
-          : Boolean.class.isAssignableFrom(input);
+      return input != null && Boolean.class.isAssignableFrom(input);
     }
   },
 
@@ -93,9 +77,7 @@ enum DefaultPredicate implements Predicate<Class<?>> {
 
     @Override
     public boolean apply(Class<?> input) {
-      return input == null
-          ? false
-          : Date.class.isAssignableFrom(input);
+      return input != null && Date.class.isAssignableFrom(input);
     }
   },
 
@@ -111,9 +93,7 @@ enum DefaultPredicate implements Predicate<Class<?>> {
 
     @Override
     public boolean apply(Class<?> input) {
-      return input == null
-          ? false
-          : Pattern.class.isAssignableFrom(input);
+      return input != null && Pattern.class.isAssignableFrom(input);
     }
   },
 
@@ -121,9 +101,7 @@ enum DefaultPredicate implements Predicate<Class<?>> {
 
     @Override
     public boolean apply(Class<?> input) {
-      return input == null
-          ? false
-          : Integer.class.isAssignableFrom(input);
+      return input != null && Integer.class.isAssignableFrom(input);
     }
   },
 
@@ -131,9 +109,7 @@ enum DefaultPredicate implements Predicate<Class<?>> {
 
     @Override
     public boolean apply(Class<?> input) {
-      return input == null
-          ? false
-          : BsonTimestamp.class.isAssignableFrom(input);
+      return input != null && BsonTimestamp.class.isAssignableFrom(input);
     }
   },
 
@@ -141,9 +117,7 @@ enum DefaultPredicate implements Predicate<Class<?>> {
 
     @Override
     public boolean apply(Class<?> input) {
-      return input == null
-          ? false
-          : Long.class.isAssignableFrom(input);
+      return input != null && Long.class.isAssignableFrom(input);
     }
   };
 

@@ -13,9 +13,9 @@ import com.solarwinds.logging.LoggerFactory;
  *
  */
 class NonThreadLocalTestReporter extends TestReporter {
-    private Logger logger = LoggerFactory.getLogger();
+    private final Logger logger = LoggerFactory.getLogger();
     
-    private List<byte[]> byteBufferList = new LinkedList<byte[]>();
+    private final List<byte[]> byteBufferList = new LinkedList<byte[]>();
             
     
     NonThreadLocalTestReporter() {

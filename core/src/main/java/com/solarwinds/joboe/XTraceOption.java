@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.solarwinds.logging.Logger;
 import com.solarwinds.logging.LoggerFactory;
+import lombok.Getter;
 
 /**
  * An option key within X-Trace-Options header. This does NOT store the option value
@@ -22,9 +23,11 @@ public class XTraceOption<V> {
     public static final String CUSTOM_KV_PREFIX = "custom-";
 
 
-    private V defaultValue;
-    private String key;
-    private ValueParser<V> parser;
+    @Getter
+    private final V defaultValue;
+    @Getter
+    private final String key;
+    private final ValueParser<V> parser;
     private boolean isCustomKv = false;
 
     /**
@@ -83,14 +86,6 @@ public class XTraceOption<V> {
      */
     public boolean isCustomKv() {
         return this.isCustomKv;
-    }
-
-    public V getDefaultValue() {
-        return defaultValue;
-    }
-
-    public String getKey() {
-        return key;
     }
 
     /**

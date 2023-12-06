@@ -1,8 +1,11 @@
 package com.solarwinds.joboe.config;
 
+import lombok.Getter;
+
 public class InvalidConfigException extends Exception {
     private static final long serialVersionUID = 1L;
     protected String originalMessage;
+    @Getter
     protected ConfigProperty configProperty;
 
     public InvalidConfigException(String message) {
@@ -27,11 +30,6 @@ public class InvalidConfigException extends Exception {
         this.configProperty = configProperty;
     }
 
-
-
-    public ConfigProperty getConfigProperty() {
-        return configProperty;
-    }
 
     @Override
     public String getMessage() {

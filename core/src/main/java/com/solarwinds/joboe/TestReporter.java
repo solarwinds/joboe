@@ -25,9 +25,9 @@ import java.util.Set;
  * @author pluk
  */
 public class TestReporter implements EventReporter {
-    private static Logger logger = LoggerFactory.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger();
     
-    private ThreadLocal<List<byte[]>> byteBufList = new ThreadLocal<List<byte[]>>() {
+    private final ThreadLocal<List<byte[]>> byteBufList = new ThreadLocal<List<byte[]>>() {
         @Override 
         protected List<byte[]> initialValue() {
             return new LinkedList<byte[]>();
@@ -131,7 +131,7 @@ public class TestReporter implements EventReporter {
     private static BsonDocument getBsonDocumentFromBytes(byte[] bytes) {
         ByteBuffer buffer =  ByteBuffer.allocate(Constants.MAX_EVENT_BUFFER_SIZE).order(ByteOrder.LITTLE_ENDIAN);
         buffer.put(bytes);
-        ((Buffer)buffer).flip();
+        buffer.flip();
         
         return BsonDocuments.readFrom(buffer);
     }

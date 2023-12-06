@@ -53,11 +53,7 @@ enum DefaultReader implements BsonReader {
       byte[] read = new byte[] {BsonBytes.EOF};
       while ((read[0] = buffer.get()) != BsonBytes.EOO)
         bytes = Bytes.concat(bytes, read);
-      try {
-        return new String(bytes, Charsets.UTF_8.name());
-      } catch (java.io.UnsupportedEncodingException impossible) {
-          throw new AssertionError(impossible);
-      }
+        return new String(bytes, Charsets.UTF_8);
     }
   },
 
@@ -76,11 +72,7 @@ enum DefaultReader implements BsonReader {
       int stringLength = buffer.getInt();
       byte[] bytes = new byte[stringLength - 1];
       buffer.get(bytes).get();
-      try {
-        return new String(bytes, Charsets.UTF_8.name());
-      } catch (java.io.UnsupportedEncodingException impossible) {
-          throw new AssertionError(impossible);
-      }
+        return new String(bytes, Charsets.UTF_8);
     }
   },
 

@@ -1,10 +1,13 @@
 package com.solarwinds.joboe.span.impl;
 
+import lombok.Getter;
+
 /**
  * @deprecated Use {@link Scope} instead
  * @author pluk
  *
  */
+@Getter
 public class ActiveSpan implements BaseSpan {
     private final Scope wrapped;
 
@@ -32,8 +35,5 @@ public class ActiveSpan implements BaseSpan {
     public <V> void setSpanPropertyValue(SpanProperty<V> property, V value) {
         wrapped.span().setSpanPropertyValue(property.getWrapped(), value);
     }
-    
-    public Scope getWrapped() {
-        return wrapped;
-    }
+
 }

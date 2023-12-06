@@ -76,7 +76,7 @@ public class ServerHostInfoReader implements HostInfoReader, AzureInstanceIdRead
 
     static final String HOSTNAME_SEPARATOR = ";";
 
-    static enum DistroType {AMAZON, UBUNTU, DEBIAN, REDHAT_BASED, SUSE, SLACKWARE, GENTOO}
+    enum DistroType {AMAZON, UBUNTU, DEBIAN, REDHAT_BASED, SUSE, SLACKWARE, GENTOO}
 
     static final Map<DistroType, String> DISTRO_FILE_NAMES = new HashMap<DistroType, String>();
 
@@ -129,6 +129,7 @@ public class ServerHostInfoReader implements HostInfoReader, AzureInstanceIdRead
     }
 
     // The network adapter status. It's used for Windows only.
+    @Getter
     enum NicStatus {
         NOT_PRESENT("Not Present"),
         UP("Up"),
@@ -147,10 +148,6 @@ public class ServerHostInfoReader implements HostInfoReader, AzureInstanceIdRead
 
         NicStatus(String desc) {
             this.desc = desc;
-        }
-
-        public String getDesc() {
-            return this.desc;
         }
 
         public static NicStatus fromDesc(String desc) {

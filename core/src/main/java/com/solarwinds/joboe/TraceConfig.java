@@ -4,6 +4,7 @@ import static com.solarwinds.joboe.settings.Settings.OBOE_SETTINGS_FLAG_SAMPLE_S
 import static com.solarwinds.joboe.settings.Settings.OBOE_SETTINGS_FLAG_SAMPLE_THROUGH_ALWAYS;
 
 import com.solarwinds.joboe.settings.Settings;
+import lombok.Getter;
 
 import java.util.Collections;
 import java.util.Map;
@@ -14,11 +15,14 @@ import java.util.Map;
  * @see TraceDecisionUtil
  */
 public class TraceConfig {
-    private Integer sampleRate;
-    private SampleRateSource sampleRateSource;
-    private Short flags;
-    private Map<TokenBucketType, Double> bucketCapacities;
-    private Map<TokenBucketType, Double> bucketRates;
+    private final Integer sampleRate;
+    @Getter
+    private final SampleRateSource sampleRateSource;
+    private final Short flags;
+    @Getter
+    private final Map<TokenBucketType, Double> bucketCapacities;
+    @Getter
+    private final Map<TokenBucketType, Double> bucketRates;
     
     public TraceConfig(Integer sampleRate, SampleRateSource sampleRateSource, Short flags) {
         this(sampleRate, sampleRateSource, flags, Collections.EMPTY_MAP, Collections.EMPTY_MAP);
@@ -36,10 +40,6 @@ public class TraceConfig {
         return sampleRate;
     }
 
-    public SampleRateSource getSampleRateSource() {
-        return sampleRateSource;
-    }
-    
     public int getSampleRateSourceValue() {
         return sampleRateSource.value();
     }
@@ -50,14 +50,6 @@ public class TraceConfig {
     
     public double getBucketRate(TokenBucketType bucketType) {
         return bucketRates.containsKey(bucketType) ? bucketRates.get(bucketType) : 0;
-    }
-
-    public Map<TokenBucketType, Double> getBucketCapacities() {
-        return bucketCapacities;
-    }
-
-    public Map<TokenBucketType, Double> getBucketRates() {
-        return bucketRates;
     }
 
     public boolean hasOverrideFlag() {

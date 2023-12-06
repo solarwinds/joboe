@@ -7,6 +7,8 @@
 
 package com.solarwinds.metrics.hdrHistogram;
 
+import lombok.Getter;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -65,8 +67,24 @@ public class DoubleHistogram extends EncodableHistogram implements Serializable 
     AbstractHistogram integerValuesHistogram;
 
     volatile double doubleToIntegerValueConversionRatio;
+    /**
+     * -- GETTER --
+     *  Get the current conversion ratio from interval integer value representation to double units.
+     *  (keep in mind that this can change because it is auto ranging). This ratio can be useful
+     *  for converting integer values found in iteration, although the preferred form for accessing
+     *  iteration values would be to use the
+     *
+     *  and
+     *
+     *  accessors to
+     *  iterated values.
+     *
+     * @return the current conversion ratio from interval integer value representation to double units.
+     */
+    @Getter
     volatile double integerToDoubleValueConversionRatio;
 
+    @Getter
     private boolean autoResize = false;
 
     /**
@@ -267,10 +285,6 @@ public class DoubleHistogram extends EncodableHistogram implements Serializable 
     // Auto-resizing control:
     //
     //
-
-    public boolean isAutoResize() {
-        return autoResize;
-    }
 
     public void setAutoResize(boolean autoResize) {
         this.autoResize = autoResize;
@@ -800,22 +814,6 @@ public class DoubleHistogram extends EncodableHistogram implements Serializable 
      */
     double getCurrentHighestTrackableValue() {
         return currentHighestValueLimitInAutoRange;
-    }
-
-    /**
-     * Get the current conversion ratio from interval integer value representation to double units.
-     * (keep in mind that this can change because it is auto ranging). This ratio can be useful
-     * for converting integer values found in iteration, although the preferred form for accessing
-     * iteration values would be to use the
-     * {@link HistogramIterationValue#getDoubleValueIteratedTo() getDoubleValueIteratedTo()}
-     * and
-     * {@link HistogramIterationValue#getDoubleValueIteratedFrom() getDoubleValueIteratedFrom()}
-     * accessors to {@link HistogramIterationValue} iterated values.
-     *
-     * @return the current conversion ratio from interval integer value representation to double units.
-     */
-    public double getIntegerToDoubleValueConversionRatio() {
-        return integerToDoubleValueConversionRatio;
     }
 
     /**

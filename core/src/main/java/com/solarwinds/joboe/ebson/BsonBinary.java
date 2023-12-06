@@ -56,12 +56,12 @@ public enum BsonBinary {
   private BsonReader reader;
   private BsonWriter writer;
 
-  private BsonBinary(byte terminal) {
-    this(terminal, Predicates.<Class<?>>alwaysFalse(), null, null);
+  BsonBinary(byte terminal) {
+    this(terminal, Predicates.alwaysFalse(), null, null);
   }
 
-  private BsonBinary(byte terminal, Predicate<Class<?>> predicate,
-      BsonReader reader, BsonWriter writer) {
+  BsonBinary(byte terminal, Predicate<Class<?>> predicate,
+             BsonReader reader, BsonWriter writer) {
     this.terminal = terminal;
     this.predicate = predicate;
     this.reader = reader;

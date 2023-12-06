@@ -6,10 +6,10 @@ import com.solarwinds.logging.Logger;
 import com.solarwinds.logging.LoggerFactory;
 
 public class ScopeManager implements com.solarwinds.joboe.span.ScopeManager {
-    private Logger logger = LoggerFactory.getLogger();
+    private final Logger logger = LoggerFactory.getLogger();
 
     public static final ScopeManager INSTANCE = new ScopeManager();
-    private static ScopeContext scopeContext = new ThreadLocalScopeContext();
+    private static final ScopeContext scopeContext = new ThreadLocalScopeContext();
     private static ScopeListener listener;
 
     public interface ScopeListener {

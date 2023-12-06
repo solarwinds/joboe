@@ -1,5 +1,7 @@
 package com.solarwinds.joboe.span.impl;
 
+import lombok.Getter;
+
 import java.util.Map;
 
 /**
@@ -7,6 +9,7 @@ import java.util.Map;
  * @author pluk
  *
  */
+@Getter
 public class LogEntry {
     private final long timestamp;
     private final Map<String, ?> fields;
@@ -22,16 +25,5 @@ public class LogEntry {
         this.fields = fields;
         this.error = error;
     }
-    
-    public long getTimestamp() {
-        return timestamp;
-    }
-    
-    public Map<String, ?> getFields() {
-        return fields;
-    }
-    
-    public boolean isError() {
-        return error;
-    }
+
 }

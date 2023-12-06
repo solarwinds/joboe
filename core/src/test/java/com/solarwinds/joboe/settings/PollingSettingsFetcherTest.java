@@ -139,14 +139,14 @@ public class PollingSettingsFetcherTest {
         com.solarwinds.joboe.rpc.Settings sourceSettings;
         
         //test remote settings that give empty map for args
-        sourceSettings = new com.solarwinds.joboe.rpc.Settings(Settings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE, DEFAULT_FLAGS_STRING, System.currentTimeMillis(), 100000, TTL, "", Collections.<String, ByteBuffer>emptyMap());
+        sourceSettings = new com.solarwinds.joboe.rpc.Settings(Settings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE, DEFAULT_FLAGS_STRING, System.currentTimeMillis(), 100000, TTL, "", Collections.emptyMap());
         Client client = new MockRpcClient(Collections.singletonList(sourceSettings));
         fetcher = getFetcher(client);
         settings = fetcher.getSettings();
         assertEquals(100000, (int)settings.getValue());
         assertEquals(DEFAULT_FLAGS, settings.getFlags());
-        assertEquals(null, settings.getArgValue(SettingsArg.BUCKET_CAPACITY));
-        assertEquals(null, settings.getArgValue(SettingsArg.BUCKET_RATE));
+        assertNull(settings.getArgValue(SettingsArg.BUCKET_CAPACITY));
+        assertNull(settings.getArgValue(SettingsArg.BUCKET_RATE));
         
         //test remote settings that give empty values for args that triggers BufferUnderflow
         Map<String, ByteBuffer> args = new HashMap<String, ByteBuffer>();
@@ -158,9 +158,9 @@ public class PollingSettingsFetcherTest {
         settings = fetcher.getSettings();
         assertEquals(100000, (int)settings.getValue());
         assertEquals(DEFAULT_FLAGS, settings.getFlags());
-        assertEquals(null, settings.getArgValue(SettingsArg.BUCKET_CAPACITY));
-        assertEquals(null, settings.getArgValue(SettingsArg.BUCKET_RATE));
-        assertEquals(null, settings.getArgValue(SettingsArg.METRIC_FLUSH_INTERVAL));
+        assertNull(settings.getArgValue(SettingsArg.BUCKET_CAPACITY));
+        assertNull(settings.getArgValue(SettingsArg.BUCKET_RATE));
+        assertNull(settings.getArgValue(SettingsArg.METRIC_FLUSH_INTERVAL));
         
         //test remote settings that give valid values for args
         args = new HashMap<String, ByteBuffer>();
@@ -273,7 +273,7 @@ public class PollingSettingsFetcherTest {
     }
 
     private abstract class TestClient implements Client {
-        private List<? extends Settings> settings;
+        private final List<? extends Settings> settings;
         
         protected TestClient(List<? extends Settings> settings) {
             this.settings = settings;
@@ -306,7 +306,7 @@ public class PollingSettingsFetcherTest {
     }
 
     private class MockRpcClient extends TestClient {
-        private ExecutorService service = Executors.newSingleThreadExecutor();
+        private final ExecutorService service = Executors.newSingleThreadExecutor();
         
         private MockRpcClient(List<? extends Settings> settings) {
             super(settings);
@@ -332,7 +332,7 @@ public class PollingSettingsFetcherTest {
     
     private class OneHitWonderClient extends TestClient {
         private boolean hasHit = false;
-        private ExecutorService service = Executors.newSingleThreadExecutor();
+        private final ExecutorService service = Executors.newSingleThreadExecutor();
 
         protected OneHitWonderClient(List<Settings> settings) {
             super(settings);
@@ -367,7 +367,7 @@ public class PollingSettingsFetcherTest {
     }
     
     private class ExecutionExceptionClient extends TestClient {
-        private ExecutorService service = Executors.newSingleThreadExecutor();
+        private final ExecutorService service = Executors.newSingleThreadExecutor();
 
         protected ExecutionExceptionClient() {
             super(null);

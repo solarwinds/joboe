@@ -29,8 +29,8 @@ class MetricsReporter extends SystemReporter<MetricsCategory, List<? extends Met
     static final int MAX_METRIC_NAME_LENGTH = 255;
     static final int MAX_TAG_NAME_LENGTH = 64;
     static final int MAX_TAG_VALUE_LENGTH = 255;
-    private Client rpcClient;
-    private ClientLoggingCallback<Result> loggingCallback = new ClientLoggingCallback<Result>("post metrics");
+    private final Client rpcClient;
+    private final ClientLoggingCallback<Result> loggingCallback = new ClientLoggingCallback<Result>("post metrics");
     
     MetricsReporter(Client rpcClient) {
         this.rpcClient = rpcClient;

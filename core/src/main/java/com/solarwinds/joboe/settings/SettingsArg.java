@@ -11,6 +11,7 @@ import java.util.Map;
 
 import com.solarwinds.logging.Logger;
 import com.solarwinds.logging.LoggerFactory;
+import lombok.Getter;
 
 /**
  * Setting arguments used in {@link Settings}
@@ -19,7 +20,7 @@ import com.solarwinds.logging.LoggerFactory;
  * @param <T>   the corresponding type of the argument value
  */
 public abstract class SettingsArg<T> {
-    private static Map<String, SettingsArg<?>> keyToArgs = new HashMap<String, SettingsArg<?>>();
+    private static final Map<String, SettingsArg<?>> keyToArgs = new HashMap<String, SettingsArg<?>>();
     protected Logger logger = LoggerFactory.getLogger();
     
     public static final SettingsArg<Double> BUCKET_CAPACITY = new DoubleSettingsArg("BucketCapacity");
@@ -38,22 +39,21 @@ public abstract class SettingsArg<T> {
     public static final SettingsArg<Double> RELAXED_BUCKET_RATE = new DoubleSettingsArg("TriggerRelaxedBucketRate");
     public static final SettingsArg<Double> STRICT_BUCKET_CAPACITY = new DoubleSettingsArg("TriggerStrictBucketCapacity");
     public static final SettingsArg<Double> STRICT_BUCKET_RATE = new DoubleSettingsArg("TriggerStrictBucketRate");
-    
+
+    /**
+     * -- GETTER --
+     *  Gets the string key of this <code>SettingsArg</code>
+     *
+     * @return
+     */
+    @Getter
     protected final String key;
     
     private SettingsArg(String key) {
         this.key = key;
         keyToArgs.put(key, this);
     }
-    
-    /**
-     * Gets the string key of this <code>SettingsArg</code>
-     * @return
-     */
-    public String getKey() {
-        return key;
-    }
-    
+
     /**
      * Reads byteBuffer and returns the converted argument value 
      * @param byteBuffer
@@ -120,7 +120,7 @@ public abstract class SettingsArg<T> {
                 logger.warn("Cannot find valid value for arg [" + key + "] from settings : " + e.getClass().getName());
                 return null;
             } finally {
-                ((Buffer) byteBuffer).rewind();  //cast for JDK 8- runtime compatibility
+                byteBuffer.rewind();  //cast for JDK 8- runtime compatibility
             }
         }
 
@@ -153,7 +153,7 @@ public abstract class SettingsArg<T> {
                 logger.warn("Cannot find valid value for arg [" + key + "] from settings : " + e.getClass().getName());
                 return null;
             } finally {
-                ((Buffer) byteBuffer).rewind();  //cast for JDK 8- runtime compatibility
+                byteBuffer.rewind();  //cast for JDK 8- runtime compatibility
             }
         }
 
@@ -161,7 +161,7 @@ public abstract class SettingsArg<T> {
         public ByteBuffer toByteBuffer(Integer value) {
             if (value != null) {
                 ByteBuffer buffer = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN);
-                buffer.putInt((int) value);
+                buffer.putInt(value);
 
                 buffer.rewind();
 
@@ -186,7 +186,7 @@ public abstract class SettingsArg<T> {
                 logger.warn("Cannot find valid value for arg [" + key + "] from settings : " + e.getClass().getName());
                 return null;
             } finally {
-                ((Buffer) byteBuffer).rewind();  //cast for JDK 8- runtime compatibility
+                byteBuffer.rewind();  //cast for JDK 8- runtime compatibility
             }
         }
 
@@ -194,7 +194,7 @@ public abstract class SettingsArg<T> {
         public ByteBuffer toByteBuffer(Boolean value) {
             if (value != null) {
                 ByteBuffer buffer = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN);
-                buffer.putInt((boolean) value ? 1 : 0);
+                buffer.putInt(value ? 1 : 0);
 
                 buffer.rewind();
 
@@ -219,7 +219,7 @@ public abstract class SettingsArg<T> {
                 logger.warn("Cannot find valid value for arg [" + key + "] from settings : " + e.getClass().getName());
                 return null;
             } finally {
-                ((Buffer) byteBuffer).rewind();
+                byteBuffer.rewind();
             }
         }
 

@@ -13,7 +13,7 @@ import com.solarwinds.joboe.rpc.Result;
 import com.solarwinds.joboe.rpc.SettingsResult;
 
 public class TestExecutionExceptionRpcClient implements Client {
-    private ExecutorService service = Executors.newSingleThreadExecutor();
+    private final ExecutorService service = Executors.newSingleThreadExecutor();
     
     public Future<Result> postEvents(List<Event> events, Callback<Result> callback) {
         return service.submit(new ExceptionCallable<Result>());

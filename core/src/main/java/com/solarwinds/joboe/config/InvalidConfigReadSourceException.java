@@ -1,5 +1,7 @@
 package com.solarwinds.joboe.config;
 
+import lombok.Getter;
+
 /**
  * Invalid config while reading from a specific {@Link ConfigSourceType}
  *
@@ -11,7 +13,8 @@ public class InvalidConfigReadSourceException extends InvalidConfigException {
      *
      */
     private static final long serialVersionUID = 1L;
-    private ConfigSourceType configSourceType;
+    private final ConfigSourceType configSourceType;
+    @Getter
     private ConfigContainer configContainerBeforeException = null;
     private String physicalLocation = null;
 
@@ -21,10 +24,6 @@ public class InvalidConfigReadSourceException extends InvalidConfigException {
         this.configSourceType = sourceType;
         this.configContainerBeforeException = configContainerBeforeException;
         this.configProperty = exception.getConfigProperty();
-    }
-
-    public ConfigContainer getConfigContainerBeforeException() {
-        return configContainerBeforeException;
     }
 
 

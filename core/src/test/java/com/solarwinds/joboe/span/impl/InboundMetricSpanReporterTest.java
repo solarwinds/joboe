@@ -328,7 +328,7 @@ public class InboundMetricSpanReporterTest {
         assertEquals(1, measurements.size());
         SummaryLongMeasurement measurement = measurements.get(new MetricKey(InboundMetricMeasurementSpanReporter.TRANSACTION_LATENCY_METRIC_NAME, Collections.singletonMap("TransactionName", TransactionNameManager.UNKNOWN_TRANSACTION_NAME)));
         assertEquals(2, measurement.getCount()); //only 2 durations are valid
-        assertEquals(Long.valueOf(0 + MetricSpanReporter.MAX_DURATION), measurement.getSum()); //only 2 durations are valid
+        assertEquals(Long.valueOf(MetricSpanReporter.MAX_DURATION), measurement.getSum()); //only 2 durations are valid
     }
     
     /**

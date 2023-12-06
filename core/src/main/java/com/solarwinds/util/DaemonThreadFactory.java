@@ -11,7 +11,7 @@ public class DaemonThreadFactory implements ThreadFactory {
     private static final Logger logger = LoggerFactory.getLogger();
     private final String threadName;
     private static final String THREAD_NAME_PREFIX = "SolarwindsAPM";
-    private AtomicInteger count = new AtomicInteger(0);
+    private final AtomicInteger count = new AtomicInteger(0);
 
     private DaemonThreadFactory(String threadName) {
         this.threadName = threadName != null ? THREAD_NAME_PREFIX + "-" + threadName : THREAD_NAME_PREFIX;

@@ -1,10 +1,13 @@
 package com.solarwinds.metrics;
 
+import lombok.Getter;
+
 import java.util.Map;
 
+@Getter
 public class MetricKey {
-    private String stringKey;
-    private Map<String, ?> tags;
+    private final String stringKey;
+    private final Map<String, ?> tags;
 
     public MetricKey(String stringKey, Map<String, ?> tags) {
         super();
@@ -19,14 +22,6 @@ public class MetricKey {
         result = prime * result + ((stringKey == null) ? 0 : stringKey.hashCode());
         result = prime * result + ((tags == null) ? 0 : tags.hashCode());
         return result;
-    }
-    
-    public String getStringKey() {
-        return stringKey;
-    }
-    
-    public Map<String, ?> getTags() {
-        return tags;
     }
 
     @Override
@@ -44,11 +39,8 @@ public class MetricKey {
         } else if (!stringKey.equals(other.stringKey))
             return false;
         if (tags == null) {
-            if (other.tags != null)
-                return false;
-        } else if (!tags.equals(other.tags))
-            return false;
-        return true;
+            return other.tags == null;
+        } else return tags.equals(other.tags);
     }
 
     @Override

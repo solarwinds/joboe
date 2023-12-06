@@ -31,7 +31,7 @@ import com.solarwinds.logging.LoggerFactory;
  */
 public class TimeUtils {
     private static final Logger logger = LoggerFactory.getLogger();
-    private static long reference; //reference in nanosecond
+    private static final long reference; //reference in nanosecond
     private static long base; //base in microsecond
 //    private static ReadWriteLock readWriteLock = new ReentrantReadWriteLock(); removed locks as even if they are concurrency issue it will be at worse be off by the offset for a few operations, not a big deal
     
@@ -143,8 +143,8 @@ public class TimeUtils {
     }
 
     public static class Statistics<T extends Number & Comparable<T>> {
-        private List<T> data;
-        private int size;
+        private final List<T> data;
+        private final int size;
         private boolean sorted = false;
 
         public Statistics(T... data) {

@@ -7,6 +7,7 @@ import com.solarwinds.joboe.span.tag.Tag;
 import com.solarwinds.logging.Logger;
 import com.solarwinds.logging.LoggerFactory;
 import com.solarwinds.util.TimeUtils;
+import lombok.Getter;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,6 +17,7 @@ public class Span implements com.solarwinds.joboe.span.Span {
     private static final Logger logger = LoggerFactory.getLogger();
      
     private final long startTimeMicroseconds;
+    @Getter
     private String operationName;
     private SpanContext context;
     private final Map<String, Object> tags = new HashMap<String, Object>();
@@ -67,10 +69,6 @@ public class Span implements com.solarwinds.joboe.span.Span {
         return this;
     }
 
-    public String getOperationName() {
-        return operationName;
-    }
-    
     public Span setBaggageItem(String key, String value) {
         synchronized(this) {
             this.context = this.context.withBaggageItem(key, value);
@@ -379,6 +377,7 @@ public class Span implements com.solarwinds.joboe.span.Span {
      *
      * @param <V>
      */
+    @Getter
     public static class TraceProperty<V> extends Property<V> {
         public static final TraceProperty<String> ACTION = new TraceProperty<String>(null); 
         public static final TraceProperty<String> CONTROLLER = new TraceProperty<String>(null);
@@ -387,7 +386,7 @@ public class Span implements com.solarwinds.joboe.span.Span {
         public static final TraceProperty<String> CUSTOM_TRANSACTION_NAME = new TraceProperty<String>(null);
         public static final TraceProperty<Map<Long, String>> PROFILE_IDS = new TraceProperty<Map<Long, String>>(new ConcurrentHashMap<Long, String>());
         
-        private V defaultValue;
+        private final V defaultValue;
         
         private TraceProperty() {
             this(null);
@@ -396,9 +395,6 @@ public class Span implements com.solarwinds.joboe.span.Span {
         private TraceProperty(V defaultValue) {
             this.defaultValue = defaultValue;
         }
-        
-        public V getDefaultValue() {
-            return defaultValue;
-        }
+
     }
 }

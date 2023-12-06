@@ -10,7 +10,7 @@ import com.google.common.cache.LoadingCache;
 import com.solarwinds.joboe.span.impl.Span.TraceProperty;
 
 public class TracePropertyDictionary {
-    private static final LoadingCache<Long, Map<TraceProperty<?>, Object>> allTraceProperties = CacheBuilder.newBuilder().expireAfterWrite(1200, TimeUnit.SECONDS).<Long, Map<TraceProperty<?>, Object>>build(
+    private static final LoadingCache<Long, Map<TraceProperty<?>, Object>> allTraceProperties = CacheBuilder.newBuilder().expireAfterWrite(1200, TimeUnit.SECONDS).build(
                 new CacheLoader<Long, Map<TraceProperty<?>, Object>>() {
                     public Map<TraceProperty<?>, Object> load(Long key) {
                       return new HashMap<TraceProperty<?>, Object>();

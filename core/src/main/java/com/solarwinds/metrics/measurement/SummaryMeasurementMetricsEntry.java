@@ -21,7 +21,7 @@ public class SummaryMeasurementMetricsEntry extends MeasurementMetricsEntry<Summ
         Map<String, Number> summaryKvs = new HashMap<String, Number>();
         
         summaryKvs.put("count", value.getCount());
-        summaryKvs.put("sum", (Number) value.getSum());
+        summaryKvs.put("sum", value.getSum());
         
         return summaryKvs;
     }

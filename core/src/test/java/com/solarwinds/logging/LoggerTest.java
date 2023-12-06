@@ -5,6 +5,7 @@ import com.solarwinds.joboe.config.ConfigProperty;
 import com.solarwinds.logging.Logger.Level;
 import com.solarwinds.logging.Logger.LoggerStream;
 import com.solarwinds.logging.setting.LogSetting;
+import lombok.Getter;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayOutputStream;
@@ -22,8 +23,9 @@ public class LoggerTest {
 
 
     private class ProxyLoggerStream implements LoggerStream {
-        private ByteArrayOutputStream proxyOutput = new ByteArrayOutputStream();
-        private PrintStream proxyStream = new PrintStream(proxyOutput);
+        @Getter
+        private final ByteArrayOutputStream proxyOutput = new ByteArrayOutputStream();
+        private final PrintStream proxyStream = new PrintStream(proxyOutput);
 
         public void println(String value) {
             proxyStream.println(value);
@@ -33,9 +35,6 @@ public class LoggerTest {
             throwable.printStackTrace(proxyStream);
         }
 
-        public ByteArrayOutputStream getProxyOutput() {
-            return proxyOutput;
-        }
     }
     
     private void setProxyStreams(Logger logger, ProxyLoggerStream out, ProxyLoggerStream err) throws Exception {
@@ -312,7 +311,7 @@ public class LoggerTest {
     
     
     private class ProxyFormatter extends Formatter {
-        private Set<LogRecord> receievedRecords = new HashSet<LogRecord>();
+        private final Set<LogRecord> receievedRecords = new HashSet<LogRecord>();
         @Override
         public String format(LogRecord record) {
             receievedRecords.add(record);

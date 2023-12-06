@@ -16,6 +16,7 @@ import com.solarwinds.joboe.rpc.RpcClientManager;
 import com.solarwinds.joboe.rpc.RpcClientManager.OperationType;
 import com.solarwinds.logging.Logger;
 import com.solarwinds.logging.LoggerFactory;
+import lombok.Getter;
 
 import static com.solarwinds.util.HostTypeDetector.isLambda;
 
@@ -34,6 +35,7 @@ import static com.solarwinds.util.HostTypeDetector.isLambda;
  *
  */
 public class SettingsManager {
+    @Getter
     private static SettingsFetcher fetcher;
     private static final Map<SettingsArg<?>, Set<SettingsArgChangeListener<?>>> listeners = new ConcurrentHashMap<SettingsArg<?>, Set<SettingsArgChangeListener<?>>>();
     private static final Logger logger = LoggerFactory.getLogger();
@@ -180,8 +182,5 @@ public class SettingsManager {
             return null;
         }
     }
-    
-    public static SettingsFetcher getFetcher() {
-        return fetcher;
-    }
+
 }

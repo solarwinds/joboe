@@ -29,7 +29,7 @@ public class BackTraceCache {
 
     private static Cache<List<StackTraceElement>, String> getCache() {
         if (backTraceCache == null && enabled) {
-            backTraceCache = CacheBuilder.newBuilder().maximumSize(20).expireAfterAccess(3600, TimeUnit.SECONDS).<List<StackTraceElement>, String>build(); //1 hour cache
+            backTraceCache = CacheBuilder.newBuilder().maximumSize(20).expireAfterAccess(3600, TimeUnit.SECONDS).build(); //1 hour cache
         }
          
         return backTraceCache;

@@ -39,7 +39,7 @@ public class TestReporterTest {
                 
                 event = Context.startTrace();
                 event.report(nonThreadLocalReporter);
-            };
+            }
         };
         
         thread.start();

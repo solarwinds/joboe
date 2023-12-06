@@ -20,6 +20,7 @@ import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
+import lombok.Getter;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -146,7 +147,7 @@ public class GrpcClientTest extends RpcClientTest {
         GrpcCollector(int port, GrpcCollectorService service) throws IOException {
             ServerBuilder builder = ServerBuilder.forPort(port)
                     .useTransportSecurity(new File(getServerPublicKeyLocation()), new File(TEST_SERVER_PRIVATE_KEY_LOCATION))
-                    .maxInboundMessageSize((int) ProtocolClient.MAX_CALL_SIZE + 1024 * 1024) //accept a slightly bigger message
+                    .maxInboundMessageSize(ProtocolClient.MAX_CALL_SIZE + 1024 * 1024) //accept a slightly bigger message
                     .addService(service);
             this.server = builder.build();
             this.service = service;
@@ -185,7 +186,8 @@ public class GrpcClientTest extends RpcClientTest {
         protected List<ByteString> buffer = new ArrayList<ByteString>(); //what has been received so far
         protected final Collector.MessageResult result;
         private static final Collector.MessageResult PING_RESULT = Collector.MessageResult.newBuilder().setResult(Collector.ResultCode.OK).setArg("").build();
-        private Map<TaskType, Long> callCountStats = new HashMap<TaskType, Long>();
+        @Getter
+        private final Map<TaskType, Long> callCountStats = new HashMap<TaskType, Long>();
 
         public GrpcCollectorService() {
             this(Collector.ResultCode.OK, "", "");
@@ -268,9 +270,6 @@ public class GrpcClientTest extends RpcClientTest {
         }
 
 
-        public Map<TaskType, Long> getCallCountStats() {
-            return callCountStats;
-        }
     }
 
 
@@ -369,7 +368,7 @@ public class GrpcClientTest extends RpcClientTest {
     private static class GrpcRatedCollectorService extends GrpcCollectorService {
         private final int processingSpeedPerMessage;
         private final Collector.ResultCode fullResultCode;
-        private AtomicBoolean isProcessingAtomic = new AtomicBoolean(false);
+        private final AtomicBoolean isProcessingAtomic = new AtomicBoolean(false);
 
         public GrpcRatedCollectorService(int processingTimePerMessage, Collector.ResultCode fullResultCode) {
             super();
@@ -399,7 +398,7 @@ public class GrpcClientTest extends RpcClientTest {
 
         @Override
         public void ping(Collector.PingRequest request, StreamObserver<Collector.MessageResult> responseObserver) {
-            processMessage(Collections.<ByteString>emptyList(), responseObserver);
+            processMessage(Collections.emptyList(), responseObserver);
         }
 
         private void processMessage(final List<ByteString> messages, StreamObserver responseObserver) {
@@ -413,7 +412,7 @@ public class GrpcClientTest extends RpcClientTest {
                 new Thread() { //since the server is blocking, we have to return the result but delay setting back the isProcessingAtomic flag to indicate that it's busy
                     public void run() {
                         try {
-                            Thread.sleep(messages.size() * processingSpeedPerMessage);
+                            Thread.sleep((long) messages.size() * processingSpeedPerMessage);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }

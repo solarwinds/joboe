@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public class HdrHistrogramAdapterTest {
-    private static long MAX_VALUE = 60L * 60 * 1000 * 1000;
+    private static final long MAX_VALUE = 60L * 60 * 1000 * 1000;
 
     @Test
     public void testEncode() throws Exception {

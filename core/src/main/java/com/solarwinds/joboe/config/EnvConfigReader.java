@@ -14,7 +14,7 @@ import com.solarwinds.util.ServiceKeyUtils;
  *
  */
 public class EnvConfigReader extends ConfigReader {
-    private Map<String, String> env;
+    private final Map<String, String> env;
 
     public EnvConfigReader(Map<String, String> env) {
         super(ConfigSourceType.ENV_VAR);

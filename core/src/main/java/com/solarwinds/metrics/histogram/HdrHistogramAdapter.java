@@ -13,7 +13,7 @@ import java.util.Base64;
  *
  */
 public class HdrHistogramAdapter implements Histogram {
-    private com.solarwinds.metrics.hdrHistogram.Histogram hdrHistogram;
+    private final com.solarwinds.metrics.hdrHistogram.Histogram hdrHistogram;
     private Long lastValue;
     private final long MAX_VALUE;
     private final long MIN_VALUE = 0;
@@ -84,7 +84,7 @@ public class HdrHistogramAdapter implements Histogram {
         ByteBuffer buffer = ByteBuffer.allocate(size);
         
         hdrHistogram.encodeIntoCompressedByteBuffer(buffer);
-        ((Buffer) buffer).flip();  //cast for JDK 8- runtime compatibility
+        buffer.flip();  //cast for JDK 8- runtime compatibility
         
         byte[] serializedArray = new byte[buffer.remaining()];
         

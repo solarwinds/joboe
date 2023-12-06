@@ -216,7 +216,7 @@ public class ShortCountsHistogram extends AbstractHistogram {
      */
     public static ShortCountsHistogram decodeFromByteBuffer(final ByteBuffer buffer,
                                                       final long minBarForHighestTrackableValue) {
-        return (ShortCountsHistogram) decodeFromByteBuffer(buffer, ShortCountsHistogram.class,
+        return decodeFromByteBuffer(buffer, ShortCountsHistogram.class,
                 minBarForHighestTrackableValue);
     }
 

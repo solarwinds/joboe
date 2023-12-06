@@ -14,16 +14,16 @@ import com.solarwinds.logging.LoggerFactory;
  * Settings extracted from RPC calls
  */
 public class Settings extends com.solarwinds.joboe.settings.Settings {
-    private static Logger logger = LoggerFactory.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger();
     
     
-    private short type; // required
-    private short flags; // required
-    private long timestamp; // required, in millsec
-    private long value; // required
-    private String layer; // required
-    private long ttl; //time to live this settings record 
-    private Map<SettingsArg<?>, Object> args = new HashMap<SettingsArg<?>, Object>(); //other arguments
+    private final short type; // required
+    private final short flags; // required
+    private final long timestamp; // required, in millsec
+    private final long value; // required
+    private final String layer; // required
+    private final long ttl; //time to live this settings record
+    private final Map<SettingsArg<?>, Object> args = new HashMap<SettingsArg<?>, Object>(); //other arguments
     
     public Settings(short type, String stringFlags, long timestamp, long value, long ttl, String layer, Map<String, ByteBuffer> args) {
         this.type = type;

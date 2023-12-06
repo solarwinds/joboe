@@ -6,6 +6,7 @@ import com.solarwinds.logging.Logger.Level;
 import com.solarwinds.logging.LoggerFactory;
 import com.solarwinds.util.DaemonThreadFactory;
 import com.solarwinds.util.HeartbeatSchedulerProvider;
+import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.List;
@@ -48,7 +49,7 @@ public class RpcClient implements com.solarwinds.joboe.rpc.Client {
 
     public enum TaskType {
         POST_EVENTS(true), POST_METRICS(true), POST_STATUS(true), GET_SETTINGS(true), CONNECTION_INIT(false);
-        private boolean threadpoolRequired;
+        private final boolean threadpoolRequired;
         TaskType(boolean threadpoolRequired) {
             this.threadpoolRequired = threadpoolRequired;
         }
@@ -499,6 +500,7 @@ public class RpcClient implements com.solarwinds.joboe.rpc.Client {
      * @author pluk
      *
      */
+    @Getter
     enum RetryType {
         TRY_LATER(true), //retry as result code is TRY_LATER
         LIMIT_EXCEED(true), //retry as result code is LIMIT_EXCEED
@@ -507,19 +509,17 @@ public class RpcClient implements com.solarwinds.joboe.rpc.Client {
         CONNECTION_RECOVERED(false), //retry due to connection successfully recovered from failure
         REDIRECT(false); //retry as result code is REDIRECT
 
-        private boolean failure;
+        /**
+         * -- GETTER --
+         *
+         * @return whether this result code is considered a "failure" result code
+         */
+        private final boolean failure;
 
         RetryType(boolean failure) {
             this.failure = failure;
         }
 
-        /**
-         *
-         * @return whether this result code is considered a "failure" result code
-         */
-        public boolean isFailure() {
-            return failure;
-        }
     }
 
     /**
@@ -600,7 +600,7 @@ public class RpcClient implements com.solarwinds.joboe.rpc.Client {
 
         private boolean shouldRetry;
         private Integer activeDelay;
-        private TaskType taskType;
+        private final TaskType taskType;
 
         RetryParams(TaskType taskType) {
             this.taskType = taskType;

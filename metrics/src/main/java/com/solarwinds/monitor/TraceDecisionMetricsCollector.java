@@ -44,7 +44,7 @@ class TraceDecisionMetricsCollector extends AbstractMetricsEntryCollector {
     }
 
     private SimpleMeasurementMetricsEntry getMetricEntry(MetricType metricType, String keyName) {
-        return new SimpleMeasurementMetricsEntry(keyName, Collections.<String, Object>emptyMap(), TraceDecisionUtil.consumeMetricsData(metricType));
+        return new SimpleMeasurementMetricsEntry(keyName, Collections.emptyMap(), TraceDecisionUtil.consumeMetricsData(metricType));
     }
     private List<SimpleMeasurementMetricsEntry> convertToMetricsEntries(Map<Entry<String, Object>, Integer> data, String keyName) {
         List<SimpleMeasurementMetricsEntry> entries = new ArrayList<SimpleMeasurementMetricsEntry>();

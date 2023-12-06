@@ -7,6 +7,8 @@
 
 package com.solarwinds.metrics.hdrHistogram;
 
+import lombok.Getter;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.nio.ByteBuffer;
@@ -486,7 +488,7 @@ public class ConcurrentHistogram extends Histogram {
      */
     public static ConcurrentHistogram decodeFromByteBuffer(final ByteBuffer buffer,
                                                            final long minBarForHighestTrackableValue) {
-        return (ConcurrentHistogram) decodeFromByteBuffer(buffer, ConcurrentHistogram.class,
+        return decodeFromByteBuffer(buffer, ConcurrentHistogram.class,
                 minBarForHighestTrackableValue);
     }
 
@@ -499,7 +501,7 @@ public class ConcurrentHistogram extends Histogram {
      */
     public static ConcurrentHistogram decodeFromCompressedByteBuffer(final ByteBuffer buffer,
                                                                      final long minBarForHighestTrackableValue) throws DataFormatException {
-        return (ConcurrentHistogram) decodeFromCompressedByteBuffer(buffer, ConcurrentHistogram.class,
+        return decodeFromCompressedByteBuffer(buffer, ConcurrentHistogram.class,
                 minBarForHighestTrackableValue);
     }
 
@@ -528,6 +530,7 @@ public class ConcurrentHistogram extends Histogram {
         }
     }
 
+    @Getter
     static class AtomicLongArrayWithNormalizingOffset extends AtomicLongArray {
 
         private int normalizingIndexOffset;
@@ -535,10 +538,6 @@ public class ConcurrentHistogram extends Histogram {
         AtomicLongArrayWithNormalizingOffset(int length, int normalizingIndexOffset) {
             super(length);
             this.normalizingIndexOffset = normalizingIndexOffset;
-        }
-
-        public int getNormalizingIndexOffset() {
-            return normalizingIndexOffset;
         }
 
         public void setNormalizingIndexOffset(int normalizingIndexOffset) {

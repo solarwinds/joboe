@@ -4,13 +4,15 @@ import com.solarwinds.joboe.Context;
 import com.solarwinds.joboe.Metadata;
 import com.solarwinds.logging.Logger;
 import com.solarwinds.logging.LoggerFactory;
+import lombok.Getter;
 
 public class Scope implements com.solarwinds.joboe.span.Scope  {
     private final Span wrapped;
 
-    private Logger logger = LoggerFactory.getLogger();
+    private final Logger logger = LoggerFactory.getLogger();
     private final boolean finishOnClose;
     private final boolean isAsyncPropagation;
+    @Getter
     private final Metadata previousMetadata;
     
     private static final ScopeManager scopeManager = ScopeManager.INSTANCE;
@@ -40,10 +42,6 @@ public class Scope implements com.solarwinds.joboe.span.Scope  {
         if (finishOnClose) {
             wrapped.finish();
         }
-    }
-
-    public Metadata getPreviousMetadata() {
-        return previousMetadata;
     }
 
     @Override

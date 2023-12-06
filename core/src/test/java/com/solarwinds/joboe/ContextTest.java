@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -70,7 +71,7 @@ public class ContextTest {
             public void run() {
                 try {
                     Metadata childMD = Context.getMetadata();
-                    assertFalse(parentMD == childMD);     // different object
+                    assertNotSame(parentMD, childMD);     // different object
                     assertEquals(parentMD.toHexString(), childMD.toHexString()); // but same metadata
                     assertTrue(childMD.isValid());
                 } catch (Error e) {
@@ -107,8 +108,8 @@ public class ContextTest {
         thread.start();
         thread.join();
         Context.setSkipInheritingContext(false);
-        
-        assertEquals(false, thread.threadContext.isValid()); //no context inherited
+
+        assertFalse(thread.threadContext.isValid()); //no context inherited
         
         //test remote config changes
         SimpleSettingsFetcher fetcher = (SimpleSettingsFetcher) SettingsManager.getFetcher();
@@ -117,8 +118,8 @@ public class ContextTest {
         thread = new TestThread();
         thread.start();
         thread.join();
-        
-        assertEquals(false, thread.threadContext.isValid()); //no context inherited
+
+        assertFalse(thread.threadContext.isValid()); //no context inherited
         
         //re-enable inherit context
         testSettingsReader.put(new SettingsMockupBuilder().withFlags(TracingMode.ALWAYS).withSampleRate(TraceDecisionUtil.SAMPLE_RESOLUTION).build());
@@ -273,7 +274,7 @@ public class ContextTest {
         deserializedEvents = tracingReporter.getSentEvents();
         assertEquals(1, deserializedEvents.size());
         DeserializedEvent deseralizedEvent = deserializedEvents.get(0);
-        assertEquals(null, deseralizedEvent.getSentEntries().get("Backtrace"));
+        assertNull(deseralizedEvent.getSentEntries().get("Backtrace"));
         assertEquals("some value", deseralizedEvent.getSentEntries().get("OtherKv"));
         tracingReporter.reset();
         

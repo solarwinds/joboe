@@ -1,5 +1,7 @@
 package com.solarwinds.metrics.measurement;
 
+import lombok.Getter;
+
 /**
  * A {@link Measurement} that holds the summary of a series of values provided by {@link recordValue} calls. 
  * 
@@ -8,6 +10,7 @@ package com.solarwinds.metrics.measurement;
  * @author pluk
  *
  */
+@Getter
 public abstract class SummaryMeasurement<T extends Number> extends Measurement<T> {
     private long count;
     
@@ -25,8 +28,5 @@ public abstract class SummaryMeasurement<T extends Number> extends Measurement<T
     public void incrementCount(int increment) {
         this.count += increment;
     }
-    
-    public long getCount() {
-        return count;
-    }
+
 }

@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EventImplTest {
-    private Logger log = Logger.getLogger(getClass().getName());
+    private final Logger log = Logger.getLogger(getClass().getName());
     private static final TestReporter reporter = TestUtils.initTraceReporter();
 
     @AfterEach
@@ -288,7 +288,7 @@ public class EventImplTest {
         final int STRING_APPEND_COUNT = 100000;
         StringBuffer longString = new StringBuffer(); 
         for (int i = 0 ; i < STRING_APPEND_COUNT; i ++) {
-            longString.append(String.valueOf(i));
+            longString.append(i);
         }
         
         Event testEvent = Context.startTrace();
@@ -323,7 +323,7 @@ public class EventImplTest {
         final int STRING_APPEND_COUNT = 1000;
         StringBuffer longString = new StringBuffer(); 
         for (int i = 0 ; i < STRING_APPEND_COUNT; i ++) {
-            longString.append(String.valueOf(i));
+            longString.append(i);
         }
         final String longPrefix = longString.toString();        
         

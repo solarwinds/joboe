@@ -1,5 +1,7 @@
 package com.solarwinds.joboe.config;
 
+import lombok.Getter;
+
 /**
  * Setting that contains scope information for each log injection category.
  * 
@@ -7,6 +9,7 @@ package com.solarwinds.joboe.config;
  * 
  * @author pluk
  */
+@Getter
 public class LogTraceIdSetting {
     private final LogTraceIdScope autoInsertScope;
     private final LogTraceIdScope mdcScope;
@@ -16,11 +19,4 @@ public class LogTraceIdSetting {
         this.mdcScope = mdcScope;
     }
 
-    public LogTraceIdScope getAutoInsertScope() {
-        return autoInsertScope;
-    }
-
-    public LogTraceIdScope getMdcScope() {
-        return mdcScope;
-    }
 }

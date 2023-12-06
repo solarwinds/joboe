@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ServerHostInfoReaderTest {
     private static final String TEST_FILE_FOLDER = "src/test/java/com/tracelytics/util/"; //using a rather static path. Using Class.getResourceAsStream does not work in test (vs main)
-    private ServerHostInfoReader reader = ServerHostInfoReader.INSTANCE;
+    private final ServerHostInfoReader reader = ServerHostInfoReader.INSTANCE;
 
     @BeforeEach
     void setup(){
@@ -44,14 +44,10 @@ public class ServerHostInfoReaderTest {
         assert(hostMetadata.containsKey("UnameSysName"));
         assert(hostMetadata.containsKey("UnameVersion"));
         HostInfoUtils.OsType osType = HostInfoUtils.getOsType();
-        if (osType == HostInfoUtils.OsType.LINUX || osType == HostInfoUtils.OsType.WINDOWS) {
-            assert (hostMetadata.containsKey("Distro"));
-        }
+        assert osType != HostInfoUtils.OsType.LINUX && osType != HostInfoUtils.OsType.WINDOWS || (hostMetadata.containsKey("Distro"));
         NetworkAddressInfo networkInfo = reader.getNetworkAddressInfo();
         if (networkInfo != null) {
-            if (!networkInfo.getIpAddresses().isEmpty()) {
-                assert(hostMetadata.containsKey("IPAddresses"));
-            }
+            assert networkInfo.getIpAddresses().isEmpty() || (hostMetadata.containsKey("IPAddresses"));
         }
     }
 

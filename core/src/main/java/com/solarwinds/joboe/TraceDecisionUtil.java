@@ -8,6 +8,7 @@ import com.solarwinds.joboe.settings.SettingsArg;
 import com.solarwinds.joboe.settings.SettingsManager;
 import com.solarwinds.logging.Logger;
 import com.solarwinds.logging.LoggerFactory;
+import lombok.Getter;
 
 import java.util.AbstractMap;
 import java.util.HashMap;
@@ -357,11 +358,7 @@ public class TraceDecisionUtil {
     private static boolean isSampledByConfig(Metadata inMetadata, TraceConfig config, boolean isTriggerTrace) {
         if (inMetadata == null) { //new trace
             if (isTriggerTrace) { //trigger trace only matters for new traces
-                if (config.hasSampleTriggerTraceFlag()) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return config.hasSampleTriggerTraceFlag();
             } else {
                 if (config.hasSampleStartFlag()) {
                     incrementMetrics(MetricType.SAMPLE_COUNT);
@@ -375,14 +372,11 @@ public class TraceDecisionUtil {
 
             if (!continuingMetadata.isSampled()) { //sampling decision from previous service decides not to trace
                 return false;
-            } else if (config.hasSampleThroughAlwaysFlag()) {
+            } else //this flag is not being used currently
+                if (config.hasSampleThroughAlwaysFlag()) {
                 incrementMetrics(MetricType.THROUGH_TRACE_COUNT);
                 return true;
-            } else if (config.hasSampleThroughFlag() && sampled(config.getSampleRate())) { //this flag is not being used currently
-                return true;
-            } else {
-                return false;
-            }
+            } else return config.hasSampleThroughFlag() && sampled(config.getSampleRate());
         }
     }
     
@@ -451,6 +445,7 @@ public class TraceDecisionUtil {
         THROUGHPUT, TOKEN_BUCKET_EXHAUSTION, TRACE_COUNT, SAMPLE_COUNT, THROUGH_TRACE_COUNT, TRIGGERED_TRACE_COUNT// ,SIGNED_REQUEST_COUNT
     }
 
+    @Getter
     public enum RequestType {
         REGULAR(false, TokenBucketType.REGULAR),
         AUTHENTICATED_TRIGGER_TRACE(true, TokenBucketType.RELAXED),
@@ -464,13 +459,6 @@ public class TraceDecisionUtil {
             this.triggerTrace = triggerTrace;
             this.bucketType = bucketType;
         }
-        
-        public boolean isTriggerTrace() {
-            return triggerTrace;
-        }
 
-        public TokenBucketType getBucketType() {
-            return bucketType;
-        }
     }
 }

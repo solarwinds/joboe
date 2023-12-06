@@ -73,11 +73,7 @@ enum DefaultWriter implements BsonWriter {
 
     @Override
     public void writeTo(ByteBuffer buffer, Object reference) {
-      try {
-        buffer.put(((String) reference).getBytes(Charsets.UTF_8.name())).put(BsonBytes.EOO);
-      } catch (java.io.UnsupportedEncodingException impossible) {
-          throw new AssertionError(impossible);
-      }
+        buffer.put(((String) reference).getBytes(Charsets.UTF_8)).put(BsonBytes.EOO);
     }
   },
 
@@ -94,13 +90,9 @@ enum DefaultWriter implements BsonWriter {
     @Override
     public void writeTo(ByteBuffer buffer, Object reference) {
       byte[] bytes;
-        try {
-            bytes = ((String) reference).getBytes(Charsets.UTF_8.name());
-            buffer.putInt(bytes.length + 1).put(bytes).put(BsonBytes.EOO);
-        } catch (java.io.UnsupportedEncodingException impossible) {
-            throw new AssertionError(impossible);
-        }
-     
+        bytes = ((String) reference).getBytes(Charsets.UTF_8);
+        buffer.putInt(bytes.length + 1).put(bytes).put(BsonBytes.EOO);
+
     }
   },
 
@@ -225,5 +217,5 @@ enum DefaultWriter implements BsonWriter {
     public void writeTo(ByteBuffer buffer, Object reference) {
       buffer.putLong(((Long) reference).longValue());
     }
-  };
+  }
 }

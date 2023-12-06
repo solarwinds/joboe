@@ -18,8 +18,8 @@ public class RpcSettingsReader implements SettingsReader {
     private static final Logger logger = LoggerFactory.getLogger();
 
 
-    private Client rpcClient;
-    private ClientLoggingCallback<SettingsResult> loggingCallback = new ClientLoggingCallback<SettingsResult>("get service settings");
+    private final Client rpcClient;
+    private final ClientLoggingCallback<SettingsResult> loggingCallback = new ClientLoggingCallback<SettingsResult>("get service settings");
 
     private static final String SSL_CLIENT_VERSION = "2";
 

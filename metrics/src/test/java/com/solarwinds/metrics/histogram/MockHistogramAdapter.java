@@ -1,14 +1,20 @@
 package com.solarwinds.metrics.histogram;
 
 public class MockHistogramAdapter implements Histogram {
-    private Double percentile;
-    private long totalCount;
-    private long sum;
-    private long max;
-    private long min;
-    private Double standardDeviation;
-    private Long last;
-    private Long countHigherThanValue;
+    private final Double percentile;
+    @lombok.Getter
+    private final long totalCount;
+    @lombok.Getter
+    private final long sum;
+    @lombok.Getter
+    private final long max;
+    @lombok.Getter
+    private final long min;
+    @lombok.Getter
+    private final Double standardDeviation;
+    @lombok.Getter
+    private final Long last;
+    private final Long countHigherThanValue;
     
     public MockHistogramAdapter(Double percentile, long totalCount, long sum, long max, long min, Double standardDeviation, long last, long countHigherThanValue) {
         super();
@@ -25,24 +31,7 @@ public class MockHistogramAdapter implements Histogram {
     public Double getPercentile(double percentile) {
         return percentile;
     }
-    public long getTotalCount() {
-        return totalCount;
-    }
-    public long getSum() {
-        return sum;
-    }
-    public long getMax() {
-        return max;
-    }
-    public long getMin() {
-        return min;
-    }
-    public Double getStandardDeviation() {
-        return standardDeviation;
-    }
-    public Long getLast() {
-        return last;
-    }
+
     public Long getCountHigherThanValue(long value) {
         return countHigherThanValue;
     }
@@ -109,9 +98,7 @@ public class MockHistogramAdapter implements Histogram {
             return false;
         if (sum != other.sum)
             return false;
-        if (totalCount != other.totalCount)
-            return false;
-        return true;
+        return totalCount == other.totalCount;
     }
 
     public byte[] encodeBase64() {

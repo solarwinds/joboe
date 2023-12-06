@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class FrameworkInfoReporterTest {
 
     private FrameworkInfoReporter reporter;
-    private TestRpcClient testRpcClient = new TestRpcClient(0);
+    private final TestRpcClient testRpcClient = new TestRpcClient(0);
 
     @BeforeEach
     protected void setUp() throws Exception {

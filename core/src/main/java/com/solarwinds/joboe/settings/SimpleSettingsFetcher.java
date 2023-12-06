@@ -13,7 +13,7 @@ import com.solarwinds.joboe.settings.TestSettingsReader.SettingsChangeCallback;
  *
  */
 public class SimpleSettingsFetcher implements SettingsFetcher {
-    private TestSettingsReader reader;
+    private final TestSettingsReader reader;
     private SettingsListener listener;
     
     public SimpleSettingsFetcher(TestSettingsReader reader) {

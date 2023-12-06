@@ -6,5 +6,5 @@ package com.solarwinds.joboe.config;
  *
  */
 public enum ConfigGroup {
-    AGENT, MONITOR, PROFILER;
+    AGENT, MONITOR, PROFILER
 }

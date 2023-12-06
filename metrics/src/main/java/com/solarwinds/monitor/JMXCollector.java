@@ -37,7 +37,7 @@ import com.solarwinds.shaded.org.json.JSONObject;
  */
 class JMXCollector extends AbstractMetricsEntryCollector {
    
-    private List<JMXScope> scopes;  //scopes that this collector should collect information from
+    private final List<JMXScope> scopes;  //scopes that this collector should collect information from
     
     static final int DEFAULT_MAX_ENTRY_COUNT = 100; //entries allowed per collection cycle
     private int maxEntryCount = DEFAULT_MAX_ENTRY_COUNT;
@@ -140,7 +140,7 @@ class JMXCollector extends AbstractMetricsEntryCollector {
             //known issue for some app server, which the JMX class might not be available yet during startup see https://github.com/librato/joboe/issues/675
             if (e.getCause() instanceof ClassNotFoundException) {
                 logger.debug("Cannot load JMX impl class: " + e.getMessage() + " the class might be available later on", e);
-                return Collections.<MetricKey, Number>emptyMap();
+                return Collections.emptyMap();
             }
             throw e;
         } finally {
@@ -232,7 +232,7 @@ class JMXCollector extends AbstractMetricsEntryCollector {
      * @return keys and values after processing the mBean attribute. Take note that although the input is one parameter, the result could be variable in size.
      */
     private static Map<MetricKey, Number> processMBeanAttribute(ObjectName mBeanName, String attributeName, MBeanServer mbs) throws Exception {
-        String prefix = (JMX_LABEL + "." + getMetricNameSegmentFromObjectName(mBeanName) + "." + attributeName.toString()).replace(' ', '_');
+        String prefix = (JMX_LABEL + "." + getMetricNameSegmentFromObjectName(mBeanName) + "." + attributeName).replace(' ', '_');
         
         AttributeProcessor processor = AttributeProcessorLocator.getProcessor(mBeanName, attributeName, mbs);
 

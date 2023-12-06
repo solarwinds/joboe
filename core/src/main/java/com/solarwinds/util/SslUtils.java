@@ -19,7 +19,7 @@ import java.security.cert.X509Certificate;
 import java.util.*;
 
 public class SslUtils {
-    private static Logger logger = LoggerFactory.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger();
     private SslUtils() {
 
     }

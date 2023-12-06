@@ -25,8 +25,8 @@ public class PollingSettingsFetcher implements SettingsFetcher {
     
     
     private final int refreshInterval; //pauses between each reader call in seconds
-    private SettingsReader reader;
-    private ExecutorService executorService = Executors.newSingleThreadExecutor(DaemonThreadFactory.newInstance("poll-settings"));
+    private final SettingsReader reader;
+    private final ExecutorService executorService = Executors.newSingleThreadExecutor(DaemonThreadFactory.newInstance("poll-settings"));
     private Settings currentSettings;
     private SettingsListener listener;
     

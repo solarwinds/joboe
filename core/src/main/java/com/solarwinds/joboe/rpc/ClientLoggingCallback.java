@@ -75,7 +75,7 @@ public class ClientLoggingCallback<T extends Result> implements Callback<T>{
      *
      */
     private class LoggingCallback implements Callback<T> {
-        private ConcurrentMap<ResultCode, LogInfo> logInfoByResultCode = new ConcurrentHashMap<ResultCode, LogInfo>();
+        private final ConcurrentMap<ResultCode, LogInfo> logInfoByResultCode = new ConcurrentHashMap<ResultCode, LogInfo>();
         private static final int REPORT_INTERVAL = 60 * 1000; //1 min
         
         {

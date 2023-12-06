@@ -14,7 +14,7 @@ import com.solarwinds.metrics.MetricsEntry;
  *
  */
 public class SimpleMeasurementMetricsEntry extends MeasurementMetricsEntry<Number>{
-    private static Logger logger = LoggerFactory.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger();
     public SimpleMeasurementMetricsEntry(String name, Number value) {
         this(name, null, value);
     }
@@ -28,7 +28,7 @@ public class SimpleMeasurementMetricsEntry extends MeasurementMetricsEntry<Numbe
     @Override
     public Map<String, Number> getSerializedKvs() {
         if (isNaN(value)) {
-            logger.debug("Not serializing this entry as it's NaN: " + toString());
+            logger.debug("Not serializing this entry as it's NaN: " + this);
             return Collections.emptyMap();
         } else {
             return Collections.singletonMap("value", value);

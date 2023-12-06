@@ -34,8 +34,8 @@ public class SystemMonitorController {
     protected static final Logger logger = LoggerFactory.getLogger();
 
     private static volatile ExecutorService executor;
-    private static List<SystemMonitor<?, ?>> monitors = new ArrayList<SystemMonitor<?, ?>>();
-    private static ConfigContainer configs;
+    private static final List<SystemMonitor<?, ?>> monitors = new ArrayList<SystemMonitor<?, ?>>();
+    private static final ConfigContainer configs;
 
     static {
         configs = ConfigManager.getConfigs(ConfigGroup.MONITOR);

@@ -289,7 +289,7 @@ public class TransactionNameManagerTest {
         
         //test long string that doesn't make the cut
         longString = generateLongString(TransactionNameManager.MAX_TRANSACTION_NAME_LENGTH + 1);
-        assertTrue(!longString.equals(TransactionNameManager.transformTransactionName(longString))); //should not be equal as it should be trimmed
+        assertFalse(longString.equals(TransactionNameManager.transformTransactionName(longString))); //should not be equal as it should be trimmed
         assertEquals(generateLongString(TransactionNameManager.MAX_TRANSACTION_NAME_LENGTH - TransactionNameManager.TRANSACTION_NAME_ELLIPSIS.length()) + TransactionNameManager.TRANSACTION_NAME_ELLIPSIS, TransactionNameManager.transformTransactionName(longString));
         
         assertEquals("abc", TransactionNameManager.transformTransactionName("ABC")); //convert to lower case

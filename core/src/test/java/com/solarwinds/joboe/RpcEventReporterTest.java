@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RpcEventReporterTest {
     private final TestSettingsReader testSettingsReader = TestUtils.initSettingsReader();
@@ -101,7 +102,7 @@ public class RpcEventReporterTest {
                 hasRejection = true;
             }
         }
-        assertEquals(true, hasRejection);
+        assertTrue(hasRejection);
         
         Thread.sleep(20000);
         assertStats(rpcReporter, null, true, 0, eventCount * 2, (long)QueuingEventReporter.QUEUE_CAPACITY);
@@ -124,7 +125,7 @@ public class RpcEventReporterTest {
         }
 
         TimeUnit.SECONDS.sleep(QueuingEventReporter.DEFAULT_FLUSH_INTERVAL + 1);
-        assertStats(rpcReporter, 0l, false, eventCount, eventCount, null);
+        assertStats(rpcReporter, 0L, false, eventCount, eventCount, null);
     }
     
     /**
@@ -144,7 +145,7 @@ public class RpcEventReporterTest {
         }
         
         TimeUnit.SECONDS.sleep(QueuingEventReporter.DEFAULT_FLUSH_INTERVAL + 1);
-        assertStats(rpcReporter, 0l, false, eventCount, eventCount, null); //rejection from the client does not count as overflow - overflow refers to the queue within the QueuingEventReporter
+        assertStats(rpcReporter, 0L, false, eventCount, eventCount, null); //rejection from the client does not count as overflow - overflow refers to the queue within the QueuingEventReporter
     }
 
 

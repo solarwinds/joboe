@@ -1,5 +1,7 @@
 package com.solarwinds.metrics.hdrHistogram;
 
+import lombok.Getter;
+
 import javax.xml.bind.DatatypeConverter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -46,13 +48,21 @@ import static java.nio.ByteOrder.BIG_ENDIAN;
 public class HistogramLogWriter {
     private static final String HISTOGRAM_LOG_FORMAT_VERSION = "1.3";
 
-    private static Pattern containsDelimeterPattern = Pattern.compile(".[, \\r\\n].");
-    private Matcher containsDelimeterMatcher = containsDelimeterPattern.matcher("");
+    private static final Pattern containsDelimeterPattern = Pattern.compile(".[, \\r\\n].");
+    private final Matcher containsDelimeterMatcher = containsDelimeterPattern.matcher("");
 
     private final PrintStream log;
 
     private ByteBuffer targetBuffer;
 
+    /**
+     * -- GETTER --
+     *  return the current base time offset (see
+     * ).
+     *
+     * @return the current base time
+     */
+    @Getter
     private long baseTime = 0;
 
     /**
@@ -182,7 +192,7 @@ public class HistogramLogWriter {
     public void outputStartTime(final long startTimeMsec) {
         log.format(Locale.US, "#[StartTime: %.3f (seconds since epoch), %s]\n",
                 startTimeMsec / 1000.0,
-                (new Date(startTimeMsec)).toString());
+                (new Date(startTimeMsec)));
     }
 
 
@@ -229,11 +239,4 @@ public class HistogramLogWriter {
         this.baseTime = baseTimeMsec;
     }
 
-    /**
-     * return the current base time offset (see {@link HistogramLogWriter#setBaseTime}).
-     * @return the current base time
-     */
-    public long getBaseTime() {
-        return baseTime;
-    }
 }

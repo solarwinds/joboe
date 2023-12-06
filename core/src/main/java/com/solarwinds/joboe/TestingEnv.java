@@ -1,11 +1,13 @@
 package com.solarwinds.joboe;
 
 import com.solarwinds.joboe.settings.TestSettingsReader;
+import lombok.Getter;
 
+@Getter
 public class TestingEnv {
-    private TestReporter tracingReporter;
-    private TestSettingsReader settingsReader;
-    private TestReporter profilingReporter;
+    private final TestReporter tracingReporter;
+    private final TestSettingsReader settingsReader;
+    private final TestReporter profilingReporter;
     
     public TestingEnv(TestReporter tracingReporter, TestReporter profilingReporter, TestSettingsReader settingsReader) {
         super();
@@ -13,16 +15,5 @@ public class TestingEnv {
         this.profilingReporter = profilingReporter;
         this.settingsReader = settingsReader;
     }
-    
-    public TestReporter getTracingReporter() {
-        return tracingReporter;
-    }
-    
-    public TestReporter getProfilingReporter() {
-        return profilingReporter;
-    }
-    
-    public TestSettingsReader getSettingsReader() {
-        return settingsReader;
-    }
+
 }

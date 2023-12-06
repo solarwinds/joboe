@@ -173,12 +173,12 @@ public enum BsonObject {
   private BsonReader reader;
   private BsonWriter writer;
 
-  private BsonObject(byte terminal) {
-    this(terminal, Predicates.<Class<?>>alwaysFalse(), null, null);
+  BsonObject(byte terminal) {
+    this(terminal, Predicates.alwaysFalse(), null, null);
   }
 
-  private BsonObject(byte terminal, Predicate<Class<?>> predicate,
-      BsonReader reader, BsonWriter writer) {
+  BsonObject(byte terminal, Predicate<Class<?>> predicate,
+             BsonReader reader, BsonWriter writer) {
     this.terminal = terminal;
     this.predicate = predicate;
     this.reader = reader;

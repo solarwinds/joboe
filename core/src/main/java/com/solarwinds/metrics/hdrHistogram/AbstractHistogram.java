@@ -301,7 +301,7 @@ public abstract class AbstractHistogram extends AbstractHistogramBase implements
         final long largestValueWithSingleUnitResolution = 2 * (long) Math.pow(10, numberOfSignificantValueDigits);
 
         unitMagnitude = (int) Math.floor(Math.log(lowestDiscernibleValue)/Math.log(2));
-        unitMagnitudeMask = (1 << unitMagnitude) - 1;
+        unitMagnitudeMask = (1L << unitMagnitude) - 1;
 
         // We need to maintain power-of-two subBucketCount (for clean direct indexing) that is large enough to
         // provide unit resolution to at least largestValueWithSingleUnitResolution. So figure out
@@ -1254,7 +1254,7 @@ public abstract class AbstractHistogram extends AbstractHistogramBase implements
             totalValue += medianEquivalentValue(iterationValue.getValueIteratedTo())
                     * iterationValue.getCountAtValueIteratedTo();
         }
-        return (totalValue * 1.0) / getTotalCount();
+        return (totalValue) / getTotalCount();
     }
 
     /**

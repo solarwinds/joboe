@@ -57,7 +57,7 @@ final class DefaultDocumentBuilder implements BsonDocument.Builder {
   @Override
   public BsonDocument build() {
     return new DefaultDocument(builder.isEmpty()
-        ? Collections.<String, Object>emptyMap()
+        ? Collections.emptyMap()
         : builder);
   }
 }

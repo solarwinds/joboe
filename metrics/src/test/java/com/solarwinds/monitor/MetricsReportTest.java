@@ -98,10 +98,10 @@ public class MetricsReportTest {
         Map<String, Object> postedCustomMetrics = postedMessages.get(1);
         
         assertBasicKeys(postedCustomMetrics);
-        
-        assertEquals(null, postedCustomMetrics.get(SpanMetricsCollector.TRANSACTION_NAME_OVERFLOW_LABEL));
+
+        assertNull(postedCustomMetrics.get(SpanMetricsCollector.TRANSACTION_NAME_OVERFLOW_LABEL));
         assertMetricEntries(testCustomMetrics, (List<Map<String, ?>>) postedCustomMetrics.get("measurements"));
-        assertEquals(null, (List<Map<String, ?>>) postedCustomMetrics.get("histograms"));
+        assertNull(postedCustomMetrics.get("histograms"));
     }
     
     /**

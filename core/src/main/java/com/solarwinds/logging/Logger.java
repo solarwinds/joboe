@@ -5,6 +5,7 @@ import com.solarwinds.joboe.config.ConfigProperty;
 import com.solarwinds.logging.setting.LogSetting;
 import com.solarwinds.util.DaemonThreadFactory;
 import com.solarwinds.util.HostInfoUtils;
+import lombok.Getter;
 
 import java.io.*;
 import java.nio.channels.Channels;
@@ -38,6 +39,7 @@ public class Logger {
     static final Logger INSTANCE = new Logger();
     static final Logger STD_STREAM_LOGGER = new Logger(); //an internal logger that uses stderr and stdout streams only
 
+    @Getter
     private Level loggerLevel = DEFAULT_LOGGING;
     private LoggerStream errorStream = new SystemErrStream();
     private LoggerStream infoStream = new SystemOutStream();
@@ -59,7 +61,7 @@ public class Logger {
         }
 
         try {
-            info("Java agent log location: " + logFilePath.toAbsolutePath().toString());
+            info("Java agent log location: " + logFilePath.toAbsolutePath());
             return new FileLoggerStream(logFilePath, logFileMaxSize * 1024 * 1024, logFileMaxBackup);
         } catch (IOException e) {
             warn("Failed to redirect logs to [" + logFilePath.toAbsolutePath() + "] : " + e.getMessage(), e);
@@ -227,11 +229,8 @@ public class Logger {
         }
     }
 
-    public Level getLoggerLevel() {
-        return loggerLevel;
-    }
 
-
+    @Getter
     public enum Level {
         OFF("off"),
         FATAL("fatal"),
@@ -250,18 +249,14 @@ public class Logger {
             }
         }
 
-        private String label;
+        private final String label;
 
-        private Level(String label) {
+        Level(String label) {
             this.label = label;
         }
 
         public static Level fromLabel(String label) {
             return map.get(label);
-        }
-
-        public String getLabel() {
-            return label;
         }
 
         public static Set<String> getAllLabels() {
@@ -357,8 +352,8 @@ public class Logger {
         private PrintWriter filePrintWriter;
         private Long lastRollFailure; //last time of file rolling failure
         private Long lastChannelReset; //last time the file channel was reset
-        private long maxSize; //in bytes
-        private int maxBackup;
+        private final long maxSize; //in bytes
+        private final int maxBackup;
         private final ExecutorService service = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(MESSAGE_QUEUE_SIZE), DaemonThreadFactory.newInstance("file-logger"));
 
 
@@ -577,14 +572,14 @@ public class Logger {
 
             //traverse the backup file and bump the index up by one, from the highest index - 1 first
             for (int i = maxBackup - 1; i > 0; i--) {
-                Path backupFilePath = Paths.get(logFilePath.toString() + "." + i);
-                Path newBackupFilePath = Paths.get(logFilePath.toString() + "." + (i + 1));
+                Path backupFilePath = Paths.get(logFilePath + "." + i);
+                Path newBackupFilePath = Paths.get(logFilePath + "." + (i + 1));
                 if (Files.exists(backupFilePath)) {
                     Files.move(backupFilePath, newBackupFilePath, StandardCopyOption.ATOMIC_MOVE);
                 }
             }
             //move the current log file
-            Files.move(logFilePath, Paths.get(logFilePath.toString() + ".1"), StandardCopyOption.ATOMIC_MOVE);
+            Files.move(logFilePath, Paths.get(logFilePath + ".1"), StandardCopyOption.ATOMIC_MOVE);
         }
 
         FileLockAndChannel tryLock() {

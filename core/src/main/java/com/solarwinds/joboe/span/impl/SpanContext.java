@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.solarwinds.joboe.Metadata;
 import com.solarwinds.joboe.OboeException;
+import lombok.Getter;
 
 /**
  * Implements OpenTracing's SpanContext interface
@@ -14,16 +15,23 @@ import com.solarwinds.joboe.OboeException;
  *
  */
 public class SpanContext implements com.solarwinds.joboe.span.SpanContext {
+    @Getter
     private final long traceId;
-    private final long spanId; 
+    @Getter
+    private final long spanId;
+    @Getter
     private final Long parentId;
     
+    @Getter
     private final byte flags;
     private final Map<String, String> baggage = new HashMap<String, String>();
     
+    @Getter
     private final Metadata metadata;
+    @Getter
     private final Metadata previousMetadata;
 
+    @Getter
     private Metadata entryMetadata;
     
     /**
@@ -67,35 +75,11 @@ public class SpanContext implements com.solarwinds.joboe.span.SpanContext {
         return this.baggage;
     }
 
-    public long getTraceId() {
-        return traceId;
-    }
-
-    public long getSpanId() {
-        return spanId;
-    }
-
-    public Long getParentId() {
-        return parentId;
-    }
-
-    public byte getFlags() {
-        return flags;
-    }
-    
-    public Metadata getPreviousMetadata() {
-        return previousMetadata;
-    }
-
     /**
      *  keep a reference on the state of the entry metadata, as otherwise it will be lost when the metadata get updated
      */
     public void markEntryMetadata() {
         this.entryMetadata = new Metadata(metadata);
-    }
-
-    public Metadata getEntryMetadata() {
-        return entryMetadata;
     }
 
     /**
@@ -141,7 +125,7 @@ public class SpanContext implements com.solarwinds.joboe.span.SpanContext {
 			                       new BigInteger(parts[2], 16).longValue(), 
 			                       new BigInteger(parts[3], 16).longValue(), 
 			                       new BigInteger(parts[4], 16).byteValue(),  
-			                       Collections.<String, String>emptyMap(),
+			                       Collections.emptyMap(),
 			                       null);
 		} catch (OboeException e) {
 			throw new IllegalArgumentException(value, e);
@@ -162,13 +146,8 @@ public class SpanContext implements com.solarwinds.joboe.span.SpanContext {
         return new SpanContext(metadata, traceId, spanId, parentId, flags, baggage, previousMetadata);
     }
 
-    public Metadata getMetadata() {
-        return metadata;
-    }
-    
 
-    
-	@Override
+    @Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
@@ -195,12 +174,9 @@ public class SpanContext implements com.solarwinds.joboe.span.SpanContext {
 		if (flags != other.flags)
 			return false;
 		if (metadata == null) {
-			if (other.metadata != null)
-				return false;
-		} else if (!metadata.equals(other.metadata))
-			return false;
-		return true;
-	}
+            return other.metadata == null;
+		} else return metadata.equals(other.metadata);
+    }
 
     @Override
     public String toTraceId() {

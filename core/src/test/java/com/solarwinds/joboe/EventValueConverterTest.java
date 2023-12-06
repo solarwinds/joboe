@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class EventValueConverterTest {
     private static final int MAX_VALUE_LENGTH = 100;
-    private EventValueConverter converter = new EventValueConverter(MAX_VALUE_LENGTH);
+    private final EventValueConverter converter = new EventValueConverter(MAX_VALUE_LENGTH);
     Object o;
     int objectId;
 

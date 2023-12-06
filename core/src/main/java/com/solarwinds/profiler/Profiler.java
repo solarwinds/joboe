@@ -12,6 +12,7 @@ import com.solarwinds.logging.Logger;
 import com.solarwinds.logging.LoggerFactory;
 import com.solarwinds.util.DaemonThreadFactory;
 import com.solarwinds.util.TimeUtils;
+import lombok.Getter;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -25,13 +26,14 @@ import java.util.concurrent.*;
  *
  */
 public class Profiler {
-    private static ConcurrentMap<String, Profile> profileByTraceId = new ConcurrentHashMap<String, Profiler.Profile>(); //for quicker lookup
+    private static final ConcurrentMap<String, Profile> profileByTraceId = new ConcurrentHashMap<String, Profiler.Profile>(); //for quicker lookup
     private static final String SOLARWINDS_THREAD_PREFIX = "Solarwinds-";
 
-    private static Logger logger = LoggerFactory.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger();
 
     public static EventReporter reporter;
 
+    @Getter
     private static Status status = Status.UNINITIALIZED;
 
     public enum Status { UNINITIALIZED, PAUSED_CIRCUIT_BREAKER, RUNNING, STOPPING, STOPPED }
@@ -197,17 +199,13 @@ public class Profiler {
     }
 
     private static class ProfilingDurationInfo {
-        private long duration;
-        private List<String> taskIds;
+        private final long duration;
+        private final List<String> taskIds;
 
         private ProfilingDurationInfo(long duration, List<String> taskIds) {
             this.duration = duration;
             this.taskIds = taskIds;
         }
-    }
-
-    public static Status getStatus() {
-        return status;
     }
 
     /**
@@ -283,7 +281,7 @@ public class Profiler {
      *
      */
     public static class Profile {
-        private Map<Thread, SnapshotTracker> snapshotTrackersByThread = new ConcurrentHashMap<Thread, SnapshotTracker>();
+        private final Map<Thread, SnapshotTracker> snapshotTrackersByThread = new ConcurrentHashMap<Thread, SnapshotTracker>();
         private final ProfilerSetting setting;
 
         private Profile() {
@@ -530,7 +528,7 @@ public class Profiler {
         private StackTraceElement[] stack;
         private final Metadata metadata;
         private boolean stopped = false;
-        private ArrayList<Long> snapshotsOmitted = new ArrayList<Long>();
+        private final ArrayList<Long> snapshotsOmitted = new ArrayList<Long>();
 
         public SnapshotTracker(Metadata metadata) {
             this.metadata = metadata;

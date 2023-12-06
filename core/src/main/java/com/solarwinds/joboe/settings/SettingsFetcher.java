@@ -19,7 +19,7 @@ import java.util.concurrent.CountDownLatch;
  *
  */
 public interface SettingsFetcher {
-    public static final String DEFAULT_LAYER = "";
+    String DEFAULT_LAYER = "";
     
     //Settings getSettings(String serviceName);
     Settings getSettings();

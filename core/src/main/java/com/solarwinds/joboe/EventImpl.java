@@ -28,7 +28,7 @@ public class EventImpl extends Event {
     private static final Logger logger = LoggerFactory.getLogger();
     
     private BsonDocument.Builder bsonBuilder;
-    private MultiValList<String> edges = new MultiValList<String>(1);
+    private final MultiValList<String> edges = new MultiValList<String>(1);
     private boolean isAsync = false;
 
     private boolean isEntry = false;
@@ -164,9 +164,9 @@ public class EventImpl extends Event {
      */
     private void insertToBsonBuilder(String key, Object value) {
         if ("Label".equals(key) && value instanceof String) {
-            if ("entry".equals((String)value)) {
+            if ("entry".equals(value)) {
                 isEntry = true;
-            } else if ("exit".equals((String)value)) {
+            } else if ("exit".equals(value)) {
                 isExit = true;
             }
         } else if ("Backtrace".equals(key) && !metadata.incrNumBacktraces()) { //do not add backtrace if limit is exceeded
@@ -290,7 +290,7 @@ public class EventImpl extends Event {
         BsonWriter writer = BsonToken.DOCUMENT.writer();
         ByteBuffer buffer = BUFFER.get();
         //ByteBuffer buffer = ByteBuffer.allocate(MAX_EVENT_BUFFER_SIZE).order(ByteOrder.LITTLE_ENDIAN);
-        ((Buffer) buffer).clear(); //cast for JDK 8- runtime compatibility
+        buffer.clear(); //cast for JDK 8- runtime compatibility
 
         boolean retry = false;
         try {
@@ -305,7 +305,7 @@ public class EventImpl extends Event {
             logger.warn("The KVs are too big to be converted. Trimming down the KVs...");
             doc = trimDoc(doc);
 
-            ((Buffer) buffer).clear();  //cast for JDK 8- runtime compatibility
+            buffer.clear();  //cast for JDK 8- runtime compatibility
 
             if (doc != null) {
                 RuntimeException bsonException = null;
@@ -324,7 +324,7 @@ public class EventImpl extends Event {
             }
         }
 
-        ((Buffer) buffer).flip();  //cast for JDK 8- runtime compatibility
+        buffer.flip();  //cast for JDK 8- runtime compatibility
         
         byte[] bytes = new byte[buffer.remaining()]; //allocate an array with the actual size required
         buffer.get(bytes);
@@ -451,7 +451,7 @@ public class EventImpl extends Event {
                 newBuilder.put(entry.getKey(), value);
             } catch (BufferOverflowException e) {
     		    logger.warn("Failed to write KV [" + entry.getKey() + "] to event, as adding it does not fit the bytebuffer, skipping this KV!");
-                ((Buffer) testBuffer).position(lastPosition);  //roll back to last position. Cast for JDK 8- runtime compatibility
+                testBuffer.position(lastPosition);  //roll back to last position. Cast for JDK 8- runtime compatibility
             }
     	}
 

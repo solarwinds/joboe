@@ -22,12 +22,12 @@ public interface Client {
     void close();
     Status getStatus();
     
-    public enum ClientType { GRPC }
-    public enum Status {
-        NOT_CONNECTED, OK, FAILURE;
+    enum ClientType { GRPC }
+    enum Status {
+        NOT_CONNECTED, OK, FAILURE
     }
     
-    public static interface Callback<T> {
+    interface Callback<T> {
         void complete(T result);
         void fail(Exception e);
     }

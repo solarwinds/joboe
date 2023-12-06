@@ -19,6 +19,7 @@ import com.solarwinds.joboe.span.impl.Span.SpanProperty;
 import com.solarwinds.joboe.span.impl.Span.TraceProperty;
 import com.solarwinds.logging.Logger;
 import com.solarwinds.logging.LoggerFactory;
+import lombok.Getter;
 
 /**
  * Manages and generates transaction name based on various rules.
@@ -55,9 +56,10 @@ public final class TransactionNameManager {
     public static final String DEFAULT_SDK_TRANSACTION_NAME_PREFIX = "custom-";
     
     static String[] customTransactionNamePattern;
-    static final Cache<String, String> urlTransactionNameCache = CacheBuilder.newBuilder().maximumSize(1000).expireAfterAccess(1200, TimeUnit.SECONDS).<String, String>build(); //20 mins cache
+    static final Cache<String, String> urlTransactionNameCache = CacheBuilder.newBuilder().maximumSize(1000).expireAfterAccess(1200, TimeUnit.SECONDS).build(); //20 mins cache
     
     private static final Set<String> existingTransactionNames = new HashSet<String>();
+    @Getter
     private static boolean limitExceeded;
     private static int maxNameCount = DEFAULT_MAX_NAME_COUNT;
     
@@ -312,11 +314,7 @@ public final class TransactionNameManager {
         limitExceeded = true; //toggle the flag
         return false;
     }
-    
-    public static boolean isLimitExceeded() {
-        return limitExceeded;
-    }
-    
+
     public static void clearTransactionNames() {
        synchronized(existingTransactionNames) {
            existingTransactionNames.clear();

@@ -1,5 +1,7 @@
 package com.solarwinds.joboe.settings;
 
+import lombok.Getter;
+
 /**
  * Listens to change of {@link SettingsArg} from {@link Settings}
  * 
@@ -12,17 +14,14 @@ package com.solarwinds.joboe.settings;
  * @param <T>
  */
 public abstract class SettingsArgChangeListener<T> {
-    private SettingsArg<T> type;
+    @Getter
+    private final SettingsArg<T> type;
     private T lastValue;
     
     public SettingsArgChangeListener(SettingsArg<T> type) {
         this.type = type;
     }
-    
-    public SettingsArg<T> getType() {
-        return type;
-    }
-    
+
     public final void onValue(T value) {
         boolean changed;
 

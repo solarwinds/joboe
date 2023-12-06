@@ -6,6 +6,7 @@ import com.solarwinds.joboe.settings.SettingsManager;
 import com.solarwinds.logging.Logger;
 import com.solarwinds.logging.LoggerFactory;
 import com.solarwinds.util.HexUtils;
+import lombok.Getter;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -31,7 +32,21 @@ public class XTraceOptions {
     static final String KEY_VALUE_SEPARATOR = "=";
 
 
+    /**
+     * -- GETTER --
+     *  Gets the exceptions occurred during the construction of XTraceOptions by
+     *
+     * @return
+     */
+    @Getter
     private final List<XTraceOptionException> exceptions;
+    /**
+     * -- GETTER --
+     *  Gets the authentication status after invocation of
+     *
+     * @return
+     */
+    @Getter
     private final AuthenticationStatus authenticationStatus;
 
     static {
@@ -103,7 +118,7 @@ public class XTraceOptions {
                         exceptions.add(new InvalidFormatXTraceOptionException(option, optionEntry));
                     } else {
                         if (!options.containsKey(option)) {
-                            options.put((XTraceOption<Boolean>) option, true);
+                            options.put(option, true);
                         } else {
                             logger.debug("Duplicated option [" + option.getKey() + "] found in X-Trace-Options, ignoring...");
                         }
@@ -214,22 +229,6 @@ public class XTraceOptions {
         return customKvs;
     }
 
-    /**
-     * Gets the exceptions occurred during the construction of XTraceOptions by {@link XTraceOptions#getXTraceOptions}
-     * @return
-     */
-    public List<XTraceOptionException> getExceptions() {
-        return exceptions;
-    }
-
-    /**
-     * Gets the authentication status after invocation of {@link XTraceOptions#getXTraceOptions}
-     * @return
-     */
-    public AuthenticationStatus getAuthenticationStatus() {
-        return authenticationStatus;
-    }
-
     public abstract static class XTraceOptionException extends Exception {
         XTraceOptionException(String message, Exception cause) {
             super(message, cause);
@@ -243,6 +242,7 @@ public class XTraceOptions {
         
     }
     
+    @Getter
     public static abstract class InvalidXTraceOptionException extends XTraceOptionException {
         protected String invalidOptionKey;
         private static final String RESPONSE_KEY = "ignored";
@@ -250,10 +250,6 @@ public class XTraceOptions {
         protected InvalidXTraceOptionException(String invalidOptionKey, String message) {
             super(message);
             this.invalidOptionKey = invalidOptionKey;
-        }
-
-        public String getInvalidOptionKey() {
-            return invalidOptionKey;
         }
 
         @Override
@@ -300,12 +296,33 @@ public class XTraceOptions {
     }
     
 
+    @Getter
     public static class AuthenticationStatus {
         public static final AuthenticationStatus OK = new AuthenticationStatus(false, true, null);
         public static final AuthenticationStatus NOT_AUTHENTICATED = new AuthenticationStatus(false, false, null);
 
+        /**
+         * -- GETTER --
+         *  Gets the reason of the authentication failure. If the authentication was successfully or no authentication is done,
+         *  then this will be null
+         *
+         * @return
+         */
         private final String reason;
+        /**
+         * -- GETTER --
+         *  Whether there is failure during the authentication.
+         *  Take note that if no authentication was taken place (for example no signature), then this will be `false`
+         *
+         * @return
+         */
         private final boolean failure;
+        /**
+         * -- GETTER --
+         *  Whether the request is authenticated
+         *
+         * @return
+         */
         private final boolean authenticated;
 
         private AuthenticationStatus(boolean failure, boolean authenticated, String reason) {
@@ -316,33 +333,6 @@ public class XTraceOptions {
 
         public static AuthenticationStatus failure(String reason) {
             return new AuthenticationStatus(true, false, reason);
-        }
-
-        /**
-         * Whether the request is authenticated
-         * @return
-         */
-        public boolean isAuthenticated() {
-            return authenticated;
-        }
-
-        /**
-         * Whether there is failure during the authentication.
-         *
-         * Take note that if no authentication was taken place (for example no signature), then this will be `false`
-         * @return
-         */
-        public boolean isFailure() {
-            return failure;
-        }
-
-        /**
-         * Gets the reason of the authentication failure. If the authentication was successfully or no authentication is done,
-         * then this will be null
-         * @return
-         */
-        public String getReason() {
-            return reason;
         }
 
         @Override
@@ -363,7 +353,7 @@ public class XTraceOptions {
 
             if (failure != that.failure) return false;
             if (authenticated != that.authenticated) return false;
-            return reason != null ? reason.equals(that.reason) : that.reason == null;
+            return Objects.equals(reason, that.reason);
         }
 
         @Override

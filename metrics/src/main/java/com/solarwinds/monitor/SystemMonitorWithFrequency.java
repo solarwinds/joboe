@@ -102,11 +102,11 @@ public abstract class SystemMonitorWithFrequency<T, D> extends SystemMonitor<T, 
     }
 
     public enum TimeUnit {
-        PER_HOUR(60 * 60 * 1000), PER_MINUTE(60 * 1000), PER_SECOND(1 * 1000);
+        PER_HOUR(60 * 60 * 1000), PER_MINUTE(60 * 1000), PER_SECOND(1000);
         
         private final int duration; //in millisec 
         
-        private TimeUnit(int duration) {
+        TimeUnit(int duration) {
             this.duration = duration;
         }
         

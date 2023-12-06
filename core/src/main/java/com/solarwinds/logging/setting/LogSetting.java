@@ -1,11 +1,13 @@
 package com.solarwinds.logging.setting;
 
 import com.solarwinds.logging.Logger;
+import lombok.Getter;
 
 import java.io.Serializable;
 import java.nio.file.Path;
 import java.util.Objects;
 
+@Getter
 public class LogSetting implements Serializable {
     private final Logger.Level level;
     private final boolean stdoutEnabled;
@@ -24,30 +26,6 @@ public class LogSetting implements Serializable {
         this.logFilePath = logFilePath;
         this.logFileMaxSize = logFileMaxSize != null ? logFileMaxSize : DEFAULT_FILE_MAX_SIZE;
         this.logFileMaxBackup = logFileMaxBackup != null ? logFileMaxBackup : DEFAULT_FILE_MAX_BACKUP;
-    }
-
-    public Logger.Level getLevel() {
-        return level;
-    }
-
-    public boolean isStdoutEnabled() {
-        return stdoutEnabled;
-    }
-
-    public boolean isStderrEnabled() {
-        return stderrEnabled;
-    }
-
-    public Path getLogFilePath() {
-        return logFilePath;
-    }
-
-    public int getLogFileMaxSize() {
-        return logFileMaxSize;
-    }
-
-    public int getLogFileMaxBackup() {
-        return logFileMaxBackup;
     }
 
     @Override

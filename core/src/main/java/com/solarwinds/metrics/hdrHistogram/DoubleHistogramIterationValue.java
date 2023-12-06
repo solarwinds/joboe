@@ -7,6 +7,8 @@
 
 package com.solarwinds.metrics.hdrHistogram;
 
+import lombok.Getter;
+
 /**
  * Represents a value point iterated through in a {@link DoubleHistogram}, with associated stats.
  * <ul>
@@ -33,6 +35,7 @@ package com.solarwinds.metrics.hdrHistogram;
  * </ul>
  */
 
+@Getter
 public class DoubleHistogramIterationValue {
     private final HistogramIterationValue integerHistogramIterationValue;
 
@@ -90,7 +93,4 @@ public class DoubleHistogramIterationValue {
         return integerHistogramIterationValue.getPercentileLevelIteratedTo();
     }
 
-    public HistogramIterationValue getIntegerHistogramIterationValue() {
-        return integerHistogramIterationValue;
-    }
 }

@@ -210,7 +210,7 @@ public interface BsonDocument extends Map<String, Object> {
    * </ul>
    * </p>
    */
-  public interface Builder {
+  interface Builder {
 
     /**
      * Adds {@code key} and its associated {@code value} to the document being

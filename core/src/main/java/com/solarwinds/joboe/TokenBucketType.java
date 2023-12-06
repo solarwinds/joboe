@@ -1,5 +1,8 @@
 package com.solarwinds.joboe;
 
+import lombok.Getter;
+
+@Getter
 public enum TokenBucketType {
     REGULAR("regular"), STRICT("strict"), RELAXED("relaxed");
 
@@ -9,7 +12,4 @@ public enum TokenBucketType {
         this.label = label;
     }
 
-    public String getLabel() {
-        return label;
-    }
 }

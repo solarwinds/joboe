@@ -244,7 +244,7 @@ public abstract class RpcClientTest {
             List<Event> events = new ArrayList<Event>();
 
             int eventCount = 1000;
-            long totalSize = eventCount * BIG_EVENT.toBytes().length; //just an approximation
+            long totalSize = (long) eventCount * BIG_EVENT.toBytes().length; //just an approximation
 
             for (int i = 0 ; i < eventCount; i ++) { //1000 events, each event is around 100kb
                 events.add(BIG_EVENT);

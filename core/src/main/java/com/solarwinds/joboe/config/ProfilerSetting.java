@@ -1,5 +1,7 @@
 package com.solarwinds.joboe.config;
 
+import lombok.Getter;
+
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -12,9 +14,13 @@ public class ProfilerSetting implements Serializable {
     public static final int DEFAULT_CIRCUIT_BREAKER_COUNT_THRESHOLD = 2;
     public static final Set<String> DEFAULT_EXCLUDE_PACKAGES = new HashSet<String>(Arrays.asList("java", "javax", "com.sun", "sun", "sunw"));
     private final boolean isEnabled;
+    @Getter
     private final Set<String> excludePackages;
+    @Getter
     private final int interval;
+    @Getter
     private final int circuitBreakerDurationThreshold;
+    @Getter
     private final int circuitBreakerCountThreshold;
     
     public ProfilerSetting(boolean isEnabled, Set<String> excludePackages, int interval, int circuitBreakerDurationThreshold, int circuitBreakerCountThreshold) {
@@ -32,22 +38,6 @@ public class ProfilerSetting implements Serializable {
     
     public boolean isEnabled() {
         return isEnabled;
-    }
-    
-    public int getInterval() {
-        return interval;
-    }
-    
-    public Set<String> getExcludePackages() {
-        return excludePackages;
-    }
-    
-    public int getCircuitBreakerDurationThreshold() {
-        return circuitBreakerDurationThreshold;
-    }
-    
-    public int getCircuitBreakerCountThreshold() {
-        return circuitBreakerCountThreshold;
     }
 
     @Override

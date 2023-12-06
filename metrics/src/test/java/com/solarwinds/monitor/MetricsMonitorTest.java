@@ -14,10 +14,10 @@ import org.junit.jupiter.api.Test;
 
 import static com.solarwinds.joboe.TestUtils.testSettingsReader;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 public class MetricsMonitorTest {
-	private ConfigContainer config = new ConfigContainer();
+	private final ConfigContainer config = new ConfigContainer();
 	{
         try {
             config.putByStringValue(ConfigProperty.MONITOR_JMX_SCOPES, "{}");
@@ -33,7 +33,7 @@ public class MetricsMonitorTest {
 		MetricsMonitor monitor2 = MetricsMonitor.buildInstance(config);
 		
 		//should be same instance
-		assertTrue(monitor1 == monitor2);
+        assertSame(monitor1, monitor2);
 	}
 
 	@Test

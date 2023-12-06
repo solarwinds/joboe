@@ -23,11 +23,7 @@ public abstract class MetricSpanReporter implements SpanReporter {
     protected MetricSpanReporter() {
         // disable histogram collection if it's explicitly set to disable
         Boolean configValue = (Boolean) ConfigManager.getConfig(ConfigProperty.MONITOR_SPAN_METRICS_ENABLE);
-        if (Boolean.FALSE.equals(configValue)) {
-            this.spanMetricsEnabled = false;
-        } else {
-            this.spanMetricsEnabled = true;
-        }
+        this.spanMetricsEnabled = !Boolean.FALSE.equals(configValue);
 
 
     }

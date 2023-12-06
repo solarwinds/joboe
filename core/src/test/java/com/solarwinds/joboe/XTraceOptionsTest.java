@@ -4,12 +4,15 @@ import com.solarwinds.joboe.XTraceOptions.HmacSignatureAuthenticator;
 import org.junit.jupiter.api.Test;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class XTraceOptionsTest {
 
@@ -172,21 +175,21 @@ public class XTraceOptionsTest {
 
         //no X-Trace-Options but has signature
         options = XTraceOptions.getXTraceOptions(null, "abc");
-        assertEquals(null, options);
+        assertNull(options);
 
     }
 
     @Test
     public void testHmacAuthenticator() throws Exception {
-        HmacSignatureAuthenticator authenticator = new XTraceOptions.HmacSignatureAuthenticator("8mZ98ZnZhhggcsUmdMbS".getBytes(Charset.forName("US-ASCII")));
+        HmacSignatureAuthenticator authenticator = new XTraceOptions.HmacSignatureAuthenticator("8mZ98ZnZhhggcsUmdMbS".getBytes(StandardCharsets.US_ASCII));
 
-        assertEquals(true, authenticator.authenticate("trigger-trace;sw-keys=lo:se,check-id:123;ts=1564597681", "26e33ce58c52afc507c5c1e9feff4ac5562c9e1c"));
-        assertEquals(false, authenticator.authenticate("trigger-trace;sw-keys=lo:se,check-id:123;ts=1564597681", "2c1c398c3e6be898f47f74bf74f035903b48baaa"));
+        assertTrue(authenticator.authenticate("trigger-trace;sw-keys=lo:se,check-id:123;ts=1564597681", "26e33ce58c52afc507c5c1e9feff4ac5562c9e1c"));
+        assertFalse(authenticator.authenticate("trigger-trace;sw-keys=lo:se,check-id:123;ts=1564597681", "2c1c398c3e6be898f47f74bf74f035903b48baaa"));
     }
 
     @Test
     public void testAuthenticate() {
-        HmacSignatureAuthenticator authenticator = new XTraceOptions.HmacSignatureAuthenticator("8mZ98ZnZhhggcsUmdMbS".getBytes(Charset.forName("US-ASCII")));
+        HmacSignatureAuthenticator authenticator = new XTraceOptions.HmacSignatureAuthenticator("8mZ98ZnZhhggcsUmdMbS".getBytes(StandardCharsets.US_ASCII));
 
         //missing ts
         assertEquals(XTraceOptions.AuthenticationStatus.failure("bad-timestamp"), XTraceOptions.authenticate("trigger-trace;sw-keys=lo:se,check-id:123", null, "2c1c398c3e6be898f47f74bf74f035903b48b59c", authenticator));

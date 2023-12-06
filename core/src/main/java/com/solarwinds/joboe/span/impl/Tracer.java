@@ -31,9 +31,9 @@ public class Tracer implements com.solarwinds.joboe.span.Tracer {
 //    public static final Tracer NO_OP = new Tracer();
     public static final Tracer INSTANCE = new Tracer();
     
-    private static Random random = new Random(); //better to use ThreadLocalRandom, but it's only supported in 1.7+
+    private static final Random random = new Random(); //better to use ThreadLocalRandom, but it's only supported in 1.7+
     
-    private static Logger logger = LoggerFactory.getLogger();
+    private static final Logger logger = LoggerFactory.getLogger();
     
     private Tracer() {
         injectors.put(Format.Builtin.HTTP_HEADERS, new Injector<TextMap>() {
@@ -54,7 +54,7 @@ public class Tracer implements com.solarwinds.joboe.span.Tracer {
         if (injector == null) {
           throw new UnsupportedOperationException();
         }
-        injector.inject((SpanContext) spanContext, carrier);
+        injector.inject(spanContext, carrier);
     }
 
     public <C> com.solarwinds.joboe.span.SpanContext extract(Format<C> format, C carrier) {
@@ -67,11 +67,11 @@ public class Tracer implements com.solarwinds.joboe.span.Tracer {
     
     public class SpanBuilder implements com.solarwinds.joboe.span.Tracer.SpanBuilder {
         private SpanContext explicitParentContext;
-        private Map<String, Object> tags = new HashMap<String, Object>();
-        private Map<SpanProperty<?>, Object> properties = new HashMap<SpanProperty<?>, Object>();
+        private final Map<String, Object> tags = new HashMap<String, Object>();
+        private final Map<SpanProperty<?>, Object> properties = new HashMap<SpanProperty<?>, Object>();
         private Long startTimestamp;
-        private String operationName;
-        private List<SpanReporter> reporters = new ArrayList<SpanReporter>();        
+        private final String operationName;
+        private final List<SpanReporter> reporters = new ArrayList<SpanReporter>();
         
         private byte flags;
         private boolean ignoreActiveSpan;

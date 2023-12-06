@@ -22,8 +22,8 @@ import com.solarwinds.util.DaemonThreadFactory;
  *
  */
 public class MetricsCollector extends SystemCollector<MetricsCategory, List<? extends MetricsEntry<?>>> {
-    private Map<MetricsCategory, AbstractMetricsEntryCollector> collectors = new HashMap<MetricsCategory, AbstractMetricsEntryCollector>();
-    private ExecutorService executorService; 
+    private final Map<MetricsCategory, AbstractMetricsEntryCollector> collectors = new HashMap<MetricsCategory, AbstractMetricsEntryCollector>();
+    private final ExecutorService executorService;
     private static final int MAX_WAIT_TIME = 10; //max wait time for a collection task, in terms of second
 
 

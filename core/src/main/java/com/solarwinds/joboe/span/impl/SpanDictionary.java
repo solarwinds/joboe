@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
  *
  */
 public class SpanDictionary {
-	private static final Cache<Long, Span> directory = CacheBuilder.newBuilder().expireAfterWrite(600, TimeUnit.SECONDS).<Long, Span>build();
+	private static final Cache<Long, Span> directory = CacheBuilder.newBuilder().expireAfterWrite(600, TimeUnit.SECONDS).build();
 	
 	public static long setSpan(Span span) {
 	    long spanId = getId(span);
@@ -31,6 +31,6 @@ public class SpanDictionary {
 	}
 	
 	private static long getId(Span span) {
-	    return ((SpanContext) span.context()).getSpanId();
+	    return span.context().getSpanId();
 	}
 }

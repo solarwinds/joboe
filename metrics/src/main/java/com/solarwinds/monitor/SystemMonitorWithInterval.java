@@ -13,7 +13,7 @@ public abstract class SystemMonitorWithInterval<T, D> extends SystemMonitor<T, D
     protected static final long DEFAULT_INTERVAL = 30 * 1000; //By default, collect every 30 secs
     private static final long MIN_INTERVAL = 30 * 1000; //30 secs as minimum, avoid excessive polling.  At the moment we don't even store metrics in our backend at any more fine-grained intervals than 30 seconds.
     
-    private long interval;
+    private final long interval;
     
     /**
      * 

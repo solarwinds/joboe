@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class FileLoggerStreamTest {
     @Test
@@ -88,7 +89,7 @@ public class FileLoggerStreamTest {
         }
 
         //there should not be a .2 backup
-        assertEquals(false, Files.exists(Paths.get(logFilePath.toString() + ".2")));
+        assertFalse(Files.exists(Paths.get(logFilePath + ".2")));
 
         System.out.println(backupPath.toAbsolutePath());
         lines = Files.readAllLines(backupPath);
@@ -158,7 +159,7 @@ public class FileLoggerStreamTest {
 
         for (int i = 1; i <= expectedLogFileCount - 1; i++) { //-1 will be the backups
             try {
-                List<String> lines = Files.readAllLines(Paths.get(logFilePath.toString() + "." + i));
+                List<String> lines = Files.readAllLines(Paths.get(logFilePath + "." + i));
                 allLogLines.addAll(lines);
                 System.out.println(i + " => " + lines.size());
             } catch (NoSuchFileException e) {
@@ -188,7 +189,7 @@ public class FileLoggerStreamTest {
         Files.deleteIfExists(logFilePath);
 
         int i = 1;
-        while (Files.deleteIfExists(Paths.get(logFilePath.toString() + "." + (i ++)))) {
+        while (Files.deleteIfExists(Paths.get(logFilePath + "." + (i ++)))) {
 
         }
     }
@@ -203,7 +204,7 @@ public class FileLoggerStreamTest {
 
     private Path getTestLogFilePath(String fileName) {
         try {
-            return Paths.get(URI.create(getClass().getProtectionDomain().getCodeSource().getLocation().toURI().toString() + fileName));
+            return Paths.get(URI.create(getClass().getProtectionDomain().getCodeSource().getLocation().toURI() + fileName));
         } catch (URISyntaxException e) {
             e.printStackTrace();
             return null;

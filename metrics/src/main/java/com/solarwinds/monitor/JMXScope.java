@@ -11,8 +11,8 @@ import java.util.List;
  *
  */
 public class JMXScope {
-    private String objectName;
-    private String[] attributes;
+    private final String objectName;
+    private final String[] attributes;
     
     /**
      * 

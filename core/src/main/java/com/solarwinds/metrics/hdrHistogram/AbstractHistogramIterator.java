@@ -43,7 +43,7 @@ abstract class AbstractHistogramIterator implements Iterator<HistogramIterationV
         this.integerToDoubleValueConversionRatio = histogram.getIntegerToDoubleValueConversionRatio();
         this.currentIndex = 0;
         this.currentValueAtIndex = 0;
-        this.nextValueAtIndex = 1 << histogram.unitMagnitude;
+        this.nextValueAtIndex = 1L << histogram.unitMagnitude;
         this.prevValueIteratedTo = 0;
         this.totalCountToPrevIndex = 0;
         this.totalCountToCurrentIndex = 0;

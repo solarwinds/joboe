@@ -21,7 +21,7 @@ class FrameworkInfoReporter extends SystemReporter<String, Object> {
     private Map<String, Object> frameworkKvs;
     private final Client rpcClient;
     
-    private ClientLoggingCallback<Result> loggingCallback = new ClientLoggingCallback<Result>("framework init");
+    private final ClientLoggingCallback<Result> loggingCallback = new ClientLoggingCallback<Result>("framework init");
     
     public FrameworkInfoReporter() throws ClientException {
         this(RpcClientManager.getClient(OperationType.METRICS));

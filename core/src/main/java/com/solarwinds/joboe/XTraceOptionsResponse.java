@@ -63,7 +63,7 @@ public class XTraceOptionsResponse {
         return response;
     }
     
-    private Map<String, String> keyValues = new LinkedHashMap<String, String>();
+    private final Map<String, String> keyValues = new LinkedHashMap<String, String>();
     
     private XTraceOptionsResponse() {
         

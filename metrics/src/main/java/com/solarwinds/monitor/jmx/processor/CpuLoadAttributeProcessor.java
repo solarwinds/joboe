@@ -4,6 +4,7 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
 import java.lang.management.RuntimeMXBean;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -73,8 +74,8 @@ class CpuLoadAttributeProcessor extends AttributeProcessor  {
      * @return Cpu load from 0 to 1. Null if the computation is not successful
      */
     private synchronized Double computeCpuLoad() {
-        OperatingSystemMXBean osBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-        RuntimeMXBean runtimeBean = (RuntimeMXBean) ManagementFactory.getRuntimeMXBean();
+        OperatingSystemMXBean osBean = ManagementFactory.getOperatingSystemMXBean();
+        RuntimeMXBean runtimeBean = ManagementFactory.getRuntimeMXBean();
         
         int availableProcessorCount = osBean.getAvailableProcessors();
         
@@ -105,7 +106,7 @@ class CpuLoadAttributeProcessor extends AttributeProcessor  {
                 if (elapsedUpTime > 0L) {
                     BigDecimal cpuUsage = new BigDecimal(elapsedCpu / (elapsedUpTime * 1000000.0 * availableProcessorCount)); 
                     
-                    cpuUsage = cpuUsage.setScale(4, BigDecimal.ROUND_HALF_UP);
+                    cpuUsage = cpuUsage.setScale(4, RoundingMode.HALF_UP);
                     
                     return cpuUsage.doubleValue();
                 }

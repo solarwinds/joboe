@@ -1,5 +1,7 @@
 package com.solarwinds.joboe;
 
+import lombok.Getter;
+
 /**
  * Contains the result of trace decision (whether a request is sampled and whether metrics should be reported)
  * 
@@ -8,6 +10,7 @@ package com.solarwinds.joboe;
  * @author pluk
  *
  */
+@Getter
 public class TraceDecision {
     private final boolean sampled;
     private final boolean reportMetrics;
@@ -37,28 +40,5 @@ public class TraceDecision {
         this.requestType = requestType;
         this.incomingMetadata = incomingMetadata;
     }
-    
-    public boolean isSampled() {
-        return sampled;
-    }
-    
-    public boolean isReportMetrics() {
-        return reportMetrics;
-    }
-    
-    public TraceConfig getTraceConfig() {
-        return traceConfig;
-    }
-    
-    public boolean isBucketExhausted() {
-        return bucketExhausted;
-    }
 
-    public TraceDecisionUtil.RequestType getRequestType() {
-        return requestType;
-    }
-
-    public Metadata getIncomingMetadata() {
-        return incomingMetadata;
-    }
 }

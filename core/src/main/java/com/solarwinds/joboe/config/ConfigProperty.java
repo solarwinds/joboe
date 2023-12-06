@@ -1,5 +1,7 @@
 package com.solarwinds.joboe.config;
 
+import lombok.Getter;
+
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -64,8 +66,15 @@ public enum ConfigProperty {
     PROFILER_ENABLED_ENV_VAR(new ConfigKey(null, EnvPrefix.PRODUCT + "PROFILER_ENABLED"), ConfigGroup.PROFILER, Boolean.class),
     PROFILER_INTERVAL_ENV_VAR(new ConfigKey(null, EnvPrefix.PRODUCT + "PROFILER_INTERVAL"), ConfigGroup.PROFILER, Integer.class);
     private final ConfigKey configKey;
-    private Class<? extends Serializable> typeClass;
-    private ConfigGroup group;
+    /**
+     * -- GETTER --
+     *
+     * @return the Java Class of the property value
+     */
+    @Getter
+    private final Class<? extends Serializable> typeClass;
+    private final ConfigGroup group;
+    @Getter
     private ConfigParser<?, ?> configParser;
 
     public static class EnvPrefix {
@@ -159,22 +168,10 @@ public enum ConfigProperty {
 
     /**
      *
-     * @return the Java Class of the property value
-     */
-    public Class<? extends Serializable> getTypeClass() {
-        return typeClass;
-    }
-
-    /**
-     *
      * @return the Grouping of this ConfigProperty
      */
     ConfigGroup getGroup() {
         return group;
-    }
-
-    public ConfigParser<?, ?> getConfigParser() {
-        return configParser;
     }
 
     static class ConfigPropertyRegistry {

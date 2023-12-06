@@ -18,7 +18,7 @@ public class SpanContextTest {
 		Metadata metadata = new Metadata();
 		metadata.randomize();
 		
-		SpanContext sourceContext = new SpanContext(metadata, random.nextLong(), random.nextLong(), random.nextLong(), (byte) 0, Collections.<String,String>emptyMap(), null);
+		SpanContext sourceContext = new SpanContext(metadata, random.nextLong(), random.nextLong(), random.nextLong(), (byte) 0, Collections.emptyMap(), null);
 		
 		assertEquals(sourceContext, SpanContext.contextFromString(sourceContext.contextAsString()));
 	}
@@ -52,7 +52,7 @@ public class SpanContextTest {
 		
 		byte flags = 123;
 		
-		SpanContext spanContext = new SpanContext(metadata, random.nextLong(), random.nextLong(), random.nextLong(), flags, Collections.<String,String>emptyMap(), null);
+		SpanContext spanContext = new SpanContext(metadata, random.nextLong(), random.nextLong(), random.nextLong(), flags, Collections.emptyMap(), null);
 		
 		assertEquals(flags, spanContext.getFlags());
 	}
