@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class DockerInfoReaderTest {
-    private static final String TEST_FILE_PREFIX = "src/test/java/com/tracelytics/util/docker-cgroup-"; //using a rather static path. Using Class.getResourceAsStream does not work in test (vs main)
+    private static final String TEST_FILE_PREFIX = "src/test/java/com/solarwinds/util/docker-cgroup-"; //using a rather static path. Using Class.getResourceAsStream does not work in test (vs main)
 
     @BeforeEach
     protected void tearDown() throws Exception {

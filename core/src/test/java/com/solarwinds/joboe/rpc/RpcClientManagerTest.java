@@ -10,7 +10,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RpcClientManagerTest {
-    private static final String TEST_SERVER_CERT_LOCATION = "src/test/java/com/tracelytics/joboe/rpc/test-collector-public.pem";
+    private static final String TEST_SERVER_CERT_LOCATION = "src/test/java/com/solarwinds/joboe/rpc/test-collector-public.pem";
 
 
     @Test

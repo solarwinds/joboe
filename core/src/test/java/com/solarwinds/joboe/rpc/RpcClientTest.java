@@ -44,8 +44,8 @@ public abstract class RpcClientTest {
     protected static final List<Event> TEST_EVENTS = generateTestEvents();
     protected static final Event BIG_EVENT = generateBigEvent();
 
-    private static final String TEST_SERVER_CERT_LOCATION = "src/test/java/com/tracelytics/joboe/rpc/test-collector-public.pem";
-    private static final String INVALID_CERT_LOCATION = "src/test/java/com/tracelytics/joboe/rpc/invalid-collector.crt";
+    private static final String TEST_SERVER_CERT_LOCATION = "src/test/java/com/solarwinds/joboe/rpc/test-collector-public.pem";
+    private static final String INVALID_CERT_LOCATION = "src/test/java/com/solarwinds/joboe/rpc/invalid-collector.crt";
     private static int portWalker = TEST_SERVER_PORT_BASE;
     private static int testServerPort = TEST_SERVER_PORT_BASE;
     protected static final List<Settings> TEST_SETTINGS = generateTestSettings();

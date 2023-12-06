@@ -42,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 //@RunWith(Parameterized.class)
 public class GrpcClientTest extends RpcClientTest {
-    private static final String TEST_SERVER_PRIVATE_KEY_LOCATION = "src/test/java/com/tracelytics/joboe/rpc/grpc/test-collector-private.pem";
+    private static final String TEST_SERVER_PRIVATE_KEY_LOCATION = "src/test/java/com/solarwinds/joboe/rpc/grpc/test-collector-private.pem";
 
     private static final List<Collector.OboeSetting> TEST_OBOE_SETTINGS = convertToOboeSettings(TEST_SETTINGS);
 

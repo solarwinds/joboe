@@ -11,9 +11,9 @@ public class K8sReaderTest {
 
     @BeforeEach
     protected void setUp() throws Exception {
-        ServerHostInfoReader.K8sReader.NAMESPACE_FILE_LOC_LINUX = "src/test/java/com/tracelytics/util/namespace";
+        ServerHostInfoReader.K8sReader.NAMESPACE_FILE_LOC_LINUX = "src/test/java/com/solarwinds/util/namespace";
 
-        ServerHostInfoReader.K8sReader.POD_UUID_FILE_LOC = "src/test/java/com/tracelytics/util/poduid";
+        ServerHostInfoReader.K8sReader.POD_UUID_FILE_LOC = "src/test/java/com/solarwinds/util/poduid";
         ServerHostInfoReader.osType = HostInfoUtils.OsType.LINUX;
         tested = new ServerHostInfoReader.K8sReader();
     }

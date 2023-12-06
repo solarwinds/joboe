@@ -11,7 +11,7 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ServerHostInfoReaderTest {
-    private static final String TEST_FILE_FOLDER = "src/test/java/com/tracelytics/util/"; //using a rather static path. Using Class.getResourceAsStream does not work in test (vs main)
+    private static final String TEST_FILE_FOLDER = "src/test/java/com/solarwinds/util/"; //using a rather static path. Using Class.getResourceAsStream does not work in test (vs main)
     private final ServerHostInfoReader reader = ServerHostInfoReader.INSTANCE;
 
     @BeforeEach
