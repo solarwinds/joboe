@@ -14,7 +14,7 @@ Java Oboe
 
 # Dependencies:
 
-* See 'dependencies' maven module. We want all 3rd party dependencies to be under the com.tracelytics namespace to avoid version conflicts. 
+* See 'dependencies' maven module. We want all 3rd party dependencies to be under the com.solarwinds namespace to avoid version conflicts. 
 
 # Install instructions:
 
