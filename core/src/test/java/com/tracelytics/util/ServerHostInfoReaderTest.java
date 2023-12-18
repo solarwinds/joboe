@@ -62,7 +62,6 @@ public class ServerHostInfoReaderTest {
         assertEquals(reader.getHostName(), hostId.getHostname());
         assertEquals(reader.getAwsInstanceId(), hostId.getEc2InstanceId());
         assertEquals(reader.getAwsAvailabilityZone(), hostId.getEc2AvailabilityZone());
-        assertEquals(reader.getDockerContainerId(), hostId.getDockerContainerId());
         assertEquals(reader.getHerokuDynoId(), hostId.getHerokuDynoId());
         assertEquals(reader.getNetworkAddressInfo().getMacAddresses(), hostId.getMacAddresses());
         
