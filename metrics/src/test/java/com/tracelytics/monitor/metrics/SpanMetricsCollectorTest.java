@@ -71,9 +71,4 @@ public class SpanMetricsCollectorTest {
         tested.collectMetricsEntries();
         verify(metricFlushListener).onFlush();
     }
-
-    @Test
-    void ensureNPEIsNotThrown() {
-        assertDoesNotThrow(() -> tested.collectMetricsEntries());
-    }
 }

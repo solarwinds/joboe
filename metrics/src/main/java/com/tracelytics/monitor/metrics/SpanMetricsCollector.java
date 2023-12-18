@@ -22,7 +22,7 @@ public class SpanMetricsCollector extends AbstractMetricsEntryCollector {
     public static final String TRANSACTION_NAME_OVERFLOW_LABEL = "TransactionNameOverflow"; 
     private Set<MetricSpanReporter> registeredReporters = new HashSet<MetricSpanReporter>();
 
-    private MetricFlushListener metricFlushListener;
+    private MetricFlushListener metricFlushListener = () -> {};
 
     private static final Set<MetricSpanReporter> DEFAULT_REPORTERS = new HashSet<MetricSpanReporter>();
     static {
@@ -55,10 +55,7 @@ public class SpanMetricsCollector extends AbstractMetricsEntryCollector {
         }
         
         TransactionNameManager.clearTransactionNames();
-
-        if (metricFlushListener != null){
-            metricFlushListener.onFlush();
-        }
+        metricFlushListener.onFlush();
 
         return entries;
     }
