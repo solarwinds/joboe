@@ -13,8 +13,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 /**
  * Test collecting metrics from Span reporter/actor and the "TransactionNameOverflow" flag
@@ -22,6 +25,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  */
 public class SpanMetricsCollectorTest {
+    private final SpanMetricsCollector tested = new SpanMetricsCollector();
+
     @BeforeEach
     protected void setUp() throws Exception {
         TransactionNameManager.clearTransactionNames();
@@ -42,20 +47,33 @@ public class SpanMetricsCollectorTest {
                 return testMetricEntries;
             }
         };
-        
-        SpanMetricsCollector collector = new SpanMetricsCollector();
-        assertEquals(testMetricEntries, collector.collectMetricsEntries(Collections.singleton(testSpanReporter)));
+
+        assertEquals(testMetricEntries, tested.collectMetricsEntries(Collections.singleton(testSpanReporter)));
         
         //now test the extra transaction name limit kv 
         for (int i = 0 ; i < TransactionNameManager.DEFAULT_MAX_NAME_COUNT + 1; i++) {
             TransactionNameManager.addTransactionName(String.valueOf(i)); //trigger overflow
         }
-        
-        List<? extends MetricsEntry<?>> collectedMetricsEntries = collector.collectMetricsEntries(Collections.singleton(testSpanReporter));
+
+        List<? extends MetricsEntry<?>> collectedMetricsEntries = tested.collectMetricsEntries(Collections.singleton(testSpanReporter));
         assertEquals(testMetricEntries.size() + 1, collectedMetricsEntries.size()); //+1 as it should have the extra overflow KV
         assertTrue(collectedMetricsEntries.contains(new TopLevelMetricsEntry<Boolean>(SpanMetricsCollector.TRANSACTION_NAME_OVERFLOW_LABEL, true)));
         
         //collect again, that overflow flag should be reset
-        assertEquals(testMetricEntries, collector.collectMetricsEntries(Collections.singleton(testSpanReporter)));
+        assertEquals(testMetricEntries, tested.collectMetricsEntries(Collections.singleton(testSpanReporter)));
+    }
+
+    @Test
+    void verifyThatMetricFlushListenerIsInvoked() {
+        MetricFlushListener metricFlushListener = mock(MetricFlushListener.class);
+        tested.setMetricFlushListener(metricFlushListener);
+
+        tested.collectMetricsEntries();
+        verify(metricFlushListener).onFlush();
+    }
+
+    @Test
+    void ensureNPEIsNotThrown() {
+        assertDoesNotThrow(() -> tested.collectMetricsEntries());
     }
 }

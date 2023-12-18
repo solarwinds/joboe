@@ -1,13 +1,17 @@
 package com.tracelytics.monitor.metrics;
 
-import java.util.*;
-
 import com.tracelytics.joboe.span.impl.InboundMetricMeasurementSpanReporter;
 import com.tracelytics.joboe.span.impl.MetricHistogramSpanReporter;
 import com.tracelytics.joboe.span.impl.MetricSpanReporter;
 import com.tracelytics.joboe.span.impl.TransactionNameManager;
 import com.tracelytics.metrics.MetricsEntry;
 import com.tracelytics.metrics.TopLevelMetricsEntry;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Sub metrics collector that collects span metrics (span histograms and measurements)
@@ -17,6 +21,8 @@ import com.tracelytics.metrics.TopLevelMetricsEntry;
 public class SpanMetricsCollector extends AbstractMetricsEntryCollector {
     public static final String TRANSACTION_NAME_OVERFLOW_LABEL = "TransactionNameOverflow"; 
     private Set<MetricSpanReporter> registeredReporters = new HashSet<MetricSpanReporter>();
+
+    private MetricFlushListener metricFlushListener;
 
     private static final Set<MetricSpanReporter> DEFAULT_REPORTERS = new HashSet<MetricSpanReporter>();
     static {
@@ -49,7 +55,15 @@ public class SpanMetricsCollector extends AbstractMetricsEntryCollector {
         }
         
         TransactionNameManager.clearTransactionNames();
-        
+
+        if (metricFlushListener != null){
+            metricFlushListener.onFlush();
+        }
+
         return entries;
+    }
+
+    public void setMetricFlushListener(MetricFlushListener metricFlushListener) {
+        this.metricFlushListener = metricFlushListener;
     }
 }
