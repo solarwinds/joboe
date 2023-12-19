@@ -1,7 +1,11 @@
 version: 2.1 # use CircleCI 2.1
 
+orbs:
+  ghas: solarwinds-cloud/ghas@0.1.1
+
 executors:
   java:
+    resource_class: xlarge
     parameters:
       tag:
         type: string
@@ -157,3 +161,19 @@ workflows:
             branches:
               only: otel
 
+  code-scanning:
+    jobs:
+      - ghas/codeql:
+          executor: java
+          checkout: true
+          category: joboe-scan
+          build_steps:
+            - run:
+                name: Build project
+                command:  mvn -s .circleci/m2/settings.xml clean install -DskipTests
+          language: java
+          suite: security-extended
+          context:
+            - ghas-code-scanning
+            - AWS_CIRCLE_CI_BUILD
+            - solarwinds-cloud-github-write-access
