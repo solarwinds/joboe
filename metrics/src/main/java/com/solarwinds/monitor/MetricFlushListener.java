@@ -1,4 +1,4 @@
-package com.tracelytics.monitor.metrics;
+package com.solarwinds.monitor;
 
 @FunctionalInterface
 public interface MetricFlushListener {

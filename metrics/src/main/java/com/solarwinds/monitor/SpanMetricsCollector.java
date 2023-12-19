@@ -1,11 +1,12 @@
-package com.tracelytics.monitor;
+package com.solarwinds.monitor;
 
-import com.tracelytics.joboe.span.impl.InboundMetricMeasurementSpanReporter;
-import com.tracelytics.joboe.span.impl.MetricHistogramSpanReporter;
-import com.tracelytics.joboe.span.impl.MetricSpanReporter;
-import com.tracelytics.joboe.span.impl.TransactionNameManager;
-import com.tracelytics.metrics.MetricsEntry;
-import com.tracelytics.metrics.TopLevelMetricsEntry;
+
+import com.solarwinds.joboe.span.impl.InboundMetricMeasurementSpanReporter;
+import com.solarwinds.joboe.span.impl.MetricHistogramSpanReporter;
+import com.solarwinds.joboe.span.impl.MetricSpanReporter;
+import com.solarwinds.joboe.span.impl.TransactionNameManager;
+import com.solarwinds.metrics.MetricsEntry;
+import com.solarwinds.metrics.TopLevelMetricsEntry;
 
 import java.util.ArrayList;
 import java.util.Arrays;
