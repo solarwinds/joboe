@@ -557,7 +557,7 @@ public class Profiler {
         static final int INITIAL_CIRCUIT_BREAKER_PAUSE = 60;
         static final int MAX_CIRCUIT_BREAKER_PAUSE= 60 * 60;
         static final double PAUSE_MULTIPLIER = 1.5;
-        private int nextPause = INITIAL_CIRCUIT_BREAKER_PAUSE;
+        private long nextPause = INITIAL_CIRCUIT_BREAKER_PAUSE;
 
         CircuitBreaker(int durationThreshold, int countThreshold) {
             this.durationThreshold = durationThreshold;
@@ -583,7 +583,7 @@ public class Profiler {
          * @return
          */
         public long getPause(long duration) {
-            int pause = 0;
+            long pause = 0;
             if (duration <= durationThreshold) {
                 if (consecutiveGoodCount < countThreshold) {
                     consecutiveGoodCount ++;
@@ -598,7 +598,7 @@ public class Profiler {
                     if (consecutiveBadCount == countThreshold) { //trigger circuit breaker
                         pause = nextPause;
 
-                        nextPause *= PAUSE_MULTIPLIER;
+                        nextPause = (long) (nextPause * PAUSE_MULTIPLIER);
                         nextPause = Math.min(nextPause, MAX_CIRCUIT_BREAKER_PAUSE);
                         consecutiveBadCount = 0; //also reset the bad count, if we get more consecutive bad duration, we want to increase the threshold further
                     }

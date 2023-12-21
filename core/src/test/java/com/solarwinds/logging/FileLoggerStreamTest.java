@@ -14,6 +14,7 @@ import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -132,9 +133,9 @@ public class FileLoggerStreamTest {
         cleanup(logFilePath);
         for (int i = 0; i < processCount; i++) {
             String printString = getTestString(i, printStringSize);
-            String command = "java -cp " + classPathString + " " + TestLoggerProcess.class.getName() + " " + logFilePath.toAbsolutePath() + " " + maxSize + " " + maxBackup + " " + iterationCount + " " + printString;
+            String[] command = new String[]{"java", "-cp", classPathString, TestLoggerProcess.class.getName(), String.valueOf(logFilePath.toAbsolutePath()), String.valueOf(maxSize), String.valueOf(maxBackup), String.valueOf(iterationCount), printString};
             Process process = Runtime.getRuntime().exec(command);
-            System.out.println("Executing command " + command + " process " + process);
+            System.out.println("Executing command " + Arrays.toString(command) + " process " + process);
             processes.add(process);
         }
 
