@@ -186,7 +186,7 @@ workflows:
                 name: Build project
                 command:  mvn -s .circleci/m2/settings.xml clean install -DskipTests
           language: java
-          suite: security-extended
+          suite: security-and-quality
           context:
             - ghas-code-scanning
             - AWS_CIRCLE_CI_BUILD
