@@ -99,21 +99,21 @@ public class HistogramLogProcessor extends Thread {
                         inputFileName = args[++i];
                     } else if (args[i].equals("-tag")) {
                         tag = args[++i];
-                    } else if (args[i].equals("-mpw")) {
+                    } else if (args[i].equals("-mpw") && (i + 1) < args.length) {
                         movingWindowPercentileToReport = Double.parseDouble(args[++i]);
                         movingWindow = true;
-                    } else if (args[i].equals("-mpwi")) {
+                    } else if (args[i].equals("-mpwi") && (i + 1) < args.length) {
                         movingWindowIntervalCount = Integer.parseInt(args[++i]);
                         movingWindow = true;
-                    } else if (args[i].equals("-start")) {
+                    } else if (args[i].equals("-start") && (i + 1) < args.length) {
                         rangeStartTimeSec = Double.parseDouble(args[++i]);
-                    } else if (args[i].equals("-end")) {
+                    } else if (args[i].equals("-end") && (i + 1) < args.length) {
                         rangeEndTimeSec = Double.parseDouble(args[++i]);
-                    } else if (args[i].equals("-o")) {
+                    } else if (args[i].equals("-o") && (i + 1) < args.length) {
                         outputFileName = args[++i];
-                    } else if (args[i].equals("-percentilesOutputTicksPerHalf")) {
+                    } else if (args[i].equals("-percentilesOutputTicksPerHalf") && (i + 1) < args.length) {
                         percentilesOutputTicksPerHalf = Integer.parseInt(args[++i]);
-                    } else if (args[i].equals("-outputValueUnitRatio")) {
+                    } else if (args[i].equals("-outputValueUnitRatio") && (i + 1) < args.length) {
                         outputValueUnitRatio = Double.parseDouble(args[++i]);
                     } else if (args[i].equals("-h")) {
                         askedForHelp = true;

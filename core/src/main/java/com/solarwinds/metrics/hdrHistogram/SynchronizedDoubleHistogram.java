@@ -456,4 +456,9 @@ public class SynchronizedDoubleHistogram extends DoubleHistogram {
     public synchronized int encodeIntoCompressedByteBuffer(final ByteBuffer targetBuffer) {
         return super.encodeIntoCompressedByteBuffer(targetBuffer);
     }
+
+    @Override
+    public int hashCode() {
+        return (int) integerValuesHistogram.identity;
+    }
 }

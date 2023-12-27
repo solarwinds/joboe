@@ -305,21 +305,7 @@ public class LoggerTest {
         logger.fatal("fatal-message");
         logger.fatal("fatal-message", new Exception("fatal-exception"));
     }
-    
-    
-    
-    
-    
-    private class ProxyFormatter extends Formatter {
-        private final Set<LogRecord> receievedRecords = new HashSet<LogRecord>();
-        @Override
-        public String format(LogRecord record) {
-            receievedRecords.add(record);
-            return "";
-        }
-        
-    }
-    
+
     private static int countOccurence(String input, String phase) {
         int occurence = 0;
         

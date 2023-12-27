@@ -212,42 +212,7 @@ public class MetricsReportTest {
         MetricsReporter reporter = new MetricsReporter(client);
         
         Map<MetricsCategory, List<? extends MetricsEntry<?>>> collectedEntries = new HashMap<MetricsCategory, List<? extends MetricsEntry<?>>>();
-
-        List<SimpleMeasurementMetricsEntry> measurementEntries = new ArrayList<SimpleMeasurementMetricsEntry>();    
-        List<HistogramMetricsEntry> histogramEntries = new ArrayList<HistogramMetricsEntry>();
-        
-        final List<HistogramMetricsEntry> testLayerHistogramMetrics = new ArrayList<HistogramMetricsEntry>();
-        HistogramMetricsEntry histogramEntry;
-        
-        histogramEntry = new HistogramMetricsEntry("a", Collections.singletonMap("layer", "a"), new MockHistogramAdapter(10.0, 20, 30, 40, 50, 60.0, 70, 80));
-        testLayerHistogramMetrics.add(histogramEntry);
-        histogramEntries.add(histogramEntry);
-        
-        histogramEntry = new HistogramMetricsEntry("b", null, new MockHistogramAdapter(100.0, 200, 300, 400, 500, 600.0, 700, 800));
-        testLayerHistogramMetrics.add(histogramEntry);
-        histogramEntries.add(histogramEntry);
-        
-        final List<MetricsEntry<?>> testLayerCountMetrics = new ArrayList<MetricsEntry<?>>();
-        SimpleMeasurementMetricsEntry measurementEntry;
-        
-        measurementEntry = new SimpleMeasurementMetricsEntry("a", null, 1);
-        testLayerCountMetrics.add(measurementEntry);
-        measurementEntries.add(measurementEntry);
-        
-        measurementEntry = new SimpleMeasurementMetricsEntry("b", Collections.singletonMap("layer", "b"), 100.123);
-        testLayerCountMetrics.add(measurementEntry);
-        measurementEntries.add(measurementEntry);
-        
-        measurementEntry = new SimpleMeasurementMetricsEntry("b", Collections.singletonMap("layer", "b"), 100.123);
-        testLayerCountMetrics.add(measurementEntry);
-        measurementEntries.add(measurementEntry);
-        
-        histogramEntry = new HistogramMetricsEntry("c", null, new MockHistogramAdapter(1.0, 2, 3, 4, 5, 6.0, 7, 8));
-        testLayerCountMetrics.add(histogramEntry);
-        histogramEntries.add(histogramEntry);
-        
-
-        //client rejection is considered a minor problem and should not throw SystemReporterException 
+        //client rejection is considered a minor problem and should not throw SystemReporterException
         reporter.reportData(collectedEntries, INTERVAL);
     }
     

@@ -496,4 +496,9 @@ public class SynchronizedHistogram extends Histogram {
             throws IOException, ClassNotFoundException {
         o.defaultReadObject();
     }
+
+    @Override
+    public int hashCode() {
+        return (int) identity;
+    }
 }

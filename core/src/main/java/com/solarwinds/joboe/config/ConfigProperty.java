@@ -146,15 +146,6 @@ public enum ConfigProperty {
 
     /**
      *
-     * @param argumentKey  the argument name used in -javaagent
-     * @return              the corresponding ConfigProperty by the agent argument key used. Null if the property is not defined under that argument key
-     */
-    public static ConfigProperty fromAgentArgumentKey(String argumentKey) {
-        return ConfigPropertyRegistry.AGENT_ARGUMENT_KEY_TO_PARAMETER.get(argumentKey);
-    }
-
-    /**
-     *
      * @param environmentVariableKey  the environment variable key used
      * @return              the corresponding ConfigProperty by the  environment variable key used. Null if the property is not defined under that  environment variable key
      */
@@ -177,7 +168,6 @@ public enum ConfigProperty {
     static class ConfigPropertyRegistry {
         private static final Map<String, ConfigProperty> CONFIG_FILE_KEY_TO_PARAMETER = new HashMap<String, ConfigProperty>();
         private static final Map<String, ConfigProperty> ENVIRONMENT_VARIABLE_KEY_TO_PARAMETER = new HashMap<String, ConfigProperty>();
-        private static final Map<String, ConfigProperty> AGENT_ARGUMENT_KEY_TO_PARAMETER = new HashMap<String, ConfigProperty>();
     }
 }
 

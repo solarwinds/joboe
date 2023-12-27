@@ -1,11 +1,10 @@
 package com.solarwinds.joboe;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
 import com.solarwinds.logging.Logger;
 import com.solarwinds.logging.LoggerFactory;
+
+import java.util.Deque;
+import java.util.LinkedList;
 
 /**
  * Mock reporter similar to {@link TestReporter}, only that this one does not work in thread local manner
@@ -15,7 +14,7 @@ import com.solarwinds.logging.LoggerFactory;
 class NonThreadLocalTestReporter extends TestReporter {
     private final Logger logger = LoggerFactory.getLogger();
     
-    private final List<byte[]> byteBufferList = new LinkedList<byte[]>();
+    private final Deque<byte[]> byteBufferList = new LinkedList<byte[]>();
             
     
     NonThreadLocalTestReporter() {
@@ -39,12 +38,12 @@ class NonThreadLocalTestReporter extends TestReporter {
         
     @Override
     public synchronized byte[] getLastSent() {
-        return ((LinkedList<byte[]>)byteBufferList).getLast();
+        return byteBufferList.getLast();
     }
    
     @Override
-    public synchronized List<byte[]> getBufList() {
-        return new ArrayList<byte[]>(byteBufferList); //return a clone
+    public synchronized Deque<byte[]> getBufList() {
+        return new LinkedList<>(byteBufferList); //return a clone
     }
 } 
 

@@ -94,12 +94,4 @@ public class TokenBucket {
             availableTokens = capacity;
         }
     }
-    
-    double getRatePerSecond() {
-        return ratePerSecond;
-    }
-    
-    double getCapacity() {
-        return capacity;
-    }
 }

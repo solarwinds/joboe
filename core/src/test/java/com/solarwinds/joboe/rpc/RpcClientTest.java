@@ -49,7 +49,6 @@ public abstract class RpcClientTest {
     private static int portWalker = TEST_SERVER_PORT_BASE;
     private static int testServerPort = TEST_SERVER_PORT_BASE;
     protected static final List<Settings> TEST_SETTINGS = generateTestSettings();
-    private static final Map<Field, Integer> originalFieldIntValues = new HashMap<Field, Integer>();
 
 
     private static final RpcClient.RetryParamConstants QUICK_RETRY = new RpcClient.RetryParamConstants(100, 200, 3);
@@ -67,10 +66,6 @@ public abstract class RpcClientTest {
 
     @AfterEach
     public void tearDown() throws Exception {
-        for (Entry<Field, Integer> originalFieldValue : originalFieldIntValues.entrySet()) {
-            originalFieldValue.getKey().setInt(null, originalFieldValue.getValue().intValue());
-        }
-
         testCollector.stop();
     }
 
@@ -478,12 +473,6 @@ public abstract class RpcClientTest {
             List<ByteBuffer> receivedMessages = testCollector.flush();
             assertEquals(1, receivedMessages.size());
 
-            Set<Entry<String, Object>> receivedEntries = getEntriesFromBytes(receivedMessages.get(0).array()); //first message should be connection init
-
-            Set<String> receivedKeys = new HashSet<String>();
-            for (Entry<String, Object> receivedEntry : receivedEntries) {
-                receivedKeys.add(receivedEntry.getKey());
-            }
         } finally {
             if (client != null) {
                 client.close();

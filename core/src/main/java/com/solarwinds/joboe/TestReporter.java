@@ -10,6 +10,7 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -27,18 +28,13 @@ import java.util.Set;
 public class TestReporter implements EventReporter {
     private static final Logger logger = LoggerFactory.getLogger();
     
-    private final ThreadLocal<List<byte[]>> byteBufList = new ThreadLocal<List<byte[]>>() {
-        @Override 
-        protected List<byte[]> initialValue() {
-            return new LinkedList<byte[]>();
-        }
-    };    
+    private final ThreadLocal<Deque<byte[]>> byteBufList = ThreadLocal.withInitial(LinkedList::new);
     
     public TestReporter() {
     }
     
     public void reset() {
-        byteBufList.set(new LinkedList<byte[]>());
+        byteBufList.set(new LinkedList<>());
     }
 
     public void send(Event event) {
@@ -52,7 +48,7 @@ public class TestReporter implements EventReporter {
     }
         
     public byte[] getLastSent() {
-        return ((LinkedList<byte[]>)byteBufList.get()).getLast();
+        return byteBufList.get().getLast();
     }
     
     public List<BsonDocument> getSentEventsAsBsonDocument() {
@@ -77,7 +73,7 @@ public class TestReporter implements EventReporter {
                     if ("__Init".equals(kv.getKey())) { //then this is the init entry event
                         isInitEvent = true;
                     } else if ("Layer".equals(kv.getKey())) {
-                        if (initLayers.contains(kv.getValue())) { //then this is the init exit event
+                        if (initLayers.contains(kv.getValue().toString())) { //then this is the init exit event
                             isInitEvent = true;
                         }
                     }
@@ -99,7 +95,7 @@ public class TestReporter implements EventReporter {
         return getSentEvents(false);
     }
     
-    public List<byte[]> getBufList() {
+    public Deque<byte[]> getBufList() {
         return byteBufList.get();
     }
     
