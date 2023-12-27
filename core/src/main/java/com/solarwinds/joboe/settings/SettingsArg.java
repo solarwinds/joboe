@@ -1,6 +1,5 @@
 package com.solarwinds.joboe.settings;
 
-import java.nio.Buffer;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

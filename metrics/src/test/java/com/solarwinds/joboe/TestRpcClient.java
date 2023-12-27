@@ -4,7 +4,6 @@ import com.solarwinds.joboe.rpc.Client;
 import com.solarwinds.joboe.rpc.Result;
 import com.solarwinds.joboe.rpc.ResultCode;
 import com.solarwinds.joboe.rpc.SettingsResult;
-import com.solarwinds.joboe.settings.Settings;
 
 import java.util.ArrayList;
 import java.util.Collections;

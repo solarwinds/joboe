@@ -11,10 +11,6 @@ import org.junit.jupiter.api.Test;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Field;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.logging.Formatter;
-import java.util.logging.LogRecord;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

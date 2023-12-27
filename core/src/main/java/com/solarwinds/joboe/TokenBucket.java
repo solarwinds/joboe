@@ -3,9 +3,9 @@ package com.solarwinds.joboe;
 
 /**
  * A bucket that contains tokens to be consumed. The bucket is refilled based on the replenish rate.
- * 
- * This class is converted from https://github.com/tracelytics/scribe/blob/FastTransformer/src/token_bucket.h
- * 
+ *
+ * This class is converted from <a href="https://github.com/tracelytics/scribe/blob/FastTransformer/src/token_bucket.h">...</a>
+ *
  * @author Patson Luk
  *
  */

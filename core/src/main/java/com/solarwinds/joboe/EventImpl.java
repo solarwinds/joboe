@@ -15,7 +15,6 @@ import com.solarwinds.util.JavaProcessUtils;
 import com.solarwinds.util.TimeUtils;
 
 import java.lang.reflect.Array;
-import java.nio.Buffer;
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

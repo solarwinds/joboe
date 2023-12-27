@@ -2,13 +2,12 @@ package com.solarwinds.metrics.histogram;
 
 import com.solarwinds.metrics.hdrHistogram.ConcurrentHistogram;
 
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.Base64;
 
 
 /**
- * Adaptor to HDR histogram https://github.com/HdrHistogram/HdrHistogram
+ * Adaptor to HDR histogram <a href="https://github.com/HdrHistogram/HdrHistogram">...</a>
  * @author pluk
  *
  */

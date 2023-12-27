@@ -19,11 +19,11 @@ import java.util.jar.Manifest;
 
 /**
  * Extracts and reports framework information by locating the jar used by a package. 
- * 
+ *
  * We are using the MANIFEST.MF within the jar for framework information. Take note that if the information in the MANIFEST does not comply to the spec in 
- * http://docs.oracle.com/javase/7/docs/technotes/guides/jar/jar.html
+ * <a href="http://docs.oracle.com/javase/7/docs/technotes/guides/jar/jar.html">...</a>
  * , then we will not report the framework
- *  
+ *
  * @author Patson Luk
  *
  */

@@ -289,7 +289,7 @@ public class ServerHostInfoReader implements HostInfoReader, AzureInstanceIdRead
      * Determines whether a network interface is physical (for Linux only).
      * <p>
      * By our definition, a network interface is considered physical if its link in /sys/class/net does NOT contain "/virtual/"
-     * https://github.com/librato/joboe/issues/728
+     * <a href="https://github.com/librato/joboe/issues/728">...</a>
      * <p>
      * Take note that this definition is different from NetworkInterface.isVirtual()
      *
@@ -318,7 +318,7 @@ public class ServerHostInfoReader implements HostInfoReader, AzureInstanceIdRead
      * <p>
      * Since in IPv4 preferred environment, `NetworkInterface.getAll` might return ghost Microsoft Hyper-V Network Adapter
      * <p>
-     * https://swicloud.atlassian.net/browse/AO-14670 for details
+     * <a href="https://swicloud.atlassian.net/browse/AO-14670">...</a> for details
      *
      * @param networkInterface
      * @return false if it's NOT a Microsoft Hyper-V Network Adapter or it's UP
@@ -507,7 +507,7 @@ public class ServerHostInfoReader implements HostInfoReader, AzureInstanceIdRead
     /**
      * Identifies the distro value on a Linux system
      * <p>
-     * Code logic copied from https://github.com/librato/oboe/blob/a3dd998e7ea239e3d5e5c7ece8c635c3ff61c903/liboboe/reporter/ssl.cc#L559
+     * Code logic copied from <a href="https://github.com/librato/oboe/blob/a3dd998e7ea239e3d5e5c7ece8c635c3ff61c903/liboboe/reporter/ssl.cc#L559">...</a>
      *
      * @return
      */

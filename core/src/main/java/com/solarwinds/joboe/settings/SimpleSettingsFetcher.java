@@ -2,8 +2,6 @@ package com.solarwinds.joboe.settings;
 
 import java.util.concurrent.CountDownLatch;
 
-import com.solarwinds.joboe.settings.TestSettingsReader.SettingsChangeCallback;
-
 /**
  * A testing fetcher that returns {@link Settings} by directly reads from the {@link TestSettingsReader} provided in constructor
  * 

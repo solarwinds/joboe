@@ -69,8 +69,8 @@ class CpuLoadAttributeProcessor extends AttributeProcessor  {
     }
     
     /**
-     * Compute the Cpu load using logic in JConsole source. Referenced from {@link http://knight76.blogspot.ca/2009/05/how-to-get-java-cpu-usage-jvm-instance.html}
-     * 
+     * Compute the Cpu load using logic in JConsole source. Referenced from {@link <a href="http://knight76.blogspot.ca/2009/05/how-to-get-java-cpu-usage-jvm-instance.html">...</a>}
+     *
      * @return Cpu load from 0 to 1. Null if the computation is not successful
      */
     private synchronized Double computeCpuLoad() {

@@ -24,12 +24,12 @@ public final class References {
     private References(){}
 
     /**
-     * See http://opentracing.io/spec/#causal-span-references for more information about CHILD_OF references
+     * See <a href="http://opentracing.io/spec/#causal-span-references">...</a> for more information about CHILD_OF references
      */
     public static final String CHILD_OF = "child_of";
 
     /**
-     * See http://opentracing.io/spec/#causal-span-references for more information about FOLLOWS_FROM references
+     * See <a href="http://opentracing.io/spec/#causal-span-references">...</a> for more information about FOLLOWS_FROM references
      */
     public static final String FOLLOWS_FROM = "follows_from";
 }

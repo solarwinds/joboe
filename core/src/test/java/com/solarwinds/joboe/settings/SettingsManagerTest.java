@@ -19,7 +19,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.verify;
 
 public class SettingsManagerTest {
     private static final TestSettingsReader testSettingsReader = TestUtils.initSettingsReader();

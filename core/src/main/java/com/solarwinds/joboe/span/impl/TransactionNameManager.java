@@ -23,21 +23,21 @@ import lombok.Getter;
 
 /**
  * Manages and generates transaction name based on various rules.
- * 
+ *
  * For transaction name management:
  * <ol>
  *  <li> getTransactionName generates a transaction name, the result will be recorded if not null, if more than 200 transaction name is recorded, it throws a LimitExceededException
  *  <li> addTransactionName allows adding a new transaction name explicitly, if more than 200 transaction name is recorded, it throws a LimitExceededException
  *  <li> Provides a handle to clear the recorded transaction names
  * </ol>
- * 
+ *
  * For transaction name generation:
  * <ol>
- *  <li>transaction.namePattern if defined, value is the pattern used to generate a transaction name off a URL by concatenating matching tokens with '.'. The pattern is a list of tokens separated by comma, valid tokens are host and p1, p2, ... pn. For example value "host,p2" on URL http://localhost:8080/test-api/action, will generate transaction name "localhost.action"</li>
+ *  <li>transaction.namePattern if defined, value is the pattern used to generate a transaction name off a URL by concatenating matching tokens with '.'. The pattern is a list of tokens separated by comma, valid tokens are host and p1, p2, ... pn. For example value "host,p2" on URL <a href="http://localhost:8080/test-api/action">...</a>, will generate transaction name "localhost.action"</li>
  *  <li>controller.action</li>
  *  <li>default transaction name pattern to be applied to URL as defined in <code>DEFAULT_TRANSACTION_NAME_PATTERN</code></li>
  * </ol>
- * 
+ *
  * @author pluk
  *
  */
@@ -150,9 +150,9 @@ public final class TransactionNameManager {
     }
 
     /**
-     * Transform the transaction name according to https://github.com/librato/gotv/blob/376240c5fcce883f37a5358cb30ac39ab9283c7e/collector/agentmetrics/tags.go#L41-L52 and
-     * https://github.com/librato/jackdaw/blob/0930023a2d30dc42e58ed45cc05df9b46e2b7da1/src/main/java/com/librato/jackdaw/ingress/IngressMeasurement.java#L28
-     * 
+     * Transform the transaction name according to <a href="https://github.com/librato/gotv/blob/376240c5fcce883f37a5358cb30ac39ab9283c7e/collector/agentmetrics/tags.go#L41-L52">...</a> and
+     * <a href="https://github.com/librato/jackdaw/blob/0930023a2d30dc42e58ed45cc05df9b46e2b7da1/src/main/java/com/librato/jackdaw/ingress/IngressMeasurement.java#L28">...</a>
+     *
      * @param inputTransactionName
      * @return
      */
@@ -251,14 +251,14 @@ public final class TransactionNameManager {
     
     /**
      * Generates a transaction name by concatenating matching pattern tokens with '.' 
-     * 
-     * The valid tokens are host and p1, p2, ... pn. For example a token list of ["host", "p2"] on URL http://localhost:8080/test-api/action/1, will generate transaction name "localhost.action"</li>
-     * 
+     *
+     * The valid tokens are host and p1, p2, ... pn. For example a token list of ["host", "p2"] on URL <a href="http://localhost:8080/test-api/action/1">...</a>, will generate transaction name "localhost.action"</li>
+     *
      * @param host
      * @param url                       url that must NOT contains query param
      * @param transactionNamePattern    the token pattern as an array
-     * @param separator 
-     * @param separatorAsPrefix 
+     * @param separator
+     * @param separatorAsPrefix
      * @return
      */
     static String buildTransactionNameByUrlAndPattern(String host, String url, String[] transactionNamePattern, boolean separatorAsPrefix, String separator) {

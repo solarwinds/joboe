@@ -19,7 +19,7 @@ import lombok.Getter;
 
 /**
  * Oboe Metadata: Task and Op IDs
- * Note that this is migrated from AO's X-Trace ID and it complies with the W3C trace context spec: https://www.w3.org/TR/trace-context
+ * Note that this is migrated from AO's X-Trace ID and it complies with the W3C trace context spec: <a href="https://www.w3.org/TR/trace-context">...</a>
 
  */
 public class Metadata {

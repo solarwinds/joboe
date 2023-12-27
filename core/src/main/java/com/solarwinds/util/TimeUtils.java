@@ -13,18 +13,18 @@ import com.solarwinds.logging.LoggerFactory;
 
 /**
  *  Utils that provide timestamp in microsecond precision since the epoch time
- *  
+ *
  *  In this static initializer, we take the current millisec as the "base" time (times 1000 so we get the "base" time in micro second unit)
  *  and take the current nanotime as the "reference" point (as zero nanosecs from the "base" time). 
  *  Take note that this is what the winoboe has essentially been doing to get microsec precision timestamps on windows
  *
  *  When a timestamp is requested, we take the current nanotime minus the "reference" point, which gives us the "offset" from the "base" time. 
  *  The offset is then added to the "base" time which finally returns the timestamp in microsecond.
- * 
+ *
  *  This Utils uses a background worker to adjust the base time periodically to address Time shift and drifting problem
- * 
- *  More information in https://github.com/librato/joboe/issues/537
- * 
+ *
+ *  More information in <a href="https://github.com/librato/joboe/issues/537">...</a>
+ *
  * Auto-adjust the 
  * @author pluk
  *
@@ -59,7 +59,7 @@ public class TimeUtils {
     
     /**
      * Starts background working to periodically adjust the base time to address Time drifting and shift problem as documented in
-     * https://github.com/librato/joboe/issues/537
+     * <a href="https://github.com/librato/joboe/issues/537">...</a>
      * @param paramValue
      * @return
      */
