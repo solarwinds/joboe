@@ -104,8 +104,8 @@ public class XTraceOptions {
 
             optionKey = optionKey.trim();
 
-            if ("".equals(optionKey)) { //skip empty key
-                if (!"".equals(optionEntry)) {
+            if (optionKey.isEmpty()) { //skip empty key
+                if (!optionEntry.isEmpty()) {
                     logger.debug("Skipped entry [" + optionEntry + "] in X-Trace-Options as the key is empty");
                 }
                 continue;

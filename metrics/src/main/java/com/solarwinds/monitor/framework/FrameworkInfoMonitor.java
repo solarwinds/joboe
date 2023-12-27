@@ -12,7 +12,7 @@ import com.solarwinds.monitor.SystemMonitorWithInterval;
 public class FrameworkInfoMonitor extends SystemMonitorWithInterval<String, Object> {
     private static final long DEFAULT_INTERVAL = 60 * 1000; //every 1 min
     
-    public FrameworkInfoMonitor(ConfigContainer configs) throws ClientException {
+    public FrameworkInfoMonitor() throws ClientException {
         super(DEFAULT_INTERVAL, new FrameworkInfoCollector(), new FrameworkInfoReporter());
     }
 

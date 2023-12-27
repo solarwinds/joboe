@@ -224,7 +224,7 @@ public class SingleWriterDoubleRecorder {
         }
     }
 
-    private class InternalDoubleHistogram extends DoubleHistogram {
+    private static class InternalDoubleHistogram extends DoubleHistogram {
         private final long containingInstanceId;
 
         private InternalDoubleHistogram(long id, int numberOfSignificantValueDigits) {

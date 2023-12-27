@@ -18,8 +18,8 @@ public class LoggerTest {
     
 
 
-    private class ProxyLoggerStream implements LoggerStream {
-        @Getter
+    @Getter
+    private static class ProxyLoggerStream implements LoggerStream {
         private final ByteArrayOutputStream proxyOutput = new ByteArrayOutputStream();
         private final PrintStream proxyStream = new PrintStream(proxyOutput);
 

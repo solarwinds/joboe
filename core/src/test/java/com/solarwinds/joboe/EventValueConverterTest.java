@@ -28,25 +28,21 @@ public class EventValueConverterTest {
     @Test
     public void testSimpleTypeBooleans() {
         assertEquals(true, converter.convertToEventValue(true));
-        assertEquals(Boolean.TRUE, converter.convertToEventValue(Boolean.TRUE));
     }
 
     @Test
     public void testSimpleTypeDoubles() {
         assertEquals((double) 0, converter.convertToEventValue((double) 0));
-        assertEquals(new Double(0), converter.convertToEventValue(new Double(0)));
     }
 
     @Test
     public void testSimpleTypeIntegers() {
         assertEquals(0, converter.convertToEventValue(0));
-        assertEquals(new Integer(0), converter.convertToEventValue(new Integer(0)));
     }
 
     @Test
     public void testSimpleTypeLongs() {
         assertEquals((long) 0, converter.convertToEventValue((long) 0));
-        assertEquals(new Long(0), converter.convertToEventValue(new Long(0)));
     }
 
     @Test
@@ -79,25 +75,21 @@ public class EventValueConverterTest {
     @Test
     public void testSpecialTypeFloat() throws Exception {
         assertEquals((double) 0, converter.convertToEventValue((float) 0));
-        assertEquals((double) 0, converter.convertToEventValue(new Float(0)));
     }
 
     @Test
     public void testSpecialTypeShort() throws Exception {
         assertEquals(0, converter.convertToEventValue((short) 0));
-        assertEquals(0, converter.convertToEventValue(new Short((short) 0)));
     }
 
     @Test
     public void testSpecialTypeByte() throws Exception {
         assertEquals(0, converter.convertToEventValue((byte) 0));
-        assertEquals(0, converter.convertToEventValue(new Byte((byte)0)));
     }
 
     @Test
     public void testSpecialTypeChar() throws Exception {
         assertEquals("a", converter.convertToEventValue('a'));
-        assertEquals("a", converter.convertToEventValue(new Character('a')));
     }
 
     @Test

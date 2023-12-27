@@ -275,7 +275,7 @@ public class DiagnosticTools {
             client = RpcClientManager.getClient(OperationType.STATUS, serviceKey);
             com.solarwinds.joboe.rpc.Result rpcCallResult = client.postStatus(generateDiagnosticMessage(), null).get(timeout, TimeUnit.MILLISECONDS);
 
-            if (!"".equals(rpcCallResult.getWarning())) { //warning for postStatus call is likely for service key errors, see https://swicloud.atlassian.net/browse/AO-16547?focusedCommentId=197795
+            if (!rpcCallResult.getWarning().isEmpty()) { //warning for postStatus call is likely for service key errors, see https://swicloud.atlassian.net/browse/AO-16547?focusedCommentId=197795
                 return Result.invalidServiceKey(serviceKey, rpcCallResult.getWarning());
             }  else if (rpcCallResult.getResultCode() == ResultCode.TRY_LATER) {
                 return Result.tryLater();
@@ -324,7 +324,7 @@ public class DiagnosticTools {
             return false;
         }
         
-        if ("".equals(serviceName.trim())) {
+        if (serviceName.trim().isEmpty()) {
             logger.warn("Service Name should not be empty in Service Key [" + ServiceKeyUtils.maskServiceKey(serviceKey) + "]");
             return false;
         }

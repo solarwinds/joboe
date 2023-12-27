@@ -954,7 +954,7 @@ public class ServerHostInfoReader implements HostInfoReader, AzureInstanceIdRead
             try {
                 String getContainerTypeResult = ExecUtils.exec(
                         "powershell Get-ItemProperty -Path HKLM:\\SYSTEM\\CurrentControlSet\\Control\\ -Name \"ContainerType\"");
-                if (getContainerTypeResult != null && !"".equals(getContainerTypeResult)) {
+                if (getContainerTypeResult != null && !getContainerTypeResult.isEmpty()) {
                     dockerId = ServerHostInfoReader.INSTANCE.getHostName();
                 }
             } catch (Exception e) {

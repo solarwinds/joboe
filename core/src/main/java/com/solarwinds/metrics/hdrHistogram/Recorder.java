@@ -258,7 +258,7 @@ public class Recorder {
         }
     }
 
-    private class InternalAtomicHistogram extends AtomicHistogram {
+    private static class InternalAtomicHistogram extends AtomicHistogram {
         private final long containingInstanceId;
 
         private InternalAtomicHistogram(long id,
@@ -270,7 +270,7 @@ public class Recorder {
         }
     }
 
-    private class InternalConcurrentHistogram extends ConcurrentHistogram {
+    private static class InternalConcurrentHistogram extends ConcurrentHistogram {
         private final long containingInstanceId;
 
         private InternalConcurrentHistogram(long id, int numberOfSignificantValueDigits) {

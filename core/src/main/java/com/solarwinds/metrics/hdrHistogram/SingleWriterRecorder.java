@@ -247,7 +247,7 @@ public class SingleWriterRecorder {
         }
     }
 
-    private class InternalHistogram extends Histogram {
+    private static class InternalHistogram extends Histogram {
         private final long containingInstanceId;
 
         private InternalHistogram(long id, int numberOfSignificantValueDigits) {

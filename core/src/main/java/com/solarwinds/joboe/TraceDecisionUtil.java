@@ -83,7 +83,7 @@ public class TraceDecisionUtil {
                 return new TraceDecision(false, false, config, requestType);
             }
 
-            boolean isReportMetrics = isReportMetricsByConfig(inXTraceID, config);
+            boolean isReportMetrics = isReportMetricsByConfig(config);
             if (xTraceOptions != null && xTraceOptions.getAuthenticationStatus().isFailure()) {
                 logger.debug("Bad x-tv-options-signature, not tracing");
                 return new TraceDecision(false, isReportMetrics, null, requestType);
@@ -380,7 +380,7 @@ public class TraceDecisionUtil {
         }
     }
     
-    private static boolean isReportMetricsByConfig(String inXTraceID, TraceConfig config) {
+    private static boolean isReportMetricsByConfig(TraceConfig config) {
         return config.isMetricsEnabled(); //report metrics as far as the metrics is enabled in config. No propagation for now
     }
 

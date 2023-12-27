@@ -47,6 +47,7 @@ public class DoubleHistogramIterationValue {
         this.integerHistogramIterationValue = integerHistogramIterationValue;
     }
 
+    @Override
     public String toString() {
         return  "valueIteratedTo:" + getValueIteratedTo() +
                 ", prevValueIteratedTo:" + getValueIteratedFrom() +

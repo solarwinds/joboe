@@ -766,6 +766,7 @@ public class DoubleHistogram extends EncodableHistogram implements Serializable 
      * @param other the other histogram to compare to
      * @return True if this histogram are equivalent with the other.
      */
+    @Override
     public boolean equals(final Object other){
         if ( this == other ) {
             return true;
@@ -1196,7 +1197,7 @@ public class DoubleHistogram extends EncodableHistogram implements Serializable 
      * An {@link Iterable}{@literal <}{@link DoubleHistogramIterationValue}{@literal >} through
      * the histogram using a {@link DoublePercentileIterator}
      */
-    public class Percentiles implements Iterable<DoubleHistogramIterationValue> {
+    public static class Percentiles implements Iterable<DoubleHistogramIterationValue> {
         final DoubleHistogram histogram;
         final int percentileTicksPerHalfDistance;
 
@@ -1220,7 +1221,7 @@ public class DoubleHistogram extends EncodableHistogram implements Serializable 
      * An {@link Iterable}{@literal <}{@link DoubleHistogramIterationValue}{@literal >} through
      * the histogram using a {@link DoubleLinearIterator}
      */
-    public class LinearBucketValues implements Iterable<DoubleHistogramIterationValue> {
+    public static class LinearBucketValues implements Iterable<DoubleHistogramIterationValue> {
         final DoubleHistogram histogram;
         final double valueUnitsPerBucket;
 
@@ -1244,7 +1245,7 @@ public class DoubleHistogram extends EncodableHistogram implements Serializable 
      * An {@link Iterable}{@literal <}{@link DoubleHistogramIterationValue}{@literal >} through
      * the histogram using a {@link DoubleLogarithmicIterator}
      */
-    public class LogarithmicBucketValues implements Iterable<DoubleHistogramIterationValue> {
+    public static class LogarithmicBucketValues implements Iterable<DoubleHistogramIterationValue> {
         final DoubleHistogram histogram;
         final double valueUnitsInFirstBucket;
         final double logBase;
@@ -1271,7 +1272,7 @@ public class DoubleHistogram extends EncodableHistogram implements Serializable 
      * An {@link Iterable}{@literal <}{@link DoubleHistogramIterationValue}{@literal >} through
      * the histogram using a {@link DoubleRecordedValuesIterator}
      */
-    public class RecordedValues implements Iterable<DoubleHistogramIterationValue> {
+    public static class RecordedValues implements Iterable<DoubleHistogramIterationValue> {
         final DoubleHistogram histogram;
 
         private RecordedValues(final DoubleHistogram histogram) {
@@ -1293,7 +1294,7 @@ public class DoubleHistogram extends EncodableHistogram implements Serializable 
      * An {@link Iterable}{@literal <}{@link DoubleHistogramIterationValue}{@literal >} through
      * the histogram using a {@link DoubleAllValuesIterator}
      */
-    public class AllValues implements Iterable<DoubleHistogramIterationValue> {
+    public static class AllValues implements Iterable<DoubleHistogramIterationValue> {
         final DoubleHistogram histogram;
 
         private AllValues(final DoubleHistogram histogram) {

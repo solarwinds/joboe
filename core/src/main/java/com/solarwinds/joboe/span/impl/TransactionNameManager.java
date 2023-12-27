@@ -161,7 +161,7 @@ public final class TransactionNameManager {
         
         if (transactionName.length() > MAX_TRANSACTION_NAME_LENGTH) {
             transactionName = transactionName.substring(0, MAX_TRANSACTION_NAME_LENGTH - TRANSACTION_NAME_ELLIPSIS.length()) + TRANSACTION_NAME_ELLIPSIS;
-        } else if ("".equals(transactionName)) {
+        } else if (transactionName.isEmpty()) {
             transactionName = " "; //ensure that it at least has 1 character 
         }
         
@@ -205,9 +205,9 @@ public final class TransactionNameManager {
         //try controller/action
         String controller = span.getTracePropertyValue(TraceProperty.CONTROLLER);
         String action = span.getTracePropertyValue(TraceProperty.ACTION);
-        if (controller != null && !"".equals(controller) && action != null) { //controller should not be null nor empty
+        if (controller != null && !controller.isEmpty() && action != null) { //controller should not be null nor empty
             //do NOT add to cache as this transaction name is not extracted from URL. ie same URL might map to multiple controller/action combinations
-            if ("".equals(action)) { //if action is empty string, use the controller name only to avoid trailing dot
+            if (action.isEmpty()) { //if action is empty string, use the controller name only to avoid trailing dot
                 return controller;
             } else {
                 return controller + "." + action;
@@ -274,7 +274,7 @@ public final class TransactionNameManager {
         
         int counter = 1;
         for (String token : url.split("/")) {
-            if (!"".equals(token)) {
+            if (!token.isEmpty()) {
                 String tokenName = "p" + counter ++;
                 urlTokenMap.put(tokenName, token);
             }

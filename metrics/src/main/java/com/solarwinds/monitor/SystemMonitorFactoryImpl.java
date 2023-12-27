@@ -53,7 +53,7 @@ public class SystemMonitorFactoryImpl implements SystemMonitorFactory {
 
     private FrameworkInfoMonitor buildFrameworkInfoMonitor() {
         try {
-            return new FrameworkInfoMonitor(configs);
+            return new FrameworkInfoMonitor();
         } catch (Exception e) {
             logger.warn("Failed to build Framework Monitor! " + e.getMessage());
             return null;

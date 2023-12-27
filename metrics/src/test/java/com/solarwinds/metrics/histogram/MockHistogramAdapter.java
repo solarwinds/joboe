@@ -2,17 +2,17 @@ package com.solarwinds.metrics.histogram;
 
 public class MockHistogramAdapter implements Histogram {
     private final Double percentile;
-    @lombok.Getter
+    @lombok.Getter(onMethod_ = {@Override})
     private final long totalCount;
-    @lombok.Getter
+    @lombok.Getter(onMethod_ = {@Override})
     private final long sum;
-    @lombok.Getter
+    @lombok.Getter(onMethod_ = {@Override})
     private final long max;
-    @lombok.Getter
+    @lombok.Getter(onMethod_ = {@Override})
     private final long min;
-    @lombok.Getter
+    @lombok.Getter(onMethod_ = {@Override})
     private final Double standardDeviation;
-    @lombok.Getter
+    @lombok.Getter(onMethod_ = {@Override})
     private final Long last;
     private final Long countHigherThanValue;
     

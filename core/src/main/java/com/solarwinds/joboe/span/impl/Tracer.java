@@ -109,8 +109,8 @@ public class Tracer implements com.solarwinds.joboe.span.Tracer {
                 Metadata newMetadata = new Metadata(parentMetadata); //create metadata clone from parent span - so it appears as a branch
                 Scope existingScope = ScopeManager.INSTANCE.active();
 
-                newSpan = new Span(Tracer.this,
-                                   operationName, 
+                newSpan = new Span(
+                        operationName,
                                    new SpanContext(newMetadata, 
                                                    parentContext.getTraceId(),
                                                    spanId,
@@ -142,8 +142,8 @@ public class Tracer implements com.solarwinds.joboe.span.Tracer {
                     newTraceId = spanMetadata.getTraceId();
                 }
                 
-                newSpan = new Span(Tracer.this, 
-                                   operationName, 
+                newSpan = new Span(
+                        operationName,
                                    new SpanContext(spanMetadata, 
                                                    newTraceId,
                                                    spanId,
@@ -208,7 +208,7 @@ public class Tracer implements com.solarwinds.joboe.span.Tracer {
                 spanMetadata.setTraceId(newTraceId);
                 
                 SpanContext newContext = new SpanContext(spanMetadata, newTraceId, spanId, null, flags, new HashMap<String, String>(), null);
-                newSpan = new Span(Tracer.this, operationName, newContext, startTimestamp, tags, reporters);
+                newSpan = new Span(operationName, newContext, startTimestamp, tags, reporters);
             }
             
             for (Entry<SpanProperty<?>, Object> propertyEntry : properties.entrySet()) {

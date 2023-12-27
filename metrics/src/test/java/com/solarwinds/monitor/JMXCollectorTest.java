@@ -204,12 +204,12 @@ public class JMXCollectorTest {
         		"}");
         
         MetricsInfo[] definedMetricsInfo = new MetricsInfo[] {
-            new MetricsInfo("MemoryPool", "Usage"),
-            new MetricsInfo("Memory", "HeapMemoryUsage", "NonHeapMemoryUsage"),
-            new MetricsInfo("GarbageCollector", "CollectionTime"),
-            new MetricsInfo("Threading", "ThreadCount"),
-            new MetricsInfo("OperatingSystem", "ProcessCpuTime", "AvailableProcessors", "ProcessCpuLoad"),
-            new MetricsInfo("Runtime", "Uptime")
+                new MetricsInfo("MemoryPool", "Usage"),
+                new MetricsInfo("Memory", "HeapMemoryUsage", "NonHeapMemoryUsage"),
+                new MetricsInfo("GarbageCollector", "CollectionTime"),
+                new MetricsInfo("Threading", "ThreadCount"),
+                new MetricsInfo("OperatingSystem", "ProcessCpuTime", "AvailableProcessors", "ProcessCpuLoad"),
+                new MetricsInfo("Runtime", "Uptime")
         };
         
         
@@ -274,7 +274,7 @@ public class JMXCollectorTest {
         }
     }
     
-    private class MetricsInfo {
+    private static class MetricsInfo {
         private final String type;
         private final String[] attributes;
         
@@ -285,7 +285,7 @@ public class JMXCollectorTest {
         
     }
     
-    private class TestMBeanServer implements MBeanServer {
+    private static class TestMBeanServer implements MBeanServer {
         private final int entriesPerObjectName;
         public TestMBeanServer(int entriesPerObjectName) {
             this.entriesPerObjectName = entriesPerObjectName;

@@ -86,7 +86,7 @@ public class TraceEventReporterTest {
 	@Test
 	public void testReportSpanWithLogEntries() {
 		List<DeserializedEvent> sentEvents;
-		Span span = Tracer.INSTANCE.buildSpan("with-log-entries").withReporters(TraceEventSpanReporter.REPORTER).startManual();
+		Span span = Tracer.INSTANCE.buildSpan("with-log-entries").withReporters(TraceEventSpanReporter.REPORTER).start();
 
 		sentEvents = tracingReporter.getSentEvents();
 		tracingReporter.reset();
@@ -134,7 +134,7 @@ public class TraceEventReporterTest {
 		List<DeserializedEvent> sentEvents;
 
 		final long START_TIME = 1L;
-		Span span = Tracer.INSTANCE.buildSpan("explicit-timestamp").withReporters(TraceEventSpanReporter.REPORTER).withStartTimestamp(START_TIME).startManual();
+		Span span = Tracer.INSTANCE.buildSpan("explicit-timestamp").withReporters(TraceEventSpanReporter.REPORTER).withStartTimestamp(START_TIME).start();
 
 		sentEvents = tracingReporter.getSentEvents();
 		tracingReporter.reset();

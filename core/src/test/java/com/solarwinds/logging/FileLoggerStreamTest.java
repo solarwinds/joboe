@@ -212,7 +212,7 @@ public class FileLoggerStreamTest {
         }
     }
 
-    class ReadProcessThread extends Thread {
+    static class ReadProcessThread extends Thread {
         private final BufferedReader inputReader, errorReader;
         private final String prefix;
         private boolean shouldRun = true;

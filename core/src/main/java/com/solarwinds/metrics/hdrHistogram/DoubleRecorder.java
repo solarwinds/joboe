@@ -225,7 +225,7 @@ public class DoubleRecorder {
         }
     }
 
-    private class InternalConcurrentDoubleHistogram extends ConcurrentDoubleHistogram {
+    private static class InternalConcurrentDoubleHistogram extends ConcurrentDoubleHistogram {
         private final long containingInstanceId;
 
         private InternalConcurrentDoubleHistogram(long id, int numberOfSignificantValueDigits) {

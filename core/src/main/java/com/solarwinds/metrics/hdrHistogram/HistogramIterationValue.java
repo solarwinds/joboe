@@ -76,6 +76,7 @@ public class HistogramIterationValue {
     HistogramIterationValue() {
     }
 
+    @Override
     public String toString() {
         return  "valueIteratedTo:" + valueIteratedTo +
                 ", prevValueIteratedTo:" + valueIteratedFrom +

@@ -954,6 +954,7 @@ public abstract class AbstractHistogram extends AbstractHistogramBase implements
      * @param other the other histogram to compare to
      * @return True if this histogram are equivalent with the other.
      */
+    @Override
     public boolean equals(final Object other){
         if ( this == other ) {
             return true;
@@ -1446,7 +1447,7 @@ public abstract class AbstractHistogram extends AbstractHistogramBase implements
      * An {@link Iterable}{@literal <}{@link HistogramIterationValue}{@literal >} through
      * the histogram using a {@link PercentileIterator}
      */
-    public class Percentiles implements Iterable<HistogramIterationValue> {
+    public static class Percentiles implements Iterable<HistogramIterationValue> {
         final AbstractHistogram histogram;
         final int percentileTicksPerHalfDistance;
 
@@ -1470,7 +1471,7 @@ public abstract class AbstractHistogram extends AbstractHistogramBase implements
      * An {@link Iterable}{@literal <}{@link HistogramIterationValue}{@literal >} through
      * the histogram using a {@link LinearIterator}
      */
-    public class LinearBucketValues implements Iterable<HistogramIterationValue> {
+    public static class LinearBucketValues implements Iterable<HistogramIterationValue> {
         final AbstractHistogram histogram;
         final long valueUnitsPerBucket;
 
@@ -1494,7 +1495,7 @@ public abstract class AbstractHistogram extends AbstractHistogramBase implements
      * An {@link Iterable}{@literal <}{@link HistogramIterationValue}{@literal >} through
      * the histogram using a {@link LogarithmicIterator}
      */
-    public class LogarithmicBucketValues implements Iterable<HistogramIterationValue> {
+    public static class LogarithmicBucketValues implements Iterable<HistogramIterationValue> {
         final AbstractHistogram histogram;
         final long valueUnitsInFirstBucket;
         final double logBase;
@@ -1521,7 +1522,7 @@ public abstract class AbstractHistogram extends AbstractHistogramBase implements
      * An {@link Iterable}{@literal <}{@link HistogramIterationValue}{@literal >} through
      * the histogram using a {@link RecordedValuesIterator}
      */
-    public class RecordedValues implements Iterable<HistogramIterationValue> {
+    public static class RecordedValues implements Iterable<HistogramIterationValue> {
         final AbstractHistogram histogram;
 
         private RecordedValues(final AbstractHistogram histogram) {
@@ -1543,7 +1544,7 @@ public abstract class AbstractHistogram extends AbstractHistogramBase implements
      * An {@link Iterable}{@literal <}{@link HistogramIterationValue}{@literal >} through
      * the histogram using a {@link AllValuesIterator}
      */
-    public class AllValues implements Iterable<HistogramIterationValue> {
+    public static class AllValues implements Iterable<HistogramIterationValue> {
         final AbstractHistogram histogram;
 
         private AllValues(final AbstractHistogram histogram) {

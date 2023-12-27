@@ -24,6 +24,7 @@ import java.util.concurrent.*;
  *
  * @author Patson Luk
  */
+@Getter
 public class Logger {
     public static final String SOLARWINDSS_TAG = "[SolarWinds APM]";
 
@@ -39,7 +40,6 @@ public class Logger {
     static final Logger INSTANCE = new Logger();
     static final Logger STD_STREAM_LOGGER = new Logger(); //an internal logger that uses stderr and stdout streams only
 
-    @Getter
     private Level loggerLevel = DEFAULT_LOGGING;
     private LoggerStream errorStream = new SystemErrStream();
     private LoggerStream infoStream = new SystemOutStream();
@@ -270,7 +270,7 @@ public class Logger {
         void printStackTrace(Throwable throwable);
     }
 
-    class CompositeStream implements LoggerStream {
+    static class CompositeStream implements LoggerStream {
         private final LoggerStream[] streams;
 
         private CompositeStream(LoggerStream... streams) {
@@ -610,7 +610,7 @@ public class Logger {
             return null;
         }
 
-        private class FileLockAndChannel {
+        private static class FileLockAndChannel {
             private final FileLock fileLock;
             private final FileChannel lockChannel;
 

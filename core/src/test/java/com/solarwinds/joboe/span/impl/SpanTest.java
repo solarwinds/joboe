@@ -29,7 +29,7 @@ public class SpanTest {
 		tags.put("tag3", 3.0);
 		
 		
-		Span span = new Span(Tracer.INSTANCE, "test", spanContext, START_TIME, tags, Collections.EMPTY_LIST);
+		Span span = new Span("test", spanContext, START_TIME, tags, Collections.EMPTY_LIST);
 		
 		span.setTracePropertyValue(TraceProperty.HAS_ERROR, true);
 		
@@ -65,7 +65,7 @@ public class SpanTest {
 		tags.put("tag3", 3.0);
 		
 		
-		Span span = new Span(Tracer.INSTANCE, "test", spanContext, START_TIME, tags, Collections.EMPTY_LIST);
+		Span span = new Span("test", spanContext, START_TIME, tags, Collections.EMPTY_LIST);
 		span.setTag("boolean", true);
 		span.setTag("number", 5);
 		span.setTag("string", "");
@@ -95,7 +95,7 @@ public class SpanTest {
 		
 		Map<String, Object> tags = new HashMap<String, Object>();
 		
-		Span span = new Span(Tracer.INSTANCE, "test", spanContext, START_TIME, tags, Collections.EMPTY_LIST);
+		Span span = new Span("test", spanContext, START_TIME, tags, Collections.EMPTY_LIST);
 		
 		span.setBaggageItem("baggage3", "3");
 		

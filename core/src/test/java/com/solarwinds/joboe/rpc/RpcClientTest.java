@@ -662,7 +662,7 @@ public abstract class RpcClientTest {
             public void run() {
                 while (keepRunning.get()) {
                     try {
-                        while (!isPortAvailable(unstableServerPort)) {
+                        while (isPortNotAvailable()) {
                             System.out.println("unstable server port [" + unstableServerPort + "] is not yet available... sleeping");
                             TimeUnit.SECONDS.sleep(1);
                         }
@@ -876,7 +876,7 @@ public abstract class RpcClientTest {
 
         int MAX_PORT = portWalker + 2000; //huh shouldn't hit it
         while (portWalker <= MAX_PORT) {
-            if (!isPortAvailable(portWalker)) {
+            if (isPortNotAvailable()) {
                 portWalker ++;
             } else {
                 return portWalker;
@@ -886,22 +886,20 @@ public abstract class RpcClientTest {
         return 0;
     }
 
-    private static boolean isPortAvailable(int port) {
+    private static boolean isPortNotAvailable() {
         Socket s = new Socket();
         try {
             s.connect(new InetSocketAddress("localhost", portWalker), 100);
             //that means the port is occupied
-            return false;
+            return true;
         } catch (IOException e) {
             //that means port is available
-            return true;
+            return false;
         } finally {
-            if( s != null){
-                try {
-                    s.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            try {
+                s.close();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }

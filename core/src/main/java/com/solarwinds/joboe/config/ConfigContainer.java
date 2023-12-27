@@ -159,11 +159,11 @@ public class ConfigContainer {
             if (typeClass == String.class) {
                 javaValue = valueString;
             } else if (typeClass == Long.class) {
-                javaValue = new Long(valueString);
+                javaValue = Long.valueOf(valueString);
             } else if (typeClass == BigDecimal.class) {
                 javaValue = new BigDecimal(valueString);
             } else if (typeClass == Integer.class) {
-                javaValue = new Integer(valueString);
+                javaValue = Integer.valueOf(valueString);
             } else if (typeClass == Boolean.class) {
                 if ("true".equalsIgnoreCase(valueString) || "false".equalsIgnoreCase(valueString)) { //use strict handling, do not allow unexpected/invalid values 
                     javaValue = Boolean.valueOf(valueString);

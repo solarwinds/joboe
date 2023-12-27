@@ -14,24 +14,15 @@ import lombok.Getter;
  * @author pluk
  *
  */
+@Getter
 public class SpanContext implements com.solarwinds.joboe.span.SpanContext {
-    @Getter
     private final long traceId;
-    @Getter
     private final long spanId;
-    @Getter
     private final Long parentId;
-    
-    @Getter
     private final byte flags;
     private final Map<String, String> baggage = new HashMap<String, String>();
-    
-    @Getter
     private final Metadata metadata;
-    @Getter
     private final Metadata previousMetadata;
-
-    @Getter
     private Metadata entryMetadata;
     
     /**
@@ -111,7 +102,7 @@ public class SpanContext implements com.solarwinds.joboe.span.SpanContext {
      * @return
      */
 	public static SpanContext contextFromString(String value) {
-		if (value == null || value.equals("")) {
+		if (value == null || value.isEmpty()) {
 			throw new IllegalArgumentException();
 		}
 

@@ -175,7 +175,7 @@ public class RpcClient implements com.solarwinds.joboe.rpc.Client {
                                 return null;
                             } else if (e instanceof ClientRecoverableException) {
                                 logConnectException(e, taskType);
-                                reconnectClient(retryParams); //retry the connection, this blocks until connection is re-established
+                                reconnectClient(); //retry the connection, this blocks until connection is re-established
                                 retryParams.flagRetry(RetryType.SERVER_ERROR); //retry after a server error
                                 return null; //return null as the result as call result is unresolved
                             } else if (e instanceof ClientException) { //cannot recover
@@ -191,13 +191,10 @@ public class RpcClient implements com.solarwinds.joboe.rpc.Client {
 
                 /**
                  * Blocks until a connection is successfully re-established or max retry attempt is reached
-                 * @param retryParams
-                 * @return  whether the reconnect operation is successful
                  */
-                private boolean reconnectClient(RetryParams retryParams) {
+                private void reconnectClient() {
                     shutdownProtocolClient();
                     initClient();
-                    return true;
                 }
             });
 
@@ -232,7 +229,7 @@ public class RpcClient implements com.solarwinds.joboe.rpc.Client {
      */
     private void resetClient(String arg) throws ClientFatalException {
         shutdownProtocolClient(); //shut down the current generated client
-        if (arg != null && !"".equals(arg)) {
+        if (arg != null && !arg.isEmpty()) {
             String[] tokens = arg.split(":");
 
             String newHost;
@@ -481,7 +478,7 @@ public class RpcClient implements com.solarwinds.joboe.rpc.Client {
                 }
 
                 String warning = result.getWarning();
-                if (warning != null && !"".equals(warning)) {
+                if (warning != null && !warning.isEmpty()) {
                     if (logger.shouldLog(Level.DEBUG) || !warning.equals(previousReportedWarning)) {
                         logger.warn("RPC call warning : [" + warning + "]");
                         previousReportedWarning = warning;

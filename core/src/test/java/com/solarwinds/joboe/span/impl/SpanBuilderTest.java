@@ -149,7 +149,7 @@ public class SpanBuilderTest {
         assertSameTraceContext(parentScope.span().context(), childActiveScope.span().context());
         childActiveScope.close();
                 
-        Span childSpan = tracer.buildSpan("non-active-child").startManual(); //it should infer the current active span as parent
+        Span childSpan = tracer.buildSpan("non-active-child").start(); //it should infer the current active span as parent
         assertSameTraceContext(parentScope.span().context(), childSpan.context());
         childSpan.finish();
         

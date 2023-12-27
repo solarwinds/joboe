@@ -35,7 +35,7 @@ public class TestExecutionExceptionRpcClient implements Client {
         return service.submit(new ExceptionCallable<SettingsResult>());
     }
 
-    private class ExceptionCallable<T> implements Callable<T> {
+    private static class ExceptionCallable<T> implements Callable<T> {
         @Override
         public T call() throws Exception {
             throw new ClientException("testing exception from exception rpc client");

@@ -31,7 +31,7 @@ public class ExecUtils {
             String errorResult = errorStreamFuture.get(EXEC_TIMEOUT, TimeUnit.SECONDS);
             String standardResult = inputStreamFuture.get(EXEC_TIMEOUT, TimeUnit.SECONDS);
 
-            if (errorResult.length() > 0) {
+            if (!errorResult.isEmpty()) {
                 logger.debug("exec " + command + " output to error stream : " + errorResult);
             }
 
@@ -65,7 +65,7 @@ public class ExecUtils {
                 StringBuilder stringBuilder = new StringBuilder();
 
                 while ((line = bufferedReader.readLine()) != null) {
-                    if (line.equals("")) {
+                    if (line.isEmpty()) {
                         continue;
                     }
                     stringBuilder.append(line);

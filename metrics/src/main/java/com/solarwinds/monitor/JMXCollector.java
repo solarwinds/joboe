@@ -87,7 +87,7 @@ class JMXCollector extends AbstractMetricsEntryCollector {
                     String attributeString = (String) attributeObj;
                     attributeString = attributeString.trim();
                     
-                    if ("".equals(attributeString) || "*".equals(attributeString)) {
+                    if (attributeString.isEmpty() || "*".equals(attributeString)) {
                         attributes = new String[0];
                     } else {
                         attributes = new String[] { attributeString };

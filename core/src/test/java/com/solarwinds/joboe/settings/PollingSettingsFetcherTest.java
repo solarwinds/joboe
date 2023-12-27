@@ -273,7 +273,7 @@ public class PollingSettingsFetcherTest {
         
     }
 
-    private abstract class TestClient implements Client {
+    private abstract static class TestClient implements Client {
         private final List<? extends Settings> settings;
         
         protected TestClient(List<? extends Settings> settings) {
@@ -309,7 +309,7 @@ public class PollingSettingsFetcherTest {
         }
     }
 
-    private class MockRpcClient extends TestClient {
+    private static class MockRpcClient extends TestClient {
         private final ExecutorService service = Executors.newSingleThreadExecutor();
         
         private MockRpcClient(List<? extends Settings> settings) {
@@ -335,7 +335,7 @@ public class PollingSettingsFetcherTest {
         }
     }
     
-    private class OneHitWonderClient extends TestClient {
+    private static class OneHitWonderClient extends TestClient {
         private boolean hasHit = false;
         private final ExecutorService service = Executors.newSingleThreadExecutor();
 
@@ -366,7 +366,7 @@ public class PollingSettingsFetcherTest {
         }
     }
     
-    private class ExecutionExceptionClient extends TestClient {
+    private static class ExecutionExceptionClient extends TestClient {
         private final ExecutorService service = Executors.newSingleThreadExecutor();
 
         protected ExecutionExceptionClient() {

@@ -27,13 +27,12 @@ public class Span implements com.solarwinds.joboe.span.Span {
             
     /**
      * 
-     * @param tracer    Tracer tied to this span, take note that the tracer instance determined what SpanReporter would be used to report the span
      * @param operationName
      * @param context
      * @param startTimeMicroseconds
      * @param tags
      */
-    public Span(Tracer tracer, String operationName, SpanContext context, long startTimeMicroseconds, Map<String, Object> tags, List<SpanReporter> reporters) {
+    public Span(String operationName, SpanContext context, long startTimeMicroseconds, Map<String, Object> tags, List<SpanReporter> reporters) {
         this.operationName = operationName;
         this.context = context;
         this.startTimeMicroseconds = startTimeMicroseconds;
@@ -236,11 +235,11 @@ public class Span implements com.solarwinds.joboe.span.Span {
      */
     public Span error(Map<String, ?> fields) {
         long time = TimeUtils.getTimestampMicroSeconds();
-        return log(time, new LogEntry(time, fields, true));
+        return log(new LogEntry(time, fields, true));
         
     }
     
-    private Span log(long timestampMicroseconds, LogEntry logEntry) {
+    private Span log(LogEntry logEntry) {
         for (SpanReporter reporter : reporters) {
             reporter.reportOnLog(this, logEntry);
         }
@@ -250,7 +249,7 @@ public class Span implements com.solarwinds.joboe.span.Span {
     
     @Override
     public Span log(long timestampMicroseconds, Map<String, ?> fields) {
-        log(timestampMicroseconds, new LogEntry(timestampMicroseconds, fields));
+        log(new LogEntry(timestampMicroseconds, fields));
         
         return this;
     }
