@@ -22,6 +22,7 @@ class GenericAttributeProcessor extends AttributeProcessor  {
         super(mBeanServer);
     }
 
+    @Override
     public Map<String, Object> process(ObjectName mBeanName, String attributeName) throws InstanceNotFoundException, AttributeNotFoundException, ReflectionException, MBeanException {
         Map<String, Object> values = new LinkedHashMap<String, Object>();
     

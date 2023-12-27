@@ -10,6 +10,7 @@ public class TestSettingsReader implements SettingsReader {
     private final Map<String, Settings> layerSettings = new ConcurrentHashMap<String, Settings>();
     private SettingsChangeCallback settingsChangeCallback;
     
+    @Override
     public Map<String, Settings> getSettings() throws OboeSettingsException {
         return Collections.unmodifiableMap(layerSettings);
     }
@@ -38,6 +39,7 @@ public class TestSettingsReader implements SettingsReader {
         return new CountDownLatch(0);
     }
     
+    @Override
     public void close() {
     }
     

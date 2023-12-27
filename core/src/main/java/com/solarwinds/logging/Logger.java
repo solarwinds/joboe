@@ -303,10 +303,12 @@ public class Logger {
         private SystemOutStream() {
         }
 
+        @Override
         public void println(String value) {
             System.out.println(value);
         }
 
+        @Override
         public void printStackTrace(Throwable throwable) {
             throwable.printStackTrace(System.out);
         }
@@ -318,10 +320,12 @@ public class Logger {
         private SystemErrStream() {
         }
 
+        @Override
         public void println(String value) {
             System.err.println(value);
         }
 
+        @Override
         public void printStackTrace(Throwable throwable) {
             throwable.printStackTrace(System.err);
         }
@@ -409,6 +413,7 @@ public class Logger {
             }
         }
 
+        @Override
         public void println(final String value) {
             try {
                 service.submit(new LogTask() {
@@ -424,6 +429,7 @@ public class Logger {
             }
         }
 
+        @Override
         public void printStackTrace(final Throwable throwable) {
             try {
                 service.submit(new LogTask() {

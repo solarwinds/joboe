@@ -123,34 +123,32 @@ public class Profiler {
         final CircuitBreaker circuitBreaker = new CircuitBreaker(localSetting.getCircuitBreakerDurationThreshold(), localSetting.getCircuitBreakerCountThreshold());
 
         ExecutorService service = Executors.newFixedThreadPool(1, DaemonThreadFactory.newInstance("profiling-sampler"));
-        samplerFuture = service.submit(new Runnable() {
-            public void run() {
-                while (status != Status.STOPPING) {
-                    status = Status.RUNNING;
-                    try {
-                        ProfilingDurationInfo durationInfo = checkThreads(); //take and report snapshots on the list on tracked threads
-                        long duration = durationInfo.duration;
+        samplerFuture = service.submit(() -> {
+            while (status != Status.STOPPING) {
+                status = Status.RUNNING;
+                try {
+                    ProfilingDurationInfo durationInfo = checkThreads(); //take and report snapshots on the list on tracked threads
+                    long duration = durationInfo.duration;
 
-                        long circuitBreakerPause = circuitBreaker.getPause(duration); //consult with the circuit break on whether the last operation would trigger a pause
-                        if (circuitBreakerPause > 0) { //circuit breaker is triggered, pausing
-                            status = Status.PAUSED_CIRCUIT_BREAKER;
-                            logger.info("Pause profiling for " + circuitBreakerPause + " secs. Previous profiling operation took " + duration + "ms. That's total of " +  circuitBreaker.getBreakCountThreshold() +  " consecutive profiling operation(s) that exceeded the circuit breaker duration threshold " + circuitBreaker.getBreakDurationThreshold() + " ms");
-                            TimeUnit.SECONDS.sleep(circuitBreakerPause);
-                        } else {
-                            long sleepTime = interval - System.currentTimeMillis() % interval; //snap the sleep time to the next closest time frame based on the interval
+                    long circuitBreakerPause = circuitBreaker.getPause(duration); //consult with the circuit break on whether the last operation would trigger a pause
+                    if (circuitBreakerPause > 0) { //circuit breaker is triggered, pausing
+                        status = Status.PAUSED_CIRCUIT_BREAKER;
+                        logger.info("Pause profiling for " + circuitBreakerPause + " secs. Previous profiling operation took " + duration + "ms. That's total of " +  circuitBreaker.getBreakCountThreshold() +  " consecutive profiling operation(s) that exceeded the circuit breaker duration threshold " + circuitBreaker.getBreakDurationThreshold() + " ms");
+                        TimeUnit.SECONDS.sleep(circuitBreakerPause);
+                    } else {
+                        long sleepTime = interval - System.currentTimeMillis() % interval; //snap the sleep time to the next closest time frame based on the interval
 
-                            TimeUnit.MILLISECONDS.sleep(sleepTime);
-                        }
-                    } catch (InterruptedException e) {
-                        logger.debug("Profiler interrupted: " + e.getMessage()); //hard to tell whether this is triggered by JVM shutdown
-                        status = Status.STOPPING; //flag it to stop
-                    } catch (Throwable e) {
-                        logger.warn("Profiler interrupted unexpectedly: " + e.getMessage(), e);
-                        status = Status.STOPPING; //flag it to stop
+                        TimeUnit.MILLISECONDS.sleep(sleepTime);
                     }
+                } catch (InterruptedException e) {
+                    logger.debug("Profiler interrupted: " + e.getMessage()); //hard to tell whether this is triggered by JVM shutdown
+                    status = Status.STOPPING; //flag it to stop
+                } catch (Throwable e) {
+                    logger.warn("Profiler interrupted unexpectedly: " + e.getMessage(), e);
+                    status = Status.STOPPING; //flag it to stop
                 }
-                status = Status.STOPPED;
             }
+            status = Status.STOPPED;
         });
         service.shutdown();
     }

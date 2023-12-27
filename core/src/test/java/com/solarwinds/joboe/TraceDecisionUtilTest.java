@@ -282,13 +282,11 @@ public class TraceDecisionUtilTest {
         ExecutorService executorService = Executors.newFixedThreadPool(THREAD_COUNT);
         List<Callable<Object>> tasks = new ArrayList<Callable<Object>>();
         for (int i = 0; i < THREAD_COUNT; i++) {
-            tasks.add(new Callable<Object>() {
-                public Object call() throws Exception {
-                    for (int i = 0; i < RUN_PER_THREAD; i++) {
-                        TraceDecisionUtil.shouldTraceRequest("LayerA", null, null, null);
-                    }
-                    return null;
+            tasks.add(() -> {
+                for (int i1 = 0; i1 < RUN_PER_THREAD; i1++) {
+                    TraceDecisionUtil.shouldTraceRequest("LayerA", null, null, null);
                 }
+                return null;
             });
         }
 
@@ -300,12 +298,10 @@ public class TraceDecisionUtilTest {
         //try to do increment and clear at once
         tasks.clear();
         for (int i = 0; i < THREAD_COUNT; i++) {
-            tasks.add(new Callable<Object>() {
-                public Object call() throws Exception {
-                    TraceDecisionUtil.shouldTraceRequest("LayerA", null, null, null);
-                    int data = TraceDecisionUtil.consumeMetricsData(MetricType.THROUGHPUT);
-                    return data;
-                }
+            tasks.add(() -> {
+                TraceDecisionUtil.shouldTraceRequest("LayerA", null, null, null);
+                int data1 = TraceDecisionUtil.consumeMetricsData(MetricType.THROUGHPUT);
+                return data1;
             });
         }
 

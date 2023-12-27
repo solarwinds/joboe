@@ -46,15 +46,12 @@ public class SystemMonitorController {
      * Starts the System monitoring. Should only be called once. If more than once has been called, the other calls would be ignored
      */
     public static synchronized void start() {
-        startWithBuilder(new SystemMonitorBuilder() {
-            @Override
-            public List<SystemMonitor<?, ?>> build() {
-                if (configs == null) {
-                    logger.error("Cannot start the System Monitors! The property/config is not found!");
-                    return null;
-                }
-                return new SystemMonitorFactoryImpl(configs).buildMonitors();
+        startWithBuilder(() -> {
+            if (configs == null) {
+                logger.error("Cannot start the System Monitors! The property/config is not found!");
+                return null;
             }
+            return new SystemMonitorFactoryImpl(configs).buildMonitors();
         });
     }
 

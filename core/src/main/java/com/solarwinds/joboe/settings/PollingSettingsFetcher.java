@@ -43,6 +43,7 @@ public class PollingSettingsFetcher implements SettingsFetcher {
         startWorker();
     }    
 
+    @Override
     public Settings getSettings() {
         synchronized(this) {
             if (isExpired(currentSettings)) {
@@ -64,14 +65,17 @@ public class PollingSettingsFetcher implements SettingsFetcher {
         return isExpired;
     }
 
+    @Override
     public CountDownLatch isSettingsAvailableLatch() {
         return firstTryLatch;
     }
     
+    @Override
     public void registerListener(SettingsListener listener) {
         this.listener = listener;
     }
     
+    @Override
     public void close() {
         active = false;
         executorService.shutdown();
@@ -86,6 +90,7 @@ public class PollingSettingsFetcher implements SettingsFetcher {
      */
     private Future<?> startWorker() {
         return executorService.submit(new Runnable() {
+            @Override
             public void run() {
                 logger.debug("Starting background worker to update settings");
                 boolean running = true;

@@ -37,6 +37,7 @@ public class TestReporter implements EventReporter {
         byteBufList.set(new LinkedList<>());
     }
 
+    @Override
     public void send(Event event) {
         try {
             byte[] buf = event.toBytes();
@@ -149,11 +150,13 @@ public class TestReporter implements EventReporter {
         }
     }
 
+    @Override
     public EventReporterStats consumeStats() {
         int sentEvent = getBufList().size();
         return new EventReporterStats(sentEvent, 0, 0, sentEvent, 0);
     }
     
+    @Override
     public void close() {
     }
 } 

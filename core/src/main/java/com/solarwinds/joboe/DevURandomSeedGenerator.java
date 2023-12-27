@@ -13,6 +13,7 @@ public class DevURandomSeedGenerator implements SeedGenerator
 {
     private static final File DEV_U_RANDOM = new File("/dev/urandom");
 
+    @Override
     public byte[] generateSeed(int length) throws SeedException
     {
         FileInputStream file = null;

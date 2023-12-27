@@ -36,19 +36,19 @@ public class Tracer implements com.solarwinds.joboe.span.Tracer {
     private static final Logger logger = LoggerFactory.getLogger();
     
     private Tracer() {
-        injectors.put(Format.Builtin.HTTP_HEADERS, new Injector<TextMap>() {
-            public void inject(com.solarwinds.joboe.span.SpanContext spanContext, TextMap carrier) {
-                if (spanContext instanceof SpanContext && ((SpanContext) spanContext).getMetadata().isValid()) {
-                    carrier.put(HeaderConstants.W3C_TRACE_CONTEXT_HEADER, ((SpanContext) spanContext).getMetadata().toHexString());
-                }
+        injectors.put(Format.Builtin.HTTP_HEADERS, (Injector<TextMap>) (spanContext, carrier) -> {
+            if (spanContext instanceof SpanContext && ((SpanContext) spanContext).getMetadata().isValid()) {
+                carrier.put(HeaderConstants.W3C_TRACE_CONTEXT_HEADER, ((SpanContext) spanContext).getMetadata().toHexString());
             }
         });
     }
     
+    @Override
     public SpanBuilder buildSpan(String operationName) {
         return new SpanBuilder(operationName);
     }
 
+    @Override
     public <C> void inject(com.solarwinds.joboe.span.SpanContext spanContext, Format<C> format, C carrier) {
         Injector<C> injector = (Injector<C>) injectors.get(format);
         if (injector == null) {
@@ -57,6 +57,7 @@ public class Tracer implements com.solarwinds.joboe.span.Tracer {
         injector.inject(spanContext, carrier);
     }
 
+    @Override
     public <C> com.solarwinds.joboe.span.SpanContext extract(Format<C> format, C carrier) {
         Extractor<C> extractor = (Extractor<C>) extractors.get(format);
         if (extractor == null) {
@@ -250,15 +251,18 @@ public class Tracer implements com.solarwinds.joboe.span.Tracer {
             return newMetadata;
         }
         
+        @Override
         public SpanBuilder asChildOf(com.solarwinds.joboe.span.SpanContext parentContext) {
             this.explicitParentContext = (SpanContext) parentContext; 
             return this;
         }
 
+        @Override
         public SpanBuilder asChildOf(com.solarwinds.joboe.span.Span parentSpan) {
             return asChildOf(parentSpan.context());
         }
 
+        @Override
         public SpanBuilder addReference(String referenceType, com.solarwinds.joboe.span.SpanContext referencedContext) {
             throw new UnsupportedOperationException();
         }
@@ -268,14 +272,17 @@ public class Tracer implements com.solarwinds.joboe.span.Tracer {
             return this;
         }
         
+        @Override
         public SpanBuilder withTag(String key, String value) {
             return withTag(key, (Object)value);
         }
         
+        @Override
         public SpanBuilder withTag(String key, boolean value) {
             return withTag(key, (Object)value);
         }
         
+        @Override
         public SpanBuilder withTag(String key, Number value) {
             return withTag(key, (Object)value);
         }
@@ -290,6 +297,7 @@ public class Tracer implements com.solarwinds.joboe.span.Tracer {
             return withTag(tag.getKey(), value);
         }
         
+        @Override
         public SpanBuilder withStartTimestamp(long startTimestamp) {
             this.startTimestamp = startTimestamp;
             return this;
@@ -336,6 +344,7 @@ public class Tracer implements com.solarwinds.joboe.span.Tracer {
             return start();
         }
 
+        @Override
         public SpanBuilder ignoreActiveSpan() {
             ignoreActiveSpan = true;
             return this;

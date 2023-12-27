@@ -41,7 +41,8 @@ public abstract class Settings {
     public final boolean isDefault() {
         return (getType() == OBOE_SETTINGS_TYPE_DEFAULT_SAMPLE_RATE);
     }
-    
+
+    @Override
     public String toString() {
         return "[Settings: timestamp=" + getTimestamp() + 
                 " type=" + getType() + 

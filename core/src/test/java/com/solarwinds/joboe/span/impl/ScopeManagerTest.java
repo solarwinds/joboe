@@ -42,48 +42,42 @@ public class ScopeManagerTest {
 	public void testSnapshot() throws ExecutionException, InterruptedException {
         ExecutorService executorService = Executors.newCachedThreadPool();
 
-	    Future<Object> future1 = executorService.submit(new Callable<Object>() {
-            @Override
-            public Object call() throws Exception {
-                Scope s1 = Tracer.INSTANCE.buildSpan("1-1").startActive();
-                Scope s2 = Tracer.INSTANCE.buildSpan("1-2").startActive();
-                TimeUnit.SECONDS.sleep(1);
+	    Future<Object> future1 = executorService.submit(() -> {
+            Scope s1 = Tracer.INSTANCE.buildSpan("1-1").startActive();
+            Scope s2 = Tracer.INSTANCE.buildSpan("1-2").startActive();
+            TimeUnit.SECONDS.sleep(1);
 
-                ScopeContextSnapshot snapshot = ScopeManager.INSTANCE.getSnapshot();
-                ScopeManager.INSTANCE.removeAllScopes(); //remove the scope while the 2nd callable still have active scopes
-                TimeUnit.SECONDS.sleep(2);
+            ScopeContextSnapshot snapshot = ScopeManager.INSTANCE.getSnapshot();
+            ScopeManager.INSTANCE.removeAllScopes(); //remove the scope while the 2nd callable still have active scopes
+            TimeUnit.SECONDS.sleep(2);
 
-                assertNull(ScopeManager.INSTANCE.active()); //no active scope since it's cleared
+            assertNull(ScopeManager.INSTANCE.active()); //no active scope since it's cleared
 
-                snapshot.restore();
+            snapshot.restore();
 
-                //now assert the scopes are restored;
-                assertEquals(s2, ScopeManager.INSTANCE.active());
-                s2.close();
-                assertEquals(s1, ScopeManager.INSTANCE.active());
-                s1.close();
-                assertNull(ScopeManager.INSTANCE.active());
+            //now assert the scopes are restored;
+            assertEquals(s2, ScopeManager.INSTANCE.active());
+            s2.close();
+            assertEquals(s1, ScopeManager.INSTANCE.active());
+            s1.close();
+            assertNull(ScopeManager.INSTANCE.active());
 
-                return null;
-            }
+            return null;
         });
 
-        Future<Object> future2 = executorService.submit(new Callable<Object>() {
-            @Override
-            public Object call() throws Exception {
-                Scope s1 = Tracer.INSTANCE.buildSpan("2-1").startActive();
-                Scope s2 = Tracer.INSTANCE.buildSpan("2-2").startActive();
-                TimeUnit.SECONDS.sleep(2);
-                //when it wakes up here, 1st callable would have called removeAllScopes
-                //verify the thread local nature, 1st callable's removeAllScopes should not affect this current thread
-                assertEquals(s2, ScopeManager.INSTANCE.active());
-                s2.close();
-                assertEquals(s1, ScopeManager.INSTANCE.active());
-                s1.close();
-                assertNull(ScopeManager.INSTANCE.active());
+        Future<Object> future2 = executorService.submit(() -> {
+            Scope s1 = Tracer.INSTANCE.buildSpan("2-1").startActive();
+            Scope s2 = Tracer.INSTANCE.buildSpan("2-2").startActive();
+            TimeUnit.SECONDS.sleep(2);
+            //when it wakes up here, 1st callable would have called removeAllScopes
+            //verify the thread local nature, 1st callable's removeAllScopes should not affect this current thread
+            assertEquals(s2, ScopeManager.INSTANCE.active());
+            s2.close();
+            assertEquals(s1, ScopeManager.INSTANCE.active());
+            s1.close();
+            assertNull(ScopeManager.INSTANCE.active());
 
-                return null;
-            }
+            return null;
         });
 
         executorService.shutdown();

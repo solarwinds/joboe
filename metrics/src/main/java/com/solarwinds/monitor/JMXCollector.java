@@ -111,13 +111,11 @@ class JMXCollector extends AbstractMetricsEntryCollector {
             throw new InvalidConfigException("Error parsing scope for JMX : " + e.getMessage(), e);
         }
         
-        Collections.sort(scopes, new Comparator<JMXScope>() {
-            public int compare(JMXScope o1, JMXScope o2) {
-                if (o1.getObjectName() == null) {
-                    return o2.getObjectName() == null ? 0 : -1;
-                }
-                return o1.getObjectName().compareTo(o2.getObjectName());
+        Collections.sort(scopes, (o1, o2) -> {
+            if (o1.getObjectName() == null) {
+                return o2.getObjectName() == null ? 0 : -1;
             }
+            return o1.getObjectName().compareTo(o2.getObjectName());
         });
         
         return scopes;

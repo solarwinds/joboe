@@ -71,6 +71,7 @@ public class UDPReporter implements EventReporter {
         this.port = port;
     }
 
+    @Override
     public void send(Event event) throws EventReporterException {
         byte[] buf;
         try {
@@ -87,10 +88,12 @@ public class UDPReporter implements EventReporter {
         }
     }
 
+    @Override
     public EventReporterStats consumeStats() {
         return new EventReporterStats(0, 0, 0, 0, 0); //not implemented
     }
     
+    @Override
     public void close() {
     }
 }

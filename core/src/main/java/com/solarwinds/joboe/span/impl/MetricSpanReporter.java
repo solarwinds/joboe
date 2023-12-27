@@ -32,6 +32,7 @@ public abstract class MetricSpanReporter implements SpanReporter {
         return spanMetricsEnabled;
     }
         
+    @Override
     public final void reportOnStart(Span span) {
         
     }
@@ -39,6 +40,7 @@ public abstract class MetricSpanReporter implements SpanReporter {
     /**
      * Records the span duration as a histogram and a measurement
      */
+    @Override
     public final void reportOnFinish(Span span, long finishMicros) {
         if (spanMetricsEnabled && span.context().getMetadata().isReportMetrics()) {
             long duration = finishMicros - span.getStart();
@@ -53,6 +55,7 @@ public abstract class MetricSpanReporter implements SpanReporter {
     
     protected abstract void reportMetrics(Span span, long duration);
     
+    @Override
     public final void reportOnLog(Span span, LogEntry logEntry) {
         // do nothing for now. Might want to accumulate log entries in the future?
     }

@@ -66,6 +66,7 @@ public abstract class MetricMeasurementSpanReporter extends MetricSpanReporter {
      * Consumes and resets metric entries on this reporter 
      * @return  a list of metric entries collected so since previous call to this method
      */
+    @Override
     public List<MetricsEntry<?>> consumeMetricEntries() {
         Map<MetricKey, SummaryLongMeasurement> reportingMeasurements = consumeMeasurements();
         

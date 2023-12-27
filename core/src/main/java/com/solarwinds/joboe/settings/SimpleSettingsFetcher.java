@@ -19,14 +19,11 @@ public class SimpleSettingsFetcher implements SettingsFetcher {
     public SimpleSettingsFetcher(TestSettingsReader reader) {
         this.reader = reader;
         
-        reader.onSettingsChanged( new SettingsChangeCallback() {
-            public void settingsChanged() {
-                fetch();
-            }
-        });
+        reader.onSettingsChanged(() -> fetch());
     }
     
     
+    @Override
     public Settings getSettings() {
         try {
             return reader.getSettings().get(DEFAULT_LAYER);
@@ -36,6 +33,7 @@ public class SimpleSettingsFetcher implements SettingsFetcher {
         }
     }
 
+    @Override
     public void registerListener(SettingsListener listener) {
         this.listener = listener;
     }
@@ -47,10 +45,12 @@ public class SimpleSettingsFetcher implements SettingsFetcher {
         }
     }
 
+    @Override
     public CountDownLatch isSettingsAvailableLatch() {
         return new CountDownLatch(0);
     }
     
+    @Override
     public void close() {
         if (reader != null) {
             reader.close();

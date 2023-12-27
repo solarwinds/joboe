@@ -69,12 +69,14 @@ public class SslUtils {
      */
     private static TrustManager[] explicitHostCheckManager(final TrustManager[] trustManagers, final String host) {
         X509TrustManager manager = new X509TrustManager() {
+            @Override
             public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
                 for (TrustManager trustManager : trustManagers) {
                     ((X509TrustManager) trustManager).checkClientTrusted(x509Certificates, s);
                 }
             }
 
+            @Override
             public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
                 for (TrustManager trustManager : trustManagers) {
                     ((X509TrustManager) trustManager).checkServerTrusted(x509Certificates, s);
@@ -97,6 +99,7 @@ public class SslUtils {
                 }
             }
 
+            @Override
             public X509Certificate[] getAcceptedIssuers() {
                 return new X509Certificate[0];
             }

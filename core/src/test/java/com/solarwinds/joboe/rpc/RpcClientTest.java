@@ -659,6 +659,7 @@ public abstract class RpcClientTest {
         final List<ByteBuffer> collectorEvents = new ArrayList<ByteBuffer>();
 
         Thread serverThread = new Thread() {
+            @Override
             public void run() {
                 while (keepRunning.get()) {
                     try {

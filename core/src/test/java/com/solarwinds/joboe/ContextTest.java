@@ -67,18 +67,16 @@ public class ContextTest {
         final Metadata parentMD = Context.getMetadata();
         final AtomicReference<Error> assertionError = new AtomicReference<Error>(); 
         
-        Thread thr = new Thread() {
-            public void run() {
-                try {
-                    Metadata childMD = Context.getMetadata();
-                    assertNotSame(parentMD, childMD);     // different object
-                    assertEquals(parentMD.toHexString(), childMD.toHexString()); // but same metadata
-                    assertTrue(childMD.isValid());
-                } catch (Error e) {
-                    assertionError.set(e);
-                }
+        Thread thr = new Thread(() -> {
+            try {
+                Metadata childMD = Context.getMetadata();
+                assertNotSame(parentMD, childMD);     // different object
+                assertEquals(parentMD.toHexString(), childMD.toHexString()); // but same metadata
+                assertTrue(childMD.isValid());
+            } catch (Error e) {
+                assertionError.set(e);
             }
-        };
+        });
         
         thr.start();
         thr.join();
@@ -214,11 +212,9 @@ public class ContextTest {
         final AtomicInteger collectedEventsCount = new AtomicInteger();
         
         for (int i = 0; i < newMaxEvent + 50; i ++) {
-            threadPool.submit(new Runnable() {
-                public void run() {
-                    Event event = Context.createEvent();
-                    event.report(tracingReporter);
-                }
+            threadPool.submit(() -> {
+                Event event = Context.createEvent();
+                event.report(tracingReporter);
             });
         }
         
@@ -288,13 +284,11 @@ public class ContextTest {
         
         List<Future<?>> futures = new ArrayList<Future<?>>();
         for (int i = 0; i < newBacktraces + 10; i ++) {  
-            futures.add(threadPool.submit(new Runnable() {
-                public void run() {
-                    Event event = Context.createEvent();
-                    event.addInfo("Backtrace", "some backtrace"); //10 backtraces will not be reported
-                    event.addInfo("OtherKv", "some value");
-                    event.report(tracingReporter);
-                }
+            futures.add(threadPool.submit(() -> {
+                Event event1 = Context.createEvent();
+                event1.addInfo("Backtrace", "some backtrace"); //10 backtraces will not be reported
+                event1.addInfo("OtherKv", "some value");
+                event1.report(tracingReporter);
             }));
         }
         

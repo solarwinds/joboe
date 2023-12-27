@@ -28,18 +28,22 @@ public class MockHistogramAdapter implements Histogram {
         this.countHigherThanValue = countHigherThanValue;
     }
     
+    @Override
     public Double getPercentile(double percentile) {
         return percentile;
     }
 
+    @Override
     public Long getCountHigherThanValue(long value) {
         return countHigherThanValue;
     }
     
+    @Override
     public void recordValue(long value) {
         // TODO Auto-generated method stub
         
     }
+    @Override
     public void reset() {
         // TODO Auto-generated method stub
         
@@ -101,6 +105,7 @@ public class MockHistogramAdapter implements Histogram {
         return totalCount == other.totalCount;
     }
 
+    @Override
     public byte[] encodeBase64() {
         return new byte[0];
     }

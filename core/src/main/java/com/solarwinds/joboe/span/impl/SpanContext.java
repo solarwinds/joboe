@@ -63,6 +63,7 @@ public class SpanContext implements com.solarwinds.joboe.span.SpanContext {
         this.baggage.putAll(baggage);
     }
 
+    @Override
     public Iterable<Map.Entry<String, String>> baggageItems() {
         return Collections.unmodifiableSet(baggage.entrySet());
     }

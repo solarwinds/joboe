@@ -31,6 +31,7 @@ public class SystemMonitorFactoryImpl implements SystemMonitorFactory {
      * 
      * @return list of {@code SystemMonitor}s based on the configurations provided by the factory constructor
      */
+    @Override
     public List<SystemMonitor<?, ?>> buildMonitors() {
         List<SystemMonitor<?, ?>> monitors = new ArrayList<SystemMonitor<?, ?>>();
 

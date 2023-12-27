@@ -650,11 +650,7 @@ public class ServerHostInfoReader implements HostInfoReader, AzureInstanceIdRead
                 DaemonThreadFactory.newInstance("host-id-checker"));
         //align to minute, figure out the delay in ms
         long delay = 60 * 1000 - System.currentTimeMillis() % (60 * 1000);
-        executorService.scheduleAtFixedRate(new Runnable() {
-            public void run() {
-                hostId = buildHostId();
-            }
-        }, delay, HOST_ID_CHECK_INTERVAL * 1000, TimeUnit.MILLISECONDS);
+        executorService.scheduleAtFixedRate(() -> hostId = buildHostId(), delay, HOST_ID_CHECK_INTERVAL * 1000, TimeUnit.MILLISECONDS);
     }
 
     private HostId buildHostId() {

@@ -40,6 +40,7 @@ public class TraceEventSpanReporter implements SpanReporter {
      * span (and corresponding trace) should be traced. If the root span is traced and is a new trace,
      * then extra KVs are added (SampleRate, BucketCapacity etc)
      */
+    @Override
     public void reportOnStart(Span span) {
 //        ClassInstrumentation.startOrContinueTrace()
 
@@ -115,6 +116,7 @@ public class TraceEventSpanReporter implements SpanReporter {
      * then sets the legacy TLS Context.metadata to previous tracing metadata (usually the parent span), clear the TLS metadata if there's no previous tracing metadata
      *
      */
+    @Override
     public void reportOnFinish(Span span, long finishMicros) {
         Metadata spanMetadata = span.context().getMetadata();
 
@@ -187,6 +189,7 @@ public class TraceEventSpanReporter implements SpanReporter {
     /**
      * Reports info event base on the fields in the LogEntry provided
      */
+    @Override
     public void reportOnLog(Span span, LogEntry logEntry) {
         Metadata spanMetadata = span.context().getMetadata();
 

@@ -29,6 +29,7 @@ public class JsonConfigReader extends ConfigReader {
     /**
      * 
      */
+    @Override
     public void read(ConfigContainer container) throws InvalidConfigException {
         if (configStream == null) {
             throw new InvalidConfigException("Cannot find any valid configuration for agent");

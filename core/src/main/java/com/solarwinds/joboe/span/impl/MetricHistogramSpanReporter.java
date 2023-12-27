@@ -49,6 +49,7 @@ public class MetricHistogramSpanReporter extends MetricSpanReporter {
     /**
      * Records the span duration as a histogram and a measurement
      */
+    @Override
     protected void reportMetrics(Span span, long duration) {
         if (!span.isRoot()) { //only insert values to histograms if this is the root span 
             return;
@@ -80,6 +81,7 @@ public class MetricHistogramSpanReporter extends MetricSpanReporter {
      * Consumes and resets metric entries on this reporter 
      * @return  a list of metric entries collected so since previous call to this method
      */
+    @Override
     public List<MetricsEntry<?>> consumeMetricEntries() {
         Map<MetricKey, Histogram> reportingHistograms = consumeHistograms();
         

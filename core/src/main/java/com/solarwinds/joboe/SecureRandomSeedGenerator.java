@@ -38,6 +38,7 @@ public class SecureRandomSeedGenerator implements SeedGenerator
     /**
      * {@inheritDoc}
      */
+    @Override
     public byte[] generateSeed(int length) throws SeedException
     {
         return SOURCE.generateSeed(length);

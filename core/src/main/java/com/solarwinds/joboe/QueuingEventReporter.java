@@ -92,6 +92,7 @@ public class QueuingEventReporter implements EventReporter {
         private CountDownLatch countDownLatch = new CountDownLatch(1);
         private final ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1, DaemonThreadFactory.newInstance("send-event-delay"));
 
+        @Override
         public void run() {
             while (!exitSignalled || !eventQueue.isEmpty()) {
                 List<Event> sendingEvents = new ArrayList<Event>();
@@ -157,6 +158,7 @@ public class QueuingEventReporter implements EventReporter {
      *
      * @throws EventReporterException if the reporter cannot accepts this event, for example the queue is full
      */
+    @Override
     public void send(Event event) throws EventReporterException {
         if (!eventQueue.offer(event)) {
             stats.incrementOverflowedCount(1);
@@ -193,6 +195,7 @@ public class QueuingEventReporter implements EventReporter {
      *
      * @return
      */
+    @Override
     public EventReporterStats consumeStats() {
         return stats.consumeStats();
     }
@@ -201,6 +204,7 @@ public class QueuingEventReporter implements EventReporter {
     /**
      * Closes this reporter orderly. Allow all submitted events to be processed with a default timeout
      */
+    @Override
     public void close() {
         logger.debug("Closing queueing event reporter, signaling shut down after sending all events");
         if (client.getStatus() != Client.Status.OK) {

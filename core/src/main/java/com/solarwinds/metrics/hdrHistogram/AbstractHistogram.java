@@ -1174,6 +1174,7 @@ public abstract class AbstractHistogram extends AbstractHistogramBase implements
      * get the tag string [optionally] associated with this histogram
      * @return tag string [optionally] associated with this histogram
      */
+    @Override
     public String getTag() {
         return tag;
     }
@@ -1182,6 +1183,7 @@ public abstract class AbstractHistogram extends AbstractHistogramBase implements
      * Set the tag string associated with this histogram
      * @param tag the tag string to assciate with this histogram
      */
+    @Override
     public void setTag(String tag) {
         this.tag = tag;
     }
@@ -1456,6 +1458,7 @@ public abstract class AbstractHistogram extends AbstractHistogramBase implements
         /**
          * @return A {@link PercentileIterator}{@literal <}{@link HistogramIterationValue}{@literal >}
          */
+        @Override
         public Iterator<HistogramIterationValue> iterator() {
             return new PercentileIterator(histogram, percentileTicksPerHalfDistance);
         }
@@ -1479,6 +1482,7 @@ public abstract class AbstractHistogram extends AbstractHistogramBase implements
         /**
          * @return A {@link LinearIterator}{@literal <}{@link HistogramIterationValue}{@literal >}
          */
+        @Override
         public Iterator<HistogramIterationValue> iterator() {
             return new LinearIterator(histogram, valueUnitsPerBucket);
         }
@@ -1505,6 +1509,7 @@ public abstract class AbstractHistogram extends AbstractHistogramBase implements
         /**
          * @return A {@link LogarithmicIterator}{@literal <}{@link HistogramIterationValue}{@literal >}
          */
+        @Override
         public Iterator<HistogramIterationValue> iterator() {
             return new LogarithmicIterator(histogram, valueUnitsInFirstBucket, logBase);
         }
@@ -1526,6 +1531,7 @@ public abstract class AbstractHistogram extends AbstractHistogramBase implements
         /**
          * @return A {@link RecordedValuesIterator}{@literal <}{@link HistogramIterationValue}{@literal >}
          */
+        @Override
         public Iterator<HistogramIterationValue> iterator() {
             return new RecordedValuesIterator(histogram);
         }
@@ -1547,6 +1553,7 @@ public abstract class AbstractHistogram extends AbstractHistogramBase implements
         /**
          * @return A {@link AllValuesIterator}{@literal <}{@link HistogramIterationValue}{@literal >}
          */
+        @Override
         public Iterator<HistogramIterationValue> iterator() {
             return new AllValuesIterator(histogram);
         }

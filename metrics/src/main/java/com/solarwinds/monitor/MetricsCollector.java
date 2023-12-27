@@ -62,11 +62,9 @@ public class MetricsCollector extends SystemCollector<MetricsCategory, List<? ex
             final AbstractMetricsEntryCollector collector = collectorEntry.getValue();
             
             //asynchronously call all sub metric entry collectors to collect metrics
-            Future<List<? extends MetricsEntry<?>>> collectedFuture = executorService.submit(new Callable<List<? extends MetricsEntry<?>>>() {
-                public List<? extends MetricsEntry<?>> call() throws Exception {
-                    List<? extends MetricsEntry<?>> collectedEntries = collector.collectMetricsEntries();
-                    return collectedEntries;
-                }
+            Future<List<? extends MetricsEntry<?>>> collectedFuture = executorService.submit(() -> {
+                List<? extends MetricsEntry<?>> collectedEntries = collector.collectMetricsEntries();
+                return collectedEntries;
             });
             
             collectedFutures.put(collectorEntry.getKey(), collectedFuture);

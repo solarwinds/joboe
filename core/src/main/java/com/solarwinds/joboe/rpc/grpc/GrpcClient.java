@@ -168,19 +168,9 @@ public class GrpcClient implements ProtocolClient {
         String getDescription();
     }
 
-    private static final Serializer<Map<String, Object>> KEY_VALUE_MAP_SERIALIZER = new Serializer<Map<String, Object>>() {
-        @Override
-        public ByteString serialize(Map<String, Object> item) throws BsonBufferException {
-            return ByteString.copyFrom(BsonUtils.convertMapToBson(item, INITIAL_MESSAGE_SIZE, MAX_MESSAGE_SIZE));
-        }
-    };
+    private static final Serializer<Map<String, Object>> KEY_VALUE_MAP_SERIALIZER = item -> ByteString.copyFrom(BsonUtils.convertMapToBson(item, INITIAL_MESSAGE_SIZE, MAX_MESSAGE_SIZE));
 
-    private static final Serializer<Event> EVENT_SERIALIZER = new Serializer<Event>() {
-        @Override
-        public ByteString serialize(Event event) throws BsonBufferException {
-            return ByteString.copyFrom(event.toBytes());
-        }
-    };
+    private static final Serializer<Event> EVENT_SERIALIZER = event -> ByteString.copyFrom(event.toBytes());
 
     private static final PostAction POST_EVENTS_ACTION = new PostAction() {
         @Override
@@ -253,18 +243,15 @@ public class GrpcClient implements ProtocolClient {
             NettyChannelBuilder channelBuilder = NettyChannelBuilder.forAddress(host, port);
 
             if (proxyConfig != null) {
-                channelBuilder = channelBuilder.proxyDetector(new ProxyDetector() {
-                    @Override
-                    public ProxiedSocketAddress proxyFor(SocketAddress targetServerAddress) throws IOException {
-                        HttpConnectProxiedSocketAddress.Builder builder = HttpConnectProxiedSocketAddress.newBuilder().setProxyAddress(new InetSocketAddress(proxyConfig.getHost(), proxyConfig.getPort())).setTargetAddress((InetSocketAddress) targetServerAddress);
-                        if (proxyConfig.getUsername() != null) {
-                            builder = builder.setUsername(proxyConfig.getUsername());
-                        }
-                        if (proxyConfig.getPassword() != null) {
-                            builder = builder.setPassword(proxyConfig.getPassword());
-                        }
-                        return builder.build();
+                channelBuilder = channelBuilder.proxyDetector(targetServerAddress -> {
+                    HttpConnectProxiedSocketAddress.Builder builder = HttpConnectProxiedSocketAddress.newBuilder().setProxyAddress(new InetSocketAddress(proxyConfig.getHost(), proxyConfig.getPort())).setTargetAddress((InetSocketAddress) targetServerAddress);
+                    if (proxyConfig.getUsername() != null) {
+                        builder = builder.setUsername(proxyConfig.getUsername());
                     }
+                    if (proxyConfig.getPassword() != null) {
+                        builder = builder.setPassword(proxyConfig.getPassword());
+                    }
+                    return builder.build();
                 });
             }
 

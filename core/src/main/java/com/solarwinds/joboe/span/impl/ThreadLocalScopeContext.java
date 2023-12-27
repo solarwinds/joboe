@@ -49,6 +49,7 @@ public class ThreadLocalScopeContext implements ScopeContext {
         threadLocal.get().addAll(scopes);
     }
 
+    @Override
     public ScopeContextSnapshot getSnapshot() {
         return new ThreadLocalScopeContextSnapshot(threadLocal.get());
     }
@@ -59,6 +60,7 @@ public class ThreadLocalScopeContext implements ScopeContext {
             snapshotStack = (Stack<Scope>) currentStack.clone();
         }
 
+        @Override
         public void restore() {
             threadLocal.get().clear(); //remove all the scope from current thread
             addScopes(snapshotStack); //add the snapshot back to the current thread

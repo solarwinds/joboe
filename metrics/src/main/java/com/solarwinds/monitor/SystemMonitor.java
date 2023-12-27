@@ -55,6 +55,7 @@ public abstract class SystemMonitor<T, D> implements Runnable {
     /**
      * Starts the data collection/report cycle
      */
+    @Override
     public final void run() {
         try {
             if (collector == null || reporter == null) {

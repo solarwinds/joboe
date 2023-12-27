@@ -83,16 +83,14 @@ public class TimeUtils {
 //                }
 //            }, 0, timeAdjustInterval, TimeUnit.SECONDS);
             //using simple thread instead, see deadlock problem as documented in https://github.com/librato/joboe/issues/608
-            DaemonThreadFactory.newInstance("time-adjustment").newThread(new Runnable() {
-                public void run() {
-                    try {
-                        while (true) {
-                            adjustBase();
-                            TimeUnit.SECONDS.sleep(timeAdjustInterval);
-                        }
-                    } catch (InterruptedException e) {
-                        logger.debug("Adjust time worker thread interrupted, probably due to shutdown : " + e.getMessage());
+            DaemonThreadFactory.newInstance("time-adjustment").newThread(() -> {
+                try {
+                    while (true) {
+                        adjustBase();
+                        TimeUnit.SECONDS.sleep(timeAdjustInterval);
                     }
+                } catch (InterruptedException e) {
+                    logger.debug("Adjust time worker thread interrupted, probably due to shutdown : " + e.getMessage());
                 }
             }).start();
             

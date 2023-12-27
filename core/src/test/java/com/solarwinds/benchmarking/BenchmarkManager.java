@@ -20,17 +20,14 @@ public class BenchmarkManager {
 
     private static final int REPORT_INTERVAL = 10;
     private static final void start() {
-        service.submit(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    while (true) {
-                        TimeUnit.SECONDS.sleep(REPORT_INTERVAL);
-                        reportHistograms();
-                    }
-                } catch (InterruptedException e) {
-                    //ok
+        service.submit(() -> {
+            try {
+                while (true) {
+                    TimeUnit.SECONDS.sleep(REPORT_INTERVAL);
+                    reportHistograms();
                 }
+            } catch (InterruptedException e) {
+                //ok
             }
         });
     }
@@ -58,12 +55,7 @@ public class BenchmarkManager {
 
 
     public static final void record(String key, long value) {
-        Histogram histogram = histograms.computeIfAbsent(key, new Function<String, Histogram>() {
-            @Override
-            public Histogram apply(String t) {
-                return new Histogram(3);
-            }
-        });
+        Histogram histogram = histograms.computeIfAbsent(key, t -> new Histogram(3));
         histogram.recordValue(value);
     }
 

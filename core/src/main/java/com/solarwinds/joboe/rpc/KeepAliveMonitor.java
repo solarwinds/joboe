@@ -31,6 +31,7 @@ public class KeepAliveMonitor implements HeartbeatScheduler {
         schedule();
     }
 
+    @Override
     public synchronized void schedule() {
         if (keepAliveFuture != null) {
             keepAliveFuture.cancel(false);

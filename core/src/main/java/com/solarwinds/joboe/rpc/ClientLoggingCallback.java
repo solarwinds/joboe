@@ -37,10 +37,12 @@ public class ClientLoggingCallback<T extends Result> implements Callback<T>{
         }
     } 
     
+    @Override
     public void complete(T result) {
         delegation.complete(result);
     }
 
+    @Override
     public void fail(Exception e) {
         delegation.fail(e);
     }
@@ -52,6 +54,7 @@ public class ClientLoggingCallback<T extends Result> implements Callback<T>{
      */
     private class FinerLoggingCallback implements Callback<T> {
 
+        @Override
         public void complete(T result) {
             ResultCode resultCode = result.getResultCode();
             String arg = result.getArg();
@@ -62,6 +65,7 @@ public class ClientLoggingCallback<T extends Result> implements Callback<T>{
             }
         }
 
+        @Override
         public void fail(Exception e) {
             logger.warn("Client operation [" + operation + "] failed with exception message : " + e.getMessage(), e);
         }
@@ -84,6 +88,7 @@ public class ClientLoggingCallback<T extends Result> implements Callback<T>{
             }
         }
         
+        @Override
         public void complete(Result result) {
             ResultCode resultCode = result.getResultCode();
             
@@ -107,6 +112,7 @@ public class ClientLoggingCallback<T extends Result> implements Callback<T>{
             }
         }
 
+        @Override
         public void fail(Exception e) {
             //do not log exception here as we only want to warn something for persisting exception, which is something this logger cannot determine  
         }

@@ -15,32 +15,39 @@ import com.solarwinds.joboe.rpc.SettingsResult;
 public class TestExecutionExceptionRpcClient implements Client {
     private final ExecutorService service = Executors.newSingleThreadExecutor();
     
+    @Override
     public Future<Result> postEvents(List<Event> events, Callback<Result> callback) {
         return service.submit(new ExceptionCallable<Result>());
     }
 
+    @Override
     public Future<Result> postMetrics(List<Map<String, Object>> messages, Callback<Result> callback) {
         return service.submit(new ExceptionCallable<Result>());
     }
 
+    @Override
     public Future<Result> postStatus(List<Map<String, Object>> messages, Callback<Result> callback) {
         return service.submit(new ExceptionCallable<Result>());
     }
 
+    @Override
     public Future<SettingsResult> getSettings(String version, Callback<SettingsResult> callback) {
         return service.submit(new ExceptionCallable<SettingsResult>());
     }
-    
+
     private class ExceptionCallable<T> implements Callable<T> {
+        @Override
         public T call() throws Exception {
             throw new ClientException("testing exception from exception rpc client");
         }
     }
     
+    @Override
     public Status getStatus() {
         return Status.OK;
     }
     
+    @Override
     public void close() {
         service.shutdown();
     }

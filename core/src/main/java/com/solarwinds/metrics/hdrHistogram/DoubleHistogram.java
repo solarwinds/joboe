@@ -940,6 +940,7 @@ public class DoubleHistogram extends EncodableHistogram implements Serializable 
      * get the start time stamp [optionally] stored with this histogram
      * @return the start time stamp [optionally] stored with this histogram
      */
+    @Override
     public long getStartTimeStamp() {
         return integerValuesHistogram.getStartTimeStamp();
     }
@@ -948,6 +949,7 @@ public class DoubleHistogram extends EncodableHistogram implements Serializable 
      * Set the start time stamp value associated with this histogram to a given value.
      * @param timeStampMsec the value to set the time stamp to, [by convention] in msec since the epoch.
      */
+    @Override
     public void setStartTimeStamp(final long timeStampMsec) {
         integerValuesHistogram.setStartTimeStamp(timeStampMsec);
     }
@@ -956,6 +958,7 @@ public class DoubleHistogram extends EncodableHistogram implements Serializable 
      * get the end time stamp [optionally] stored with this histogram
      * @return the end time stamp [optionally] stored with this histogram
      */
+    @Override
     public long getEndTimeStamp() {
         return integerValuesHistogram.getEndTimeStamp();
     }
@@ -964,6 +967,7 @@ public class DoubleHistogram extends EncodableHistogram implements Serializable 
      * Set the end time stamp value associated with this histogram to a given value.
      * @param timeStampMsec the value to set the time stamp to, [by convention] in msec since the epoch.
      */
+    @Override
     public void setEndTimeStamp(final long timeStampMsec) {
         integerValuesHistogram.setEndTimeStamp(timeStampMsec);
     }
@@ -972,6 +976,7 @@ public class DoubleHistogram extends EncodableHistogram implements Serializable 
      * get the tag string [optionally] associated with this histogram
      * @return tag string [optionally] associated with this histogram
      */
+    @Override
     public String getTag() {
         return integerValuesHistogram.getTag();
     }
@@ -980,6 +985,7 @@ public class DoubleHistogram extends EncodableHistogram implements Serializable 
      * Set the tag string associated with this histogram
      * @param tag the tag string to assciate with this histogram
      */
+    @Override
     public void setTag(String tag) {
         integerValuesHistogram.setTag(tag);
     }
@@ -1202,6 +1208,7 @@ public class DoubleHistogram extends EncodableHistogram implements Serializable 
         /**
          * @return A {@link DoublePercentileIterator}{@literal <}{@link DoubleHistogramIterationValue}{@literal >}
          */
+        @Override
         public Iterator<DoubleHistogramIterationValue> iterator() {
             return new DoublePercentileIterator(histogram, percentileTicksPerHalfDistance);
         }
@@ -1225,6 +1232,7 @@ public class DoubleHistogram extends EncodableHistogram implements Serializable 
         /**
          * @return A {@link DoubleLinearIterator}{@literal <}{@link DoubleHistogramIterationValue}{@literal >}
          */
+        @Override
         public Iterator<DoubleHistogramIterationValue> iterator() {
             return new DoubleLinearIterator(histogram, valueUnitsPerBucket);
         }
@@ -1251,6 +1259,7 @@ public class DoubleHistogram extends EncodableHistogram implements Serializable 
         /**
          * @return A {@link DoubleLogarithmicIterator}{@literal <}{@link DoubleHistogramIterationValue}{@literal >}
          */
+        @Override
         public Iterator<DoubleHistogramIterationValue> iterator() {
             return new DoubleLogarithmicIterator(histogram, valueUnitsInFirstBucket, logBase);
         }
@@ -1272,6 +1281,7 @@ public class DoubleHistogram extends EncodableHistogram implements Serializable 
         /**
          * @return A {@link DoubleRecordedValuesIterator}{@literal <}{@link HistogramIterationValue}{@literal >}
          */
+        @Override
         public Iterator<DoubleHistogramIterationValue> iterator() {
             return new DoubleRecordedValuesIterator(histogram);
         }
@@ -1293,6 +1303,7 @@ public class DoubleHistogram extends EncodableHistogram implements Serializable 
         /**
          * @return A {@link DoubleAllValuesIterator}{@literal <}{@link HistogramIterationValue}{@literal >}
          */
+        @Override
         public Iterator<DoubleHistogramIterationValue> iterator() {
             return new DoubleAllValuesIterator(histogram);
         }

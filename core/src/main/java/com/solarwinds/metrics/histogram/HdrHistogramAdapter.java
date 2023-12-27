@@ -23,10 +23,12 @@ public class HdrHistogramAdapter implements Histogram {
         this.MAX_VALUE = highestTrackableValue;
     }
     
+    @Override
     public Double getPercentile(double percentile) {
         return (double) hdrHistogram.getValueAtPercentile(percentile);
     }
 
+    @Override
     public void recordValue(long value) throws HistogramException {
         
         if (value >= MIN_VALUE && value <= MAX_VALUE) {
@@ -42,35 +44,43 @@ public class HdrHistogramAdapter implements Histogram {
         
     }
 
+    @Override
     public void reset() {
         hdrHistogram.reset();
         lastValue = null;
     }
 
+    @Override
     public long getTotalCount() {
         return hdrHistogram.getTotalCount();
     }
 
+    @Override
     public long getSum() {
         return (long)(hdrHistogram.getTotalCount() * hdrHistogram.getMean()); //close enough... as this histogram does not keep total
     }
 
+    @Override
     public long getMax() {
         return hdrHistogram.getMaxValue();
     }
 
+    @Override
     public long getMin() {
         return hdrHistogram.getMinValue();
     }
 
+    @Override
     public Double getStandardDeviation() {
         return hdrHistogram.getStdDeviation();
     }
 
+    @Override
     public Long getLast() {
         return lastValue != null ? lastValue : null;
     }
 
+    @Override
     public Long getCountHigherThanValue(long value) {
         return hdrHistogram.getCountBetweenValues(value, hdrHistogram.getMaxValue());
     }
@@ -79,6 +89,7 @@ public class HdrHistogramAdapter implements Histogram {
          return hdrHistogram;
     }
     
+    @Override
     public byte[] encodeBase64() {
         int size = hdrHistogram.getNeededByteBufferCapacity();
         ByteBuffer buffer = ByteBuffer.allocate(size);

@@ -112,6 +112,7 @@ public class RpcClient implements com.solarwinds.joboe.rpc.Client {
 
         FutureTask<T> task = new FutureTask<T>(
             new Callable<T>() {
+                @Override
                 public T call() throws ClientException {
                     T result = null;
 
@@ -268,12 +269,7 @@ public class RpcClient implements com.solarwinds.joboe.rpc.Client {
 
     private final void asyncInitClient() {
         ExecutorService executorService = Executors.newSingleThreadExecutor(DaemonThreadFactory.newInstance("init-rpc-client"));
-        executorService.submit(new Runnable() {
-            @Override
-            public void run() {
-                initClient();
-            }
-        });
+        executorService.submit(() -> initClient());
         executorService.shutdown();
     }
 
@@ -354,8 +350,10 @@ public class RpcClient implements com.solarwinds.joboe.rpc.Client {
      * @return  Future of the Result
      * @throws ClientException
      */
+    @Override
     public Future<Result> postEvents(final List<Event> events, final Callback<Result> callback) throws ClientException {
         return submit(new CallableWithCallback<Result>(callback) {
+            @Override
             public Result doCall() throws Exception {
                 return protocolClient.doPostEvents(serviceKey, events);
             }
@@ -371,8 +369,10 @@ public class RpcClient implements com.solarwinds.joboe.rpc.Client {
      * @return  Future of the Result
      * @throws ClientException
      */
+    @Override
     public Future<Result> postMetrics(final List<Map<String, Object>> messages, final Callback<Result> callback) throws ClientException {
         return submit(new CallableWithCallback<Result>(callback) {
+            @Override
             public Result doCall() throws Exception {
                 return protocolClient.doPostMetrics(serviceKey, messages);
             }
@@ -387,8 +387,10 @@ public class RpcClient implements com.solarwinds.joboe.rpc.Client {
      * @return  Future of the Result
      * @throws ClientException
      */
+    @Override
     public Future<Result> postStatus(final List<Map<String, Object>> messages, final Callback<Result> callback) throws ClientException {
         return submit(new CallableWithCallback<Result>(callback) {
+            @Override
             public Result doCall() throws Exception {
                 return protocolClient.doPostStatus(serviceKey, messages);
             }
@@ -403,8 +405,10 @@ public class RpcClient implements com.solarwinds.joboe.rpc.Client {
      * @return  Future of the SettingsResult
      * @throws ClientException
      */
+    @Override
     public Future<SettingsResult> getSettings(final String version, final Callback<SettingsResult> callback) throws ClientException {
         return submit(new CallableWithCallback<SettingsResult>(callback) {
+            @Override
             public SettingsResult doCall() throws Exception {
                 return protocolClient.doGetSettings(serviceKey, version);
             }
@@ -419,6 +423,7 @@ public class RpcClient implements com.solarwinds.joboe.rpc.Client {
      *
      * This client cannot be reused anymore after closing.
      */
+    @Override
     public void close() {
         isClosing = true;
 
@@ -447,6 +452,7 @@ public class RpcClient implements com.solarwinds.joboe.rpc.Client {
      * Gets the current connection {@link com.solarwinds.joboe.rpc.Client.Status}
      * @return
      */
+    @Override
     public Status getStatus() {
         return connectionStatus;
     }
@@ -466,6 +472,7 @@ public class RpcClient implements com.solarwinds.joboe.rpc.Client {
         }
         private static String previousReportedWarning = null; //could be modified by multiple thread, but it's rather harmless even if that happens
 
+        @Override
         public final T call() throws Exception {
             try {
                 T result = doCall(); //might be more performant to separate the load generation with the actual collector outbound call

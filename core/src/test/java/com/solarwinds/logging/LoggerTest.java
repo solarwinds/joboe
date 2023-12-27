@@ -27,10 +27,12 @@ public class LoggerTest {
         private final ByteArrayOutputStream proxyOutput = new ByteArrayOutputStream();
         private final PrintStream proxyStream = new PrintStream(proxyOutput);
 
+        @Override
         public void println(String value) {
             proxyStream.println(value);
         }
 
+        @Override
         public void printStackTrace(Throwable throwable) {
             throwable.printStackTrace(proxyStream);
         }

@@ -30,17 +30,15 @@ public class TestReporterTest {
         final TestReporter threadLocalReporter = ReporterFactory.getInstance().createTestReporter(true);
         final TestReporter nonThreadLocalReporter = ReporterFactory.getInstance().createTestReporter(false);
         
-        Thread thread = new Thread() {
-            public void run() {
-                Event event;
-                
-                event = Context.startTrace();
-                event.report(threadLocalReporter);
-                
-                event = Context.startTrace();
-                event.report(nonThreadLocalReporter);
-            }
-        };
+        Thread thread = new Thread(() -> {
+            Event event;
+
+            event = Context.startTrace();
+            event.report(threadLocalReporter);
+
+            event = Context.startTrace();
+            event.report(nonThreadLocalReporter);
+        });
         
         thread.start();
         thread.join();

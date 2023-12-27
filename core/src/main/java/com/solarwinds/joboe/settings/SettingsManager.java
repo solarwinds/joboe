@@ -100,16 +100,14 @@ public class SettingsManager {
      */
     public static void initializeFetcher(SettingsFetcher fetcher) {
         SettingsManager.fetcher = fetcher;
-        fetcher.registerListener(new SettingsListener() {
-            public void onSettingsRetrieved(Settings newSettings) {
-                //figure out the difference and notify listeners
-                for (Entry<SettingsArg<?>, Set<SettingsArgChangeListener<?>>> entry : listeners.entrySet()) {
-                    SettingsArg<?> listenedToArg = entry.getKey();
-                    Object newValue = newSettings != null ? newSettings.getArgValue(listenedToArg) : null;
-                    
-                    for (SettingsArgChangeListener<?> listener : entry.getValue()) {
-                        notifyValue(listener, newValue);
-                    }
+        fetcher.registerListener(newSettings -> {
+            //figure out the difference and notify listeners
+            for (Entry<SettingsArg<?>, Set<SettingsArgChangeListener<?>>> entry : listeners.entrySet()) {
+                SettingsArg<?> listenedToArg = entry.getKey();
+                Object newValue = newSettings != null ? newSettings.getArgValue(listenedToArg) : null;
+
+                for (SettingsArgChangeListener<?> listener : entry.getValue()) {
+                    notifyValue(listener, newValue);
                 }
             }
         });

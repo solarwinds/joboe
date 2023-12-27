@@ -409,16 +409,15 @@ public class GrpcClientTest extends RpcClientTest {
             } else {
                 buffer.addAll(messages);
 
-                new Thread() { //since the server is blocking, we have to return the result but delay setting back the isProcessingAtomic flag to indicate that it's busy
-                    public void run() {
-                        try {
-                            Thread.sleep((long) messages.size() * processingSpeedPerMessage);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        isProcessingAtomic.set(false);
+                //since the server is blocking, we have to return the result but delay setting back the isProcessingAtomic flag to indicate that it's busy
+                new Thread(() -> {
+                    try {
+                        Thread.sleep((long) messages.size() * processingSpeedPerMessage);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
-                }.start();
+                    isProcessingAtomic.set(false);
+                }).start();
 
                 responseObserver.onNext(Collector.MessageResult.newBuilder().setResult(Collector.ResultCode.OK).setArg("").build());
                 responseObserver.onCompleted();

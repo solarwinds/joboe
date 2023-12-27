@@ -120,6 +120,7 @@ public class EventImpl extends Event {
     /* (non-Javadoc)
      * @see com.tracelytics.joboe.Event#addInfo(java.lang.String, java.lang.Object)
      */
+    @Override
     public void addInfo(String key, Object value) {
         if (metadata.isSampled()) {
             insertToBsonBuilder(key, value);
@@ -129,6 +130,7 @@ public class EventImpl extends Event {
     /* (non-Javadoc)
      * @see com.tracelytics.joboe.Event#addInfo(java.util.Map)
      */
+    @Override
     public void addInfo(Map<String, ?> infoMap) {
         if (metadata.isSampled()) {
             for(Map.Entry<String, ?> entry : infoMap.entrySet()) {
@@ -140,6 +142,7 @@ public class EventImpl extends Event {
     /* (non-Javadoc)
      * @see com.tracelytics.joboe.Event#addInfo(java.lang.Object)
      */
+    @Override
     public void addInfo(Object... info) {
         if (metadata.isSampled()) {
             if (info.length % 2 == 1) {
@@ -179,6 +182,7 @@ public class EventImpl extends Event {
     /* (non-Javadoc)
      * @see com.tracelytics.joboe.Event#addEdge(com.tracelytics.joboe.Metadata)
      */
+    @Override
     public void addEdge(Metadata md) {
         if (metadata.isSampled() && md.isSampled() && metadata.isTaskEqual(md) && !edges.contains(md.opHexString())) {
             edges.add(md.opHexString());
@@ -188,6 +192,7 @@ public class EventImpl extends Event {
     /* (non-Javadoc)
      * @see com.tracelytics.joboe.Event#addEdge(java.lang.String)
      */
+    @Override
     public void addEdge(String hexstr) {
         try {
             addEdge(new Metadata(hexstr));
@@ -199,6 +204,7 @@ public class EventImpl extends Event {
     /* (non-Javadoc)
      * @see com.tracelytics.joboe.Event#setAsync()
      */
+    @Override
     public void setAsync() {
         this.isAsync = true;
     }
@@ -206,6 +212,7 @@ public class EventImpl extends Event {
     /* (non-Javadoc)
      * @see com.tracelytics.joboe.Event#report(com.tracelytics.joboe.EventReporter)
      */
+    @Override
     public void report(EventReporter reporter) {
         report(Context.getMetadata(), reporter);
     }
@@ -213,6 +220,7 @@ public class EventImpl extends Event {
     /* (non-Javadoc)
      * @see com.tracelytics.joboe.Event#report()
      */
+    @Override
     public void report()  {
         report(Context.getMetadata(), DEFAULT_REPORTER);
     }
@@ -220,6 +228,7 @@ public class EventImpl extends Event {
     /* (non-Javadoc)
      * @see com.tracelytics.joboe.Event#report(com.tracelytics.joboe.Metadata)
      */
+    @Override
     public void report(Metadata md) {
     	report(md, DEFAULT_REPORTER);
     }
@@ -227,6 +236,7 @@ public class EventImpl extends Event {
     /* (non-Javadoc)
      * @see com.tracelytics.joboe.Event#report(com.tracelytics.joboe.Metadata, com.tracelytics.joboe.EventReporter)
      */
+    @Override
     public void report(Metadata contextMetadata, EventReporter reporter) {
         if (reporter == null) {
             return;
@@ -285,6 +295,7 @@ public class EventImpl extends Event {
     /* (non-Javadoc)
      * @see com.tracelytics.joboe.Event#toBytes()
      */
+    @Override
     public byte[] toBytes() throws BsonBufferException {
         BsonDocument doc = bsonBuilder.build();
         BsonWriter writer = BsonToken.DOCUMENT.writer();
@@ -334,6 +345,7 @@ public class EventImpl extends Event {
     /* (non-Javadoc)
      * @see com.tracelytics.joboe.Event#toByteBuffer()
      */
+    @Override
     public ByteBuffer toByteBuffer() throws BsonBufferException {
         return ByteBuffer.wrap(toBytes());
     }
@@ -588,6 +600,7 @@ public class EventImpl extends Event {
     /* (non-Javadoc)
      * @see com.tracelytics.joboe.Event#setTimestamp(long)
      */
+    @Override
     public void setTimestamp(long timestamp) {
         this.timestamp  = timestamp;
     }

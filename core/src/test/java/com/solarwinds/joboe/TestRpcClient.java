@@ -38,32 +38,38 @@ public class TestRpcClient implements Client {
         settingsResult = new SettingsResult(resultCode, "", "", Collections.emptyList());
     }
 
+    @Override
     public Future<Result> postEvents(List<Event> events, Callback<Result> callback) {
         sleep();
         postedEvents.addAll(events);
         return CompletableFuture.completedFuture(stringResult);
     }
 
+    @Override
     public Future<Result> postMetrics(List<Map<String, Object>> messages, Callback<Result> callback) {
         sleep();
         postedMetrics.addAll(messages);
         return CompletableFuture.completedFuture(stringResult);
     }
 
+    @Override
     public Future<Result> postStatus(List<Map<String, Object>> messages, Callback<Result> callback) {
         sleep();
         postedStatus.addAll(messages);
         return CompletableFuture.completedFuture(stringResult);
     }
 
+    @Override
     public Future<SettingsResult> getSettings(String version, Callback<SettingsResult> callback) {
         sleep();
         return CompletableFuture.completedFuture(settingsResult);
     }
     
+    @Override
     public void close() {
     }
     
+    @Override
     public Status getStatus() {
         return Status.OK;
     }

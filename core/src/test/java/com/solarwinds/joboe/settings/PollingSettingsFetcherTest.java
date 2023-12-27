@@ -250,6 +250,7 @@ public class PollingSettingsFetcherTest {
     
     private static class TestSettingsListener implements SettingsListener {
         private Settings settingsRetrieved;
+        @Override
         public void onSettingsRetrieved(Settings newSettings) {
             settingsRetrieved = newSettings;
         }
@@ -279,14 +280,17 @@ public class PollingSettingsFetcherTest {
             this.settings = settings;
         }
         
+        @Override
         public final Future<Result> postEvents(List<Event> events, Callback<Result> callback) throws ClientException {
             return null; //not used
         }
 
+        @Override
         public final Future<Result> postMetrics(List<Map<String, Object>> messages, Callback<Result> callback) throws ClientException {
             return null; //not used
         }
 
+        @Override
         public final Future<Result> postStatus(List<Map<String, Object>> messages, Callback<Result> callback) throws ClientException {
             return null; //not used
         }
@@ -312,19 +316,20 @@ public class PollingSettingsFetcherTest {
             super(settings);
         }
 
+        @Override
         public Future<SettingsResult> getSettings(String version, Callback<SettingsResult> callback) throws ClientException {
-            return service.submit(new Callable<SettingsResult>() {
-                public SettingsResult call() throws Exception {
-                    //need to create deep clone for each buffer args
-                    return new SettingsResult(ResultCode.OK, "", "", getClonedSettings());
-                }
+            return service.submit(() -> {
+                //need to create deep clone for each buffer args
+                return new SettingsResult(ResultCode.OK, "", "", getClonedSettings());
             });
         }
         
+        @Override
         public void close() {
             service.shutdown();
         }
         
+        @Override
         public Status getStatus() {
             return Status.OK;
         }
@@ -338,29 +343,24 @@ public class PollingSettingsFetcherTest {
             super(settings);
         }
 
+        @Override
         public Future<SettingsResult> getSettings(String version, Callback<SettingsResult> callback) {
             if (!hasHit) {
                 hasHit = true; //hit once! next one should return exception
-                return service.submit(new Callable<SettingsResult>() {
-                    public SettingsResult call() throws Exception {
-                        return new SettingsResult(ResultCode.OK, "", "", getClonedSettings());
-                    }
-                    
-                });
+                return service.submit(() -> new SettingsResult(ResultCode.OK, "", "", getClonedSettings()));
             } else {
-                return service.submit(new Callable<SettingsResult>() {
-                    public SettingsResult call() throws Exception {
-                        throw new RuntimeException("Testing exception");
-                    }
-                    
+                return service.submit(() -> {
+                    throw new RuntimeException("Testing exception");
                 });
             }
         }
 
+        @Override
         public void close() {
             service.shutdown();
         }
         
+        @Override
         public Status getStatus() {
             return Status.OK;
         }
@@ -373,22 +373,23 @@ public class PollingSettingsFetcherTest {
             super(null);
         }
 
+        @Override
         public Future<SettingsResult> getSettings(String version, Callback<SettingsResult> callback) {
             return getExecutionException();
         }
         
         private Future<SettingsResult> getExecutionException() { //could have used CompletableFuture but it's jdk 8...
-           return service.submit(new Callable<SettingsResult>() {
-               public SettingsResult call() throws Exception {
-                   throw new Exception("test");
-               }
+           return service.submit(() -> {
+               throw new Exception("test");
            });
         }
 
+        @Override
         public void close() {
             service.shutdown();
         }
         
+        @Override
         public Status getStatus() {
             return Status.OK;
         }

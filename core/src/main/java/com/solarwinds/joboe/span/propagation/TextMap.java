@@ -36,6 +36,7 @@ public interface TextMap extends Iterable<Map.Entry<String, String>> {
      * @see Format.Builtin#TEXT_MAP
      * @see Format.Builtin#HTTP_HEADERS
      */
+    @Override
     Iterator<Map.Entry<String,String>> iterator();
 
     /**

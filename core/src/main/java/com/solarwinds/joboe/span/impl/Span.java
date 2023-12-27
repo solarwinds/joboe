@@ -64,11 +64,13 @@ public class Span implements com.solarwinds.joboe.span.Span {
         }
     }
 
+    @Override
     public Span setOperationName(String operationName) {
         this.operationName = operationName;
         return this;
     }
 
+    @Override
     public Span setBaggageItem(String key, String value) {
         synchronized(this) {
             this.context = this.context.withBaggageItem(key, value);
@@ -76,6 +78,7 @@ public class Span implements com.solarwinds.joboe.span.Span {
         }
     }
 
+    @Override
     public String getBaggageItem(String key) {
         synchronized(this) {
             return this.context.getBaggageItem(key);
@@ -87,6 +90,7 @@ public class Span implements com.solarwinds.joboe.span.Span {
         return context.contextAsString() + " - " + operationName;
     }
 
+    @Override
     public SpanContext context() {
         // doesn't need to be a copy since all fields are final
         return context;
@@ -98,10 +102,12 @@ public class Span implements com.solarwinds.joboe.span.Span {
         }
     }
 
+    @Override
     public void finish() {
         finish(TimeUtils.getTimestampMicroSeconds());
     }
 
+    @Override
     public void finish(long finishMicros) {
         if (isRoot()) {
             //set TRANSACTION_NAME, this is a bit specific but is probably ok for now as Span is our own specific impl (vs ISpan)
@@ -129,14 +135,17 @@ public class Span implements com.solarwinds.joboe.span.Span {
         }
     }
 
+    @Override
     public Span setTag(String key, String value) {
       return setTagAsObject(key, value);
     }
 
+    @Override
     public Span setTag(String key, boolean value) {
       return setTagAsObject(key, value);
     }
 
+    @Override
     public Span setTag(String key, Number value) {
       return setTagAsObject(key, value);
     }
@@ -239,20 +248,24 @@ public class Span implements com.solarwinds.joboe.span.Span {
         return this;
     }
     
+    @Override
     public Span log(long timestampMicroseconds, Map<String, ?> fields) {
         log(timestampMicroseconds, new LogEntry(timestampMicroseconds, fields));
         
         return this;
     }
     
+    @Override
     public Span log(Map<String, ?> fields) {
         return log(TimeUtils.getTimestampMicroSeconds(), fields);
     }
 
+    @Override
     public Span log(String event) {
         return log(Collections.singletonMap("event", event));
     }
 
+    @Override
     public Span log(long timestampMicroseconds, String event) {
         return log(timestampMicroseconds, Collections.singletonMap("event", event));
     }
@@ -325,10 +338,7 @@ public class Span implements com.solarwinds.joboe.span.Span {
 //        };
         public static final SpanProperty<Boolean> IS_PROFILE = new SpanProperty<Boolean>(false);
         public static final SpanProperty<Boolean> IS_ASYNC = new SpanProperty<Boolean>(false);
-        public static final SpanProperty<AtomicInteger> PROFILE_SPAN_COUNT = new SpanProperty<AtomicInteger>(new Producer<AtomicInteger>() { 
-            public AtomicInteger produce() { 
-                return new AtomicInteger(0); 
-            }});
+        public static final SpanProperty<AtomicInteger> PROFILE_SPAN_COUNT = new SpanProperty<AtomicInteger>(() -> new AtomicInteger(0));
         
         public static final SpanProperty<Set<String>> CHILD_EDGES = new SpanProperty<Set<String>>();
         public static final SpanProperty<Set<String>> REPORTED_TAG_KEYS = new SpanProperty<Set<String>>();

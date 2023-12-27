@@ -40,6 +40,7 @@ public class RpcSettingsReader implements SettingsReader {
     /* (non-Javadoc)
      * @see com.tracelytics.joboe.SettingsReader#getLayerSampleRate(java.lang.String)
      */
+    @Override
     public Map<String, Settings> getSettings() throws OboeSettingsException {
         SettingsResult result;
         try {
@@ -59,6 +60,7 @@ public class RpcSettingsReader implements SettingsReader {
         }
     }
 
+    @Override
     public void close() {
         if (rpcClient != null) {
             rpcClient.close();
