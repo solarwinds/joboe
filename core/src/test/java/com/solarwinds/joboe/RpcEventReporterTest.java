@@ -215,7 +215,6 @@ public class RpcEventReporterTest {
         
         
         //simulate a flush interval change
-        SimpleSettingsFetcher fetcher = (SimpleSettingsFetcher) SettingsManager.getFetcher();
         testSettingsReader.put(new SettingsMockupBuilder().withFlags(TracingMode.ALWAYS).withSampleRate(TraceDecisionUtil.SAMPLE_RESOLUTION).withSettingsArg(SettingsArg.EVENTS_FLUSH_INTERVAL, 3).build());  //every 3 secs
         
         for (int i = 0 ; i < eventCount; i ++) { //sending more, and it should be ok
@@ -240,7 +239,6 @@ public class RpcEventReporterTest {
         RpcEventReporter rpcReporter = new RpcEventReporter(rpcClient);
         
         //simulate a flush interval change
-        SimpleSettingsFetcher fetcher = (SimpleSettingsFetcher) SettingsManager.getFetcher();
         testSettingsReader.put(new SettingsMockupBuilder().withFlags(TracingMode.ALWAYS).withSampleRate(TraceDecisionUtil.SAMPLE_RESOLUTION).withSettingsArg(SettingsArg.EVENTS_FLUSH_INTERVAL, 10).build());  //long flush interval
         
         Event event = Context.createEvent();

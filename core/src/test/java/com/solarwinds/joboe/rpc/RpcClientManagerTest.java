@@ -15,8 +15,6 @@ public class RpcClientManagerTest {
 
     @Test
     public void testValidEnvironmentVariables() throws Exception {
-        Map<String, String> testEnv = new HashMap<String, String>();
-        
         RpcClientManager.init("unit-test-collector1:1234", TEST_SERVER_CERT_LOCATION);
         
         //verify the fields

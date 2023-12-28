@@ -74,7 +74,7 @@ public class GrpcClientTest extends RpcClientTest {
     public void testExhaustedServer() throws Exception {
         System.out.println("running testExhaustedServer");
         int exhaustedServerPort = locateAvailablePort();
-        TestCollector exhaustedServer = startExhaustedServer(exhaustedServerPort);
+        startExhaustedServer(exhaustedServerPort);
         Client client = null;
 
         try {
@@ -152,7 +152,7 @@ public class GrpcClientTest extends RpcClientTest {
             this.server = builder.build();
             this.service = service;
             server.start();
-            System.out.println("Grpc collector started at " + port + " with service " + service);
+            System.out.println("Grpc collector started at " + port + " with service GrpcCollectorService");
         }
 
         @Override

@@ -34,6 +34,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
 public abstract class RpcClientTest {
@@ -319,7 +320,7 @@ public abstract class RpcClientTest {
         int softDisabledServerPort = locateAvailablePort();
 
         String warning = "Test warning";
-        TestCollector softDisabledServer = startSoftDisabledTestCollector(softDisabledServerPort, warning);
+        startSoftDisabledTestCollector(softDisabledServerPort, warning);
         try {
             client = new RpcClient(TEST_SERVER_HOST, softDisabledServerPort, TEST_CLIENT_ID, getProtocolClientFactory(new File(getServerPublicKeyLocation()).toURI().toURL()));
 
@@ -764,9 +765,7 @@ public abstract class RpcClientTest {
         try {
             client = new RpcClient(TEST_SERVER_HOST, errorServerPort, TEST_CLIENT_ID, QUICK_RETRY, getProtocolClientFactory(new File(getServerPublicKeyLocation()).toURI().toURL()));
 
-            List<Future<Result>> futures = new ArrayList<Future<Result>>();
-            List<Event> sentEvents = new ArrayList<Event>();
-            Result result = client.postEvents(TEST_EVENTS, null).get();//will fail and give up base on QUICK_RETRY
+            client.postEvents(TEST_EVENTS, null).get();//will fail and give up base on QUICK_RETRY
 
             fail("Expect exception because of retry failures, but it's not thrown!");
         } catch (ExecutionException e) {
@@ -794,28 +793,12 @@ public abstract class RpcClientTest {
         int biasedServerPort = locateAvailablePort();
 
         TestCollector basiedServer = startBiasedTestCollector(biasedServerPort, Collections.singletonMap(TaskType.POST_METRICS, ResultCode.TRY_LATER));
-        Client client = null;
+        Client client =  new RpcClient(TEST_SERVER_HOST, biasedServerPort, TEST_CLIENT_ID, getProtocolClientFactory(new File(getServerPublicKeyLocation()).toURI().toURL()));
+        assertThrows(TimeoutException.class, () -> client.postMetrics(new ArrayList<Map<String,Object>>(), null).get(5, TimeUnit.SECONDS),"Not expecting to return any result for this call!"); //this is supposed to get held up because of TRY_LAYER)
 
-        try {
-            client = new RpcClient(TEST_SERVER_HOST, biasedServerPort, TEST_CLIENT_ID, getProtocolClientFactory(new File(getServerPublicKeyLocation()).toURI().toURL()));
-
-            List<Future<Result>> futures = new ArrayList<Future<Result>>();
-
-            try {
-                Result result = client.postMetrics(new ArrayList<Map<String,Object>>(), null).get(5, TimeUnit.SECONDS); //this is supposed to get held up because of TRY_LAYER
-                fail("Not expecting to return any result for this call!");
-            } catch (TimeoutException e) {
-                //expected
-            }
-
-            assertEquals(com.solarwinds.joboe.rpc.ResultCode.OK, client.getSettings("", null).get().getResultCode()); //this should be successful
-
-        } finally {
-            if (client != null) {
-                client.close();
-            }
-            basiedServer.stop();
-        }
+        assertEquals(com.solarwinds.joboe.rpc.ResultCode.OK, client.getSettings("", null).get().getResultCode()); //this should be successful
+        client.close();
+        basiedServer.stop();
 
     }
 

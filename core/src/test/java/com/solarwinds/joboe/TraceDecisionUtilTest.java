@@ -733,10 +733,6 @@ public class TraceDecisionUtilTest {
         return new AbstractMap.SimpleEntry<String, Object>(key, value);
     }
 
-    private static class MatchAllUrlConfig {
-
-    }
-
     private TraceConfigs buildUrlConfigs(ResourceMatcher matcher, TracingMode tracingMode, Integer sampleRate) {
         Map<ResourceMatcher, TraceConfig> result = new LinkedHashMap<ResourceMatcher, TraceConfig>();
         TraceConfig traceConfig = buildTraceConfig(tracingMode, sampleRate);

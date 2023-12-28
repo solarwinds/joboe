@@ -108,9 +108,6 @@ public class ContextTest {
         Context.setSkipInheritingContext(false);
 
         assertFalse(thread.threadContext.isValid()); //no context inherited
-        
-        //test remote config changes
-        SimpleSettingsFetcher fetcher = (SimpleSettingsFetcher) SettingsManager.getFetcher();
         //disable inherit context
         testSettingsReader.put(new SettingsMockupBuilder().withFlags(TracingMode.ALWAYS).withSampleRate(TraceDecisionUtil.SAMPLE_RESOLUTION).withSettingsArg(SettingsArg.DISABLE_INHERIT_CONTEXT, true).build());
         thread = new TestThread();
@@ -142,7 +139,6 @@ public class ContextTest {
         Context.clearMetadata(); //this triggers creation of new metadata
         Context.getMetadata().randomize(); //make it a valid context
         int newTtl = 2;
-        SimpleSettingsFetcher fetcher = (SimpleSettingsFetcher) SettingsManager.getFetcher();
         //set to 2 secs
         testSettingsReader.put(new SettingsMockupBuilder().withFlags(TracingMode.ALWAYS).withSampleRate(TraceDecisionUtil.SAMPLE_RESOLUTION).withSettingsArg(SettingsArg.MAX_CONTEXT_AGE, newTtl).build());
         
@@ -183,7 +179,6 @@ public class ContextTest {
         Context.clearMetadata(); //this triggers creation of new metadata
         Context.getMetadata().randomize(true); //make it a valid context
         int newMaxEvent = 10;
-        SimpleSettingsFetcher fetcher = (SimpleSettingsFetcher) SettingsManager.getFetcher();
         testSettingsReader.put(new SettingsMockupBuilder().withFlags(TracingMode.ALWAYS).withSampleRate(TraceDecisionUtil.SAMPLE_RESOLUTION).withSettingsArg(SettingsArg.MAX_CONTEXT_EVENTS, newMaxEvent).build());
         
         for (int i = 0; i < newMaxEvent; i ++) {
@@ -208,8 +203,6 @@ public class ContextTest {
         Context.getMetadata().randomize(true); //make it a valid context
         
         ExecutorService threadPool = Executors.newCachedThreadPool();
-        
-        final AtomicInteger collectedEventsCount = new AtomicInteger();
         
         for (int i = 0; i < newMaxEvent + 50; i ++) {
             threadPool.submit(() -> {
@@ -244,7 +237,6 @@ public class ContextTest {
         Context.clearMetadata(); //this triggers creation of new metadata
         Context.getMetadata().randomize(true); //make it a valid context
         int newBacktraces = 10;
-        SimpleSettingsFetcher fetcher = (SimpleSettingsFetcher) SettingsManager.getFetcher();
         testSettingsReader.put(new SettingsMockupBuilder().withFlags(TracingMode.ALWAYS).withSampleRate(TraceDecisionUtil.SAMPLE_RESOLUTION).withSettingsArg(SettingsArg.MAX_CONTEXT_BACKTRACES, newBacktraces).build());
         
         for (int i = 0; i < newBacktraces; i ++) {

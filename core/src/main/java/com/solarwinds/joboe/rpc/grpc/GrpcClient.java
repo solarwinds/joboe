@@ -140,7 +140,7 @@ public class GrpcClient implements ProtocolClient {
         for (List<ByteString> itemsAsByteString : itemsByCalls) {
             Collector.HostID hostId = hostIdManager.getHostID();
             Collector.MessageRequest.Builder builder = Collector.MessageRequest.newBuilder().setApiKey(serviceKey).setIdentity(hostId).setEncoding(Collector.EncodingType.BSON);
-            logger.debug(postAction.getDescription() + " " + itemsAsByteString.size() + " item(s) using gRPC client " + GrpcClient.this + ", hostId=" + hostId);
+            logger.debug(postAction.getDescription() + " " + itemsAsByteString.size() + " item(s) using gRPC client hostId=" + hostId);
             try {
                 builder.addAllMessages(itemsAsByteString);
                 resultMessage = postAction.post(client.withDeadlineAfter(deadlineSeconds, TimeUnit.SECONDS), builder.build());

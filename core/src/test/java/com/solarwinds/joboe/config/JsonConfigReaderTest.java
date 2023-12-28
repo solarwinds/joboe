@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class JsonConfigReaderTest {
     @Test
     public void testValidRead() throws InvalidConfigException {
-        JsonConfigReader reader = new JsonConfigReader(getClass().getResourceAsStream("valid.json"));
+        JsonConfigReader reader = new JsonConfigReader(JsonConfigReaderTest.class.getResourceAsStream("valid.json"));
         ConfigContainer container = new ConfigContainer();
         reader.read(container);
 

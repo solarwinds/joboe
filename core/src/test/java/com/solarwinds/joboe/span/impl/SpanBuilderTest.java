@@ -207,7 +207,7 @@ public class SpanBuilderTest {
         assertFalse(Context.getMetadata().isValid()); //TLS context should also be cleared
         
         
-        Span span3 = tracer.buildSpan("span3").withReporters(TraceEventSpanReporter.REPORTER).withSpanProperty(SpanProperty.TRACE_DECISION_PARAMETERS, TRACE_DECISION_PARAMS).startManual();
+        Span span3 = tracer.buildSpan("span3").withReporters(TraceEventSpanReporter.REPORTER).withSpanProperty(SpanProperty.TRACE_DECISION_PARAMETERS, TRACE_DECISION_PARAMS).start();
         spanMetadata = span3.context().getMetadata();
         assertTrue(spanMetadata.isValid()); 
         assertTrue(spanMetadata.isSampled());
@@ -421,7 +421,6 @@ public class SpanBuilderTest {
     @Test
     public void testContextTtl() throws InterruptedException {
         int newTtl = 2;
-        SimpleSettingsFetcher fetcher = (SimpleSettingsFetcher) SettingsManager.getFetcher();
         //set to 2 secs
         testSettingsReader.put(new SettingsMockupBuilder().withFlags(TracingMode.ALWAYS).withSampleRate(TraceDecisionUtil.SAMPLE_RESOLUTION).withSettingsArg(SettingsArg.MAX_CONTEXT_AGE, newTtl).build());
 

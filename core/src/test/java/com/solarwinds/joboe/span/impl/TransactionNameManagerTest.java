@@ -66,7 +66,6 @@ public class TransactionNameManagerTest {
         span.finish();
         
         //simulate a limit change (higher)
-        SimpleSettingsFetcher fetcher = (SimpleSettingsFetcher) SettingsManager.getFetcher();
         testSettingsReader.put(new SettingsMockupBuilder().withFlags(TracingMode.ALWAYS).withSampleRate(TraceDecisionUtil.SAMPLE_RESOLUTION).withSettingsArg(SettingsArg.MAX_TRANSACTIONS, TransactionNameManager.DEFAULT_MAX_NAME_COUNT + 1).build());
         
         //now it should be okay to add this name

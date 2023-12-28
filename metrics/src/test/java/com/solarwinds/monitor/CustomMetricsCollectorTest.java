@@ -131,7 +131,6 @@ public class CustomMetricsCollectorTest {
         assertFalse(entriesByMetricsKey.containsKey(new MetricKey("test" + CustomMetricsCollector.limit, null))); //not exist as the entry should be dropped due to limit
         
         //simulate a limit change (lower)
-        SimpleSettingsFetcher fetcher = (SimpleSettingsFetcher) SettingsManager.getFetcher();
         testSettingsReader.put(new SettingsMockupBuilder().withFlags(TracingMode.ALWAYS).withSampleRate(TraceDecisionUtil.SAMPLE_RESOLUTION).withSettingsArg(SettingsArg.MAX_CUSTOM_METRICS, 1).build());
         CustomMetricsCollector.INSTANCE.recordIncrementMetrics("test-1", 1, null); //ok
         CustomMetricsCollector.INSTANCE.recordIncrementMetrics("test-2", 1, null); //not ok, limit exceeded

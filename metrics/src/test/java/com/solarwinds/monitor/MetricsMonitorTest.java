@@ -43,7 +43,6 @@ public class MetricsMonitorTest {
 	    assertEquals(defaultInterval, monitor.getInterval()); //no updates
 	    
 	    //simulate an update on metrics flush interval
-	    SimpleSettingsFetcher fetcher = (SimpleSettingsFetcher) SettingsManager.getFetcher();
 	    //every 10 secs, valid
 	    testSettingsReader.put(new SettingsMockupBuilder().withFlags(TracingMode.ALWAYS).withSampleRate(TraceDecisionUtil.SAMPLE_RESOLUTION).withSettingsArg(SettingsArg.METRIC_FLUSH_INTERVAL, 10).build());
 	    assertEquals(10 * 1000, monitor.getInterval()); //should update to new metrics flush interval in millisec

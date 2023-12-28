@@ -104,7 +104,6 @@ public class MetadataTest {
         assertEquals(Metadata.DEFAULT_TTL, Metadata.getTtl());
         
         int newTtl = 10;
-        SimpleSettingsFetcher fetcher = (SimpleSettingsFetcher) SettingsManager.getFetcher();
         testSettingsReader.put(new SettingsMockupBuilder().withFlags(TracingMode.ALWAYS).withSampleRate(TraceDecisionUtil.SAMPLE_RESOLUTION).withSettingsArg(SettingsArg.MAX_CONTEXT_AGE, newTtl).build());
         
         assertEquals(newTtl * 1000, Metadata.getTtl());  //sec to millisec
@@ -120,7 +119,6 @@ public class MetadataTest {
         assertEquals(Metadata.DEFAULT_MAX_EVENTS, Metadata.getMaxEvents());
         
         int newMaxEvents = 100;
-        SimpleSettingsFetcher fetcher = (SimpleSettingsFetcher) SettingsManager.getFetcher();
         testSettingsReader.put(new SettingsMockupBuilder().withFlags(TracingMode.ALWAYS).withSampleRate(TraceDecisionUtil.SAMPLE_RESOLUTION).withSettingsArg(SettingsArg.MAX_CONTEXT_EVENTS, newMaxEvents).build());
         
         assertEquals(newMaxEvents, Metadata.getMaxEvents());
@@ -137,7 +135,6 @@ public class MetadataTest {
         assertEquals(Metadata.DEFAULT_MAX_BACKTRACES, Metadata.getMaxBacktraces());
         
         int newMaxBacktraces = 100;
-        SimpleSettingsFetcher fetcher = (SimpleSettingsFetcher) SettingsManager.getFetcher();
         testSettingsReader.put(new SettingsMockupBuilder().withFlags(TracingMode.ALWAYS).withSampleRate(TraceDecisionUtil.SAMPLE_RESOLUTION).withSettingsArg(SettingsArg.MAX_CONTEXT_BACKTRACES, newMaxBacktraces).build());
         
         assertEquals(newMaxBacktraces, Metadata.getMaxBacktraces());

@@ -115,13 +115,6 @@ public class SslUtils {
 
     public static SSLContext getSslContext(URL serverCertLocation, String explicitHostCheck) throws IOException, GeneralSecurityException {
 
-        //start local key store => so the collector knows that this client is safe to talk with
-        //        KeyStore clientKeyStore = KeyStore.getInstance("bks");
-        //        clientKeyStore.load(classLoader.getResourceAsStream("META-INF/client.bks"), "labrat1214".toCharArray());
-        //
-        //        KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-        //        keyManagerFactory.init(clientKeyStore, "labrat1214".toCharArray());
-
         // Create an SSLContext that uses our TrustManager
         TrustManagerFactory factory = getTrustManagerFactory(serverCertLocation);
         //SSLContext context = getSSLContext(factory.getTrustManagers());
@@ -130,12 +123,7 @@ public class SslUtils {
             managers = explicitHostCheckManager(managers, explicitHostCheck);
         }
 
-        SSLContext context = getSSLContext(managers);
-
-        //context.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(), null);
-
-
-        return context;
+        return getSslContext(managers);
     }
 
     /**
@@ -144,7 +132,7 @@ public class SslUtils {
      * @return  SSLContext that prefers protocol version higher than TLSv1
      * @throws GeneralSecurityException
      */
-    private static SSLContext getSSLContext(TrustManager[] trustManagers) throws GeneralSecurityException {
+    private static SSLContext getSslContext(TrustManager[] trustManagers) throws GeneralSecurityException {
         SSLContext context = SSLContext.getInstance("TLS");
         context.init(null, trustManagers, null);
 
@@ -179,14 +167,8 @@ public class SslUtils {
     private static boolean isDefaultTLSv1(SSLContext context) {
         List<String> enabledProtocols = new ArrayList<String>(Arrays.asList(context.getDefaultSSLParameters().getProtocols())); //the list has to be mutable
 
-        Iterator<String> iterator = enabledProtocols.iterator();
-        while (iterator.hasNext()) { //need to filter out protocols such as SSLv2Hello, SSLv3 etc
-            String protocol = iterator.next();
-            if (!protocol.startsWith("TLSv")) {
-                iterator.remove();
-            }
-        }
-
+        //need to filter out protocols such as SSLv2Hello, SSLv3 etc
+        enabledProtocols.removeIf(protocol -> !protocol.startsWith("TLSv"));
         return enabledProtocols.size() == 1 && "TLSv1".equals(enabledProtocols.get(0));
     }
 }

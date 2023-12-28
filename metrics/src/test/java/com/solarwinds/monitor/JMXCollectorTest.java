@@ -4,16 +4,43 @@ import com.solarwinds.joboe.config.ConfigContainer;
 import com.solarwinds.joboe.config.ConfigProperty;
 import com.solarwinds.joboe.config.InvalidConfigException;
 import com.solarwinds.metrics.MetricKey;
-import com.solarwinds.monitor.JMXCollector;
 import org.junit.jupiter.api.Test;
 
-import javax.management.*;
+import javax.management.Attribute;
+import javax.management.AttributeList;
+import javax.management.AttributeNotFoundException;
+import javax.management.InstanceAlreadyExistsException;
+import javax.management.InstanceNotFoundException;
+import javax.management.IntrospectionException;
+import javax.management.InvalidAttributeValueException;
+import javax.management.ListenerNotFoundException;
+import javax.management.MBeanAttributeInfo;
+import javax.management.MBeanException;
+import javax.management.MBeanInfo;
+import javax.management.MBeanRegistrationException;
+import javax.management.MBeanServer;
+import javax.management.NotCompliantMBeanException;
+import javax.management.NotificationFilter;
+import javax.management.NotificationListener;
+import javax.management.ObjectInstance;
+import javax.management.ObjectName;
+import javax.management.OperationsException;
+import javax.management.QueryExp;
+import javax.management.ReflectionException;
 import javax.management.loading.ClassLoaderRepository;
 import java.io.ObjectInputStream;
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class JMXCollectorTest {
     /**
@@ -79,12 +106,7 @@ public class JMXCollectorTest {
         configs.putByStringValue(ConfigProperty.MONITOR_JMX_MAX_ENTRY, "-1");
         configs.putByStringValue(ConfigProperty.MONITOR_JMX_SCOPES, "{\"java.lang:type=MemoryPool,*\":[\"Usage\"],\"java.lang:type=Memory\":[\"HeapMemoryUsage\",\"NonHeapMemoryUsage\"]}");
 
-        try {
-            JMXCollector collector = new JMXCollector(configs);
-            fail("Expect " + InvalidConfigException.class.getName());
-        } catch (InvalidConfigException e) {
-            //expected
-        }
+        assertThrows(InvalidConfigException.class, () -> new JMXCollector(configs));
     }
     
     /**
@@ -96,12 +118,7 @@ public class JMXCollectorTest {
         
         configs.putByStringValue(ConfigProperty.MONITOR_JMX_SCOPES, "{"); //invalid json format
 
-        try {
-            JMXCollector collector = new JMXCollector(configs);
-            fail("Expect " + InvalidConfigException.class.getName());
-        } catch (InvalidConfigException e) {
-            //expected
-        }
+        assertThrows(InvalidConfigException.class, () -> new JMXCollector(configs));
     }
     
     /**
@@ -111,20 +128,11 @@ public class JMXCollectorTest {
     @Test
     public void testCollectInformation1() throws InvalidConfigException {
         ConfigContainer configs = new ConfigContainer();
-        
-        //configs.putByStringValue(ConfigProperty.MONITOR_JMX_SCOPES, "java.lang:type=MemoryPool,name=PS Eden Space[Usage];java.lang:type=Memory[HeapMemoryUsage,NonHeapMemoryUsage]");
         configs.putByStringValue(ConfigProperty.MONITOR_JMX_SCOPES, "{\"java.lang:type=MemoryPool,*\":[\"Usage\"],\"java.lang:type=Memory\":[\"HeapMemoryUsage\",\"NonHeapMemoryUsage\"]}");
-        
-        
         JMXCollector collector = new JMXCollector(configs);
         
         try {
             Map<MetricKey, Number> information = collectAll(collector);
-            
-//            assertTrue(information.containsKey("JMX.java.lang:type=MemoryPool,name=PS_Eden_Space.Usage.committed"));
-//            assertFalse(information.containsKey("JMX.java.lang:type=MemoryPool,name=PS_Survivor_Space.Usage.committed"));
-//            assertTrue(information.containsKey("JMX.java.lang:type=Memory.NonHeapMemoryUsage.committed"));
-//            assertFalse(information.containsKey("JMX.java.lang:type=OperatingSystem.ProcessCpuLoad"));
             assertFalse(information.isEmpty()); //data returned could be different JVM from JVM and also newer jre 1.7 version seems to use different name of MemoryPoll (Eden Space VS PS Eden Space)
         } catch (Exception e) {
             e.printStackTrace();
@@ -136,13 +144,7 @@ public class JMXCollectorTest {
      */
     @Test
     public void testCollectInformation2() {
-        try {
-            JMXCollector collector = new JMXCollector(new ConfigContainer()); //test defaults
-            
-            fail("Except InvalidConfigException to be thrown. Empty scope is not allowed");
-        } catch (InvalidConfigException e) {
-            //expected
-        }
+        assertThrows(InvalidConfigException.class, () -> new JMXCollector(new ConfigContainer()), "Except InvalidConfigException to be thrown. Empty scope is not allowed");
     }
     
     /**

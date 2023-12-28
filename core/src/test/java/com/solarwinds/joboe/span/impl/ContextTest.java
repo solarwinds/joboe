@@ -80,7 +80,6 @@ public class ContextTest {
         assertEdge(span2EntryEvent, span2InfoEvent);
         
         Scope scope3 = startScope("span3");
-        Span span3 = scope3.span();
         DeserializedEvent span3EntryEvent = getLastSentEvent();
         assertEdge(span2InfoEvent, span3EntryEvent); //span 3 entry should point to the span 2 info event
         
@@ -110,7 +109,6 @@ public class ContextTest {
         span1.setTag("URL", "sibling-spans");
         
         Scope scope2 = startScope("span2");
-        Span span2 = scope2.span();
         DeserializedEvent span2EntryEvent = getLastSentEvent();
         assertEdge(span1EntryEvent, span2EntryEvent); //span 2 entry should point to the span 1 entry event
         
@@ -123,7 +121,6 @@ public class ContextTest {
         assertEdge(span1EntryEvent, span1InfoEvent);
         
         Scope scope3 = startScope("span3");
-        Span span3 = scope3.span();
         DeserializedEvent span3EntryEvent = getLastSentEvent();
         assertEdge(span1InfoEvent, span3EntryEvent); //span 3 entry should point to the span 1 info event
         
@@ -151,7 +148,6 @@ public class ContextTest {
         DeserializedEvent span1EntryEvent = getLastSentEvent();
         
         Scope scope = startScope("span2"); //a span nested below a legacy span
-        Span span = scope.span();
         DeserializedEvent span2EntryEvent = getLastSentEvent();
         assertEdge(span1EntryEvent, span2EntryEvent); //span 2 entry should point to the span 1 entry event
         
@@ -203,7 +199,6 @@ public class ContextTest {
         assertEdge(span1InfoEvent, span2EntryEvent); //span 2 entry should "inline" into active span 1, hence pointing at span 1's info event
         
         Scope scope3 = startTraceScope("span3");
-        Span span3 = scope3.span();
         DeserializedEvent span3EntryEvent = getLastSentEvent();
         assertEdge(span2EntryEvent, span3EntryEvent);
         
@@ -251,81 +246,73 @@ public class ContextTest {
         final List<Throwable> asyncErrors = Collections.synchronizedList(new ArrayList<Throwable>());
         
         
-        Thread thread1 = new Thread() {
-            @Override
-            public void run() {
+        Thread thread1 = new Thread(() -> {
+            try {
+                Scope scope2 = startScope("async-span2", true);
+                Span span2 = scope2.span();
+                DeserializedEvent span2EntryEvent = getLastSentEvent(threadLocalReporter);
+                assertEdge(span1InfoEvent, span2EntryEvent);
+
+                span2.log("test", 2);
+                DeserializedEvent span2InfoEvent = getLastSentEvent(threadLocalReporter);
+                assertEdge(span2EntryEvent, span2InfoEvent);
+
+                Scope scope4 = startScope("span4");
+                DeserializedEvent span4EntryEvent = getLastSentEvent(threadLocalReporter);
+                assertEdge(span2InfoEvent, span4EntryEvent);
+
                 try {
-                    Scope scope2 = startScope("async-span2", true);
-                    Span span2 = scope2.span();
-                    DeserializedEvent span2EntryEvent = getLastSentEvent(threadLocalReporter);
-                    assertEdge(span1InfoEvent, span2EntryEvent);
-                    
-                    span2.log("test", 2);
-                    DeserializedEvent span2InfoEvent = getLastSentEvent(threadLocalReporter);
-                    assertEdge(span2EntryEvent, span2InfoEvent);
-                    
-                    Scope scope4 = startScope("span4");
-                    Span span4 = scope4.span();
-                    DeserializedEvent span4EntryEvent = getLastSentEvent(threadLocalReporter);
-                    assertEdge(span2InfoEvent, span4EntryEvent);
-                    
-                    try {
-                        TimeUnit.SECONDS.sleep(1);
-                    } catch (InterruptedException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                    scope4.close();
-                    DeserializedEvent span4ExitEvent = getLastSentEvent(threadLocalReporter);
-                    assertEdge(span4EntryEvent, span4ExitEvent);
-                    
-                    scope2.close();
-                    DeserializedEvent span2ExitEvent = getLastSentEvent(threadLocalReporter);
-                    assertEdge(span4ExitEvent, span2ExitEvent);
-                    assertEdge(span2InfoEvent, span2ExitEvent);
-                } catch (Throwable e) {
-                    asyncErrors.add(e);
+                    TimeUnit.SECONDS.sleep(1);
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
                 }
+                scope4.close();
+                DeserializedEvent span4ExitEvent = getLastSentEvent(threadLocalReporter);
+                assertEdge(span4EntryEvent, span4ExitEvent);
+
+                scope2.close();
+                DeserializedEvent span2ExitEvent = getLastSentEvent(threadLocalReporter);
+                assertEdge(span4ExitEvent, span2ExitEvent);
+                assertEdge(span2InfoEvent, span2ExitEvent);
+            } catch (Throwable e) {
+                asyncErrors.add(e);
             }
-        };
+        });
         thread1.start();
         
-        Thread thread2 = new Thread() {
-            @Override
-            public void run() {
+        Thread thread2 = new Thread(() -> {
+            try {
+                Scope scope3 = startScope("async-span3", true);
+                Span span3 = scope3.span();
+                DeserializedEvent span3EntryEvent = getLastSentEvent(threadLocalReporter);
+                assertEdge(span1InfoEvent, span3EntryEvent);
+
+                span3.log("test", 3);
+                DeserializedEvent span3InfoEvent = getLastSentEvent(threadLocalReporter);
+                assertEdge(span3EntryEvent, span3InfoEvent);
+
+                Scope scope5 = startScope("span5");
+                DeserializedEvent span5EntryEvent = getLastSentEvent(threadLocalReporter);
+                assertEdge(span3InfoEvent, span5EntryEvent);
                 try {
-                    Scope scope3 = startScope("async-span3", true);
-                    Span span3 = scope3.span();
-                    DeserializedEvent span3EntryEvent = getLastSentEvent(threadLocalReporter);
-                    assertEdge(span1InfoEvent, span3EntryEvent);
-                    
-                    span3.log("test", 3);
-                    DeserializedEvent span3InfoEvent = getLastSentEvent(threadLocalReporter);
-                    assertEdge(span3EntryEvent, span3InfoEvent);
-                    
-                    Scope scope5 = startScope("span5");
-                    Span span5 = scope5.span();
-                    DeserializedEvent span5EntryEvent = getLastSentEvent(threadLocalReporter);
-                    assertEdge(span3InfoEvent, span5EntryEvent);
-                    try {
-                        TimeUnit.SECONDS.sleep(1);
-                    } catch (InterruptedException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                    scope5.close();
-                    DeserializedEvent span5ExitEvent = getLastSentEvent(threadLocalReporter);
-                    assertEdge(span5EntryEvent, span5ExitEvent);
-                    
-                    scope3.close();
-                    DeserializedEvent span3ExitEvent = getLastSentEvent(threadLocalReporter);
-                    assertEdge(span5ExitEvent, span3ExitEvent);
-                    assertEdge(span3InfoEvent, span3ExitEvent);
-                } catch (Throwable e) {
-                    asyncErrors.add(e);
+                    TimeUnit.SECONDS.sleep(1);
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
                 }
+                scope5.close();
+                DeserializedEvent span5ExitEvent = getLastSentEvent(threadLocalReporter);
+                assertEdge(span5EntryEvent, span5ExitEvent);
+
+                scope3.close();
+                DeserializedEvent span3ExitEvent = getLastSentEvent(threadLocalReporter);
+                assertEdge(span5ExitEvent, span3ExitEvent);
+                assertEdge(span3InfoEvent, span3ExitEvent);
+            } catch (Throwable e) {
+                asyncErrors.add(e);
             }
-        };
+        });
         
         thread2.start();
         
