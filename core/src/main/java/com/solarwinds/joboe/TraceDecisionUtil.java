@@ -10,6 +10,7 @@ import com.solarwinds.logging.Logger;
 import com.solarwinds.logging.LoggerFactory;
 import lombok.Getter;
 
+import javax.annotation.Nonnull;
 import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.List;
@@ -307,8 +308,8 @@ public class TraceDecisionUtil {
      * @param localConfig
      * @return
      */
-    static TraceConfig computeTraceConfig(TraceConfig remoteConfig, TraceConfig localConfig, boolean localTriggerTraceEnabled) {
-        boolean hasRemoteConfigOverride = remoteConfig != null && remoteConfig.hasOverrideFlag();
+    static TraceConfig computeTraceConfig(@Nonnull TraceConfig remoteConfig, TraceConfig localConfig, boolean localTriggerTraceEnabled) {
+        boolean hasRemoteConfigOverride = remoteConfig.hasOverrideFlag();
 
         //consider sample rate:
         TraceConfig sampleRateConfig;
@@ -326,9 +327,9 @@ public class TraceDecisionUtil {
         
         
         //consider tracing flags:
-        Short flags;
+        short flags;
         if (hasRemoteConfigOverride && localConfig.isFlagsConfigured()) { //get the Lower flags 
-            flags = (short) (remoteConfig.getFlags() & localConfig.getFlags()); 
+            flags = (short) (remoteConfig.getFlags() & localConfig.getFlags());
         } else if (localConfig.isFlagsConfigured()) {
             flags = localConfig.getFlags();
         } else {

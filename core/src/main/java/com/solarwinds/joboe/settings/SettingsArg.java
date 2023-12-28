@@ -179,8 +179,8 @@ public abstract class SettingsArg<T> {
         @Override
         public Boolean readValue(ByteBuffer byteBuffer) {
             try {
-                Integer value = byteBuffer.order(ByteOrder.LITTLE_ENDIAN).getInt();
-                return value != null ? value != 0 : null; //any non zero is considered as True
+                int value = byteBuffer.order(ByteOrder.LITTLE_ENDIAN).getInt();
+                return value != 0; //any non-zero is considered as True
             } catch (BufferUnderflowException e) {
                 logger.warn("Cannot find valid value for arg [" + key + "] from settings : " + e.getClass().getName());
                 return null;

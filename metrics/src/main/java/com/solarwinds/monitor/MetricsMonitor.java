@@ -28,7 +28,7 @@ public class MetricsMonitor extends SystemMonitorWithFrequency<MetricsCategory, 
         super(DEFAULT_TIME_UNIT, DEFAULT_FREQUENCY, metricsCollector, new MetricsReporter(RpcClientManager.getClient(OperationType.METRICS)));
         
         if (configs.containsProperty(ConfigProperty.MONITOR_METRICS_FLUSH_INTERVAL)) {
-            setInterval((Integer) configs.get(ConfigProperty.MONITOR_METRICS_FLUSH_INTERVAL) * 1000);
+            setInterval(((Long) configs.get(ConfigProperty.MONITOR_METRICS_FLUSH_INTERVAL)) * 1000);
         }
         
         SettingsManager.registerListener(new SettingsArgChangeListener<Integer>(SettingsArg.METRIC_FLUSH_INTERVAL) {

@@ -36,13 +36,8 @@ public class InvalidConfigException extends Exception {
         if (configProperty == null) {
             return super.getMessage();
         } else {
-            StringBuilder message = new StringBuilder("Found error in config. ");
-            if (configProperty != null) {
-                message.append("Config key: " + configProperty.name());
-            }
-
-            message.append(" " + super.getMessage());
-            return message.toString();
+            return "Found error in config. Config key: " + configProperty.name() +
+                    " " + super.getMessage();
         }
     }
 }

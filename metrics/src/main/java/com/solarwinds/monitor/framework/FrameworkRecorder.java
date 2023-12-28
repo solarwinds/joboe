@@ -71,19 +71,20 @@ public class FrameworkRecorder {
         try {
             sourceStream = sourceLocation.openStream();
             if (sourceStream != null) { //source stream could be null, for example file:/C:/apache-tomcat-9.0.30/webapps/test_jdbc_war/WEB-INF/classes/
-                JarInputStream jarInputStream = new JarInputStream(sourceStream);
-                logger.debug("Extracting framework info from cp entry " + sourceLocation);
-                Manifest manifest = jarInputStream.getManifest();
+                try (JarInputStream jarInputStream = new JarInputStream(sourceStream)) {
+                    logger.debug("Extracting framework info from cp entry " + sourceLocation);
+                    Manifest manifest = jarInputStream.getManifest();
 
-                if (manifest != null) {
-                    Attributes attributes = manifest.getMainAttributes();
-                    FrameworkInfo frameworkInfo = extractInfoFromAttributes(attributes);
-                    if (frameworkInfo != null) {
-                        logger.debug("Framework info extracted from [" + sourceLocation + "] : " + frameworkInfo);
-                    } else {
-                        logger.debug("No framework info extracted from [" + sourceLocation + "]");
+                    if (manifest != null) {
+                        Attributes attributes = manifest.getMainAttributes();
+                        FrameworkInfo frameworkInfo = extractInfoFromAttributes(attributes);
+                        if (frameworkInfo != null) {
+                            logger.debug("Framework info extracted from [" + sourceLocation + "] : " + frameworkInfo);
+                        } else {
+                            logger.debug("No framework info extracted from [" + sourceLocation + "]");
+                        }
+                        return frameworkInfo;
                     }
-                    return frameworkInfo;
                 }
             }
         } catch (IOException e) {

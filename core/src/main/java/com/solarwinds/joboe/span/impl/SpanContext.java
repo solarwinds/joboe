@@ -143,7 +143,7 @@ public class SpanContext implements com.solarwinds.joboe.span.SpanContext {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((baggage == null) ? 0 : baggage.hashCode());
+		result = prime * result + baggage.hashCode();
 		result = prime * result + flags;
 		result = prime * result + ((metadata == null) ? 0 : metadata.hashCode());
 		return result;
@@ -158,11 +158,8 @@ public class SpanContext implements com.solarwinds.joboe.span.SpanContext {
 		if (getClass() != obj.getClass())
 			return false;
 		SpanContext other = (SpanContext) obj;
-		if (baggage == null) {
-			if (other.baggage != null)
-				return false;
-		} else if (!baggage.equals(other.baggage))
-			return false;
+        if (!baggage.equals(other.baggage))
+            return false;
 		if (flags != other.flags)
 			return false;
 		if (metadata == null) {

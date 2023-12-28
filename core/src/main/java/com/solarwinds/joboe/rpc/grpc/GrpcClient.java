@@ -1,8 +1,6 @@
 package com.solarwinds.joboe.rpc.grpc;
 
 import com.google.protobuf.ByteString;
-import com.solarwinds.trace.ingestion.proto.Collector;
-import com.solarwinds.trace.ingestion.proto.TraceCollectorGrpc;
 import com.solarwinds.joboe.BsonBufferException;
 import com.solarwinds.joboe.Event;
 import com.solarwinds.joboe.HostId;
@@ -19,6 +17,8 @@ import com.solarwinds.joboe.rpc.ResultCode;
 import com.solarwinds.joboe.rpc.SettingsResult;
 import com.solarwinds.logging.Logger;
 import com.solarwinds.logging.LoggerFactory;
+import com.solarwinds.trace.ingestion.proto.Collector;
+import com.solarwinds.trace.ingestion.proto.TraceCollectorGrpc;
 import com.solarwinds.util.BsonUtils;
 import com.solarwinds.util.HostInfoUtils;
 import com.solarwinds.util.SslUtils;
@@ -153,7 +153,11 @@ public class GrpcClient implements ProtocolClient {
             }
         }
 
-        return new Result(resultMessage.getResult() != null ? ResultCode.valueOf(resultMessage.getResult().name()) : null, resultMessage.getArg(), resultMessage.getWarning());
+        if (resultMessage == null) {
+            return new Result(null, null, null);
+        }
+
+        return new Result(ResultCode.valueOf(resultMessage.getResult().name()), resultMessage.getArg(), resultMessage.getWarning());
     }
 
     interface Serializer<T> {

@@ -128,20 +128,19 @@ class MetricsReporter extends SystemReporter<MetricsCategory, List<? extends Met
             Map<String, String> trimmedTags = new HashMap<String, String>(); //AO metrics only support String value for now
             for (Entry<String, ?> tagEntry : metricsEntry.getTags().entrySet()) {
                 String trimmedKey = tagEntry.getKey().length() <= MAX_TAG_NAME_LENGTH ? tagEntry.getKey() : tagEntry.getKey().substring(0, MAX_TAG_NAME_LENGTH);
-                Object trimmedValue;
                 Object value = tagEntry.getValue();
                 if (value != null) {
+                    Object trimmedValue;
                     if (value instanceof String) {
                         String valueString = (String) value;
                         trimmedValue = valueString.length() <= MAX_TAG_VALUE_LENGTH ? valueString : valueString.substring(0, MAX_TAG_VALUE_LENGTH);
                     } else {
                         trimmedValue = value;
                     }
+                    trimmedTags.put(trimmedKey, trimmedValue.toString());
                 } else {
                     logger.warn("Unexpected null tag value for metrics [" + metricsEntry.getName() + "] with tag [" + tagEntry.getKey() + "]" );
-                    trimmedValue = null;
                 }
-                trimmedTags.put(trimmedKey, trimmedValue.toString());
             }
             extractedKeyValues.put("tags", trimmedTags);
         }

@@ -51,9 +51,10 @@ enum DefaultReader implements BsonReader {
     public Object checkedReadFrom(ByteBuffer buffer) {
       byte[] bytes = new byte[] {};
       byte[] read = new byte[] {BsonBytes.EOF};
-      while ((read[0] = buffer.get()) != BsonBytes.EOO)
+      while ((read[0] = buffer.get()) != BsonBytes.EOO) {
         bytes = Bytes.concat(bytes, read);
-        return new String(bytes, Charsets.UTF_8);
+      }
+      return new String(bytes, Charsets.UTF_8);
     }
   },
 

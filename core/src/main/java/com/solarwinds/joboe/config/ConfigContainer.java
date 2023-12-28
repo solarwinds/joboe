@@ -83,12 +83,10 @@ public class ConfigContainer {
         }
     }
     
-    public Object remove(ConfigProperty propertyKey) {  
-        if (configMaps != null) {
-            Map<ConfigProperty, Object> configs = configMaps.get(propertyKey.getGroup());
-            if (configs != null) {
-                return configs.remove(propertyKey);
-            }
+    public Object remove(ConfigProperty propertyKey) {
+        Map<ConfigProperty, Object> configs = configMaps.get(propertyKey.getGroup());
+        if (configs != null) {
+            return configs.remove(propertyKey);
         }
         return null;
     }

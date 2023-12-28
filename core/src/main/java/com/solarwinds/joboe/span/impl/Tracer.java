@@ -177,12 +177,10 @@ public class Tracer implements com.solarwinds.joboe.span.Tracer {
                     if (properties.containsKey(SpanProperty.TRACE_DECISION)) { //Sampling decision is already made
                         //TODO extract http headers still?
                         traceDecision = (TraceDecision) properties.get(SpanProperty.TRACE_DECISION);
-                    } else if (samplingParameters != null ){
+                    } else {
                         traceDecision = TraceDecisionUtil.shouldTraceRequest(operationName, xtrace, xTraceOptions,
                                 Collections.singletonList(samplingParameters.getResource()));
                         withSpanProperty(SpanProperty.TRACE_DECISION, traceDecision);
-                    } else { //not an expected trace entry point, and there's no parent span/valid context, hence it's an no-op, we should still create a span though
-                        traceDecision = null;
                     }
                     
                     if (traceDecision != null) {

@@ -19,7 +19,6 @@ import okhttp3.Response;
 import okhttp3.ResponseBody;
 import org.json.JSONException;
 
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -368,7 +367,9 @@ public class ServerHostInfoReader implements HostInfoReader, AzureInstanceIdRead
                 startHostIdChecker();
             } finally {
                 Context.setMetadata(existingMetdataContext); //set the existing context back
-                scopeContextSnapshot.restore();
+                if (scopeContextSnapshot != null) {
+                    scopeContextSnapshot.restore();
+                }
             }
         }
         return hostId;

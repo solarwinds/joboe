@@ -22,10 +22,9 @@ public abstract class SystemReporter<T, D> {
     
     /**
      * Reports data based on the input collectedData
-     * @param collectedData
-     * @param the interval for the collected data in millisec
-     * 
-     * @throws SystemReporterException
+     * @param collectedData data to report
+     * @param interval interval for the collected data in milliseconds
+     *
      */
     public abstract void reportData(Map<T, D> collectedData, long interval) throws SystemReporterException;
 

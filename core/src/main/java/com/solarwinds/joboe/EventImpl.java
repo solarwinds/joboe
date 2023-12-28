@@ -473,8 +473,7 @@ public class EventImpl extends Event {
     
     /**
      * Returns the estimate byte size of the object in bson. Take note that this only account for Bson object type
-     * @param object
-     * @return
+     * @param object to use for byte size estimate
      */
     private static int getBsonByteSize(Object object) {
         if (object instanceof String) { //if it's a String element check if it's too long
@@ -489,7 +488,7 @@ public class EventImpl extends Event {
             return Integer.SIZE / 8;
         } else if (object instanceof Long) {
             return Long.SIZE / 8;
-        } else if (object.getClass().isArray() ) {
+        } else if (object != null && object.getClass().isArray() ) {
             int size = 0;
             int length = Array.getLength(object);
             for (int i = 0; i < length; i++) {

@@ -21,7 +21,7 @@ public class JsonConfigReaderTest {
      */
     @Test
     public void testPartialRead() {
-        JsonConfigReader reader = new JsonConfigReader(getClass().getResourceAsStream("invalid.json"));
+        JsonConfigReader reader = new JsonConfigReader(JsonConfigReaderTest.class.getResourceAsStream("invalid.json"));
         ConfigContainer container = new ConfigContainer();
         try {
             reader.read(container);

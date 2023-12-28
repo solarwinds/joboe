@@ -1,14 +1,14 @@
 package com.solarwinds.joboe.settings;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import com.solarwinds.joboe.rpc.Client;
 import com.solarwinds.joboe.rpc.ClientLoggingCallback;
 import com.solarwinds.joboe.rpc.ResultCode;
 import com.solarwinds.joboe.rpc.SettingsResult;
 import com.solarwinds.logging.Logger;
 import com.solarwinds.logging.LoggerFactory;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Reads {@link Settings} from the source provided by the rpc {@link Client} specified during instantiation
@@ -25,10 +25,7 @@ public class RpcSettingsReader implements SettingsReader {
 
     /**
      *
-     * @param rpcClient
-     * @param hostname
-     * @param addresses
-     * @param uuid
+     * @param rpcClient client to use for retrieving settings
      *
      */
     RpcSettingsReader(Client rpcClient) {
