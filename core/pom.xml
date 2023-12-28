@@ -216,48 +216,48 @@
               <relocations>
                 <relocation>
                   <pattern>com.solarwinds.trace</pattern>
-                  <shadedPattern>com.solarwinds.shaded.trace</shadedPattern>
+                  <shadedPattern>com.solarwinds.joboe.shaded.trace</shadedPattern>
                 </relocation>
                 <relocation>
                   <pattern>android.annotation</pattern>
-                  <shadedPattern>com.solarwinds.shaded.android.annotation</shadedPattern>
+                  <shadedPattern>com.solarwinds.joboe.shaded.android.annotation</shadedPattern>
                 </relocation>
                 <relocation>
                   <pattern>javax.annotation</pattern>
-                  <shadedPattern>com.solarwinds.shaded.javax.annotation</shadedPattern>
+                  <shadedPattern>com.solarwinds.joboe.shaded.javax.annotation</shadedPattern>
                 </relocation>
                 <relocation>
                   <pattern>cloud</pattern>
-                  <shadedPattern>com.solarwinds.shaded.cloud</shadedPattern>
+                  <shadedPattern>com.solarwinds.joboe.shaded.cloud</shadedPattern>
                 </relocation>
                 <relocation>
                   <pattern>okhttp3</pattern>
-                  <shadedPattern>com.solarwinds.shaded.okhttp3</shadedPattern>
+                  <shadedPattern>com.solarwinds.joboe.shaded.okhttp3</shadedPattern>
                 </relocation>
                 <relocation>
                   <pattern>okio</pattern>
-                  <shadedPattern>com.solarwinds.shaded.okio</shadedPattern>
+                  <shadedPattern>com.solarwinds.joboe.shaded.okio</shadedPattern>
                 </relocation>
                 <relocation>
                   <pattern>kotlin</pattern>
-                  <shadedPattern>com.solarwinds.shaded.kotlin</shadedPattern>
+                  <shadedPattern>com.solarwinds.joboe.shaded.kotlin</shadedPattern>
                 </relocation>
                 <relocation>
                   <pattern>io</pattern>
-                  <shadedPattern>com.solarwinds.shaded.io</shadedPattern>
+                  <shadedPattern>com.solarwinds.joboe.shaded.io</shadedPattern>
                 </relocation>
                 <relocation>
                   <pattern>org</pattern>
-                  <shadedPattern>com.solarwinds.shaded.org</shadedPattern>
+                  <shadedPattern>com.solarwinds.joboe.shaded.org</shadedPattern>
                 </relocation>
                 <relocation>
                   <pattern>google</pattern>
-                  <shadedPattern>com.solarwinds.shaded.google2</shadedPattern>
+                  <shadedPattern>com.solarwinds.joboe.shaded.google2</shadedPattern>
                 </relocation>
                 <relocation>
                   <pattern>com.google</pattern>
                   <!-- some of the dependencies include guava too-->
-                  <shadedPattern>com.solarwinds.shaded.google</shadedPattern>
+                  <shadedPattern>com.solarwinds.joboe.shaded.google</shadedPattern>
                 </relocation>
               </relocations>
               <transformers>
