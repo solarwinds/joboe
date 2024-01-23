@@ -9,7 +9,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Collections;
 import java.util.HashMap;
 
-import static com.solarwinds.joboe.core.settings.SettingsManager.DEFAULT_SETTINGS;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -26,7 +25,7 @@ class AwsLambdaSettingsFetcherTest {
 
     @BeforeEach
     void setup(){
-        tested = new AwsLambdaSettingsFetcher(settingsReaderMock, DEFAULT_SETTINGS);
+        tested = new AwsLambdaSettingsFetcher(settingsReaderMock);
     }
 
     @Test
@@ -90,46 +89,19 @@ class AwsLambdaSettingsFetcherTest {
     }
 
     @Test
-    void verifyThatNewSettingIsNotFetchedWhenCurrentSettingsIsNotExpired() throws OboeSettingsException {
-        com.solarwinds.joboe.core.rpc.Settings defaultSettings = new com.solarwinds.joboe.core.rpc.Settings(
-                (short) 2,
-                "2",
-                System.currentTimeMillis(),
-                1_000,
-                120,
-                "90",
-                Collections.emptyMap());
-
-
-        tested = new AwsLambdaSettingsFetcher(settingsReaderMock, defaultSettings);
-        tested.getSettings();
-        verify(settingsReaderMock, never()).getSettings();
-    }
-
-    @Test
-    void verifyThatHardCodedDefaultSettingIsUsedWhenThereIsNoSetting() throws OboeSettingsException {
+    void verifyThatNullIsReturnedWhenThereIsNoSetting() throws OboeSettingsException {
         when(settingsReaderMock.getSettings()).thenReturn(Collections.emptyMap());
 
         Settings actual = tested.getSettings();
-        assertEquals(0, actual.getType());
-        assertEquals(20, actual.getFlags());
-
-        assertEquals(0, actual.getTtl());
-        assertEquals("", actual.getLayer());
-        assertEquals(1_000_000, actual.getValue());
+        assertNull(actual);
     }
 
     @Test
-    void verifyThatHardCodedDefaultSettingIsUsedWhenThereIsAOboeSettingsException() throws OboeSettingsException {
+    void verifyThatNullIsReturnedWhenThereIsAnOboeSettingsException() throws OboeSettingsException {
         when(settingsReaderMock.getSettings()).thenThrow(OboeSettingsException.class);
 
         Settings actual = tested.getSettings();
-        assertEquals(0, actual.getType());
-        assertEquals(20, actual.getFlags());
-
-        assertEquals(0, actual.getTtl());
-        assertEquals("", actual.getLayer());
-        assertEquals(1_000_000, actual.getValue());
+        assertNull(actual);
     }
 
     @Test

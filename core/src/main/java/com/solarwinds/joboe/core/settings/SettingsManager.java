@@ -40,42 +40,7 @@ public class SettingsManager {
     private static final Map<SettingsArg<?>, Set<SettingsArgChangeListener<?>>> listeners = new ConcurrentHashMap<SettingsArg<?>, Set<SettingsArgChangeListener<?>>>();
     private static final Logger logger = LoggerFactory.getLogger();
 
-    public static final Settings DEFAULT_SETTINGS = new com.solarwinds.joboe.core.rpc.Settings(
-            (short) 0,
-            "SAMPLE_START,SAMPLE_THROUGH_ALWAYS",
-            System.currentTimeMillis(),
-            1_000_000,
-            0,
-            "",
-            new HashMap<String, ByteBuffer>() {{
-                ByteBuffer bucketCap = ByteBuffer.allocate(Double.BYTES).order(ByteOrder.LITTLE_ENDIAN).putDouble(8);
-                bucketCap.rewind();
-                put("BucketCapacity", bucketCap);
 
-                ByteBuffer bucketRate = ByteBuffer.allocate(Double.BYTES).order(ByteOrder.LITTLE_ENDIAN).putDouble(0.17);
-                bucketRate.rewind();
-                put("BucketRate", bucketRate);
-
-                ByteBuffer metricFlush = ByteBuffer.allocate(Integer.BYTES).order(ByteOrder.LITTLE_ENDIAN).putInt(60);
-                metricFlush.rewind();
-                put("MetricsFlushInterval", metricFlush);
-
-                ByteBuffer triggerStrictRate = ByteBuffer.allocate(Double.BYTES).order(ByteOrder.LITTLE_ENDIAN).putDouble(0.1);
-                triggerStrictRate.rewind();
-                put("TriggerStrictBucketRate", triggerStrictRate);
-
-                ByteBuffer triggerStrictCap = ByteBuffer.allocate(Double.BYTES).order(ByteOrder.LITTLE_ENDIAN).putDouble(6);
-                triggerStrictCap.rewind();
-                put("TriggerStrictBucketCapacity", triggerStrictCap);
-
-                ByteBuffer triggerRelaxedCap = ByteBuffer.allocate(Double.BYTES).order(ByteOrder.LITTLE_ENDIAN).putDouble(20);
-                triggerRelaxedCap.rewind();
-                put("TriggerRelaxedBucketCapacity", triggerRelaxedCap);
-
-                ByteBuffer triggerRelaxedRate = ByteBuffer.allocate(Double.BYTES).order(ByteOrder.LITTLE_ENDIAN).putDouble(1);
-                triggerRelaxedRate.rewind();
-                put("TriggerRelaxedBucketRate", triggerRelaxedRate);
-            }});
 
 
     public static CountDownLatch initialize() throws ClientException {
@@ -84,7 +49,7 @@ public class SettingsManager {
 
     public static CountDownLatch initialize(String filePath) throws ClientException {
         if (isLambda()) {
-            fetcher = new AwsLambdaSettingsFetcher(new FileSettingsReader(filePath), DEFAULT_SETTINGS);
+            fetcher = new AwsLambdaSettingsFetcher(new FileSettingsReader(filePath));
         } else {
             fetcher = new PollingSettingsFetcher(new RpcSettingsReader(RpcClientManager.getClient(OperationType.SETTINGS)));
         }

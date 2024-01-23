@@ -716,15 +716,6 @@ public class TraceDecisionUtilTest {
         assertTrue(traceDecision.isReportMetrics());
     }
 
-    @Test
-    public void returnDefaultSampleRateSourceWhenDefaultSettingsIsUsed() {
-        try(MockedStatic<SettingsManager> settingsManagerMock = mockStatic(SettingsManager.class)) {
-            settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsManager.DEFAULT_SETTINGS);
-            TraceConfig remoteTraceConfig = TraceDecisionUtil.getRemoteTraceConfig();
-            assertEquals(SampleRateSource.DEFAULT, remoteTraceConfig.getSampleRateSource());
-        }
-    }
-
     private static Map.Entry<String, Object> getLayerTag(String layer) {
         return getTag("Layer", layer);
     }

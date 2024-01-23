@@ -17,16 +17,14 @@ public class AwsLambdaSettingsFetcher implements SettingsFetcher {
 
     private Settings currentSettings;
 
-    public AwsLambdaSettingsFetcher(SettingsReader settingsReader, Settings settings){
+    public AwsLambdaSettingsFetcher(SettingsReader settingsReader){
         this.settingsReader = settingsReader;
-        this.currentSettings = settings;
     }
 
     @Override
     public Settings getSettings() {
         Settings settings = currentSettings;
-        long millisecondsElapsed = System.currentTimeMillis() - settings.getTimestamp();
-        if (millisecondsElapsed > settings.getTtl() * 1000) {
+        if (settings == null || System.currentTimeMillis() - settings.getTimestamp() > settings.getTtl() * 1000) {
             try {
                 Map<String, Settings> allSettings = settingsReader.getSettings();
                 if (allSettings.isEmpty()) {
