@@ -255,9 +255,9 @@ public class TraceDecisionUtil {
      * @return
      */
     private static TraceConfig getLocalUniversalTraceConfig() {
-        int sampleRate = SettingsManager.getSamplingConfiguration().getSampleRate();
+        Integer sampleRate = SettingsManager.getSamplingConfiguration().getSampleRate();
         TracingMode tracingMode = SettingsManager.getSamplingConfiguration().getTracingMode();
-        return  new TraceConfig(sampleRate, sampleRate != 0 ? SampleRateSource.FILE : SampleRateSource.DEFAULT, tracingMode != null ? tracingMode.toFlags() : null);
+        return  new TraceConfig(sampleRate, sampleRate != null ? SampleRateSource.FILE : SampleRateSource.DEFAULT, tracingMode != null ? tracingMode.toFlags() : null);
     }
 
     /**

@@ -1,8 +1,11 @@
 package com.solarwinds.joboe.sampling;
 
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -20,9 +23,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 
 
+@ExtendWith(MockitoExtension.class)
 public class TraceDecisionUtilTest {
     private static final String TEST_LAYER = "test";
 
@@ -34,12 +38,21 @@ public class TraceDecisionUtilTest {
 
     private static final XTraceOptions TRIGGER_TRACE_OPTIONS = XTraceOptions.getXTraceOptions("trigger-trace", null);
 
+    @Mock
+    private SettingsFetcher settingsFetcherMock;
+
+    @BeforeEach
+    void setup() {
+        SettingsManager.initialize(settingsFetcherMock, SamplingConfiguration.builder().build());
+        TraceDecisionUtil.reset();
+    }
+
+
     @Test
     public void testShouldTraceRequest()
         throws Exception {
         //tracing mode NEVER
-        MockedStatic<SettingsManager> settingsManagerMock = mockStatic(SettingsManager.class);
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(false, false, false, false, true).build());
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(false, false, false, false, true).build());
 
         assertFalse(TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, null).isSampled());
         assertFalse(TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, null).isSampled());
@@ -50,7 +63,7 @@ public class TraceDecisionUtilTest {
         assertFalse(TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, X_TRACE_ID_INCORRECT_FORMAT, null, null).isSampled());
         
         //tracing mode ALWAYS
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(true, false, true, true, true).build());
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(true, false, true, true, true).build());
 
         assertTrue(TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, null).isSampled());
         assertTrue(TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, X_TRACE_ID_SAMPLED, null, null).isSampled());
@@ -61,7 +74,7 @@ public class TraceDecisionUtilTest {
         assertTrue(TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, X_TRACE_ID_INCORRECT_FORMAT, null, null).isSampled());
 
         //tracing mode THROUGH_ALWAYS
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(false, false, true, false, true).build());
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(false, false, true, false, true).build());
 
         assertFalse(TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, null).isSampled());
         assertFalse(TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, TRIGGER_TRACE_OPTIONS, null).isSampled());
@@ -70,38 +83,35 @@ public class TraceDecisionUtilTest {
         assertFalse(TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, X_TRACE_ID_INCOMPATIBLE, null, null).isSampled()); //incompatible x-trace header, so x-trace id is ignored
         assertFalse(TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, X_TRACE_ID_ALL_ZEROS, null, null).isSampled()); //invalid x-trace header, so x-trace id is ignored
         assertFalse(TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, X_TRACE_ID_INCORRECT_FORMAT, null, null).isSampled()); //incorrect format x-trace header, so x-trace id is ignored
-        settingsManagerMock.close();
     }
 
     @Test
     public void testNoSettings() throws Exception {
-        MockedStatic<SettingsManager> settingsManagerMock = mockStatic(SettingsManager.class);
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(false, false, false, false, true).build());
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(false, false, false, false, true).build());
 
         //do not trace in any situation if settings not available https://tracelytics.atlassian.net/browse/TVI-1588
         assertFalse(TraceDecisionUtil.shouldTraceRequest("NotFoundLayer", null, null, null).isSampled());
         assertFalse(TraceDecisionUtil.shouldTraceRequest("NotFoundLayer", X_TRACE_ID_SAMPLED, null, null).isSampled());
-        settingsManagerMock.close();
     }
+
 
 
     @Test
     public void testPrecedence() throws Exception {
-        MockedStatic<SettingsManager> settingsManagerMock = mockStatic(SettingsManager.class);
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(false, false, false, false, true).build());
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(false, false, false, false, true).build());
 
         //case 1: set remote TracingMode = ENABLED with no override, no local settings
         //local universal : null/null
         //remote : ENABLED/100% (override OFF) 
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(true, false, true, true, false).withSettingsType(Settings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE).build());
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(true, false, true, true, false).withSettingsType(Settings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE).build());
         assertTrue(TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, null).isSampled());
         assertTrue(TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, X_TRACE_ID_SAMPLED, null, null).isSampled());
 
         //case 2: set remote TracingMode = ENABLED with override, no local settings
         //local universal : null/null
         //remote : ENABLED/100%
-        settingsManagerMock.when(SettingsManager::getSettings)
-                .thenReturn(SettingsMock.builder()
+        when(settingsFetcherMock.getSettings())
+                .thenReturn(SettingsStub.builder()
                         .withFlags(true, false, true, true, true)
                         .withSettingsType(Settings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE)
                         .build());
@@ -111,10 +121,9 @@ public class TraceDecisionUtilTest {
         //case 3: set local TracingMode = ENABLED with no sample rate
         //local universal : ENABLED/null
         //remote : ENABLED/100%
-        settingsManagerMock.when(SettingsManager::getSamplingConfiguration)
-                .thenReturn(SamplingConfiguration.builder().tracingMode(TracingMode.ENABLED).build());
-        settingsManagerMock.when(SettingsManager::getSettings)
-                .thenReturn(SettingsMock.builder()
+        SettingsManager.initialize(settingsFetcherMock, SamplingConfiguration.builder().tracingMode(TracingMode.ENABLED).build());
+        when(settingsFetcherMock.getSettings())
+                .thenReturn(SettingsStub.builder()
                         .withFlags(true, false, true, true, true)
                         .withSettingsType(Settings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE)
                         .build());
@@ -126,10 +135,9 @@ public class TraceDecisionUtilTest {
         //case 4: set no local TracingMode, with sample rate = 0%
         //local universal : null/0%
         //remote : ENABLED/100%
-        settingsManagerMock.when(SettingsManager::getSamplingConfiguration)
-                .thenReturn(SamplingConfiguration.builder().sampleRate(0).build());
-        settingsManagerMock.when(SettingsManager::getSettings)
-                .thenReturn(SettingsMock.builder()
+        SettingsManager.initialize(settingsFetcherMock, SamplingConfiguration.builder().sampleRate(0).build());
+        when(settingsFetcherMock.getSettings())
+                .thenReturn(SettingsStub.builder()
                         .withFlags(true, false, true, true, true)
                         .withSettingsType(Settings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE)
                         .build());
@@ -141,10 +149,9 @@ public class TraceDecisionUtilTest {
         //case 5: set local TracingMode = DISABLED, with no sample Rate
         //local universal : DISABLED/null
         //remote : ENABLED/100%
-        settingsManagerMock.when(SettingsManager::getSamplingConfiguration)
-                .thenReturn(SamplingConfiguration.builder().tracingMode(TracingMode.DISABLED).build());
-        settingsManagerMock.when(SettingsManager::getSettings)
-                .thenReturn(SettingsMock.builder()
+        SettingsManager.initialize(settingsFetcherMock, SamplingConfiguration.builder().tracingMode(TracingMode.DISABLED).build());
+        when(settingsFetcherMock.getSettings())
+                .thenReturn(SettingsStub.builder()
                         .withFlags(true, false, true, true, true)
                         .withSettingsType(Settings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE)
                         .build());
@@ -157,13 +164,13 @@ public class TraceDecisionUtilTest {
         //local universal : DISABLED/null
         //remote : ENABLED/100%
         TraceConfigs testingUrlSampleRateConfigs = buildUrlConfigs(url -> true, TracingMode.ALWAYS,1000000);
-        settingsManagerMock.when(SettingsManager::getSamplingConfiguration)
-                .thenReturn(SamplingConfiguration.builder()
-                        .internalTransactionSettings(testingUrlSampleRateConfigs)
-                        .tracingMode(TracingMode.DISABLED)
-                        .build());
-        settingsManagerMock.when(SettingsManager::getSettings)
-                .thenReturn(SettingsMock.builder()
+        SettingsManager.initialize(settingsFetcherMock, SamplingConfiguration.builder()
+                .internalTransactionSettings(testingUrlSampleRateConfigs)
+                .tracingMode(TracingMode.DISABLED)
+                .build());
+
+        when(settingsFetcherMock.getSettings())
+                .thenReturn(SettingsStub.builder()
                         .withFlags(true, false, true, true, true)
                         .withSettingsType(Settings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE)
                         .build());
@@ -180,13 +187,13 @@ public class TraceDecisionUtilTest {
         Map<ResourceMatcher, TraceConfig> urlTraceConfigsByMatcher = new LinkedHashMap<>();
         urlTraceConfigsByMatcher.put(url -> url.endsWith("png") || url.endsWith("jpg"), buildTraceConfig(TracingMode.DISABLED, 0));
         urlTraceConfigsByMatcher.put(url -> url.contains("trace"), buildTraceConfig(TracingMode.ENABLED, null));
-        settingsManagerMock.when(SettingsManager::getSamplingConfiguration)
-                .thenReturn(SamplingConfiguration.builder()
-                        .internalTransactionSettings(new TraceConfigs(urlTraceConfigsByMatcher))
-                        .tracingMode(TracingMode.DISABLED)
-                        .build());
-        settingsManagerMock.when(SettingsManager::getSettings)
-                .thenReturn(SettingsMock.builder()
+        SettingsManager.initialize(settingsFetcherMock, SamplingConfiguration.builder()
+                .internalTransactionSettings(new TraceConfigs(urlTraceConfigsByMatcher))
+                .tracingMode(TracingMode.DISABLED)
+                .build());
+
+        when(settingsFetcherMock.getSettings())
+                .thenReturn(SettingsStub.builder()
                         .withFlags(true, false, true, true, true)
                         .withSettingsType(Settings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE)
                         .build());
@@ -197,15 +204,12 @@ public class TraceDecisionUtilTest {
         assertEquals(SampleRateSource.OBOE, TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, Collections.singletonList("http://trace-this")).getTraceConfig().getSampleRateSource()); //source is from OBOE as rate is NOT defined in local config
 
 
-        //clean up
-        settingsManagerMock.close();
     }
 
     @Test
     public void testUrlConfigs() throws Exception {
         //Add SRv1 always, override, sampling rate 1000000
-        MockedStatic<SettingsManager> settingsManagerMock = mockStatic(SettingsManager.class);
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder()
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder()
                 .withFlags(true, false, true, true, true)
                 .withSampleRate(1000000).withSettingsType(Settings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE)
                 .build());
@@ -217,11 +221,10 @@ public class TraceDecisionUtilTest {
 
         //Add local URL rate, should override the SRv1 rate if pattern matches
         TraceConfigs testingUrlSampleRateConfigs = buildUrlConfigs(url -> url.endsWith(".html"), TracingMode.ALWAYS, 0);
-        settingsManagerMock.when(SettingsManager::getSamplingConfiguration)
-                .thenReturn(SamplingConfiguration.builder()
-                        .internalTransactionSettings(testingUrlSampleRateConfigs)
-                        .tracingMode(TracingMode.DISABLED)
-                        .build());
+        SettingsManager.initialize(settingsFetcherMock, SamplingConfiguration.builder()
+                .internalTransactionSettings(testingUrlSampleRateConfigs)
+                .build());
+
         //pattern match, should all have sample rate 0% for new traces, but continuing/AVW trace should still go on
         assertFalse(TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, Collections.singletonList("http://something.html")).isSampled());
         assertTrue(TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, X_TRACE_ID_SAMPLED, null, Collections.singletonList("http://something.html")).isSampled());
@@ -234,11 +237,9 @@ public class TraceDecisionUtilTest {
 
         //Add local URL rate, should override the SRv1 rate if pattern matches
         testingUrlSampleRateConfigs = buildUrlConfigs(url -> url.endsWith(".html"), TracingMode.NEVER, 0);
-        settingsManagerMock.when(SettingsManager::getSamplingConfiguration)
-                .thenReturn(SamplingConfiguration.builder()
-                        .internalTransactionSettings(testingUrlSampleRateConfigs)
-                        .tracingMode(TracingMode.DISABLED)
-                        .build());
+        SettingsManager.initialize(settingsFetcherMock, SamplingConfiguration.builder()
+                .internalTransactionSettings(testingUrlSampleRateConfigs)
+                .build());
 
 
         //pattern match, should block all traffic even for continuing traces since the url tracingMode is never
@@ -254,11 +255,9 @@ public class TraceDecisionUtilTest {
         Map<ResourceMatcher, TraceConfig> urlTraceConfigsByMatcher = new LinkedHashMap<>();
         urlTraceConfigsByMatcher.put(url -> url.endsWith("png") || url.endsWith("jpg"), buildTraceConfig(TracingMode.DISABLED, 0));
         urlTraceConfigsByMatcher.put(url -> url.contains("trace"), buildTraceConfig(TracingMode.ENABLED, null));
-        settingsManagerMock.when(SettingsManager::getSamplingConfiguration)
-                .thenReturn(SamplingConfiguration.builder()
-                        .internalTransactionSettings(new TraceConfigs(urlTraceConfigsByMatcher))
-                        .tracingMode(TracingMode.DISABLED)
-                        .build());
+        SettingsManager.initialize(settingsFetcherMock, SamplingConfiguration.builder()
+                .internalTransactionSettings(new TraceConfigs(urlTraceConfigsByMatcher))
+                .build());
         TraceDecision traceDecision;
 
         //pattern match on "disabled", should block all traffic even for continuing traces since the transaction settings tracingMode is disabled
@@ -284,15 +283,13 @@ public class TraceDecisionUtilTest {
         assertEquals(SampleRateSource.OBOE, traceDecision.getTraceConfig().getSampleRateSource());  //rate is coming from the remote settings
         assertTrue(TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, X_TRACE_ID_SAMPLED, null, Collections.singletonList("http://something.xxx")).isSampled());
         assertTrue(TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, X_TRACE_ID_SAMPLED, null, Collections.singletonList("http://something.xxx")).isReportMetrics());
-        settingsManagerMock.close();
     }
 
 
 
     @Test
     public void testThroughput() throws Exception {
-        MockedStatic<SettingsManager> settingsManagerMock = mockStatic(SettingsManager.class);
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(true, false, true, true, false).build());
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(true, false, true, true, false).build());
         
         int data;
         TraceDecisionUtil.consumeMetricsData(TraceDecisionUtil.MetricType.THROUGHPUT); //clear it
@@ -307,14 +304,11 @@ public class TraceDecisionUtilTest {
 
         data = TraceDecisionUtil.consumeMetricsData(TraceDecisionUtil.MetricType.THROUGHPUT); //consumed once already, so this time should return 0
         assertEquals(0, data);
-        settingsManagerMock.close();
-
     }
 
     @Test
     public void testThroughputConcurrency() throws Exception {
-        MockedStatic<SettingsManager> settingsManagerMock = mockStatic(SettingsManager.class);
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(true, false, true, true, false).build());
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(true, false, true, true, false).build());
 
         TraceDecisionUtil.consumeMetricsData(TraceDecisionUtil.MetricType.THROUGHPUT); //clear it
 
@@ -350,27 +344,26 @@ public class TraceDecisionUtilTest {
         executorService.invokeAll(tasks); //do not really need to assert, we just want to make sure no exceptions is triggered. The number could be a bit off and it's acceptable
         executorService.shutdown();
         executorService.awaitTermination(10, TimeUnit.SECONDS);
-        settingsManagerMock.close();
     }
 
     @Test
     public void testTokenBucketExhaustion() throws Exception {
-        MockedStatic<SettingsManager> settingsManagerMock = mockStatic(SettingsManager.class);
         TraceDecisionUtil.consumeMetricsData(TraceDecisionUtil.MetricType.TOKEN_BUCKET_EXHAUSTION); //clear it
+        SettingsManager.initialize(settingsFetcherMock, SamplingConfiguration.builder().build());
 
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(true, false, true, true, false).withSampleRate(1000000).withSettingsArg(SettingsArg.BUCKET_CAPACITY, 0.0).withSettingsArg(SettingsArg.BUCKET_RATE, 0.0).build());
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(true, false, true, true, false).withSampleRate(1000000).withSettingsArg(SettingsArg.BUCKET_CAPACITY, 0.0).withSettingsArg(SettingsArg.BUCKET_RATE, 0.0).build());
         TraceDecisionUtil.shouldTraceRequest("LayerA", null, null, null); //exhaustion +1
         TraceDecisionUtil.shouldTraceRequest("LayerA", null, null, null); //exhaustion +1
         TraceDecisionUtil.shouldTraceRequest("LayerA", X_TRACE_ID_SAMPLED, null, null); //no change in exhaustion, as Continue trace does not have bucket restriction
         //LayerA should have 2 token bucket exhaustion count
 
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(true, false, true, true, false).withSampleRate(0).withSettingsArg(SettingsArg.BUCKET_CAPACITY, 0.0).withSettingsArg(SettingsArg.BUCKET_RATE, 0.0).build());
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(true, false, true, true, false).withSampleRate(0).withSettingsArg(SettingsArg.BUCKET_CAPACITY, 0.0).withSettingsArg(SettingsArg.BUCKET_RATE, 0.0).build());
         TraceDecisionUtil.shouldTraceRequest("LayerB", null, null, null); //no change in exhaustion, sample rate at 0
         TraceDecisionUtil.shouldTraceRequest("LayerB", null, null, null); //no change in exhaustion, sample rate at 0
         TraceDecisionUtil.shouldTraceRequest("LayerB", X_TRACE_ID_SAMPLED, null, null); //no change in exhaustion, as Continue trace does not have bucket restriction
         //LayerB should not appear in the map as it has no exhaustion count
 
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(true, false, true, true, false).withSampleRate(1000000).withSettingsArg(SettingsArg.BUCKET_CAPACITY, 1.0).withSettingsArg(SettingsArg.BUCKET_RATE, 0.0).build());
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(true, false, true, true, false).withSampleRate(1000000).withSettingsArg(SettingsArg.BUCKET_CAPACITY, 1.0).withSettingsArg(SettingsArg.BUCKET_RATE, 0.0).build());
         TraceDecisionUtil.shouldTraceRequest("LayerC", null, null, null); //exhaustion +1, sharing same token bucket as LayerA
         TraceDecisionUtil.shouldTraceRequest("LayerC", null, null, null); //exhaustion +1, tokens all used up already
         TraceDecisionUtil.shouldTraceRequest("LayerC", X_TRACE_ID_SAMPLED, null, null); //no change in exhaustion, as Continue trace does not have bucket restriction
@@ -383,7 +376,7 @@ public class TraceDecisionUtilTest {
         assertEquals(0, data);
 
         // test signed/trigger trace requests
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(true, false, true, true, false).withSampleRate(1000000)
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(true, false, true, true, false).withSampleRate(1000000)
                 .withSettingsArg(SettingsArg.BUCKET_CAPACITY, 0.0)
                 .withSettingsArg(SettingsArg.BUCKET_RATE, 0.0)
                 .withSettingsArg(SettingsArg.STRICT_BUCKET_CAPACITY, 1.0)
@@ -406,20 +399,18 @@ public class TraceDecisionUtilTest {
 
         data = TraceDecisionUtil.consumeMetricsData(TraceDecisionUtil.MetricType.TOKEN_BUCKET_EXHAUSTION); //consumed once already, so this time should return empty map
         assertEquals(6, data);
-        settingsManagerMock.close();
     }
 
 
 
     @Test
     public void testTokenBucket() throws Exception {
-        MockedStatic<SettingsManager> settingsManagerMock = mockStatic(SettingsManager.class);
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(true, false, true, true, false).build());
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(true, false, true, true, false).build());
 
         String bucketLayer = "test";
         
         //bucket capacity at 100, rate at 100 trace per sec
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(true, true, true, true, true).withSampleRate(1000000).withSettingsArg(SettingsArg.BUCKET_CAPACITY, 30.0).withSettingsArg(SettingsArg.BUCKET_RATE, 0.0).build());
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(true, true, true, true, true).withSampleRate(1000000).withSettingsArg(SettingsArg.BUCKET_CAPACITY, 30.0).withSettingsArg(SettingsArg.BUCKET_RATE, 0.0).build());
 
         TraceConfig config = TraceDecisionUtil.shouldTraceRequest(bucketLayer, null, null, Collections.singletonList("http://something.html")).getTraceConfig(); //tracing with token
         assertNotNull(config); 
@@ -428,23 +419,22 @@ public class TraceDecisionUtilTest {
         assertTrue(TraceDecisionUtil.shouldTraceRequest(bucketLayer, X_TRACE_ID_SAMPLED, null, Collections.singletonList("http://something.html")).isSampled()); //continue trace not restricted by token bucket
 
         //bucket capacity at 0, rate at 100 trace per sec
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(true, true, true, true, true).withSampleRate(1000000).withSettingsArg(SettingsArg.BUCKET_CAPACITY, 0.0).withSettingsArg(SettingsArg.BUCKET_RATE, 100.0).build());
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(true, true, true, true, true).withSampleRate(1000000).withSettingsArg(SettingsArg.BUCKET_CAPACITY, 0.0).withSettingsArg(SettingsArg.BUCKET_RATE, 100.0).build());
 
         TimeUnit.SECONDS.sleep(1);
         assertFalse(TraceDecisionUtil.shouldTraceRequest(bucketLayer, null, null, Collections.singletonList("http://something.html")).isSampled()); //no new trace as capacity is at zero
         assertTrue(TraceDecisionUtil.shouldTraceRequest(bucketLayer, X_TRACE_ID_SAMPLED, null, Collections.singletonList("http://something.html")).isSampled()); //continue trace not restricted by token bucket
         
         //bucket capacity at 50, rate at 0 trace per sec
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(true, true, true, true, true).withSampleRate(1000000).withSettingsArg(SettingsArg.BUCKET_CAPACITY, 50.0).withSettingsArg(SettingsArg.BUCKET_RATE, 0.0).build());
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(true, true, true, true, true).withSampleRate(1000000).withSettingsArg(SettingsArg.BUCKET_CAPACITY, 50.0).withSettingsArg(SettingsArg.BUCKET_RATE, 0.0).build());
         TimeUnit.SECONDS.sleep(1);
         assertFalse(TraceDecisionUtil.shouldTraceRequest(bucketLayer, null, null, Collections.singletonList("http://something.html")).isSampled()); //not tracing, sharing the same bucket instance, it has capacity 50 now but zero replenish rate and 0 left-over token from previous capacity which is zero
 
         //bucket capacity at 50, rate at 100 trace per sec, should trace again
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(true, true, true, true, true).withSampleRate(1000000).withSettingsArg(SettingsArg.BUCKET_CAPACITY, 50.0).withSettingsArg(SettingsArg.BUCKET_RATE, 100.0).build());
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(true, true, true, true, true).withSampleRate(1000000).withSettingsArg(SettingsArg.BUCKET_CAPACITY, 50.0).withSettingsArg(SettingsArg.BUCKET_RATE, 100.0).build());
         TimeUnit.SECONDS.sleep(1);
         assertTrue(TraceDecisionUtil.shouldTraceRequest(bucketLayer, null, null, Collections.singletonList("http://something.html")).isSampled()); //not tracing, sharing the same bucket instance, it has capacity 50 now but zero replenish rate and 0 left-over token from previous capacity which is zero
 
-        settingsManagerMock.close();
     }
 
     @Test
@@ -467,143 +457,132 @@ public class TraceDecisionUtilTest {
 
     @Test
     public void testTriggerTraceTraceDecision() throws Exception {
-        MockedStatic<SettingsManager> settingsManagerMock = mockStatic(SettingsManager.class);
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(true, false, true, true, false).build());
-
         TraceDecision result;
         //trigger trace enabled is set to true, tracing rate 100%
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(true, false, true, true, false).withSampleRate(1000000).build());
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(true, false, true, true, false).withSampleRate(1000000).build());
         result = TraceDecisionUtil.shouldTraceRequest("LayerA", null, TRIGGER_TRACE_OPTIONS, null);
         assertTrue(result.isSampled()); //tracing, trigger trace flagged and enabled
         assertTrue(result.isReportMetrics()); //metric should be reported regardless of rate
 
 
         //trigger trace enabled is set to true, tracing rate 0
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(true, false, true, true, false).withSampleRate(0).build());
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(true, false, true, true, false).withSampleRate(0).build());
         result = TraceDecisionUtil.shouldTraceRequest("LayerA", null, TRIGGER_TRACE_OPTIONS, null);
         assertTrue(result.isSampled()); //tracing, trigger trace flagged and enabled
         assertTrue(result.isReportMetrics()); //metric should be reported regardless of rate
 
         
         //trigger trace enabled is set to false, tracing rate 0
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(true, false, true, false, false).withSampleRate(0).build());
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(true, false, true, false, false).withSampleRate(0).build());
         result = TraceDecisionUtil.shouldTraceRequest("LayerA", null, TRIGGER_TRACE_OPTIONS, null);
         assertFalse(result.isSampled()); //not tracing, trigger trace flagged but disabled
         assertTrue(result.isReportMetrics()); //metric should be reported regardless of rate
 
         //trigger trace enabled is set to false, tracing rate 100%
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(true, false, true, false, false).withSampleRate(1000000).build());
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(true, false, true, false, false).withSampleRate(1000000).build());
         result = TraceDecisionUtil.shouldTraceRequest("LayerA", null, TRIGGER_TRACE_OPTIONS, null);
         assertFalse(result.isSampled()); //not tracing, trigger trace flagged but disabled
         assertTrue(result.isReportMetrics()); //metric should be reported regardless of rate
 
         //trigger trace enabled is set to false, tracing mode disabled
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(false, false, false, false, false).withSampleRate(0).build());
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(false, false, false, false, false).withSampleRate(0).build());
         result = TraceDecisionUtil.shouldTraceRequest("LayerA", null, TRIGGER_TRACE_OPTIONS, null);
         assertFalse(result.isSampled()); //not tracing, tracing mode disabled (so is the trigger trace option)
         assertFalse(result.isReportMetrics()); //no metrics, tracing mode disabled
 
         //trigger trace enabled is set to true, tracing rate 100% - bad signature
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(true, false, true, true, false).withSampleRate(1000000).build());
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(true, false, true, true, false).withSampleRate(1000000).build());
         XTraceOptions badSignatureOptions = new XTraceOptions(Collections.emptyMap(), Collections.emptyList(), XTraceOptions.AuthenticationStatus.failure("bad-signature"));
         result = TraceDecisionUtil.shouldTraceRequest("LayerA", null, badSignatureOptions, null);
         assertFalse(result.isSampled()); //bad signature, no tracing
         assertTrue(result.isReportMetrics()); //metric should still be reported as bad signature does not affect metrics reporting
 
         //trigger trace enabled is set to disable, trace mode disabled - bad signature
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(false, false, false, false, false).withSampleRate(0).build());
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(false, false, false, false, false).withSampleRate(0).build());
         result = TraceDecisionUtil.shouldTraceRequest("LayerA", null, badSignatureOptions, null);
         assertFalse(result.isSampled()); //bad signature, no tracing
         assertFalse(result.isReportMetrics()); //metric should not be reported due to trace mode disabled
-        settingsManagerMock.close();
     }
 
     @Test
     public void testTraceCount() throws Exception {
-        MockedStatic<SettingsManager> settingsManagerMock = mockStatic(SettingsManager.class);
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(true, false, true, true, false).build());
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(true, false, true, true, false).build());
 
         int data;
         TraceDecisionUtil.consumeMetricsData(TraceDecisionUtil.MetricType.TRACE_COUNT); //clear it
 
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(true, false, true, true, false).withSampleRate(1000000).build()); //ALWAYS sample rate = 100%
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(true, false, true, true, false).withSampleRate(1000000).build()); //ALWAYS sample rate = 100%
         TraceDecisionUtil.shouldTraceRequest("LayerA", null, null, null); //new trace at 100%, should count
         TraceDecisionUtil.shouldTraceRequest("LayerA", X_TRACE_ID_SAMPLED, null, null); //Continue trace, should count
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(true, false, true, true, false).withSampleRate(0).build()); //ALWAYS. sample rate = 0%
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(true, false, true, true, false).withSampleRate(0).build()); //ALWAYS. sample rate = 0%
         TraceDecisionUtil.shouldTraceRequest("LayerB", null, null, null); //new trace at 0%, should not count
         TraceDecisionUtil.shouldTraceRequest("LayerB", X_TRACE_ID_SAMPLED, null, null); //Continue trace, should count
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(false, false, true, false, false).withSampleRate(1000000).build()); //THROUGH. sample rate = 100% (not used anyway for THROUGH traces)
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(false, false, true, false, false).withSampleRate(1000000).build()); //THROUGH. sample rate = 100% (not used anyway for THROUGH traces)
         TraceDecisionUtil.shouldTraceRequest("LayerC", null, null, null); //new trace at THROUGH mode, should not count
         TraceDecisionUtil.shouldTraceRequest("LayerC", X_TRACE_ID_SAMPLED, null, null); //Continue trace, should count
         
         data = TraceDecisionUtil.consumeMetricsData(TraceDecisionUtil.MetricType.TRACE_COUNT);
 
         assertEquals(4, data);
-        settingsManagerMock.close();
     }
 
     @Test
     public void testSampleCount() throws Exception {
-        MockedStatic<SettingsManager> settingsManagerMock = mockStatic(SettingsManager.class);
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(true, false, true, true, false).build());
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(true, false, true, true, false).build());
 
         int data;
         TraceDecisionUtil.consumeMetricsData(TraceDecisionUtil.MetricType.SAMPLE_COUNT); //clear it
 
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(true, false, true, true, false).withSampleRate(1000000).build()); //ALWAYS sample rate = 100%
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(true, false, true, true, false).withSampleRate(1000000).build()); //ALWAYS sample rate = 100%
         TraceDecisionUtil.shouldTraceRequest("LayerA", null, null, null); //new trace at 100%, sampled
         TraceDecisionUtil.shouldTraceRequest("LayerA", X_TRACE_ID_SAMPLED, null, null); //Continue trace, no sampling
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(true, false, true, true, false).withSampleRate(500000).build()); //ALWAYS. sample rate = 50%
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(true, false, true, true, false).withSampleRate(500000).build()); //ALWAYS. sample rate = 50%
         TraceDecisionUtil.shouldTraceRequest("LayerB", null, null, null); //new trace at 0%, sampled
         TraceDecisionUtil.shouldTraceRequest("LayerB", X_TRACE_ID_SAMPLED, null, null); //Continue trace, no sampling
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(false, false, true, false, false).withSampleRate(1000000).build()); //THROUGH. sample rate = 100% (not used anyway for THROUGH traces)
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(false, false, true, false, false).withSampleRate(1000000).build()); //THROUGH. sample rate = 100% (not used anyway for THROUGH traces)
         TraceDecisionUtil.shouldTraceRequest("LayerC", null, null, null); //new trace at THROUGH mode, no sampling
         TraceDecisionUtil.shouldTraceRequest("LayerC", X_TRACE_ID_SAMPLED, null, null); //Continue trace, no sampling
         
         data = TraceDecisionUtil.consumeMetricsData(TraceDecisionUtil.MetricType.SAMPLE_COUNT);
 
         assertEquals(2, data);
-        settingsManagerMock.close();
     }
 
     @Test
     public void testThroughTraceCount() throws Exception {
-        MockedStatic<SettingsManager> settingsManagerMock = mockStatic(SettingsManager.class);
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(true, false, true, true, false).build());
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(true, false, true, true, false).build());
 
         int data;
         TraceDecisionUtil.consumeMetricsData(TraceDecisionUtil.MetricType.THROUGH_TRACE_COUNT); //clear it
 
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(true, false, true, true, false).withSampleRate(1000000).build()); //ALWAYS sample rate = 100%
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(true, false, true, true, false).withSampleRate(1000000).build()); //ALWAYS sample rate = 100%
         TraceDecisionUtil.shouldTraceRequest("LayerA", null, null, null); //not through trace
         TraceDecisionUtil.shouldTraceRequest("LayerA", X_TRACE_ID_SAMPLED, null, null); //THROUGH_TRACE_COUNT +1
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(true, false, true, true, false).withSampleRate(500000).build()); //ALWAYS. sample rate = 50%
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(true, false, true, true, false).withSampleRate(500000).build()); //ALWAYS. sample rate = 50%
         TraceDecisionUtil.shouldTraceRequest("LayerB", null, null, null); //not through trace
         TraceDecisionUtil.shouldTraceRequest("LayerB", X_TRACE_ID_SAMPLED, null, null); //THROUGH_TRACE_COUNT +1
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(false, false, true, false, false).withSampleRate(1000000).build()); //THROUGH. sample rate = 100% (not used anyway for THROUGH traces)
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(false, false, true, false, false).withSampleRate(1000000).build()); //THROUGH. sample rate = 100% (not used anyway for THROUGH traces)
         TraceDecisionUtil.shouldTraceRequest("LayerC", null, null, null); //not through trace
         TraceDecisionUtil.shouldTraceRequest("LayerC", X_TRACE_ID_SAMPLED, null, null); //THROUGH_TRACE_COUNT +1
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(false, false, false, false, false).withSampleRate(1000000).build()); //NEVER. sample rate = 100% (not used anyway as no traces get through)
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(false, false, false, false, false).withSampleRate(1000000).build()); //NEVER. sample rate = 100% (not used anyway as no traces get through)
         TraceDecisionUtil.shouldTraceRequest("LayerD", null, null, null); //not through trace
         TraceDecisionUtil.shouldTraceRequest("LayerD", X_TRACE_ID_SAMPLED, null, null); //through flag off
 
         data = TraceDecisionUtil.consumeMetricsData(TraceDecisionUtil.MetricType.THROUGH_TRACE_COUNT);
 
         assertEquals(3, data);
-        settingsManagerMock.close();
     }
 
     @Test
     public void testTriggerTraceCount() throws Exception {
-        MockedStatic<SettingsManager> settingsManagerMock = mockStatic(SettingsManager.class);
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(true, false, true, true, false).build());
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(true, false, true, true, false).build());
 
         int data;
         TraceDecisionUtil.consumeMetricsData(TraceDecisionUtil.MetricType.TRIGGERED_TRACE_COUNT); //clear it
         TraceDecisionUtil.consumeMetricsData(TraceDecisionUtil.MetricType.TRACE_COUNT); //clear it
         TraceDecisionUtil.consumeMetricsData(TraceDecisionUtil.MetricType.THROUGHPUT); //clear it
 
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(true, false, true, true, false).withSampleRate(TraceDecisionUtil.SAMPLE_RESOLUTION).build());
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(true, false, true, true, false).withSampleRate(TraceDecisionUtil.SAMPLE_RESOLUTION).build());
         XTraceOptions badSignatureOptions = new XTraceOptions(Collections.emptyMap(), Collections.emptyList(), XTraceOptions.AuthenticationStatus.failure("bad-signature"));
         XTraceOptions goodSignatureWithTriggerTraceOptions = new XTraceOptions(Collections.singletonMap(XTraceOption.TRIGGER_TRACE, true), Collections.EMPTY_LIST, XTraceOptions.AuthenticationStatus.OK);
 
@@ -629,32 +608,28 @@ public class TraceDecisionUtilTest {
         //check TRIGGERED_TRACE_COUNT, only 2 of them are traced and flagged as trigger trace
         data = TraceDecisionUtil.consumeMetricsData(TraceDecisionUtil.MetricType.TRIGGERED_TRACE_COUNT);
         assertEquals(2, data);
-        settingsManagerMock.close();
-
     }
 
     @Test
     public void testLastSampleRate() throws Exception {
-        MockedStatic<SettingsManager> settingsManagerMock = mockStatic(SettingsManager.class);
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(true, false, true, true, false).build());
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(true, false, true, true, false).build());
 
         //Add local URL rate, should override the SRv1 rate if pattern matches
         TraceConfigs testingUrlSampleRateConfigs = buildUrlConfigs(url -> url.endsWith("html"), TracingMode.NEVER, 0);
-        settingsManagerMock.when(SettingsManager::getSamplingConfiguration)
-                .thenReturn(SamplingConfiguration.builder()
-                        .internalTransactionSettings(testingUrlSampleRateConfigs)
-                        .build());
+        SettingsManager.initialize(settingsFetcherMock, SamplingConfiguration.builder()
+                .internalTransactionSettings(testingUrlSampleRateConfigs)
+                .build());
         TraceDecisionUtil.consumeLastTraceConfigs(); //clear it
 
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(true, false, true, true, false).withSampleRate(1000000).withSettingsType(Settings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE).build()); //ALWAYS sample rate = 100%
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(true, false, true, true, false).withSampleRate(1000000).withSettingsType(Settings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE).build()); //ALWAYS sample rate = 100%
         TraceDecisionUtil.shouldTraceRequest("LayerA", null, null, null); //100%, ALWAYS => record 100%
         TraceDecisionUtil.shouldTraceRequest("LayerA", null, null, Collections.singletonList("something.html")); //URL overrides, NEVER => do not record
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(true, false, true, true, false).withSampleRate(0).withSettingsType(Settings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE).build()); //ALWAYS. sample rate = 0%
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(true, false, true, true, false).withSampleRate(0).withSettingsType(Settings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE).build()); //ALWAYS. sample rate = 0%
         TraceDecisionUtil.shouldTraceRequest("LayerB", null, null, null); //0%, ALWAYS => record 0%
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(false, false, true, false, false).withSampleRate(1000000).withSettingsType(Settings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE).build()); //THROUGH. sample rate = 100% (not used anyway for THROUGH traces)
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(false, false, true, false, false).withSampleRate(1000000).withSettingsType(Settings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE).build()); //THROUGH. sample rate = 100% (not used anyway for THROUGH traces)
         TraceDecisionUtil.shouldTraceRequest("LayerC", X_TRACE_ID_SAMPLED, null, null); //100%, THROUGH => do not record
         TraceDecisionUtil.shouldTraceRequest("LayerC", null, null, null); //100%, THROUGH => do not record
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(SettingsMock.builder().withFlags(true, false, true, true, false).withSampleRate(0).withSettingsType(Settings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE).build()); //ALWAYS. sample rate = 0%
+        when(settingsFetcherMock.getSettings()).thenReturn(SettingsStub.builder().withFlags(true, false, true, true, false).withSampleRate(0).withSettingsType(Settings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE).build()); //ALWAYS. sample rate = 0%
 
         Map<String, TraceConfig> data = TraceDecisionUtil.consumeLastTraceConfigs();
 
@@ -667,12 +642,11 @@ public class TraceDecisionUtilTest {
 
 
         //case 2: add local settings sampleRate= 500000 (50%), now it should override all the oboe settings
-        settingsManagerMock.when(SettingsManager::getSamplingConfiguration)
-                .thenReturn(SamplingConfiguration.builder()
-                        .internalTransactionSettings(testingUrlSampleRateConfigs)
-                        .sampleRate(500000)
-                        .tracingMode(TracingMode.ALWAYS)
-                        .build());
+        SettingsManager.initialize(settingsFetcherMock, SamplingConfiguration.builder()
+                .internalTransactionSettings(testingUrlSampleRateConfigs)
+                .sampleRate(500000)
+                .tracingMode(TracingMode.ALWAYS)
+                .build());
 
         TraceDecisionUtil.shouldTraceRequest("LayerA", null, null, null); //50% (local settings), ALWAYS => record 50%
         TraceDecisionUtil.shouldTraceRequest("LayerA", null, null, Collections.singletonList("something.html")); //URL overrides, NEVER => do not record
@@ -688,21 +662,16 @@ public class TraceDecisionUtilTest {
         assertEquals(SampleRateSource.FILE, data.get("LayerB").getSampleRateSource());
         assertEquals(500000, data.get("LayerC").getSampleRate());
         assertEquals(SampleRateSource.FILE, data.get("LayerC").getSampleRateSource());
-
-
-        //clean up
-        settingsManagerMock.close();
     }
 
     @Test
     public void testGetRemoteSampleRate() {
-        MockedStatic<SettingsManager> settingsManagerMock = mockStatic(SettingsManager.class);
         Settings settings;
         TraceConfig remoteSampleRate;
         
         //test remote settings with no args
-        settings = SettingsMock.builder().withFlags(TracingMode.ALWAYS).withSampleRate(0).withSettingsArgs(Collections.emptyMap()).build();
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(settings);
+        settings = SettingsStub.builder().withFlags(TracingMode.ALWAYS).withSampleRate(0).withSettingsArgs(Collections.emptyMap()).build();
+        when(settingsFetcherMock.getSettings()).thenReturn(settings);
         remoteSampleRate = TraceDecisionUtil.getRemoteTraceConfig();
         assertEquals(0.0, remoteSampleRate.getBucketCapacity(TokenBucketType.REGULAR)); //should default to 0
         assertEquals(0.0, remoteSampleRate.getBucketRate(TokenBucketType.REGULAR)); //should default to 0
@@ -711,8 +680,8 @@ public class TraceDecisionUtilTest {
         Map<SettingsArg<?>, Object> args = new HashMap<SettingsArg<?>, Object>();
         args.put(SettingsArg.BUCKET_CAPACITY, null);
         args.put(SettingsArg.BUCKET_RATE, null);
-        settings = SettingsMock.builder().withFlags(TracingMode.ALWAYS).withSampleRate(0).withSettingsArgs(args).build();
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(settings);
+        settings = SettingsStub.builder().withFlags(TracingMode.ALWAYS).withSampleRate(0).withSettingsArgs(args).build();
+        when(settingsFetcherMock.getSettings()).thenReturn(settings);
         remoteSampleRate = TraceDecisionUtil.getRemoteTraceConfig();
         assertEquals(0.0, remoteSampleRate.getBucketCapacity(TokenBucketType.REGULAR)); //should default to 0
         assertEquals(0.0, remoteSampleRate.getBucketRate(TokenBucketType.REGULAR)); //should default to 0
@@ -721,8 +690,8 @@ public class TraceDecisionUtilTest {
         args = new HashMap<SettingsArg<?>, Object>();
         args.put(SettingsArg.BUCKET_CAPACITY, -1.0);
         args.put(SettingsArg.BUCKET_RATE, -2.0);
-        settings = SettingsMock.builder().withFlags(TracingMode.ALWAYS).withSampleRate(0).withSettingsArgs(args).build();
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(settings);
+        settings = SettingsStub.builder().withFlags(TracingMode.ALWAYS).withSampleRate(0).withSettingsArgs(args).build();
+        when(settingsFetcherMock.getSettings()).thenReturn(settings);
         remoteSampleRate = TraceDecisionUtil.getRemoteTraceConfig();
         assertEquals(0.0, remoteSampleRate.getBucketCapacity(TokenBucketType.REGULAR)); //should default to 0
         assertEquals(0.0, remoteSampleRate.getBucketRate(TokenBucketType.REGULAR)); //should default to 0
@@ -731,12 +700,11 @@ public class TraceDecisionUtilTest {
         args = new HashMap<SettingsArg<?>, Object>();
         args.put(SettingsArg.BUCKET_CAPACITY, 1.0);
         args.put(SettingsArg.BUCKET_RATE, 2.0);
-        settings = SettingsMock.builder().withFlags(TracingMode.ALWAYS).withSampleRate(0).withSettingsArgs(args).build();
-        settingsManagerMock.when(SettingsManager::getSettings).thenReturn(settings);
+        settings = SettingsStub.builder().withFlags(TracingMode.ALWAYS).withSampleRate(0).withSettingsArgs(args).build();
+        when(settingsFetcherMock.getSettings()).thenReturn(settings);
         remoteSampleRate = TraceDecisionUtil.getRemoteTraceConfig();
         assertEquals(1.0, remoteSampleRate.getBucketCapacity(TokenBucketType.REGULAR)); //should default to 0
         assertEquals(2.0, remoteSampleRate.getBucketRate(TokenBucketType.REGULAR)); //should default to 0
-        settingsManagerMock.close();
     }
 
     /**
@@ -779,6 +747,10 @@ public class TraceDecisionUtilTest {
 
     @Test
     public void testBadSignature() {
+        when(settingsFetcherMock.getSettings())
+                .thenReturn(SettingsStub.builder()
+                        .withFlags(true, false, true, true, false)
+                        .withSampleRate(1000000).build());
         TraceDecision traceDecision;
         traceDecision = TraceDecisionUtil.shouldTraceRequest(TEST_LAYER, null, null, null);
         assertTrue(traceDecision.isSampled());

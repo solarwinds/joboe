@@ -3,14 +3,14 @@ package com.solarwinds.joboe.sampling;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SettingsMock extends Settings {
+public class SettingsStub extends Settings {
     private final short settingsType;
     private short flags = 0;
     private int sampleRate = 1000000;
     private final Map<SettingsArg<?>, Object> args;
 
 
-    private SettingsMock(short settingsType, short flags, Integer sampleRate, Map<SettingsArg<?>, Object> args) {
+    private SettingsStub(short settingsType, short flags, Integer sampleRate, Map<SettingsArg<?>, Object> args) {
         this.settingsType = settingsType;
         this.flags = flags;
         if (sampleRate != null) {
@@ -57,11 +57,11 @@ public class SettingsMock extends Settings {
         return 0;
     }
 
-    public static SettingsMockBuilder builder() {
-        return new SettingsMockBuilder();
+    public static SettingsStubBuilder builder() {
+        return new SettingsStubBuilder();
     }
 
-    public static class SettingsMockBuilder {
+    public static class SettingsStubBuilder {
         private short flags = 0;
         private Integer sampleRate = null;
         private final Map<SettingsArg<?>, Object> args = new HashMap<SettingsArg<?>, Object>();
@@ -70,7 +70,7 @@ public class SettingsMock extends Settings {
         public static final double DEFAULT_TOKEN_BUCKET_CAPACITY = 16.0;
         private short settingsType = Settings.OBOE_SETTINGS_TYPE_DEFAULT_SAMPLE_RATE;
 
-        public SettingsMockBuilder() {
+        public SettingsStubBuilder() {
             addDefaultArgs();
         }
 
@@ -83,39 +83,39 @@ public class SettingsMock extends Settings {
             args.put(SettingsArg.STRICT_BUCKET_CAPACITY, DEFAULT_TOKEN_BUCKET_CAPACITY);
         }
 
-        public SettingsMockBuilder withFlags(boolean isStart, boolean isThrough, boolean isThroughAlways, boolean isTriggerTraceEnabled, boolean isOverride) {
+        public SettingsStubBuilder withFlags(boolean isStart, boolean isThrough, boolean isThroughAlways, boolean isTriggerTraceEnabled, boolean isOverride) {
             flags = getFlags(isStart, isThrough, isThroughAlways, isTriggerTraceEnabled, isOverride);
             return this;
         }
 
-        public SettingsMockBuilder withFlags(TracingMode tracingMode) {
+        public SettingsStubBuilder withFlags(TracingMode tracingMode) {
             flags |= tracingMode.toFlags();
             return this;
         }
 
-        public SettingsMockBuilder withSampleRate(int sampleRate) {
+        public SettingsStubBuilder withSampleRate(int sampleRate) {
             this.sampleRate = sampleRate;
             return this;
         }
 
-        public <T> SettingsMockBuilder withSettingsArg(SettingsArg<T> arg, T value) {
+        public <T> SettingsStubBuilder withSettingsArg(SettingsArg<T> arg, T value) {
             args.put(arg, value);
             return this;
         }
 
-        public SettingsMockBuilder withSettingsArgs(Map<SettingsArg<?>, ?> args) {
+        public SettingsStubBuilder withSettingsArgs(Map<SettingsArg<?>, ?> args) {
             this.args.clear();
             this.args.putAll(args);
             return this;
         }
 
-        public SettingsMockBuilder withSettingsType(short settingsType) {
+        public SettingsStubBuilder withSettingsType(short settingsType) {
             this.settingsType = settingsType;
             return this;
         }
 
-        public SettingsMock build() {
-            return new SettingsMock(settingsType, flags, sampleRate, args);
+        public SettingsStub build() {
+            return new SettingsStub(settingsType, flags, sampleRate, args);
         }
 
 

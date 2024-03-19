@@ -1,12 +1,12 @@
 package com.solarwinds.joboe.sampling;
 
-import java.util.Arrays;
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import com.solarwinds.joboe.logging.Logger;
 import com.solarwinds.joboe.logging.LoggerFactory;
 import lombok.Getter;
+
+import java.util.Arrays;
+import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Oboe Metadata: Task and Op IDs
@@ -65,8 +65,9 @@ public class Metadata {
         if (initializedStatics) {
             initialize();
             fromHexString(hexStr);
+        } else {
+            throw new SamplingException("Must call Metadata#setup first");
         }
-        throw new SamplingException("Must call Metadata#setup first");
     }
 
     public Metadata(Metadata toClone) {

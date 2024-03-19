@@ -11,6 +11,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mockStatic;
 
 
@@ -70,6 +71,7 @@ public class MetadataTest {
         //should not accept trace id from different version
         String v1Id = "01-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01";
         String v0Id = "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01";
+        Metadata.setup(SamplingConfiguration.builder().build());
 
         assertFalse(Metadata.isCompatible(v1Id));
         assertTrue(Metadata.isCompatible(v0Id));
@@ -79,7 +81,8 @@ public class MetadataTest {
     public void testSampled() throws SamplingException {
         String sampledId = "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01";
         String notSampledId = "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-00";
-        
+        Metadata.setup(SamplingConfiguration.builder().build());
+
         assertTrue(new Metadata(sampledId).isSampled());
         assertFalse(new Metadata(notSampledId).isSampled());
         
@@ -106,9 +109,10 @@ public class MetadataTest {
 
     @Test
     public void testTtlChange() {
-        assertEquals(Metadata.DEFAULT_TTL, Metadata.getTtl());
         MockedStatic<SettingsManager> settingsManagerMock = mockStatic(SettingsManager.class);
-        settingsManagerMock.verify(() -> SettingsManager.registerListener(listenerArgumentCaptor.capture()));
+        assertEquals(Metadata.DEFAULT_TTL, Metadata.getTtl());
+        Metadata.setup(SamplingConfiguration.builder().build());
+        settingsManagerMock.verify(() -> SettingsManager.registerListener(listenerArgumentCaptor.capture()), atLeastOnce());
 
         int newTtl = 10;
         listenerArgumentCaptor.getAllValues().forEach(integerSettingsArgChangeListener -> integerSettingsArgChangeListener.onChange(newTtl));
@@ -122,10 +126,11 @@ public class MetadataTest {
 
     @Test
     public void testMaxEventsChange() {
-        assertEquals(Metadata.DEFAULT_MAX_EVENTS, Metadata.getMaxEvents());
         MockedStatic<SettingsManager> settingsManagerMock = mockStatic(SettingsManager.class);
-        settingsManagerMock.verify(() -> SettingsManager.registerListener(listenerArgumentCaptor.capture()));
-        
+        Metadata.setup(SamplingConfiguration.builder().build());
+        assertEquals(Metadata.DEFAULT_MAX_EVENTS, Metadata.getMaxEvents());
+        settingsManagerMock.verify(() -> SettingsManager.registerListener(listenerArgumentCaptor.capture()), atLeastOnce());
+
         int newMaxEvents = 100;
         listenerArgumentCaptor.getAllValues().forEach(integerSettingsArgChangeListener -> integerSettingsArgChangeListener.onChange(newMaxEvents));
         assertEquals(newMaxEvents, Metadata.getMaxEvents());
@@ -140,10 +145,11 @@ public class MetadataTest {
 
     @Test
     public void testMaxBacktracesChange() {
-        assertEquals(Metadata.DEFAULT_MAX_BACKTRACES, Metadata.getMaxBacktraces());
         MockedStatic<SettingsManager> settingsManagerMock = mockStatic(SettingsManager.class);
-        settingsManagerMock.verify(() -> SettingsManager.registerListener(listenerArgumentCaptor.capture()));
-        
+        Metadata.setup(SamplingConfiguration.builder().build());
+        assertEquals(Metadata.DEFAULT_MAX_BACKTRACES, Metadata.getMaxBacktraces());
+        settingsManagerMock.verify(() -> SettingsManager.registerListener(listenerArgumentCaptor.capture()), atLeastOnce());
+
         int newMaxBacktraces = 100;
         listenerArgumentCaptor.getAllValues().forEach(integerSettingsArgChangeListener -> integerSettingsArgChangeListener.onChange(newMaxBacktraces));
         assertEquals(newMaxBacktraces, Metadata.getMaxBacktraces());

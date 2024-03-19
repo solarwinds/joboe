@@ -3,6 +3,8 @@ package com.solarwinds.joboe.sampling;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -14,10 +16,14 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class SettingsManagerTest {
+
+    @Captor
+    private ArgumentCaptor<SettingsListener> settingsListenerArgumentCaptor;
 
     @Mock
     private SettingsFetcher settingsFetcherMock;
@@ -26,62 +32,66 @@ public class SettingsManagerTest {
     public void testArgChangeListener() {
         TestArgChangeListener<Double> bucketCapacityListener = new TestArgChangeListener<Double>(SettingsArg.BUCKET_CAPACITY);
         TestArgChangeListener<Integer> metricsFlushIntervalListener = new TestArgChangeListener<Integer>(SettingsArg.METRIC_FLUSH_INTERVAL);
-        
         SettingsManager.registerListener(bucketCapacityListener);
-        SettingsManager.registerListener(metricsFlushIntervalListener);
 
+        SettingsManager.registerListener(metricsFlushIntervalListener);
         SettingsManager.initializeFetcher(settingsFetcherMock);
+        verify(settingsFetcherMock).registerListener(settingsListenerArgumentCaptor.capture());
         
         //test settings args
         Map<SettingsArg<?>, Object> args = new HashMap<SettingsArg<?>, Object>();
         args.put(SettingsArg.BUCKET_CAPACITY, 1.0);
         args.put(SettingsArg.METRIC_FLUSH_INTERVAL, 5);
 
-        when(settingsFetcherMock.getSettings())
-                .thenReturn(SettingsMock.builder()
-                        .withFlags(TracingMode.ALWAYS)
-                        .withSampleRate(TraceDecisionUtil.SAMPLE_RESOLUTION)
-                        .withSettingsArgs(args).build());
+        settingsListenerArgumentCaptor.getValue()
+                .onSettingsRetrieved(SettingsStub.builder()
+                .withFlags(TracingMode.ALWAYS)
+                .withSampleRate(TraceDecisionUtil.SAMPLE_RESOLUTION)
+                .withSettingsArgs(args).build());
         assertEquals(1.0, bucketCapacityListener.newValue);
         assertEquals((Integer) 5, metricsFlushIntervalListener.newValue);
-        
+
         //test settings args changes
         args.clear();
         args.put(SettingsArg.BUCKET_CAPACITY, 2.0);
         args.put(SettingsArg.METRIC_FLUSH_INTERVAL, 6);
-        when(settingsFetcherMock.getSettings())
-                .thenReturn(SettingsMock.builder()
-                        .withFlags(TracingMode.ALWAYS)
-                        .withSampleRate(TraceDecisionUtil.SAMPLE_RESOLUTION)
-                        .withSettingsArgs(args)
-                        .build());
+
+        settingsListenerArgumentCaptor.getValue()
+                .onSettingsRetrieved(SettingsStub.builder()
+                .withFlags(TracingMode.ALWAYS)
+                .withSampleRate(TraceDecisionUtil.SAMPLE_RESOLUTION)
+                .withSettingsArgs(args)
+                .build());
+
         assertEquals(2.0, bucketCapacityListener.newValue);
         assertEquals((Integer) 6, metricsFlushIntervalListener.newValue);
-        
+
         //test settings args set to null from non null
-        when(settingsFetcherMock.getSettings())
-                .thenReturn(SettingsMock.builder()
-                        .withFlags(TracingMode.ALWAYS)
-                        .withSampleRate(TraceDecisionUtil.SAMPLE_RESOLUTION)
-                        .withSettingsArgs(Collections.emptyMap())
-                        .build());
+        settingsListenerArgumentCaptor.getValue()
+                .onSettingsRetrieved(SettingsStub.builder()
+                .withFlags(TracingMode.ALWAYS)
+                .withSampleRate(TraceDecisionUtil.SAMPLE_RESOLUTION)
+                .withSettingsArgs(Collections.emptyMap())
+                .build());
+
         assertNull(bucketCapacityListener.newValue);
         assertNull(metricsFlushIntervalListener.newValue);
-        
-        
+
+
         //one of the test args changed from null to some value
         args.clear();
         args.put(SettingsArg.BUCKET_CAPACITY, 3.0);
-        when(settingsFetcherMock.getSettings())
-                .thenReturn(SettingsMock.builder()
+        settingsListenerArgumentCaptor.getValue()
+                .onSettingsRetrieved(SettingsStub.builder()
                         .withFlags(TracingMode.ALWAYS)
                         .withSampleRate(TraceDecisionUtil.SAMPLE_RESOLUTION)
                         .withSettingsArgs(args)
                         .build());
+
         assertEquals(3.0, bucketCapacityListener.newValue); //the value has not been changed
         assertNull(metricsFlushIntervalListener.newValue); //value has been changed
         bucketCapacityListener.newValue = null; //reset listener
-        
+
         //test values unchanged
         assertNull(bucketCapacityListener.newValue); //the value has not been changed
         assertNull(metricsFlushIntervalListener.newValue); //the value has not been changed
@@ -95,7 +105,7 @@ public class SettingsManagerTest {
     public void testGetSettings() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         when(settingsFetcherMock.getSettings())
-                .thenReturn(SettingsMock.builder()
+                .thenReturn(SettingsStub.builder()
                         .withFlags(TracingMode.ALWAYS)
                         .withSampleRate(TraceDecisionUtil.SAMPLE_RESOLUTION).build());
         when(settingsFetcherMock.isSettingsAvailableLatch())

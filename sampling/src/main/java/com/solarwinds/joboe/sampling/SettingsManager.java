@@ -34,7 +34,7 @@ public final class SettingsManager {
     private static final Logger logger = LoggerFactory.getLogger();
 
     @Getter
-    private static SamplingConfiguration samplingConfiguration;
+    private static SamplingConfiguration samplingConfiguration = SamplingConfiguration.builder().build();
 
     public static CountDownLatch initialize(SettingsFetcher fetcher, SamplingConfiguration samplingConfiguration)  {
         initializeFetcher(fetcher);
@@ -46,8 +46,7 @@ public final class SettingsManager {
             
     /**
      * Initializes this manager with a provided {@link SettingsFetcher}. Direct call to this is only for internal tests
-     * 
-     * @param fetcher
+     *
      */
     public static void initializeFetcher(SettingsFetcher fetcher) {
         SettingsManager.fetcher = fetcher;
