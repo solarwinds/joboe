@@ -1,8 +1,8 @@
 package com.solarwinds.joboe.core.rpc;
 
 import com.solarwinds.joboe.core.rpc.grpc.GrpcClientManager;
-import com.solarwinds.joboe.core.logging.Logger;
-import com.solarwinds.joboe.core.logging.LoggerFactory;
+import com.solarwinds.joboe.logging.Logger;
+import com.solarwinds.joboe.logging.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;

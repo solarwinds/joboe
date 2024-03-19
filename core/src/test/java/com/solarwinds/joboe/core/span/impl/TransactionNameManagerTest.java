@@ -1,15 +1,13 @@
 package com.solarwinds.joboe.core.span.impl;
 
-import com.solarwinds.joboe.core.TraceDecisionUtil;
-import com.solarwinds.joboe.core.TracingMode;
-import com.solarwinds.joboe.core.settings.SettingsArg;
-import com.solarwinds.joboe.core.settings.SettingsManager;
-import com.solarwinds.joboe.core.settings.SimpleSettingsFetcher;
 import com.solarwinds.joboe.core.settings.TestSettingsReader;
 import com.solarwinds.joboe.core.settings.TestSettingsReader.SettingsMockupBuilder;
 import com.solarwinds.joboe.core.span.impl.Span.SpanProperty;
 import com.solarwinds.joboe.core.span.impl.Span.TraceProperty;
 import com.solarwinds.joboe.core.util.TestUtils;
+import com.solarwinds.joboe.sampling.SettingsArg;
+import com.solarwinds.joboe.sampling.TraceDecisionUtil;
+import com.solarwinds.joboe.sampling.TracingMode;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

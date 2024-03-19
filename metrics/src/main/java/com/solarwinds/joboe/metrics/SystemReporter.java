@@ -2,8 +2,8 @@ package com.solarwinds.joboe.metrics;
 
 import java.util.Map;
 
-import com.solarwinds.joboe.core.logging.Logger;
-import com.solarwinds.joboe.core.logging.LoggerFactory;
+import com.solarwinds.joboe.logging.Logger;
+import com.solarwinds.joboe.logging.LoggerFactory;
 
 /**
  * Reports data collected by {@link SystemCollector}. Take note that this is not bound to any reporting method. Though the existing implementations all

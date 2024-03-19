@@ -3,15 +3,16 @@ package com.solarwinds.joboe.core.profiler;
 import com.solarwinds.joboe.core.Context;
 import com.solarwinds.joboe.core.Event;
 import com.solarwinds.joboe.core.EventReporter;
-import com.solarwinds.joboe.core.Metadata;
 import com.solarwinds.joboe.core.config.ProfilerSetting;
-import com.solarwinds.joboe.core.logging.Logger;
-import com.solarwinds.joboe.core.logging.LoggerFactory;
-import com.solarwinds.joboe.core.settings.SettingsArg;
-import com.solarwinds.joboe.core.settings.SettingsArgChangeListener;
-import com.solarwinds.joboe.core.settings.SettingsManager;
+import com.solarwinds.joboe.logging.Logger;
+import com.solarwinds.joboe.logging.LoggerFactory;
+
 import com.solarwinds.joboe.core.util.TimeUtils;
 import com.solarwinds.joboe.core.util.DaemonThreadFactory;
+import com.solarwinds.joboe.sampling.Metadata;
+import com.solarwinds.joboe.sampling.SettingsArg;
+import com.solarwinds.joboe.sampling.SettingsArgChangeListener;
+import com.solarwinds.joboe.sampling.SettingsManager;
 import lombok.Getter;
 
 import java.util.*;

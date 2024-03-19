@@ -3,8 +3,8 @@ package com.solarwinds.joboe.core.rpc.grpc;
 import com.solarwinds.joboe.core.rpc.Client;
 import com.solarwinds.joboe.core.rpc.RpcClient;
 import com.solarwinds.joboe.core.rpc.RpcClientManager;
-import com.solarwinds.joboe.core.logging.Logger;
-import com.solarwinds.joboe.core.logging.LoggerFactory;
+import com.solarwinds.joboe.logging.Logger;
+import com.solarwinds.joboe.logging.LoggerFactory;
 
 /**
  * Manages creation of {@link GrpcClient}. Currently, only 2 gRPC client instances are allowed per JVM process -

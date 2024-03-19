@@ -1,7 +1,7 @@
 package com.solarwinds.joboe.core.config;
 
-import com.solarwinds.joboe.core.logging.Logger;
-import com.solarwinds.joboe.core.logging.LoggerFactory;
+import com.solarwinds.joboe.logging.Logger;
+import com.solarwinds.joboe.logging.LoggerFactory;
 
 public class ConfigManager {
     private static final Logger logger = LoggerFactory.getLogger();

@@ -1,14 +1,12 @@
 package com.solarwinds.joboe.metrics;
 
-import com.solarwinds.joboe.core.TraceDecisionUtil;
-import com.solarwinds.joboe.core.TracingMode;
-import com.solarwinds.joboe.core.settings.SettingsArg;
-import com.solarwinds.joboe.core.settings.SettingsManager;
-import com.solarwinds.joboe.core.settings.SimpleSettingsFetcher;
 import com.solarwinds.joboe.core.settings.TestSettingsReader.SettingsMockupBuilder;
 import com.solarwinds.joboe.core.metrics.MetricKey;
 import com.solarwinds.joboe.core.metrics.MetricsEntry;
 import com.solarwinds.joboe.core.metrics.measurement.SummaryDoubleMeasurement;
+import com.solarwinds.joboe.sampling.SettingsArg;
+import com.solarwinds.joboe.sampling.TraceDecisionUtil;
+import com.solarwinds.joboe.sampling.TracingMode;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -42,6 +42,16 @@
   </dependencyManagement>
   <dependencies>
     <dependency>
+      <groupId>com.solarwinds.joboe</groupId>
+      <artifactId>logging</artifactId>
+      <version>${revision}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.solarwinds.joboe</groupId>
+      <artifactId>sampling</artifactId>
+      <version>${revision}</version>
+    </dependency>
+    <dependency>
       <groupId>com.google.code.findbugs</groupId>
       <artifactId>jsr305</artifactId>
       <version>3.0.2</version>

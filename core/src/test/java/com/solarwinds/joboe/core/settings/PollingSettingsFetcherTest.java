@@ -1,8 +1,12 @@
 package com.solarwinds.joboe.core.settings;
 
 import com.solarwinds.joboe.core.Event;
-import com.solarwinds.joboe.core.TraceDecisionUtil;
 import com.solarwinds.joboe.core.rpc.*;
+import com.solarwinds.joboe.sampling.Settings;
+import com.solarwinds.joboe.sampling.SettingsArg;
+import com.solarwinds.joboe.sampling.SettingsFetcher;
+import com.solarwinds.joboe.sampling.SettingsListener;
+import com.solarwinds.joboe.sampling.TraceDecisionUtil;
 import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
@@ -15,12 +19,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class PollingSettingsFetcherTest {
     private static final int SAMPLE_RATE_FOR_DEFAULT_LAYER = 400000;
-    private static final List<Settings> MOCK_SETTINGS = new ArrayList<Settings>();
+    private static final List<RpcSettings> MOCK_SETTINGS = new ArrayList<RpcSettings>();
     public static final short DEFAULT_FLAGS =
-            Settings.OBOE_SETTINGS_FLAG_TRIGGER_TRACE_ENABLED |
-            Settings.OBOE_SETTINGS_FLAG_SAMPLE_START |
-            Settings.OBOE_SETTINGS_FLAG_SAMPLE_THROUGH |
-            Settings.OBOE_SETTINGS_FLAG_SAMPLE_THROUGH_ALWAYS;
+            RpcSettings.OBOE_SETTINGS_FLAG_TRIGGER_TRACE_ENABLED |
+            RpcSettings.OBOE_SETTINGS_FLAG_SAMPLE_START |
+            RpcSettings.OBOE_SETTINGS_FLAG_SAMPLE_THROUGH |
+            RpcSettings.OBOE_SETTINGS_FLAG_SAMPLE_THROUGH_ALWAYS;
     
     public static final String DEFAULT_FLAGS_STRING = "TRIGGER_TRACE,SAMPLE_THROUGH_ALWAYS,SAMPLE_THROUGH,SAMPLE_START";
     
@@ -55,7 +59,7 @@ public class PollingSettingsFetcherTest {
 //            MOCK_SETTINGS.add(new com.solarwinds.joboe.core.rpc.Settings(Settings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE, DEFAULT_FLAGS_STRING, Agent.currentTimeStamp(), layerSampleRate.getValue(), TTL, layerSampleRate.getKey(), args));
 //        }
         
-        MOCK_SETTINGS.add(new com.solarwinds.joboe.core.rpc.Settings(Settings.OBOE_SETTINGS_TYPE_DEFAULT_SAMPLE_RATE, DEFAULT_FLAGS_STRING, System.currentTimeMillis(), SAMPLE_RATE_FOR_DEFAULT_LAYER, TTL, "", ARGS));
+        MOCK_SETTINGS.add(new RpcSettings(RpcSettings.OBOE_SETTINGS_TYPE_DEFAULT_SAMPLE_RATE, DEFAULT_FLAGS_STRING, System.currentTimeMillis(), SAMPLE_RATE_FOR_DEFAULT_LAYER, TTL, "", ARGS));
     }
 
 
@@ -69,22 +73,10 @@ public class PollingSettingsFetcherTest {
         Settings settings = null;
         
         // Test some values what we know are stored in the above file:
+        assert fetcher != null;
         settings = fetcher.getSettings();
         assertEquals(SAMPLE_RATE_FOR_DEFAULT_LAYER, (int)settings.getValue());
         assertEquals(DEFAULT_FLAGS, settings.getFlags());
-
-//        settings = fetcher.getLayerSampleRate("jboss");
-//        assertEquals(200000, (int)settings.getValue());
-//        assertEquals(DEFAULT_FLAGS, settings.getFlags());
-//
-//        settings = fetcher.getLayerSampleRate("java");
-//        assertEquals(300000, (int)settings.getValue());
-//        assertEquals(DEFAULT_FLAGS, settings.getFlags());
-//
-//        // This should use the default:
-//        settings = fetcher.getLayerSampleRate("this_does_not_exist");
-//        assertEquals(400000, (int)settings.getValue());
-//        assertEquals(DEFAULT_FLAGS, settings.getFlags());
 
         
         //old settings should not return bucket capacity nor rate
@@ -98,7 +90,8 @@ public class PollingSettingsFetcherTest {
     public void testSettingsCache() throws Exception {
         Client client = new OneHitWonderClient(MOCK_SETTINGS);
         SettingsFetcher fetcher = getFetcher(client);
-        
+
+        assert fetcher != null;
         Settings settings = fetcher.getSettings(); //first hit should be okay
         assertEquals(SAMPLE_RATE_FOR_DEFAULT_LAYER, (int)settings.getValue());
 
@@ -113,8 +106,9 @@ public class PollingSettingsFetcherTest {
     public void testSettingsCacheExpired() throws Exception {
         Client client = new OneHitWonderClient(MOCK_SETTINGS);
         SettingsFetcher fetcher = getFetcher(client);
-        
-        Settings settings = fetcher.getSettings(); //cached Settings not yet expired 
+
+        assert fetcher != null;
+        Settings settings = fetcher.getSettings(); //cached Settings not yet expired
         assertEquals(SAMPLE_RATE_FOR_DEFAULT_LAYER, (int)settings.getValue());
         
         int wait = TTL - 1; //wait shorter than TTL so settings should not yet expire on dead client
@@ -136,10 +130,10 @@ public class PollingSettingsFetcherTest {
     public void testInvalidArgs() throws Exception {
         SettingsFetcher fetcher;
         Settings settings;
-        com.solarwinds.joboe.core.rpc.Settings sourceSettings;
+        Settings sourceSettings;
         
         //test remote settings that give empty map for args
-        sourceSettings = new com.solarwinds.joboe.core.rpc.Settings(Settings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE, DEFAULT_FLAGS_STRING, System.currentTimeMillis(), 100000, TTL, "", Collections.emptyMap());
+        sourceSettings = new RpcSettings(RpcSettings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE, DEFAULT_FLAGS_STRING, System.currentTimeMillis(), 100000, TTL, "", Collections.emptyMap());
         Client client = new MockRpcClient(Collections.singletonList(sourceSettings));
         fetcher = getFetcher(client);
         settings = fetcher.getSettings();
@@ -153,7 +147,7 @@ public class PollingSettingsFetcherTest {
         args.put(SettingsArg.BUCKET_CAPACITY.getKey(), ByteBuffer.allocate(0));
         args.put(SettingsArg.BUCKET_RATE.getKey(), ByteBuffer.allocate(0));
         args.put(SettingsArg.METRIC_FLUSH_INTERVAL.getKey(), ByteBuffer.allocate(0));
-        sourceSettings = new com.solarwinds.joboe.core.rpc.Settings(Settings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE, DEFAULT_FLAGS_STRING, System.currentTimeMillis(), 100000, TTL, "", args);
+        sourceSettings = new RpcSettings(RpcSettings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE, DEFAULT_FLAGS_STRING, System.currentTimeMillis(), 100000, TTL, "", args);
         fetcher = getFetcher(new MockRpcClient(Collections.singletonList(sourceSettings)));
         settings = fetcher.getSettings();
         assertEquals(100000, (int)settings.getValue());
@@ -177,7 +171,7 @@ public class PollingSettingsFetcherTest {
         buffer.putInt(3);
         buffer.rewind();
         args.put(SettingsArg.METRIC_FLUSH_INTERVAL.getKey(), buffer);
-        sourceSettings = new com.solarwinds.joboe.core.rpc.Settings(Settings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE, DEFAULT_FLAGS_STRING, System.currentTimeMillis(), 100000, TTL, "", args);
+        sourceSettings = new RpcSettings(RpcSettings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE, DEFAULT_FLAGS_STRING, System.currentTimeMillis(), 100000, TTL, "", args);
         fetcher = getFetcher(new MockRpcClient(Collections.singletonList(sourceSettings)));
         settings = fetcher.getSettings();
         assertEquals(100000, (int)settings.getValue());
@@ -193,12 +187,13 @@ public class PollingSettingsFetcherTest {
     public void testInvalidSampleRate() throws Exception {
         SettingsFetcher fetcher;
         Settings settings;
-        com.solarwinds.joboe.core.rpc.Settings sourceSettings;
+        Settings sourceSettings;
         
         //test remote settings that gives sample rate that is greater than 1000000
-        sourceSettings = new com.solarwinds.joboe.core.rpc.Settings(Settings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE, DEFAULT_FLAGS_STRING, System.currentTimeMillis(), 1111111, TTL, "", ARGS);
+        sourceSettings = new RpcSettings(RpcSettings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE, DEFAULT_FLAGS_STRING, System.currentTimeMillis(), 1111111, TTL, "", ARGS);
         Client client = new MockRpcClient(Collections.singletonList(sourceSettings));
         fetcher = getFetcher(client);
+        assert fetcher != null;
         settings = fetcher.getSettings();
         assertEquals(TraceDecisionUtil.SAMPLE_RESOLUTION, (int)settings.getValue()); //should be adjusted to 1000000
         assertEquals(DEFAULT_FLAGS, settings.getFlags());
@@ -206,7 +201,7 @@ public class PollingSettingsFetcherTest {
         assertEquals(BUCKET_RATE, settings.getArgValue(SettingsArg.BUCKET_RATE));
         
         //test remote settings that gives sample rate that is negative
-        sourceSettings = new com.solarwinds.joboe.core.rpc.Settings(Settings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE, DEFAULT_FLAGS_STRING, System.currentTimeMillis(), -1, TTL, "", ARGS);
+        sourceSettings = new RpcSettings(RpcSettings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE, DEFAULT_FLAGS_STRING, System.currentTimeMillis(), -1, TTL, "", ARGS);
         fetcher = getFetcher(new MockRpcClient(Collections.singletonList(sourceSettings)));
         settings = fetcher.getSettings();
         assertEquals(0, (int)settings.getValue()); //should be adjusted to 0
@@ -221,10 +216,9 @@ public class PollingSettingsFetcherTest {
     public void testExecutionException()  throws Exception {
         Client client = new ExecutionExceptionClient();
         SettingsFetcher fetcher = getFetcher(client);
-        
-        Settings settings = null;
-        
-        settings = fetcher.getSettings();
+
+        assert fetcher != null;
+        Settings settings = fetcher.getSettings();
         assertNull(settings);
                 
         fetcher.close();
@@ -232,8 +226,8 @@ public class PollingSettingsFetcherTest {
 
     @Test
     public void testSettingsListener() throws InterruptedException {
-        Settings settings;
-        settings = new com.solarwinds.joboe.core.rpc.Settings(Settings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE, DEFAULT_FLAGS_STRING, System.currentTimeMillis(), 1, TTL, "", ARGS);
+        RpcSettings settings;
+        settings = new RpcSettings(RpcSettings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE, DEFAULT_FLAGS_STRING, System.currentTimeMillis(), 1, TTL, "", ARGS);
         Client client = new MockRpcClient(Collections.singletonList(settings));
         
         SettingsFetcher fetcher = new PollingSettingsFetcher(new RpcSettingsReader(client), 1); //refresh every second
@@ -302,7 +296,7 @@ public class PollingSettingsFetcherTest {
         protected List<Settings> getClonedSettings() {
             List<Settings> clonedSettings = new ArrayList<Settings>();
             for (Settings settingsEntry : settings) {
-                clonedSettings.add(new com.solarwinds.joboe.core.rpc.Settings((com.solarwinds.joboe.core.rpc.Settings) settingsEntry, System.currentTimeMillis())); //create clones with the current timestamp
+                clonedSettings.add(new RpcSettings((RpcSettings) settingsEntry, System.currentTimeMillis())); //create clones with the current timestamp
             }
             
             return clonedSettings;  
@@ -339,7 +333,7 @@ public class PollingSettingsFetcherTest {
         private boolean hasHit = false;
         private final ExecutorService service = Executors.newSingleThreadExecutor();
 
-        protected OneHitWonderClient(List<Settings> settings) {
+        protected OneHitWonderClient(List<RpcSettings> settings) {
             super(settings);
         }
 

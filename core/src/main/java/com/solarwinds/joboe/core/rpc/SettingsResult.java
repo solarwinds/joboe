@@ -2,7 +2,7 @@ package com.solarwinds.joboe.core.rpc;
 
 import java.util.List;
 
-import com.solarwinds.joboe.core.settings.Settings;
+import com.solarwinds.joboe.sampling.Settings;
 import lombok.Getter;
 
 @Getter

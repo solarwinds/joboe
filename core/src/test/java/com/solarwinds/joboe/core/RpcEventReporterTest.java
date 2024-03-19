@@ -2,12 +2,12 @@ package com.solarwinds.joboe.core;
 
 import com.solarwinds.joboe.core.rpc.Client;
 import com.solarwinds.joboe.core.rpc.ResultCode;
-import com.solarwinds.joboe.core.settings.SettingsArg;
-import com.solarwinds.joboe.core.settings.SettingsManager;
-import com.solarwinds.joboe.core.settings.SimpleSettingsFetcher;
 import com.solarwinds.joboe.core.settings.TestSettingsReader;
 import com.solarwinds.joboe.core.settings.TestSettingsReader.SettingsMockupBuilder;
 import com.solarwinds.joboe.core.util.TestUtils;
+import com.solarwinds.joboe.sampling.SettingsArg;
+import com.solarwinds.joboe.sampling.TraceDecisionUtil;
+import com.solarwinds.joboe.sampling.TracingMode;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;

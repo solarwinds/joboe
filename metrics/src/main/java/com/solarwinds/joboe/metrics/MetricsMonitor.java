@@ -8,10 +8,11 @@ import com.solarwinds.joboe.core.config.InvalidConfigException;
 import com.solarwinds.joboe.core.rpc.ClientException;
 import com.solarwinds.joboe.core.rpc.RpcClientManager;
 import com.solarwinds.joboe.core.rpc.RpcClientManager.OperationType;
-import com.solarwinds.joboe.core.settings.SettingsArg;
-import com.solarwinds.joboe.core.settings.SettingsArgChangeListener;
-import com.solarwinds.joboe.core.settings.SettingsManager;
+
 import com.solarwinds.joboe.core.metrics.MetricsEntry;
+import com.solarwinds.joboe.sampling.SettingsArg;
+import com.solarwinds.joboe.sampling.SettingsArgChangeListener;
+import com.solarwinds.joboe.sampling.SettingsManager;
 
 /**
  * {@code SystemMonitor} for various metrics. The the list of supported metrics, please refer to {@link MetricsCollector} 

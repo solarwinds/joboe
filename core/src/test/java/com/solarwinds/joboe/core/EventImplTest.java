@@ -1,20 +1,13 @@
 package com.solarwinds.joboe.core;
 
 
-import com.solarwinds.joboe.core.Constants;
-import com.solarwinds.joboe.core.Context;
-import com.solarwinds.joboe.core.Event;
-import com.solarwinds.joboe.core.EventImpl;
-import com.solarwinds.joboe.core.EventReporter;
-import com.solarwinds.joboe.core.Metadata;
-import com.solarwinds.joboe.core.ReporterFactory;
-import com.solarwinds.joboe.core.TestReporter;
 import com.solarwinds.joboe.core.TestReporter.DeserializedEvent;
 import com.solarwinds.joboe.core.config.InvalidConfigException;
 import com.solarwinds.joboe.core.ebson.BsonDocument;
 import com.solarwinds.joboe.core.ebson.BsonReader;
 import com.solarwinds.joboe.core.ebson.BsonToken;
 import com.solarwinds.joboe.core.util.TestUtils;
+import com.solarwinds.joboe.sampling.Metadata;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 

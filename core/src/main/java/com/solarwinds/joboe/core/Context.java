@@ -3,11 +3,13 @@
  */
 package com.solarwinds.joboe.core;
 
-import com.solarwinds.joboe.core.settings.SettingsArg;
-import com.solarwinds.joboe.core.settings.SettingsArgChangeListener;
-import com.solarwinds.joboe.core.settings.SettingsManager;
-import com.solarwinds.joboe.core.logging.Logger;
-import com.solarwinds.joboe.core.logging.LoggerFactory;
+import com.solarwinds.joboe.logging.Logger;
+import com.solarwinds.joboe.logging.LoggerFactory;
+import com.solarwinds.joboe.sampling.Metadata;
+import com.solarwinds.joboe.sampling.SamplingException;
+import com.solarwinds.joboe.sampling.SettingsArg;
+import com.solarwinds.joboe.sampling.SettingsArgChangeListener;
+import com.solarwinds.joboe.sampling.SettingsManager;
 
 public class Context {
     private static final ThreadLocal<Boolean> skipInheritingContextThreadLocal = new ThreadLocal<Boolean>();
@@ -60,7 +62,7 @@ public class Context {
     }
     
     public static Event createEventWithID(String metadataID)
-        throws OboeException {
+        throws SamplingException {
         return createEventWithIDAndContext(metadataID, getMetadata());
     }
     
@@ -76,7 +78,7 @@ public class Context {
         }
     }
     
-    public static Event createEventWithIDAndContext(String metadataID, Metadata currentContext) throws OboeException {
+    public static Event createEventWithIDAndContext(String metadataID, Metadata currentContext) throws SamplingException {
         if (shouldCreateEvent(currentContext)) {
             return new EventImpl(currentContext, metadataID, true);
         } else {
@@ -136,7 +138,7 @@ public class Context {
      * @param hexStr
      * @throws OboeException
      */
-    public static void setMetadata(String hexStr) throws OboeException {
+    public static void setMetadata(String hexStr) throws SamplingException {
         Metadata md = new Metadata();
         md.fromHexString(hexStr);
         setMap(md);

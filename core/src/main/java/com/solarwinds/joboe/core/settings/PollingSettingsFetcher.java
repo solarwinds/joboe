@@ -7,9 +7,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
-import com.solarwinds.joboe.core.logging.Logger;
-import com.solarwinds.joboe.core.logging.LoggerFactory;
+import com.solarwinds.joboe.logging.Logger;
+import com.solarwinds.joboe.logging.LoggerFactory;
 import com.solarwinds.joboe.core.util.DaemonThreadFactory;
+import com.solarwinds.joboe.sampling.Settings;
+import com.solarwinds.joboe.sampling.SettingsFetcher;
+import com.solarwinds.joboe.sampling.SettingsListener;
 
 /**
  * A {@link SettingsFetcher} that polls settings from the provided {@link SettingsReader} at a given refresh interval

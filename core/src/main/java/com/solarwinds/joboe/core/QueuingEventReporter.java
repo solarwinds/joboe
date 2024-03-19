@@ -16,12 +16,12 @@ import com.solarwinds.joboe.core.rpc.Client;
 import com.solarwinds.joboe.core.rpc.ClientLoggingCallback;
 import com.solarwinds.joboe.core.rpc.Result;
 import com.solarwinds.joboe.core.rpc.ResultCode;
-import com.solarwinds.joboe.core.settings.SettingsArg;
-import com.solarwinds.joboe.core.settings.SettingsArgChangeListener;
-import com.solarwinds.joboe.core.settings.SettingsManager;
-import com.solarwinds.joboe.core.logging.Logger;
-import com.solarwinds.joboe.core.logging.LoggerFactory;
+import com.solarwinds.joboe.logging.Logger;
+import com.solarwinds.joboe.logging.LoggerFactory;
 import com.solarwinds.joboe.core.util.DaemonThreadFactory;
+import com.solarwinds.joboe.sampling.SettingsArg;
+import com.solarwinds.joboe.sampling.SettingsArgChangeListener;
+import com.solarwinds.joboe.sampling.SettingsManager;
 
 /**
  * A reporter that accepts events into a queue w/o blocking but sends out events synchronously.

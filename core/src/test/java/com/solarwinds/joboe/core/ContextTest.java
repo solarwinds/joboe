@@ -1,18 +1,13 @@
 package com.solarwinds.joboe.core;
 
-import com.solarwinds.joboe.core.Context;
-import com.solarwinds.joboe.core.Event;
-import com.solarwinds.joboe.core.Metadata;
-import com.solarwinds.joboe.core.TestReporter;
 import com.solarwinds.joboe.core.TestReporter.DeserializedEvent;
-import com.solarwinds.joboe.core.TraceDecisionUtil;
-import com.solarwinds.joboe.core.TracingMode;
-import com.solarwinds.joboe.core.settings.SettingsArg;
-import com.solarwinds.joboe.core.settings.SettingsManager;
-import com.solarwinds.joboe.core.settings.SimpleSettingsFetcher;
 import com.solarwinds.joboe.core.settings.TestSettingsReader;
 import com.solarwinds.joboe.core.settings.TestSettingsReader.SettingsMockupBuilder;
 import com.solarwinds.joboe.core.util.TestUtils;
+import com.solarwinds.joboe.sampling.Metadata;
+import com.solarwinds.joboe.sampling.SettingsArg;
+import com.solarwinds.joboe.sampling.TraceDecisionUtil;
+import com.solarwinds.joboe.sampling.TracingMode;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +19,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

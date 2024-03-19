@@ -5,8 +5,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.solarwinds.joboe.core.Metadata;
 import com.solarwinds.joboe.core.OboeException;
+import com.solarwinds.joboe.sampling.Metadata;
+import com.solarwinds.joboe.sampling.SamplingException;
 import lombok.Getter;
 
 /**
@@ -119,7 +120,7 @@ public class SpanContext implements com.solarwinds.joboe.core.span.SpanContext {
 			                       new BigInteger(parts[4], 16).byteValue(),  
 			                       Collections.emptyMap(),
 			                       null);
-		} catch (OboeException e) {
+		} catch (SamplingException e) {
 			throw new IllegalArgumentException(value, e);
 		}
 	}

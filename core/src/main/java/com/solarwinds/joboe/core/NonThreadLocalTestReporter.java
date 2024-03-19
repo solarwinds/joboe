@@ -1,7 +1,7 @@
 package com.solarwinds.joboe.core;
 
-import com.solarwinds.joboe.core.logging.Logger;
-import com.solarwinds.joboe.core.logging.LoggerFactory;
+import com.solarwinds.joboe.logging.Logger;
+import com.solarwinds.joboe.logging.LoggerFactory;
 
 import java.util.Deque;
 import java.util.LinkedList;

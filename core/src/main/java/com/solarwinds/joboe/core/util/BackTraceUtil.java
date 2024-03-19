@@ -1,8 +1,8 @@
 package com.solarwinds.joboe.core.util;
 
 import com.solarwinds.joboe.core.Constants;
-import com.solarwinds.joboe.core.logging.Logger;
-import com.solarwinds.joboe.core.logging.LoggerFactory;
+import com.solarwinds.joboe.logging.Logger;
+import com.solarwinds.joboe.logging.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.List;

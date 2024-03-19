@@ -10,8 +10,9 @@ import com.solarwinds.joboe.core.ebson.BsonDocument;
 import com.solarwinds.joboe.core.ebson.BsonDocuments;
 import com.solarwinds.joboe.core.rpc.RpcClient.TaskType;
 import com.solarwinds.joboe.core.settings.PollingSettingsFetcherTest;
-import com.solarwinds.joboe.core.settings.SettingsArg;
 import com.solarwinds.joboe.core.util.TimeUtils;
+import com.solarwinds.joboe.sampling.Settings;
+import com.solarwinds.joboe.sampling.SettingsArg;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,7 +49,7 @@ public abstract class RpcClientTest {
     private static final String INVALID_CERT_LOCATION = "src/test/java/com/solarwinds/joboe/core/rpc/invalid-collector.crt";
     private static int portWalker = TEST_SERVER_PORT_BASE;
     private static int testServerPort = TEST_SERVER_PORT_BASE;
-    protected static final List<Settings> TEST_SETTINGS = generateTestSettings();
+    protected static final List<RpcSettings> TEST_SETTINGS = generateTestSettings();
 
 
     private static final RpcClient.RetryParamConstants QUICK_RETRY = new RpcClient.RetryParamConstants(100, 200, 3);
@@ -87,15 +88,15 @@ public abstract class RpcClientTest {
         return TEST_SERVER_CERT_LOCATION;
     }
 
-    private static List<Settings> generateTestSettings() {
-        List<Settings> settings = new ArrayList<Settings>();
+    private static List<RpcSettings> generateTestSettings() {
+        List<RpcSettings> settings = new ArrayList<RpcSettings>();
 
         Map<String, ByteBuffer> arguments = new HashMap<String, ByteBuffer>();
 
         arguments.put(SettingsArg.BUCKET_CAPACITY.getKey(), SettingsArg.BUCKET_CAPACITY.toByteBuffer(32.0));
         arguments.put(SettingsArg.BUCKET_RATE.getKey(), SettingsArg.BUCKET_RATE.toByteBuffer(2.0));
 
-        settings.add(new Settings(Settings.OBOE_SETTINGS_TYPE_DEFAULT_SAMPLE_RATE, PollingSettingsFetcherTest.DEFAULT_FLAGS_STRING, TimeUtils.getTimestampMicroSeconds(), 1000000, 600, "test-layer", arguments));
+        settings.add(new RpcSettings(RpcSettings.OBOE_SETTINGS_TYPE_DEFAULT_SAMPLE_RATE, PollingSettingsFetcherTest.DEFAULT_FLAGS_STRING, TimeUtils.getTimestampMicroSeconds(), 1000000, 600, "test-layer", arguments));
         return settings;
     }
 
@@ -272,8 +273,8 @@ public abstract class RpcClientTest {
             assertEquals(TEST_SETTINGS.size(), result.getSettings().size());
 
             for (int i = 0 ; i < TEST_SETTINGS.size(); i ++) {
-                Settings expectedSetting = TEST_SETTINGS.get(i);
-                com.solarwinds.joboe.core.settings.Settings receivedSetting = result.getSettings().get(i);
+                RpcSettings expectedSetting = TEST_SETTINGS.get(i);
+                Settings receivedSetting = result.getSettings().get(i);
                 assertEquals(expectedSetting.getType(), receivedSetting.getType());
 
                 short expectedFlags = expectedSetting.getFlags();

@@ -1,8 +1,9 @@
 package com.solarwinds.joboe.core.settings;
 
+import com.solarwinds.joboe.logging.Logger;
+import com.solarwinds.joboe.logging.LoggerFactory;
+import com.solarwinds.joboe.sampling.Settings;
 import com.solarwinds.trace.ingestion.proto.Collector;
-import com.solarwinds.joboe.core.logging.Logger;
-import com.solarwinds.joboe.core.logging.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;

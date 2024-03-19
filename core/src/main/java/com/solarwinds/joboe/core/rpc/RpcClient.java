@@ -1,9 +1,9 @@
 package com.solarwinds.joboe.core.rpc;
 
 import com.solarwinds.joboe.core.Event;
-import com.solarwinds.joboe.core.logging.Logger;
-import com.solarwinds.joboe.core.logging.Logger.Level;
-import com.solarwinds.joboe.core.logging.LoggerFactory;
+import com.solarwinds.joboe.logging.Logger;
+import com.solarwinds.joboe.logging.Logger.Level;
+import com.solarwinds.joboe.logging.LoggerFactory;
 import com.solarwinds.joboe.core.util.DaemonThreadFactory;
 import com.solarwinds.joboe.core.util.HeartbeatSchedulerProvider;
 import lombok.Getter;

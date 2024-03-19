@@ -4,7 +4,7 @@ import com.solarwinds.joboe.core.AtomicEventReporterStats;
 import com.solarwinds.joboe.core.Event;
 import com.solarwinds.joboe.core.EventReporter;
 import com.solarwinds.joboe.core.EventReporterStats;
-import com.solarwinds.joboe.core.logging.LoggerFactory;
+import com.solarwinds.joboe.logging.LoggerFactory;
 import com.solarwinds.joboe.core.rpc.Client;
 import com.solarwinds.joboe.core.rpc.ClientException;
 import com.solarwinds.joboe.core.rpc.Result;

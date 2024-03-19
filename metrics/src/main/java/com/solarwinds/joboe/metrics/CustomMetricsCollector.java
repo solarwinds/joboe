@@ -5,12 +5,12 @@ import com.solarwinds.joboe.core.metrics.measurement.SimpleMeasurementMetricsEnt
 import com.solarwinds.joboe.core.metrics.measurement.SummaryDoubleMeasurement;
 import com.solarwinds.joboe.core.metrics.measurement.SummaryMeasurement;
 import com.solarwinds.joboe.core.metrics.measurement.SummaryMeasurementMetricsEntry;
+import com.solarwinds.joboe.sampling.SettingsArg;
+import com.solarwinds.joboe.sampling.SettingsArgChangeListener;
+import com.solarwinds.joboe.sampling.SettingsManager;
 import com.solarwinds.joboe.shaded.google.common.cache.CacheBuilder;
 import com.solarwinds.joboe.shaded.google.common.cache.CacheLoader;
 import com.solarwinds.joboe.shaded.google.common.cache.LoadingCache;
-import com.solarwinds.joboe.core.settings.SettingsArg;
-import com.solarwinds.joboe.core.settings.SettingsArgChangeListener;
-import com.solarwinds.joboe.core.settings.SettingsManager;
 import com.solarwinds.joboe.core.metrics.MetricKey;
 import com.solarwinds.joboe.core.metrics.MetricsEntry;
 

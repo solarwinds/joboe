@@ -1,5 +1,7 @@
 package com.solarwinds.joboe.core;
 
+import com.solarwinds.joboe.sampling.Metadata;
+
 import java.nio.ByteBuffer;
 import java.util.Map;
 

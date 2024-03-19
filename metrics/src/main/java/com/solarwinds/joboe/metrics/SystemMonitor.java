@@ -2,8 +2,8 @@ package com.solarwinds.joboe.metrics;
 
 import java.util.Map;
 
-import com.solarwinds.joboe.core.logging.Logger;
-import com.solarwinds.joboe.core.logging.LoggerFactory;
+import com.solarwinds.joboe.logging.Logger;
+import com.solarwinds.joboe.logging.LoggerFactory;
 
 /**
  * An abstract monitor that collects and reports system information periodically based on the interval provided in the ctor. 

@@ -3,11 +3,11 @@ package com.solarwinds.joboe.metrics;
 import java.util.*;
 import java.util.Map.Entry;
 
-import com.solarwinds.joboe.core.TraceDecisionUtil;
-import com.solarwinds.joboe.core.TraceDecisionUtil.MetricType;
-import com.solarwinds.joboe.core.TraceConfig;
+
 import com.solarwinds.joboe.core.metrics.MetricsEntry;
 import com.solarwinds.joboe.core.metrics.measurement.SimpleMeasurementMetricsEntry;
+import com.solarwinds.joboe.sampling.TraceConfig;
+import com.solarwinds.joboe.sampling.TraceDecisionUtil;
 
 /**
  * Sub metrics collector that collects metrics recorded by {@link TraceDecisionUtil} such as "RequestCount", "TraceCount"
@@ -21,12 +21,12 @@ class TraceDecisionMetricsCollector extends AbstractMetricsEntryCollector {
         List<SimpleMeasurementMetricsEntry> layerMetricsEntries = new ArrayList<SimpleMeasurementMetricsEntry>();
         
         
-        layerMetricsEntries.add(getMetricEntry(MetricType.THROUGHPUT, "RequestCount"));
-        layerMetricsEntries.add(getMetricEntry(MetricType.TOKEN_BUCKET_EXHAUSTION, "TokenBucketExhaustionCount"));
-        layerMetricsEntries.add(getMetricEntry(MetricType.TRACE_COUNT, "TraceCount"));
-        layerMetricsEntries.add(getMetricEntry(MetricType.SAMPLE_COUNT, "SampleCount"));
-        layerMetricsEntries.add(getMetricEntry(MetricType.THROUGH_TRACE_COUNT, "ThroughTraceCount"));
-        layerMetricsEntries.add(getMetricEntry(MetricType.TRIGGERED_TRACE_COUNT, "TriggeredTraceCount"));
+        layerMetricsEntries.add(getMetricEntry(TraceDecisionUtil.MetricType.THROUGHPUT, "RequestCount"));
+        layerMetricsEntries.add(getMetricEntry(TraceDecisionUtil.MetricType.TOKEN_BUCKET_EXHAUSTION, "TokenBucketExhaustionCount"));
+        layerMetricsEntries.add(getMetricEntry(TraceDecisionUtil.MetricType.TRACE_COUNT, "TraceCount"));
+        layerMetricsEntries.add(getMetricEntry(TraceDecisionUtil.MetricType.SAMPLE_COUNT, "SampleCount"));
+        layerMetricsEntries.add(getMetricEntry(TraceDecisionUtil.MetricType.THROUGH_TRACE_COUNT, "ThroughTraceCount"));
+        layerMetricsEntries.add(getMetricEntry(TraceDecisionUtil.MetricType.TRIGGERED_TRACE_COUNT, "TriggeredTraceCount"));
 
         Map<String, TraceConfig> layerConfigs = TraceDecisionUtil.consumeLastTraceConfigs();
         
@@ -43,7 +43,7 @@ class TraceDecisionMetricsCollector extends AbstractMetricsEntryCollector {
         return layerMetricsEntries;
     }
 
-    private SimpleMeasurementMetricsEntry getMetricEntry(MetricType metricType, String keyName) {
+    private SimpleMeasurementMetricsEntry getMetricEntry(TraceDecisionUtil.MetricType metricType, String keyName) {
         return new SimpleMeasurementMetricsEntry(keyName, Collections.emptyMap(), TraceDecisionUtil.consumeMetricsData(metricType));
     }
     private List<SimpleMeasurementMetricsEntry> convertToMetricsEntries(Map<Entry<String, Object>, Integer> data, String keyName) {

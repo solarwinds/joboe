@@ -3,8 +3,8 @@ package com.solarwinds.joboe.metrics;
 import com.solarwinds.joboe.core.config.ConfigContainer;
 import com.solarwinds.joboe.core.config.ConfigGroup;
 import com.solarwinds.joboe.core.config.ConfigManager;
-import com.solarwinds.joboe.core.logging.Logger;
-import com.solarwinds.joboe.core.logging.LoggerFactory;
+import com.solarwinds.joboe.logging.Logger;
+import com.solarwinds.joboe.logging.LoggerFactory;
 import com.solarwinds.joboe.core.util.DaemonThreadFactory;
 
 import java.util.ArrayList;

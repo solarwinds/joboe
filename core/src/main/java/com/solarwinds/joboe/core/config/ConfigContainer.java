@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 
-import com.solarwinds.joboe.core.logging.Logger;
-import com.solarwinds.joboe.core.logging.LoggerFactory;
+import com.solarwinds.joboe.logging.Logger;
+import com.solarwinds.joboe.logging.LoggerFactory;
 import org.json.JSONArray;
 import org.json.JSONException;
 

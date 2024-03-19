@@ -2,6 +2,7 @@ package com.solarwinds.joboe.core.util.diagnostic;
 
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -11,14 +12,15 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import com.solarwinds.joboe.core.config.*;
-import com.solarwinds.joboe.core.logging.Logger;
-import com.solarwinds.joboe.core.logging.LoggerFactory;
+import com.solarwinds.joboe.logging.Logger;
+import com.solarwinds.joboe.logging.LoggerConfiguration;
+import com.solarwinds.joboe.logging.LoggerFactory;
 import com.solarwinds.joboe.core.rpc.Client;
 import com.solarwinds.joboe.core.rpc.ClientException;
 import com.solarwinds.joboe.core.rpc.ResultCode;
 import com.solarwinds.joboe.core.rpc.RpcClientManager;
 import com.solarwinds.joboe.core.rpc.RpcClientManager.OperationType;
-import com.solarwinds.joboe.core.logging.setting.LogSetting;
+import com.solarwinds.joboe.logging.LogSetting;
 import com.solarwinds.joboe.core.util.JavaRuntimeVersionChecker;
 import com.solarwinds.joboe.core.util.ServiceKeyUtils;
 
@@ -88,7 +90,12 @@ public class DiagnosticTools {
 
             logger.info("Using service key " + ServiceKeyUtils.maskServiceKey(serviceKey));
             container.put(ConfigProperty.AGENT_LOGGING, DEFAULT_LOG_SETTING);
-            LoggerFactory.init(container.subset(ConfigGroup.AGENT));
+            ConfigContainer subset = container.subset(ConfigGroup.AGENT);
+            LoggerFactory.init(LoggerConfiguration.builder()
+                            .logFile((Path) subset.get(ConfigProperty.AGENT_LOG_FILE))
+                            .logSetting((LogSetting) subset.get(ConfigProperty.AGENT_LOGGING))
+                            .debug(subset.get(ConfigProperty.AGENT_DEBUG) != null && (boolean) subset.get(ConfigProperty.AGENT_DEBUG))
+                    .build());
             
             ConfigManager.initialize(container);
             result = testServiceKey(serviceKey);

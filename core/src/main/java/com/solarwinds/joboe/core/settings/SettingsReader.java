@@ -1,5 +1,7 @@
 package com.solarwinds.joboe.core.settings;
 
+import com.solarwinds.joboe.sampling.Settings;
+
 import java.util.Map;
 
 /**

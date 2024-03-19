@@ -3,8 +3,8 @@ package com.solarwinds.joboe.core.rpc;
 import com.solarwinds.joboe.core.config.ConfigManager;
 import com.solarwinds.joboe.core.config.ConfigProperty;
 import com.solarwinds.joboe.core.rpc.Client.ClientType;
-import com.solarwinds.joboe.core.logging.Logger;
-import com.solarwinds.joboe.core.logging.LoggerFactory;
+import com.solarwinds.joboe.logging.Logger;
+import com.solarwinds.joboe.logging.LoggerFactory;
 
 import java.io.File;
 import java.net.MalformedURLException;

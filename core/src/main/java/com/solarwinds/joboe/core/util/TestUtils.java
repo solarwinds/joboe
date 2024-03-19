@@ -2,11 +2,14 @@ package com.solarwinds.joboe.core.util;
 
 import com.solarwinds.joboe.core.ReporterFactory;
 import com.solarwinds.joboe.core.TestReporter;
-import com.solarwinds.joboe.core.TraceDecisionUtil;
-import com.solarwinds.joboe.core.TracingMode;
 import com.solarwinds.joboe.core.config.ProfilerSetting;
 import com.solarwinds.joboe.core.profiler.Profiler;
 import com.solarwinds.joboe.core.settings.*;
+import com.solarwinds.joboe.sampling.Settings;
+import com.solarwinds.joboe.sampling.SettingsArg;
+import com.solarwinds.joboe.sampling.SettingsManager;
+import com.solarwinds.joboe.sampling.TraceDecisionUtil;
+import com.solarwinds.joboe.sampling.TracingMode;
 
 public abstract class TestUtils {
     private static final TestDefaultSettings DEFAULT_SETTINGS = new TestDefaultSettings();

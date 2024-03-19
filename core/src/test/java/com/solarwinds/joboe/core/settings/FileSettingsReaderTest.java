@@ -1,5 +1,6 @@
 package com.solarwinds.joboe.core.settings;
 
+import com.solarwinds.joboe.sampling.Settings;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;

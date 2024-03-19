@@ -2,8 +2,8 @@ package com.solarwinds.joboe.metrics;
 
 import java.util.Map;
 
-import com.solarwinds.joboe.core.logging.Logger;
-import com.solarwinds.joboe.core.logging.LoggerFactory;
+import com.solarwinds.joboe.logging.Logger;
+import com.solarwinds.joboe.logging.LoggerFactory;
 
 /**
  * Collects information and returns as maps. Take note that this collector only collects data. 

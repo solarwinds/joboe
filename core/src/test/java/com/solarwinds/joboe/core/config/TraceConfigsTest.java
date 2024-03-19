@@ -1,7 +1,9 @@
 package com.solarwinds.joboe.core.config;
 
-import com.solarwinds.joboe.core.SampleRateSource;
-import com.solarwinds.joboe.core.TraceConfig;
+import com.solarwinds.joboe.sampling.ResourceMatcher;
+import com.solarwinds.joboe.sampling.SampleRateSource;
+import com.solarwinds.joboe.sampling.TraceConfig;
+import com.solarwinds.joboe.sampling.TraceConfigs;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

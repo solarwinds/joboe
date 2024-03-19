@@ -1,6 +1,8 @@
 package com.solarwinds.joboe.core.settings;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.solarwinds.joboe.core.rpc.RpcSettings;
+import com.solarwinds.joboe.sampling.Settings;
 import com.solarwinds.trace.ingestion.proto.Collector;
 import com.solarwinds.joboe.core.rpc.ResultCode;
 import com.solarwinds.joboe.core.rpc.SettingsResult;
@@ -26,7 +28,7 @@ class SettingsUtilTest {
     private static byte[] settingsBlob;
 
     @Mock
-    private com.solarwinds.joboe.core.rpc.Settings settingsMock;
+    private RpcSettings settingsMock;
 
     @BeforeAll
     static void setup() throws IOException {

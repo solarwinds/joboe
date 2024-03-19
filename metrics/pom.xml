@@ -20,6 +20,16 @@
       <artifactId>core</artifactId>
       <version>${revision}</version>
     </dependency>
+    <dependency>
+      <groupId>com.solarwinds.joboe</groupId>
+      <artifactId>logging</artifactId>
+      <version>${revision}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.solarwinds.joboe</groupId>
+      <artifactId>sampling</artifactId>
+      <version>${revision}</version>
+    </dependency>
   </dependencies>
   <build>
     <testResources>

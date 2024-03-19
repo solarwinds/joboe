@@ -1,7 +1,6 @@
 package com.solarwinds.joboe.core.span.impl;
 
 import com.solarwinds.joboe.core.Context;
-import com.solarwinds.joboe.core.TraceDecisionUtil;
 import com.solarwinds.joboe.core.config.ConfigManager;
 import com.solarwinds.joboe.core.settings.TestSettingsReader;
 import com.solarwinds.joboe.core.span.impl.Span.SpanProperty;
@@ -11,6 +10,7 @@ import com.solarwinds.joboe.core.metrics.MetricKey;
 import com.solarwinds.joboe.core.metrics.histogram.Histogram;
 import com.solarwinds.joboe.core.metrics.measurement.SummaryLongMeasurement;
 import com.solarwinds.joboe.core.util.TestUtils;
+import com.solarwinds.joboe.sampling.TraceDecisionUtil;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

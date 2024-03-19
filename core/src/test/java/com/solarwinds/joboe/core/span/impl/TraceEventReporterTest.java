@@ -3,14 +3,14 @@ package com.solarwinds.joboe.core.span.impl;
 import com.solarwinds.joboe.core.Context;
 import com.solarwinds.joboe.core.EventImpl;
 import com.solarwinds.joboe.core.EventReporter;
-import com.solarwinds.joboe.core.SampleRateSource;
 import com.solarwinds.joboe.core.TestReporter;
 import com.solarwinds.joboe.core.TestReporter.DeserializedEvent;
 import com.solarwinds.joboe.core.XTraceHeader;
-import com.solarwinds.joboe.core.settings.SettingsArg;
 import com.solarwinds.joboe.core.settings.TestSettingsReader;
 import com.solarwinds.joboe.core.span.impl.Span.SpanProperty;
 import com.solarwinds.joboe.core.util.TestUtils;
+import com.solarwinds.joboe.sampling.SampleRateSource;
+import com.solarwinds.joboe.sampling.SettingsArg;
 import org.junit.jupiter.api.*;
 
 import java.util.Collections;

@@ -1,10 +1,12 @@
 package com.solarwinds.joboe.core.settings;
 
 import com.google.protobuf.ByteString;
+import com.solarwinds.joboe.core.rpc.RpcSettings;
+import com.solarwinds.joboe.sampling.Settings;
 import com.solarwinds.trace.ingestion.proto.Collector;
 import com.solarwinds.joboe.core.rpc.ResultCode;
 import com.solarwinds.joboe.core.rpc.SettingsResult;
-import com.solarwinds.joboe.core.logging.LoggerFactory;
+import com.solarwinds.joboe.logging.LoggerFactory;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -41,17 +43,14 @@ public final class SettingsUtil {
             convertedArguments.put(argumentEntry.getKey(), argumentEntry.getValue().asReadOnlyByteBuffer());
         }
 
-        com.solarwinds.joboe.core.rpc.Settings settings = new com.solarwinds.joboe.core.rpc.Settings(
+        return new RpcSettings(
                 convertType(grpcOboeSetting.getType()),
                 grpcOboeSetting.getFlags().toStringUtf8(),
-                //oboeSetting.getTimestamp(),
                 System.currentTimeMillis(), //use local timestamp for now, as it is easier to compare ttl with it
                 grpcOboeSetting.getValue(),
                 grpcOboeSetting.getTtl(),
                 grpcOboeSetting.getLayer().toStringUtf8(),
                 convertedArguments);
-
-        return settings;
     }
 
     public static short convertType(Collector.OboeSettingType grpcType) {

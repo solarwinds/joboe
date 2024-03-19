@@ -12,13 +12,13 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.solarwinds.joboe.core.config.ConfigManager;
 import com.solarwinds.joboe.core.config.ConfigProperty;
-import com.solarwinds.joboe.core.settings.SettingsArg;
-import com.solarwinds.joboe.core.settings.SettingsArgChangeListener;
-import com.solarwinds.joboe.core.settings.SettingsManager;
 import com.solarwinds.joboe.core.span.impl.Span.SpanProperty;
 import com.solarwinds.joboe.core.span.impl.Span.TraceProperty;
-import com.solarwinds.joboe.core.logging.Logger;
-import com.solarwinds.joboe.core.logging.LoggerFactory;
+import com.solarwinds.joboe.logging.Logger;
+import com.solarwinds.joboe.logging.LoggerFactory;
+import com.solarwinds.joboe.sampling.SettingsArg;
+import com.solarwinds.joboe.sampling.SettingsArgChangeListener;
+import com.solarwinds.joboe.sampling.SettingsManager;
 import lombok.Getter;
 
 /**
@@ -109,11 +109,9 @@ public final class TransactionNameManager {
     /**
      * Gets a transaction name based on information provided in a span and domainPrefixedTransactionName flag,
      * the result will be recorded if not null.
-     *  
+     * <p>
      * If more than <code>MAX_NAME_COUNT</code> transaction name is recorded, "other" will be returned.
-     * If the logic fails to extract a transaction from the given span, "unknown" will be returned. 
-     * @param span
-     * @return
+     * If the logic fails to extract a transaction from the given span, "unknown" will be returned.
      */
     public static String getTransactionName(Span span) {
         String transactionName;

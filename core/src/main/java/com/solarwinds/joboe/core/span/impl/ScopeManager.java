@@ -1,9 +1,9 @@
 package com.solarwinds.joboe.core.span.impl;
 
 import com.solarwinds.joboe.core.Context;
-import com.solarwinds.joboe.core.Metadata;
-import com.solarwinds.joboe.core.logging.Logger;
-import com.solarwinds.joboe.core.logging.LoggerFactory;
+import com.solarwinds.joboe.logging.Logger;
+import com.solarwinds.joboe.logging.LoggerFactory;
+import com.solarwinds.joboe.sampling.Metadata;
 
 public class ScopeManager implements com.solarwinds.joboe.core.span.ScopeManager {
     private final Logger logger = LoggerFactory.getLogger();

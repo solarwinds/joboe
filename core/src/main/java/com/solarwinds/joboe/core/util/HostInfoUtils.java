@@ -1,8 +1,8 @@
 package com.solarwinds.joboe.core.util;
 
 import com.solarwinds.joboe.core.HostId;
-import com.solarwinds.joboe.core.logging.Logger;
-import com.solarwinds.joboe.core.logging.LoggerFactory;
+import com.solarwinds.joboe.logging.Logger;
+import com.solarwinds.joboe.logging.LoggerFactory;
 import lombok.Getter;
 
 import java.util.*;

@@ -1,15 +1,13 @@
 package com.solarwinds.joboe.metrics;
 
-import com.solarwinds.joboe.core.TraceDecisionUtil;
-import com.solarwinds.joboe.core.TracingMode;
 import com.solarwinds.joboe.core.config.ConfigContainer;
 import com.solarwinds.joboe.core.config.ConfigProperty;
 import com.solarwinds.joboe.core.config.InvalidConfigException;
 import com.solarwinds.joboe.core.rpc.ClientException;
-import com.solarwinds.joboe.core.settings.SettingsArg;
-import com.solarwinds.joboe.core.settings.SettingsManager;
-import com.solarwinds.joboe.core.settings.SimpleSettingsFetcher;
 import com.solarwinds.joboe.core.settings.TestSettingsReader.SettingsMockupBuilder;
+import com.solarwinds.joboe.sampling.SettingsArg;
+import com.solarwinds.joboe.sampling.TraceDecisionUtil;
+import com.solarwinds.joboe.sampling.TracingMode;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

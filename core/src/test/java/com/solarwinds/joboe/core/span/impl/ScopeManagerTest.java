@@ -3,10 +3,10 @@ package com.solarwinds.joboe.core.span.impl;
 import com.solarwinds.joboe.core.Context;
 import com.solarwinds.joboe.core.EventImpl;
 import com.solarwinds.joboe.core.EventReporter;
-import com.solarwinds.joboe.core.Metadata;
 import com.solarwinds.joboe.core.TestReporter;
-import com.solarwinds.joboe.core.TraceDecisionUtil;
 import com.solarwinds.joboe.core.util.TestUtils;
+import com.solarwinds.joboe.sampling.Metadata;
+import com.solarwinds.joboe.sampling.TraceDecisionUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

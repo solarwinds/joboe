@@ -3,8 +3,11 @@ package com.solarwinds.joboe.core.settings;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
+import com.solarwinds.joboe.sampling.Settings;
+import com.solarwinds.joboe.sampling.SettingsFetcher;
+import com.solarwinds.joboe.sampling.SettingsArg;
+import com.solarwinds.joboe.sampling.TracingMode;
 
-import com.solarwinds.joboe.core.TracingMode;
 
 public class TestSettingsReader implements SettingsReader {
     private final Map<String, Settings> layerSettings = new ConcurrentHashMap<String, Settings>();

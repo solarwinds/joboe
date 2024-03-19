@@ -5,7 +5,6 @@ import com.solarwinds.joboe.core.Context;
 import com.solarwinds.joboe.core.Event;
 import com.solarwinds.joboe.core.EventImpl;
 import com.solarwinds.joboe.core.EventReporter;
-import com.solarwinds.joboe.core.Metadata;
 import com.solarwinds.joboe.core.OboeException;
 import com.solarwinds.joboe.core.ReporterFactory;
 import com.solarwinds.joboe.core.TestReporter;
@@ -14,6 +13,8 @@ import com.solarwinds.joboe.core.settings.TestSettingsReader;
 import com.solarwinds.joboe.core.span.impl.Span.SpanProperty;
 import com.solarwinds.joboe.core.span.impl.Tracer.SpanBuilder;
 import com.solarwinds.joboe.core.util.TestUtils;
+import com.solarwinds.joboe.sampling.Metadata;
+import com.solarwinds.joboe.sampling.SamplingException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -355,7 +356,7 @@ public class ContextTest {
             
             assertEquals(startEdge, sentEvent.getSentEntries().get(Constants.XTR_EDGE_KEY));
             assertEquals(metadata.toHexString(), sentEvent.getSentEntries().get(Constants.XTR_METADATA_KEY));
-        } catch (OboeException e) {
+        } catch (SamplingException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -376,7 +377,7 @@ public class ContextTest {
             
             assertEquals(startEdge, sentEvent.getSentEntries().get(Constants.XTR_EDGE_KEY));
             assertEquals(metadata.toHexString(), sentEvent.getSentEntries().get(Constants.XTR_METADATA_KEY));
-        } catch (OboeException e) {
+        } catch (SamplingException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }

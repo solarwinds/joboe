@@ -8,11 +8,13 @@ import com.solarwinds.joboe.core.ebson.BsonDocuments;
 import com.solarwinds.joboe.core.ebson.BsonToken;
 import com.solarwinds.joboe.core.ebson.BsonWriter;
 import com.solarwinds.joboe.core.ebson.MultiValList;
-import com.solarwinds.joboe.core.logging.Logger;
-import com.solarwinds.joboe.core.logging.LoggerFactory;
+import com.solarwinds.joboe.logging.Logger;
+import com.solarwinds.joboe.logging.LoggerFactory;
 import com.solarwinds.joboe.core.util.HostInfoUtils;
 import com.solarwinds.joboe.core.util.JavaProcessUtils;
 import com.solarwinds.joboe.core.util.TimeUtils;
+import com.solarwinds.joboe.sampling.Metadata;
+import com.solarwinds.joboe.sampling.SamplingException;
 
 import java.lang.reflect.Array;
 import java.nio.BufferOverflowException;
@@ -51,7 +53,7 @@ public class EventImpl extends Event {
     };
 
     
-    EventImpl(Metadata ctxMetadata, boolean addEdge) {
+    public EventImpl(Metadata ctxMetadata, boolean addEdge) {
         super(new Metadata(ctxMetadata));
         if (ctxMetadata.isSampled()) { //only further init the metadata if it's being traced
             init();
@@ -62,8 +64,8 @@ public class EventImpl extends Event {
     }
 
     /** Creates an event with a previously determined metadataID . See ServletInstrumentation for an example where this was needed.*/
-    EventImpl(Metadata ctxMetadata, String metadataID, boolean addEdge)
-        throws OboeException {
+    public EventImpl(Metadata ctxMetadata, String metadataID, boolean addEdge)
+        throws SamplingException {
         super(new Metadata(metadataID));
         initOverride();
         if (addEdge) {
@@ -179,7 +181,7 @@ public class EventImpl extends Event {
     }
 
     /* (non-Javadoc)
-     * @see com.solarwinds.joboe.core.Event#addEdge(com.solarwinds.joboe.core.Metadata)
+     * @see com.solarwinds.joboe.core.Event#addEdge(com.solarwinds.joboe.sampling.Metadata)
      */
     @Override
     public void addEdge(Metadata md) {
@@ -195,7 +197,7 @@ public class EventImpl extends Event {
     public void addEdge(String hexstr) {
         try {
             addEdge(new Metadata(hexstr));
-        } catch(OboeException ex) {
+        } catch(SamplingException ex) {
             logger.debug("Invalid XTrace ID: " + hexstr, ex);
         }
     }
@@ -225,7 +227,7 @@ public class EventImpl extends Event {
     }
     
     /* (non-Javadoc)
-     * @see com.solarwinds.joboe.core.Event#report(com.solarwinds.joboe.core.Metadata)
+     * @see com.solarwinds.joboe.core.Event#report(com.solarwinds.joboe.sampling.Metadata)
      */
     @Override
     public void report(Metadata md) {
@@ -233,7 +235,7 @@ public class EventImpl extends Event {
     }
     
     /* (non-Javadoc)
-     * @see com.solarwinds.joboe.core.Event#report(com.solarwinds.joboe.core.Metadata, com.solarwinds.joboe.core.EventReporter)
+     * @see com.solarwinds.joboe.core.Event#report(com.solarwinds.joboe.sampling.Metadata, com.solarwinds.joboe.core.EventReporter)
      */
     @Override
     public void report(Metadata contextMetadata, EventReporter reporter) {

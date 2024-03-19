@@ -1,5 +1,8 @@
 package com.solarwinds.joboe.core.settings;
 
+import com.solarwinds.joboe.core.rpc.RpcSettings;
+import com.solarwinds.joboe.sampling.Settings;
+import com.solarwinds.joboe.sampling.SettingsListener;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,7 +33,7 @@ class AwsLambdaSettingsFetcherTest {
 
     @Test
     void verifyThatDefaultLayerSettingIsUsed() throws OboeSettingsException {
-        com.solarwinds.joboe.core.rpc.Settings settings = new com.solarwinds.joboe.core.rpc.Settings(
+        RpcSettings settings = new RpcSettings(
                 (short) 1,
                 "2",
                 System.currentTimeMillis(),
@@ -55,7 +58,7 @@ class AwsLambdaSettingsFetcherTest {
 
     @Test
     void verifyThatDefaultSettingIsUsedWhenThereIsNoDefaultLayerSetting() throws OboeSettingsException {
-        com.solarwinds.joboe.core.rpc.Settings defaultSettings = new com.solarwinds.joboe.core.rpc.Settings(
+        RpcSettings defaultSettings = new RpcSettings(
                 (short) 2,
                 "2",
                 System.currentTimeMillis(),
@@ -64,7 +67,7 @@ class AwsLambdaSettingsFetcherTest {
                 "90",
                 Collections.emptyMap());
 
-        com.solarwinds.joboe.core.rpc.Settings settings = new com.solarwinds.joboe.core.rpc.Settings(
+        RpcSettings settings = new RpcSettings(
                 (short) 6,
                 "25",
                 System.currentTimeMillis(),

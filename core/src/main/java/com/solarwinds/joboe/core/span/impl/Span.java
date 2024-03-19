@@ -1,12 +1,12 @@
 package com.solarwinds.joboe.core.span.impl;
 
-import com.solarwinds.joboe.core.Metadata;
-import com.solarwinds.joboe.core.TraceDecision;
-import com.solarwinds.joboe.core.XTraceOptions;
 import com.solarwinds.joboe.core.span.tag.Tag;
-import com.solarwinds.joboe.core.logging.Logger;
-import com.solarwinds.joboe.core.logging.LoggerFactory;
+import com.solarwinds.joboe.logging.Logger;
+import com.solarwinds.joboe.logging.LoggerFactory;
 import com.solarwinds.joboe.core.util.TimeUtils;
+import com.solarwinds.joboe.sampling.Metadata;
+import com.solarwinds.joboe.sampling.TraceDecision;
+import com.solarwinds.joboe.sampling.XTraceOptions;
 import lombok.Getter;
 
 import java.util.*;

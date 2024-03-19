@@ -1,12 +1,12 @@
 package com.solarwinds.joboe.core.span.impl;
 
-import com.solarwinds.joboe.core.Metadata;
 import com.solarwinds.joboe.core.config.ConfigManager;
 import com.solarwinds.joboe.core.config.ConfigProperty;
-import com.solarwinds.joboe.core.logging.Logger;
-import com.solarwinds.joboe.core.logging.LoggerFactory;
+import com.solarwinds.joboe.logging.Logger;
+import com.solarwinds.joboe.logging.LoggerFactory;
 import com.solarwinds.joboe.core.config.ProfilerSetting;
 import com.solarwinds.joboe.core.profiler.Profiler;
+import com.solarwinds.joboe.sampling.Metadata;
 
 /**
  * Span reporter that acts on span start and end to trigger profiling for this current thread.

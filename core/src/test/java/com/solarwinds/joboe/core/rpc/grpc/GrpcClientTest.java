@@ -2,6 +2,7 @@ package com.solarwinds.joboe.core.rpc.grpc;
 
 
 import com.google.protobuf.ByteString;
+import com.solarwinds.joboe.sampling.SettingsArg;
 import com.solarwinds.trace.ingestion.proto.Collector;
 import com.solarwinds.trace.ingestion.proto.TraceCollectorGrpc;
 import com.solarwinds.joboe.core.rpc.Client;
@@ -12,9 +13,8 @@ import com.solarwinds.joboe.core.rpc.ResultCode;
 import com.solarwinds.joboe.core.rpc.RpcClient;
 import com.solarwinds.joboe.core.rpc.RpcClient.TaskType;
 import com.solarwinds.joboe.core.rpc.RpcClientTest;
-import com.solarwinds.joboe.core.rpc.Settings;
+import com.solarwinds.joboe.core.rpc.RpcSettings;
 import com.solarwinds.joboe.core.settings.PollingSettingsFetcherTest;
-import com.solarwinds.joboe.core.settings.SettingsArg;
 import com.solarwinds.joboe.core.util.TimeUtils;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
@@ -46,10 +46,10 @@ public class GrpcClientTest extends RpcClientTest {
 
     private static final List<Collector.OboeSetting> TEST_OBOE_SETTINGS = convertToOboeSettings(TEST_SETTINGS);
 
-    private static List<Collector.OboeSetting> convertToOboeSettings(List<Settings> settings) {
+    private static List<Collector.OboeSetting> convertToOboeSettings(List<RpcSettings> settings) {
         List<Collector.OboeSetting> oboeSettings = new ArrayList<Collector.OboeSetting>();
 
-        for (Settings fromEntry : settings) {
+        for (RpcSettings fromEntry : settings) {
             Map<String, ByteString> arguments = new HashMap<String, ByteString>();
             for (SettingsArg arg : SettingsArg.values()) {
                 Object argValue = fromEntry.getArgValue(arg);

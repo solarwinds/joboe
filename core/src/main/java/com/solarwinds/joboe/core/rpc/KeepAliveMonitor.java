@@ -1,6 +1,6 @@
 package com.solarwinds.joboe.core.rpc;
 
-import com.solarwinds.joboe.core.logging.LoggerFactory;
+import com.solarwinds.joboe.logging.LoggerFactory;
 import com.solarwinds.joboe.core.util.DaemonThreadFactory;
 
 import java.util.concurrent.Executors;

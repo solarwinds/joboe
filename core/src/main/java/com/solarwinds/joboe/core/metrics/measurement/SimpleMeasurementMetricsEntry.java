@@ -3,8 +3,8 @@ package com.solarwinds.joboe.core.metrics.measurement;
 import java.util.Collections;
 import java.util.Map;
 
-import com.solarwinds.joboe.core.logging.Logger;
-import com.solarwinds.joboe.core.logging.LoggerFactory;
+import com.solarwinds.joboe.logging.Logger;
+import com.solarwinds.joboe.logging.LoggerFactory;
 import com.solarwinds.joboe.core.metrics.MetricsEntry;
 import com.solarwinds.joboe.core.metrics.MetricKey;
 

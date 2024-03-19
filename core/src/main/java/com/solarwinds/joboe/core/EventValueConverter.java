@@ -13,8 +13,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import com.solarwinds.joboe.core.logging.Logger;
-import com.solarwinds.joboe.core.logging.LoggerFactory;
+import com.solarwinds.joboe.logging.Logger;
+import com.solarwinds.joboe.logging.LoggerFactory;
 
 /**
  * Converter that converts any object into object that are safe to used as the value of Event Info

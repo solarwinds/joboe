@@ -7,8 +7,8 @@ import com.solarwinds.joboe.core.rpc.Client;
 import com.solarwinds.joboe.core.rpc.ClientLoggingCallback;
 import com.solarwinds.joboe.core.rpc.HostType;
 import com.solarwinds.joboe.core.lambda.LambdaEventReporter;
-import com.solarwinds.joboe.core.logging.Logger;
-import com.solarwinds.joboe.core.logging.LoggerFactory;
+import com.solarwinds.joboe.logging.Logger;
+import com.solarwinds.joboe.logging.LoggerFactory;
 import lombok.Getter;
 
 /**

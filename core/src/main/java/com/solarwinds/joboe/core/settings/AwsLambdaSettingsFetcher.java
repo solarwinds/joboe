@@ -1,7 +1,10 @@
 package com.solarwinds.joboe.core.settings;
 
-import com.solarwinds.joboe.core.logging.Logger;
-import com.solarwinds.joboe.core.logging.LoggerFactory;
+import com.solarwinds.joboe.logging.Logger;
+import com.solarwinds.joboe.logging.LoggerFactory;
+import com.solarwinds.joboe.sampling.Settings;
+import com.solarwinds.joboe.sampling.SettingsFetcher;
+import com.solarwinds.joboe.sampling.SettingsListener;
 
 import java.util.Map;
 import java.util.Optional;

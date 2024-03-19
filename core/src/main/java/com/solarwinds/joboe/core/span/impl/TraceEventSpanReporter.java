@@ -7,20 +7,21 @@ import java.util.Set;
 
 import com.solarwinds.joboe.core.Context;
 import com.solarwinds.joboe.core.Event;
-import com.solarwinds.joboe.core.Metadata;
 import com.solarwinds.joboe.core.OboeException;
-import com.solarwinds.joboe.core.TraceConfig;
-import com.solarwinds.joboe.core.TraceDecision;
-import com.solarwinds.joboe.core.TraceDecisionUtil;
-import com.solarwinds.joboe.core.XTraceOption;
-import com.solarwinds.joboe.core.XTraceOptions;
 import com.solarwinds.joboe.core.config.ConfigManager;
 import com.solarwinds.joboe.core.config.ConfigProperty;
 import com.solarwinds.joboe.core.span.impl.Span.SpanProperty;
 import com.solarwinds.joboe.core.span.impl.Span.TraceProperty;
-import com.solarwinds.joboe.core.logging.Logger;
-import com.solarwinds.joboe.core.logging.LoggerFactory;
+import com.solarwinds.joboe.logging.Logger;
+import com.solarwinds.joboe.logging.LoggerFactory;
 import com.solarwinds.joboe.core.config.ProfilerSetting;
+import com.solarwinds.joboe.sampling.Metadata;
+import com.solarwinds.joboe.sampling.SamplingException;
+import com.solarwinds.joboe.sampling.TraceConfig;
+import com.solarwinds.joboe.sampling.TraceDecision;
+import com.solarwinds.joboe.sampling.TraceDecisionUtil;
+import com.solarwinds.joboe.sampling.XTraceOption;
+import com.solarwinds.joboe.sampling.XTraceOptions;
 
 /**
  * Reports span as trace events (ie a detailed sampled trace) if it is sampled for tracing
@@ -61,7 +62,7 @@ public class TraceEventSpanReporter implements SpanReporter {
             if (entryXTrace != null) {
                 try {
                     entryEvent = Context.createEventWithIDAndContext(entryXTrace, spanMetadata);
-                } catch (OboeException e) {
+                } catch (SamplingException e) {
                     logger.warn("Failed to set op ID for entry event : " + e.getMessage(), e);
                     entryEvent = Context.createEventWithContext(spanMetadata);
                 }
@@ -135,7 +136,7 @@ public class TraceEventSpanReporter implements SpanReporter {
             if (exitXTraceId != null) {
                 try {
                     exitEvent = Context.createEventWithIDAndContext(exitXTraceId, spanMetadata);
-                } catch (OboeException e) {
+                } catch (SamplingException e) {
                     logger.warn("Failed to report span on finish with exitXTraceId [" + exitXTraceId + "], not using the exitXTraceId :" + e.getMessage());
                     exitEvent = Context.createEventWithContext(spanMetadata);
                 }

@@ -4,9 +4,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import com.solarwinds.joboe.core.rpc.Client.Callback;
-import com.solarwinds.joboe.core.logging.Logger;
-import com.solarwinds.joboe.core.logging.Logger.Level;
-import com.solarwinds.joboe.core.logging.LoggerFactory;
+import com.solarwinds.joboe.logging.Logger;
+import com.solarwinds.joboe.logging.Logger.Level;
+import com.solarwinds.joboe.logging.LoggerFactory;
 
 /**
  * Provides a Thrift Callback that performs general logging on various Thrift {@link Result}. 

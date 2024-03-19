@@ -1,6 +1,6 @@
 package com.solarwinds.joboe.core.span.impl;
 
-import com.solarwinds.joboe.core.Metadata;
+import com.solarwinds.joboe.sampling.Metadata;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;

@@ -113,6 +113,8 @@
     <modules>
         <module>core</module>
         <module>metrics</module>
+        <module>logging</module>
+        <module>sampling</module>
     </modules>
 
     <distributionManagement>

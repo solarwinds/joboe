@@ -1,9 +1,9 @@
 package com.solarwinds.joboe.core.span.impl;
 
 import com.solarwinds.joboe.core.Context;
-import com.solarwinds.joboe.core.Metadata;
-import com.solarwinds.joboe.core.logging.Logger;
-import com.solarwinds.joboe.core.logging.LoggerFactory;
+import com.solarwinds.joboe.logging.Logger;
+import com.solarwinds.joboe.logging.LoggerFactory;
+import com.solarwinds.joboe.sampling.Metadata;
 import lombok.Getter;
 
 public class Scope implements com.solarwinds.joboe.core.span.Scope  {
