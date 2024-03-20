@@ -39,14 +39,6 @@ public class NoopEvent extends Event {
     }
 
     @Override
-    public void report() {
-    }
-
-    @Override
-    public void report(Metadata md) {
-    }
-
-    @Override
     public void report(Metadata md, EventReporter reporter) {
     }
 

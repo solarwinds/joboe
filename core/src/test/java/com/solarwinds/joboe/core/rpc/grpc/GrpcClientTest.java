@@ -80,7 +80,7 @@ public class GrpcClientTest extends RpcClientTest {
         try {
             client = new RpcClient(TEST_SERVER_HOST, exhaustedServerPort, TEST_CLIENT_ID, getProtocolClientFactory(new File(getServerPublicKeyLocation()).toURI().toURL()));
 
-            assertEquals(com.solarwinds.joboe.core.rpc.ResultCode.OK, client.postEvents(TEST_EVENTS, null).get().getResultCode());
+            assertEquals(com.solarwinds.joboe.core.rpc.ResultCode.OK, client.postEvents(testEvents, null).get().getResultCode());
             fail("Expected " + ClientFatalException.class.getName() + " but found none");
         } catch (ExecutionException e) {
             if (!(e.getCause() instanceof ClientFatalException)) {

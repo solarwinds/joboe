@@ -2,16 +2,15 @@ package com.solarwinds.joboe.core.span.impl;
 
 import com.solarwinds.joboe.core.Context;
 import com.solarwinds.joboe.core.config.ConfigManager;
+import com.solarwinds.joboe.core.metrics.MetricKey;
+import com.solarwinds.joboe.core.metrics.histogram.Histogram;
+import com.solarwinds.joboe.core.metrics.measurement.SummaryLongMeasurement;
 import com.solarwinds.joboe.core.settings.TestSettingsReader;
 import com.solarwinds.joboe.core.span.impl.Span.SpanProperty;
 import com.solarwinds.joboe.core.span.impl.Span.TraceProperty;
 import com.solarwinds.joboe.core.span.impl.Tracer.SpanBuilder;
-import com.solarwinds.joboe.core.metrics.MetricKey;
-import com.solarwinds.joboe.core.metrics.histogram.Histogram;
-import com.solarwinds.joboe.core.metrics.measurement.SummaryLongMeasurement;
 import com.solarwinds.joboe.core.util.TestUtils;
 import com.solarwinds.joboe.sampling.TraceDecisionUtil;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -37,18 +36,6 @@ public class InboundMetricSpanReporterTest {
         MetricHistogramSpanReporter.REPORTER.consumeMetricEntries(); //clear data
         InboundMetricMeasurementSpanReporter.REPORTER.consumeMetricEntries(); //clear data
         TransactionNameManager.clearTransactionNames();
-    }
-    
-    @AfterEach
-    protected void tearDown() throws Exception {
-        Context.clearMetadata();
-        ScopeManager.INSTANCE.removeAllScopes();
-        TraceDecisionUtil.reset();
-        ConfigManager.reset();
-        
-        testSettingsReader.reset();
-        MetricHistogramSpanReporter.REPORTER.consumeMetricEntries(); //clear data
-        InboundMetricMeasurementSpanReporter.REPORTER.consumeMetricEntries(); //clear data
     }
     
     private SpanBuilder getSpanBuilder(String operationName) {

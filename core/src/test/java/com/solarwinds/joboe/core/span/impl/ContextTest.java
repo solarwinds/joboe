@@ -3,9 +3,6 @@ package com.solarwinds.joboe.core.span.impl;
 import com.solarwinds.joboe.core.Constants;
 import com.solarwinds.joboe.core.Context;
 import com.solarwinds.joboe.core.Event;
-import com.solarwinds.joboe.core.EventImpl;
-import com.solarwinds.joboe.core.EventReporter;
-import com.solarwinds.joboe.core.OboeException;
 import com.solarwinds.joboe.core.ReporterFactory;
 import com.solarwinds.joboe.core.TestReporter;
 import com.solarwinds.joboe.core.TestReporter.DeserializedEvent;
@@ -19,7 +16,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -37,14 +33,11 @@ import static org.junit.jupiter.api.Assertions.fail;
  *
  */
 public class ContextTest {
-    private EventReporter originalReporter;
-    private static final TestReporter tracingReporter = TestUtils.initTraceReporter();
+
     protected static final TestSettingsReader testSettingsReader = TestUtils.initSettingsReader();
-    
-    
+
     @BeforeEach
-    protected void setUp() throws Exception {
-        originalReporter = EventImpl.setDefaultReporter(tracingReporter);
+    protected void setup() throws Exception {
         testSettingsReader.reset();
         testSettingsReader.put(TestUtils.getDefaultSettings());
         Context.clearMetadata();
@@ -52,49 +45,49 @@ public class ContextTest {
     }
     
     @AfterEach
-    protected void tearDown() throws Exception {
+    protected void teardown() throws Exception {
         testSettingsReader.reset();
-        EventImpl.setDefaultReporter(originalReporter);
         ScopeManager.INSTANCE.removeAllScopes();
         Context.clearMetadata(); //clear context
-        tracingReporter.reset();
     }
 
     @Test
     public void testNestedSpans() throws Exception {
-        Scope scope1 = startTraceScope("span1");
+        TestReporter testReporter = ReporterFactory.getInstance().createTestReporter();
+        TraceEventSpanReporter traceEventSpanReporter = new TraceEventSpanReporter(testReporter);
+        Scope scope1 = startTraceScope("span1", traceEventSpanReporter);
         Span span1 = scope1.span();
-        DeserializedEvent span1EntryEvent = getLastSentEvent();
+        DeserializedEvent span1EntryEvent = getLastSentEvent(testReporter);
         
         span1.setTag("URL", "nested-spans");
         span1.log("test", 2);
-        DeserializedEvent span1InfoEvent = getLastSentEvent();
+        DeserializedEvent span1InfoEvent = getLastSentEvent(testReporter);
         assertEdge(span1EntryEvent, span1InfoEvent);
         
-        Scope scope2 = startScope("span2");
+        Scope scope2 = startScope("span2", traceEventSpanReporter);
         Span span2 = scope2.span();
-        DeserializedEvent span2EntryEvent = getLastSentEvent();
+        DeserializedEvent span2EntryEvent = getLastSentEvent(testReporter);
         assertEdge(span1InfoEvent, span2EntryEvent); //span 2 entry should point to the span 1 info event
         
         span2.log("test", 2);
-        DeserializedEvent span2InfoEvent = getLastSentEvent();
+        DeserializedEvent span2InfoEvent = getLastSentEvent(testReporter);
         assertEdge(span2EntryEvent, span2InfoEvent);
         
-        Scope scope3 = startScope("span3");
-        DeserializedEvent span3EntryEvent = getLastSentEvent();
+        Scope scope3 = startScope("span3", traceEventSpanReporter);
+        DeserializedEvent span3EntryEvent = getLastSentEvent(testReporter);
         assertEdge(span2InfoEvent, span3EntryEvent); //span 3 entry should point to the span 2 info event
         
         scope3.close();
-        DeserializedEvent span3ExitEvent = getLastSentEvent();
+        DeserializedEvent span3ExitEvent = getLastSentEvent(testReporter);
         assertEdge(span3EntryEvent, span3ExitEvent);
         
         scope2.close();
-        DeserializedEvent span2ExitEvent = getLastSentEvent();
+        DeserializedEvent span2ExitEvent = getLastSentEvent(testReporter);
         assertEdge(span2InfoEvent, span2ExitEvent);
         assertEdge(span3ExitEvent, span2ExitEvent);
         
         scope1.close();
-        DeserializedEvent span1ExitEvent = getLastSentEvent();
+        DeserializedEvent span1ExitEvent = getLastSentEvent(testReporter);
         assertEdge(span1InfoEvent, span1ExitEvent);
         assertEdge(span2ExitEvent, span1ExitEvent);
 
@@ -103,34 +96,36 @@ public class ContextTest {
 
     @Test
     public void testSiblingSpans() throws Exception {
-        Scope scope1 = startTraceScope("span1");
+        TestReporter testReporter = ReporterFactory.getInstance().createTestReporter();
+        TraceEventSpanReporter traceEventSpanReporter = new TraceEventSpanReporter(testReporter);
+        Scope scope1 = startTraceScope("span1", traceEventSpanReporter);
         Span span1 = scope1.span();
-        DeserializedEvent span1EntryEvent = getLastSentEvent();
+        DeserializedEvent span1EntryEvent = getLastSentEvent(testReporter);
         
         span1.setTag("URL", "sibling-spans");
         
-        Scope scope2 = startScope("span2");
-        DeserializedEvent span2EntryEvent = getLastSentEvent();
+        Scope scope2 = startScope("span2", traceEventSpanReporter);
+        DeserializedEvent span2EntryEvent = getLastSentEvent(testReporter);
         assertEdge(span1EntryEvent, span2EntryEvent); //span 2 entry should point to the span 1 entry event
         
         scope2.close();
-        DeserializedEvent span2ExitEvent = getLastSentEvent();
+        DeserializedEvent span2ExitEvent = getLastSentEvent(testReporter);
         assertEdge(span2EntryEvent, span2ExitEvent);
         
         span1.log("test", 1);
-        DeserializedEvent span1InfoEvent = getLastSentEvent();
+        DeserializedEvent span1InfoEvent = getLastSentEvent(testReporter);
         assertEdge(span1EntryEvent, span1InfoEvent);
         
-        Scope scope3 = startScope("span3");
-        DeserializedEvent span3EntryEvent = getLastSentEvent();
+        Scope scope3 = startScope("span3", traceEventSpanReporter);
+        DeserializedEvent span3EntryEvent = getLastSentEvent(testReporter);
         assertEdge(span1InfoEvent, span3EntryEvent); //span 3 entry should point to the span 1 info event
         
         scope3.close();
-        DeserializedEvent span3ExitEvent = getLastSentEvent();
+        DeserializedEvent span3ExitEvent = getLastSentEvent(testReporter);
         assertEdge(span3EntryEvent, span3ExitEvent);
         
         scope1.close();
-        DeserializedEvent span1ExitEvent = getLastSentEvent();
+        DeserializedEvent span1ExitEvent = getLastSentEvent(testReporter);
         assertEdge(span3ExitEvent, span1ExitEvent);
         assertEdge(span1InfoEvent, span1ExitEvent);
 
@@ -145,78 +140,80 @@ public class ContextTest {
         legacyRootEntry.addInfo("Layer", "legacy-span1",
                 "Label", "entry",
                 "URL", "legacy-span-legacy");
-        legacyRootEntry.report();
-        DeserializedEvent span1EntryEvent = getLastSentEvent();
+        TestReporter tracingReporter = TestUtils.initTraceReporter();
+        legacyRootEntry.report(tracingReporter);
+        DeserializedEvent span1EntryEvent = getLastSentEvent(tracingReporter);
         
-        Scope scope = startScope("span2"); //a span nested below a legacy span
-        DeserializedEvent span2EntryEvent = getLastSentEvent();
+        Scope scope = startScope("span2", new TraceEventSpanReporter(tracingReporter)); //a span nested below a legacy span
+        DeserializedEvent span2EntryEvent = getLastSentEvent(tracingReporter);
         assertEdge(span1EntryEvent, span2EntryEvent); //span 2 entry should point to the span 1 entry event
         
         Event legacyEntry = Context.createEvent();
         legacyEntry.addInfo(
                 "Layer", "legacy-span3",
                 "Label", "entry");
-        legacyEntry.report();
-        DeserializedEvent span3EntryEvent = getLastSentEvent();
+        legacyEntry.report(tracingReporter);
+        DeserializedEvent span3EntryEvent = getLastSentEvent(tracingReporter);
         assertEdge(span2EntryEvent, span3EntryEvent); //legacy event should "inline" into current active span, which is span 2
         
         Event legacyExit = Context.createEvent();
         legacyExit.addInfo(
                 "Layer", "legacy-span3",
                 "Label", "exit");
-        legacyExit.report();
-        DeserializedEvent span3ExitEvent = getLastSentEvent();
+        legacyExit.report(tracingReporter);
+        DeserializedEvent span3ExitEvent = getLastSentEvent(tracingReporter);
         assertEdge(span3EntryEvent, span3ExitEvent);
         
         scope.close();
-        DeserializedEvent span2ExitEvent = getLastSentEvent();
+        DeserializedEvent span2ExitEvent = getLastSentEvent(tracingReporter);
         assertEdge(span3ExitEvent, span2ExitEvent); //legacy event should "inline" into current active span, which is span 2
         
         Event legacyRootExit = Context.createEvent(); //a root span with legacy event-based approach
         legacyRootExit.addInfo("Layer", "legacy-span1",
                 "Label", "exit");
-        legacyRootExit.report();
-        DeserializedEvent span1ExitEvent = getLastSentEvent();
+        legacyRootExit.report(tracingReporter);
+        DeserializedEvent span1ExitEvent = getLastSentEvent(tracingReporter);
         assertEdge(span1EntryEvent, span1ExitEvent);
     }
 
     @Test
     public void testSpanLegacySpan() throws Exception {
-        Scope scope1 = startTraceScope("span1");
+        TestReporter tracingReporter = TestUtils.initTraceReporter();
+        Scope scope1 = startTraceScope("span1", new TraceEventSpanReporter(tracingReporter));
         Span span1 = scope1.span();
-        DeserializedEvent span1EntryEvent = getLastSentEvent();
+        DeserializedEvent span1EntryEvent = getLastSentEvent(tracingReporter);
         
         span1.setTag("URL", "span-legacy-span");
         span1.log("test", 2);
-        DeserializedEvent span1InfoEvent = getLastSentEvent();
+        DeserializedEvent span1InfoEvent = getLastSentEvent(tracingReporter);
         assertEdge(span1EntryEvent, span1InfoEvent);
         
         Event legacyEntry = Context.createEvent();
         legacyEntry.addInfo(
                 "Layer", "legacy-span2",
                 "Label", "entry");
-        legacyEntry.report();
-        DeserializedEvent span2EntryEvent = getLastSentEvent();
+        legacyEntry.report(tracingReporter);
+        DeserializedEvent span2EntryEvent = getLastSentEvent(tracingReporter);
         assertEdge(span1InfoEvent, span2EntryEvent); //span 2 entry should "inline" into active span 1, hence pointing at span 1's info event
         
-        Scope scope3 = startTraceScope("span3");
-        DeserializedEvent span3EntryEvent = getLastSentEvent();
+        Scope scope3 = startTraceScope("span3", new TraceEventSpanReporter(tracingReporter));
+        DeserializedEvent span3EntryEvent = getLastSentEvent(tracingReporter);
         assertEdge(span2EntryEvent, span3EntryEvent);
         
         scope3.close();
-        DeserializedEvent span3ExitEvent = getLastSentEvent();
+        DeserializedEvent span3ExitEvent = getLastSentEvent(tracingReporter);
         assertEdge(span3EntryEvent, span3ExitEvent);
         
         Event legacyExit = Context.createEvent();
         legacyExit.addInfo(
                 "Layer", "legacy-span2",
                 "Label", "exit");
-        legacyExit.report();
-        DeserializedEvent span2ExitEvent = getLastSentEvent();
+        legacyExit.report(tracingReporter);
+        DeserializedEvent span2ExitEvent = getLastSentEvent(tracingReporter);
         assertEdge(span2EntryEvent, span2ExitEvent); //legacy span 2 exit should point directly back to its entry instead of span 3, as span 3 is a "branch"
         
         scope1.close();
-        DeserializedEvent span1ExitEvent = getLastSentEvent();
+        DeserializedEvent span1ExitEvent = getLastSentEvent(tracingReporter);
         assertEdge(span2ExitEvent, span1ExitEvent); //span 1 exit should point to legacy span 2 exit, as span 2 is "inline" into span 1
         assertEdge(span3ExitEvent, span1ExitEvent); //span 1 exit should point to span 3 exit as span 3 is a child of span 1
 
@@ -227,15 +224,9 @@ public class ContextTest {
     @Test
     public void testAsyncSpans() throws Throwable {
         final TestReporter threadLocalReporter = ReporterFactory.getInstance().createTestReporter(true);
-        Field field = EventImpl.class.getDeclaredField("DEFAULT_REPORTER");
-        field.setAccessible(true);
-        
-        TestReporter existingReporter = (TestReporter) field.get(null);
-        
-        field.set(null, threadLocalReporter);
-        
-        
-        Scope scope1 = startTraceScope("span1");
+
+        TraceEventSpanReporter traceEventSpanReporter = new TraceEventSpanReporter(threadLocalReporter);
+        Scope scope1 = startTraceScope("span1", traceEventSpanReporter);
         Span span1 = scope1.span();
         DeserializedEvent span1EntryEvent = getLastSentEvent(threadLocalReporter);
         
@@ -249,7 +240,7 @@ public class ContextTest {
         
         Thread thread1 = new Thread(() -> {
             try {
-                Scope scope2 = startScope("async-span2", true);
+                Scope scope2 = startScope("async-span2", true, traceEventSpanReporter);
                 Span span2 = scope2.span();
                 DeserializedEvent span2EntryEvent = getLastSentEvent(threadLocalReporter);
                 assertEdge(span1InfoEvent, span2EntryEvent);
@@ -258,7 +249,7 @@ public class ContextTest {
                 DeserializedEvent span2InfoEvent = getLastSentEvent(threadLocalReporter);
                 assertEdge(span2EntryEvent, span2InfoEvent);
 
-                Scope scope4 = startScope("span4");
+                Scope scope4 = startScope("span4", traceEventSpanReporter);
                 DeserializedEvent span4EntryEvent = getLastSentEvent(threadLocalReporter);
                 assertEdge(span2InfoEvent, span4EntryEvent);
 
@@ -284,7 +275,7 @@ public class ContextTest {
         
         Thread thread2 = new Thread(() -> {
             try {
-                Scope scope3 = startScope("async-span3", true);
+                Scope scope3 = startScope("async-span3", true, traceEventSpanReporter);
                 Span span3 = scope3.span();
                 DeserializedEvent span3EntryEvent = getLastSentEvent(threadLocalReporter);
                 assertEdge(span1InfoEvent, span3EntryEvent);
@@ -293,7 +284,7 @@ public class ContextTest {
                 DeserializedEvent span3InfoEvent = getLastSentEvent(threadLocalReporter);
                 assertEdge(span3EntryEvent, span3InfoEvent);
 
-                Scope scope5 = startScope("span5");
+                Scope scope5 = startScope("span5", traceEventSpanReporter);
                 DeserializedEvent span5EntryEvent = getLastSentEvent(threadLocalReporter);
                 assertEdge(span3InfoEvent, span5EntryEvent);
                 try {
@@ -325,8 +316,6 @@ public class ContextTest {
         thread1.join();
         thread2.join();
         
-        field.set(null, existingReporter); //revert back to the original reporter
-        
         for (Throwable error : asyncErrors) { //re-throw any async errors
             throw error;
         }
@@ -349,10 +338,11 @@ public class ContextTest {
         metadata.randomizeOpID();
         
         try {
+            TestReporter testReporter = ReporterFactory.getInstance().createTestReporter();
             Event event = Context.createEventWithID(metadata.toHexString());
-            event.report();
+            event.report(testReporter);
             
-            DeserializedEvent sentEvent = getLastSentEvent();
+            DeserializedEvent sentEvent = getLastSentEvent(testReporter);
             
             assertEquals(startEdge, sentEvent.getSentEntries().get(Constants.XTR_EDGE_KEY));
             assertEquals(metadata.toHexString(), sentEvent.getSentEntries().get(Constants.XTR_METADATA_KEY));
@@ -370,10 +360,11 @@ public class ContextTest {
         metadata.randomizeOpID();
         
         try {
+            TestReporter testReporter = ReporterFactory.getInstance().createTestReporter();
             Event event = Context.createEventWithIDAndContext(metadata.toHexString(), contextMetadata);
-            event.report(contextMetadata);
+            event.report(contextMetadata, testReporter);
             
-            DeserializedEvent sentEvent = getLastSentEvent();
+            DeserializedEvent sentEvent = getLastSentEvent(testReporter);
             
             assertEquals(startEdge, sentEvent.getSentEntries().get(Constants.XTR_EDGE_KEY));
             assertEquals(metadata.toHexString(), sentEvent.getSentEntries().get(Constants.XTR_METADATA_KEY));
@@ -383,20 +374,22 @@ public class ContextTest {
         }
     }
     
-    protected static Scope startTraceScope(String layerName) {
+    protected static Scope startTraceScope(String layerName, SpanReporter spanReporter) {
         return Tracer.INSTANCE
                 .buildSpan(layerName)
-                .withReporters(TraceEventSpanReporter.REPORTER)
+                .withReporters(spanReporter)
                 .withSpanProperty(SpanProperty.TRACE_DECISION_PARAMETERS, new TraceDecisionParameters(Collections.emptyMap(), "testUrl"))
                 .startActive();  
     }
     
-    protected static Scope startScope(String layerName) {
-        return Tracer.INSTANCE.buildSpan(layerName).withReporters(TraceEventSpanReporter.REPORTER).startActive();
+    protected static Scope startScope(String layerName, SpanReporter spanReporter) {
+        return Tracer.INSTANCE.buildSpan(layerName)
+                .withReporters(spanReporter)
+                .startActive();
     }
     
-    protected static Scope startScope(String layerName, boolean isAsync) {
-        SpanBuilder spanBuilder = Tracer.INSTANCE.buildSpan(layerName).withReporters(TraceEventSpanReporter.REPORTER);
+    protected static Scope startScope(String layerName, boolean isAsync, SpanReporter spanReporter) {
+        SpanBuilder spanBuilder = Tracer.INSTANCE.buildSpan(layerName).withReporters(spanReporter);
         if (isAsync) {
             spanBuilder = spanBuilder.withSpanProperty(SpanProperty.IS_ASYNC, true);
         }
@@ -425,12 +418,6 @@ public class ContextTest {
         }
         
         assertTrue(edges.contains(parentMetadata.opHexString()));
-    }
-    
-    private DeserializedEvent getLastSentEvent() {
-        List<DeserializedEvent> sentEvents = tracingReporter.getSentEvents();
-        
-        return sentEvents.isEmpty() ? null : sentEvents.get(sentEvents.size() - 1);
     }
 }
  

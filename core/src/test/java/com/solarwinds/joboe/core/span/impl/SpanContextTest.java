@@ -1,6 +1,8 @@
 package com.solarwinds.joboe.core.span.impl;
 
 import com.solarwinds.joboe.sampling.Metadata;
+import com.solarwinds.joboe.sampling.SamplingConfiguration;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -12,6 +14,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SpanContextTest {
     private static final Random random = new Random();
+
+	@BeforeEach
+	void setup(){
+		Metadata.setup(SamplingConfiguration.builder().build());
+	}
 
 	@Test
 	public void testConversion() {

@@ -1,8 +1,8 @@
 package com.solarwinds.joboe.core.span.impl;
 
 import com.solarwinds.joboe.core.Context;
-import com.solarwinds.joboe.core.EventImpl;
 import com.solarwinds.joboe.core.EventReporter;
+import com.solarwinds.joboe.core.ReporterFactory;
 import com.solarwinds.joboe.core.TestReporter;
 import com.solarwinds.joboe.core.XTraceHeader;
 import com.solarwinds.joboe.core.settings.*;
@@ -44,7 +44,6 @@ public class SpanBuilderTest {
         ScopeManager.INSTANCE.removeAllScopes();
         TraceDecisionUtil.reset();
 
-        originalReporter = EventImpl.setDefaultReporter(tracingReporter);
     }
     
     @AfterEach
@@ -54,7 +53,6 @@ public class SpanBuilderTest {
         ScopeManager.INSTANCE.removeAllScopes();
         TraceDecisionUtil.reset();
 
-        EventImpl.setDefaultReporter(originalReporter);
         tracingReporter.reset();
     }
 
@@ -188,7 +186,7 @@ public class SpanBuilderTest {
         Tracer tracer = Tracer.INSTANCE;
         Metadata spanMetadata;
         
-        Scope scope1 = tracer.buildSpan("span1").withReporters(TraceEventSpanReporter.REPORTER).withSpanProperty(SpanProperty.TRACE_DECISION_PARAMETERS, TRACE_DECISION_PARAMS).startActive();
+        Scope scope1 = tracer.buildSpan("span1").withReporters(new TraceEventSpanReporter(ReporterFactory.getInstance().createTestReporter())).withSpanProperty(SpanProperty.TRACE_DECISION_PARAMETERS, TRACE_DECISION_PARAMS).startActive();
         Span span1 = scope1.span();
         spanMetadata = span1.context().getMetadata();
         assertTrue(spanMetadata.isValid()); 
@@ -196,7 +194,7 @@ public class SpanBuilderTest {
         assertTrue(spanMetadata.isReportMetrics());
         assertSame(spanMetadata, Context.getMetadata()); //should have updated the TLS context to use the active span
         
-        Scope scope2 = tracer.buildSpan("span2").withReporters(TraceEventSpanReporter.REPORTER).startActive();
+        Scope scope2 = tracer.buildSpan("span2").withReporters(new TraceEventSpanReporter(ReporterFactory.getInstance().createTestReporter())).startActive();
         Span span2 = scope2.span();
         spanMetadata = span2.context().getMetadata();
         assertTrue(spanMetadata.isValid()); 
@@ -216,7 +214,7 @@ public class SpanBuilderTest {
         assertFalse(Context.getMetadata().isValid()); //TLS context should also be cleared
         
         
-        Span span3 = tracer.buildSpan("span3").withReporters(TraceEventSpanReporter.REPORTER).withSpanProperty(SpanProperty.TRACE_DECISION_PARAMETERS, TRACE_DECISION_PARAMS).start();
+        Span span3 = tracer.buildSpan("span3").withReporters(new TraceEventSpanReporter(ReporterFactory.getInstance().createTestReporter())).withSpanProperty(SpanProperty.TRACE_DECISION_PARAMETERS, TRACE_DECISION_PARAMS).start();
         spanMetadata = span3.context().getMetadata();
         assertTrue(spanMetadata.isValid()); 
         assertTrue(spanMetadata.isSampled());
@@ -225,7 +223,7 @@ public class SpanBuilderTest {
         assertFalse(Context.getMetadata().isValid()); //TLS context should still be invalid
         
         //now when span3 is still around, let's create span4 which is an active span
-        Scope scope4 = tracer.buildSpan("span4").withReporters(TraceEventSpanReporter.REPORTER).withSpanProperty(SpanProperty.TRACE_DECISION_PARAMETERS, TRACE_DECISION_PARAMS).startActive();
+        Scope scope4 = tracer.buildSpan("span4").withReporters(new TraceEventSpanReporter(ReporterFactory.getInstance().createTestReporter())).withSpanProperty(SpanProperty.TRACE_DECISION_PARAMETERS, TRACE_DECISION_PARAMS).startActive();
         Span span4= scope4.span();
         spanMetadata = span4.context().getMetadata();
         assertTrue(spanMetadata.isValid()); 
@@ -262,7 +260,7 @@ public class SpanBuilderTest {
         Tracer tracer = Tracer.INSTANCE;
         Metadata spanMetadata;
 
-        try (Scope scope = Tracer.INSTANCE.activateSpan(tracer.buildSpan("span1").withReporters(TraceEventSpanReporter.REPORTER).start())) {
+        try (Scope scope = Tracer.INSTANCE.activateSpan(tracer.buildSpan("span1").withReporters(new TraceEventSpanReporter(ReporterFactory.getInstance().createTestReporter())).start())) {
             Span span1 = scope.span();
             spanMetadata = span1.context().getMetadata();
             assertTrue(spanMetadata.isValid());
@@ -287,7 +285,7 @@ public class SpanBuilderTest {
         Map<String, Object> tags = Collections.singletonMap("test-tag", "test-value");
         
         Tracer tracer = Tracer.INSTANCE;
-        Span span = tracer.buildSpan("test-layer").withTags(tags).withReporters(TraceEventSpanReporter.REPORTER).withSpanProperty(SpanProperty.TRACE_DECISION_PARAMETERS, TRACE_DECISION_PARAMS).startActive().span();
+        Span span = tracer.buildSpan("test-layer").withTags(tags).withReporters(new TraceEventSpanReporter(ReporterFactory.getInstance().createTestReporter())).withSpanProperty(SpanProperty.TRACE_DECISION_PARAMETERS, TRACE_DECISION_PARAMS).startActive().span();
         
         //assert TLS context is set properly
         assertTrue(Context.getMetadata().isValid());
@@ -308,7 +306,7 @@ public class SpanBuilderTest {
         Map<String, Object> tags = Collections.singletonMap("test-tag", "test-value");
         
         Tracer tracer = Tracer.INSTANCE;
-        Span span = tracer.buildSpan("test-layer").withTags(tags).withReporters(TraceEventSpanReporter.REPORTER).withSpanProperty(SpanProperty.TRACE_DECISION_PARAMETERS, TRACE_DECISION_PARAMS).startActive().span();
+        Span span = tracer.buildSpan("test-layer").withTags(tags).withReporters(new TraceEventSpanReporter(ReporterFactory.getInstance().createTestReporter())).withSpanProperty(SpanProperty.TRACE_DECISION_PARAMETERS, TRACE_DECISION_PARAMS).startActive().span();
         
         //assert TLS context is set properly
         assertTrue(Context.getMetadata().isValid());
@@ -332,7 +330,7 @@ public class SpanBuilderTest {
         Map<String, Object> tags = Collections.singletonMap("test-tag", "test-value");
         
         Tracer tracer = Tracer.INSTANCE;
-        Span span = tracer.buildSpan("test-layer").withTags(tags).withReporters(TraceEventSpanReporter.REPORTER).withSpanProperty(SpanProperty.TRACE_DECISION_PARAMETERS, TRACE_DECISION_PARAMS).startActive().span();
+        Span span = tracer.buildSpan("test-layer").withTags(tags).withReporters(new TraceEventSpanReporter(ReporterFactory.getInstance().createTestReporter())).withSpanProperty(SpanProperty.TRACE_DECISION_PARAMETERS, TRACE_DECISION_PARAMS).startActive().span();
         
         //assert TLS context is set properly
         assertTrue(Context.getMetadata().isValid()); //even when it's completely not traced, we still want a valid context (isSampled set to false)
@@ -353,7 +351,7 @@ public class SpanBuilderTest {
         Map<String, Object> tags = Collections.singletonMap("test-tag", "test-value");
         
         Tracer tracer = Tracer.INSTANCE;
-        Span span = tracer.buildSpan("test-layer").withTags(tags).withReporters(TraceEventSpanReporter.REPORTER).startActive().span(); //no SpanProperty.TRACE_DECISION_PARAMETERS indicates that this is not a trace entry point
+        Span span = tracer.buildSpan("test-layer").withTags(tags).withReporters(new TraceEventSpanReporter(ReporterFactory.getInstance().createTestReporter())).startActive().span(); //no SpanProperty.TRACE_DECISION_PARAMETERS indicates that this is not a trace entry point
         
         //assert TLS context is set properly
         assertFalse(Context.getMetadata().isValid());
@@ -376,7 +374,7 @@ public class SpanBuilderTest {
         String xTraceId = incomingMetadata.toHexString();
         
         Tracer tracer = Tracer.INSTANCE;
-        Span span = tracer.buildSpan("test-layer").withTags(tags).withSpanProperty(SpanProperty.TRACE_DECISION_PARAMETERS, new TraceDecisionParameters(Collections.singletonMap(XTraceHeader.TRACE_ID, xTraceId), null)).withReporters(TraceEventSpanReporter.REPORTER).startActive().span();
+        Span span = tracer.buildSpan("test-layer").withTags(tags).withSpanProperty(SpanProperty.TRACE_DECISION_PARAMETERS, new TraceDecisionParameters(Collections.singletonMap(XTraceHeader.TRACE_ID, xTraceId), null)).withReporters(new TraceEventSpanReporter(ReporterFactory.getInstance().createTestReporter())).startActive().span();
         
         //assert TLS context is set properly
         assertTrue(Context.getMetadata().isValid());
@@ -405,7 +403,7 @@ public class SpanBuilderTest {
         String xTraceId = incomingMetadata.toHexString();
         
         Tracer tracer = Tracer.INSTANCE;
-        Span span = tracer.buildSpan("test-layer").withTags(tags).withSpanProperty(SpanProperty.TRACE_DECISION_PARAMETERS, new TraceDecisionParameters(Collections.singletonMap(XTraceHeader.TRACE_ID, xTraceId), null)).withReporters(TraceEventSpanReporter.REPORTER).startActive().span();
+        Span span = tracer.buildSpan("test-layer").withTags(tags).withSpanProperty(SpanProperty.TRACE_DECISION_PARAMETERS, new TraceDecisionParameters(Collections.singletonMap(XTraceHeader.TRACE_ID, xTraceId), null)).withReporters(new TraceEventSpanReporter(ReporterFactory.getInstance().createTestReporter())).startActive().span();
         
         //assert TLS context is set properly
         assertTrue(Context.getMetadata().isValid());
@@ -434,7 +432,7 @@ public class SpanBuilderTest {
         testSettingsReader.put(new SettingsMockupBuilder().withFlags(TracingMode.ALWAYS).withSampleRate(TraceDecisionUtil.SAMPLE_RESOLUTION).withSettingsArg(SettingsArg.MAX_CONTEXT_AGE, newTtl).build());
 
         Tracer tracer = Tracer.INSTANCE;
-        Scope parentScope = tracer.buildSpan("parent-span").withReporters(TraceEventSpanReporter.REPORTER).withSpanProperty(SpanProperty.TRACE_DECISION_PARAMETERS, TRACE_DECISION_PARAMS).startActive();
+        Scope parentScope = tracer.buildSpan("parent-span").withReporters(new TraceEventSpanReporter(ReporterFactory.getInstance().createTestReporter())).withSpanProperty(SpanProperty.TRACE_DECISION_PARAMETERS, TRACE_DECISION_PARAMS).startActive();
         Span parentSpan = parentScope.span();
 
         //assert TLS context is set properly
@@ -445,14 +443,14 @@ public class SpanBuilderTest {
         assertTrue(parentSpan.context().getMetadata().isValid());
         assertTrue(parentSpan.context().getMetadata().isSampled());
 
-        Span childSpan = tracer.buildSpan("child-span-1").withReporters(TraceEventSpanReporter.REPORTER).start();
+        Span childSpan = tracer.buildSpan("child-span-1").withReporters(new TraceEventSpanReporter(ReporterFactory.getInstance().createTestReporter())).start();
         assertTrue(childSpan.context().getMetadata().isValid());
         assertTrue(childSpan.context().getMetadata().isSampled());
         childSpan.finish();
 
         TimeUnit.SECONDS.sleep(newTtl + 1);
 
-        childSpan = tracer.buildSpan("child-span-2").withReporters(TraceEventSpanReporter.REPORTER).start();
+        childSpan = tracer.buildSpan("child-span-2").withReporters(new TraceEventSpanReporter(ReporterFactory.getInstance().createTestReporter())).start();
         assertFalse(childSpan.context().getMetadata().isValid()); //expired
         assertFalse(childSpan.context().getMetadata().isSampled()); //expired
         childSpan.finish();

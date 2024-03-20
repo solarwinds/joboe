@@ -4,11 +4,13 @@ import com.solarwinds.joboe.core.Context;
 import com.solarwinds.joboe.core.TestReporter;
 import com.solarwinds.joboe.core.TestReporter.DeserializedEvent;
 import com.solarwinds.joboe.core.config.ProfilerSetting;
-import com.solarwinds.joboe.core.profiler.Profiler;
+import com.solarwinds.joboe.core.profiler.Profiler.Profile;
 import com.solarwinds.joboe.core.span.impl.Span;
 import com.solarwinds.joboe.core.span.impl.Tracer;
-import com.solarwinds.joboe.core.profiler.Profiler.Profile;
 import com.solarwinds.joboe.core.util.TestUtils;
+import com.solarwinds.joboe.sampling.Metadata;
+import com.solarwinds.joboe.sampling.SamplingConfiguration;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -19,6 +21,11 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ProfileTest {
+
+    @BeforeEach
+    void setup(){
+        Metadata.setup(SamplingConfiguration.builder().build());
+    }
 
     private final ProfilerSetting profilerSetting = new ProfilerSetting(true, Collections.EMPTY_SET, ProfilerSetting.DEFAULT_INTERVAL, ProfilerSetting.DEFAULT_CIRCUIT_BREAKER_DURATION_THRESHOLD, ProfilerSetting.DEFAULT_CIRCUIT_BREAKER_COUNT_THRESHOLD);
     private final TestReporter profilingReporter = TestUtils.initProfilingReporter(profilerSetting);

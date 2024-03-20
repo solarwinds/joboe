@@ -1,8 +1,8 @@
 package com.solarwinds.joboe.core.span.impl;
 
 import com.solarwinds.joboe.core.Context;
-import com.solarwinds.joboe.core.EventImpl;
 import com.solarwinds.joboe.core.EventReporter;
+import com.solarwinds.joboe.core.ReporterFactory;
 import com.solarwinds.joboe.core.TestReporter;
 import com.solarwinds.joboe.core.util.TestUtils;
 import com.solarwinds.joboe.sampling.Metadata;
@@ -11,9 +11,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * Test the extra methods provided by ActiveSpan compared to Span
@@ -30,7 +37,6 @@ public class ScopeManagerTest {
         ScopeManager.INSTANCE.removeAllScopes();
         TraceDecisionUtil.reset();
 
-        originalReporter = EventImpl.setDefaultReporter(tracingReporter);
     }
 
     @BeforeEach
@@ -39,7 +45,6 @@ public class ScopeManagerTest {
         ScopeManager.INSTANCE.removeAllScopes();
         TraceDecisionUtil.reset();
 
-        EventImpl.setDefaultReporter(originalReporter);
         tracingReporter.reset();
     }
 
@@ -108,13 +113,13 @@ public class ScopeManagerTest {
 
 
         Context.clearMetadata();
-        Scope scope1 = ScopeManager.INSTANCE.activate(Tracer.INSTANCE.buildSpan("test-1").withReporters(TraceEventSpanReporter.REPORTER).withSpanProperty(Span.SpanProperty.TRACE_DECISION_PARAMETERS, new TraceDecisionParameters(Collections.emptyMap(), null)).start());
+        Scope scope1 = ScopeManager.INSTANCE.activate(Tracer.INSTANCE.buildSpan("test-1").withReporters(new TraceEventSpanReporter(ReporterFactory.getInstance().createTestReporter())).withSpanProperty(Span.SpanProperty.TRACE_DECISION_PARAMETERS, new TraceDecisionParameters(Collections.emptyMap(), null)).start());
         Metadata span1Metadata = scope1.span().context().getMetadata();
         assertSame(Context.getMetadata(), span1Metadata);
         assert(span1Metadata.isValid());
         assertSame(ScopeManager.INSTANCE.active(), scope1);
 
-        Scope scope2 = ScopeManager.INSTANCE.activate(Tracer.INSTANCE.buildSpan("test-2").withReporters(TraceEventSpanReporter.REPORTER).start());
+        Scope scope2 = ScopeManager.INSTANCE.activate(Tracer.INSTANCE.buildSpan("test-2").withReporters(new TraceEventSpanReporter(ReporterFactory.getInstance().createTestReporter())).start());
         Metadata span2Metadata = scope2.span().context().getMetadata();
         assertSame(Context.getMetadata(), span2Metadata);
         assert(span2Metadata.isValid());
@@ -150,13 +155,13 @@ public class ScopeManagerTest {
 
 
         Context.clearMetadata();
-        Scope scope1 = ScopeManager.INSTANCE.activate(Tracer.INSTANCE.buildSpan("test-1").withReporters(TraceEventSpanReporter.REPORTER).withSpanProperty(Span.SpanProperty.TRACE_DECISION_PARAMETERS, new TraceDecisionParameters(Collections.emptyMap(), null)).start());
+        Scope scope1 = ScopeManager.INSTANCE.activate(Tracer.INSTANCE.buildSpan("test-1").withReporters(new TraceEventSpanReporter(ReporterFactory.getInstance().createTestReporter())).withSpanProperty(Span.SpanProperty.TRACE_DECISION_PARAMETERS, new TraceDecisionParameters(Collections.emptyMap(), null)).start());
         Metadata span1Metadata = scope1.span().context().getMetadata();
         assertSame(Context.getMetadata(), span1Metadata);
         assert(span1Metadata.isValid());
         assertSame(ScopeManager.INSTANCE.active(), scope1);
 
-        Scope scope2 = ScopeManager.INSTANCE.activate(Tracer.INSTANCE.buildSpan("test-2").withReporters(TraceEventSpanReporter.REPORTER).start());
+        Scope scope2 = ScopeManager.INSTANCE.activate(Tracer.INSTANCE.buildSpan("test-2").withReporters(new TraceEventSpanReporter(ReporterFactory.getInstance().createTestReporter())).start());
         Metadata span2Metadata = scope2.span().context().getMetadata();
         assertSame(Context.getMetadata(), span2Metadata);
         assert(span2Metadata.isValid());
@@ -173,7 +178,7 @@ public class ScopeManagerTest {
         Context.getMetadata().randomize(true);
         legacyContext = Context.getMetadata();
 
-        scope1 = ScopeManager.INSTANCE.activate(Tracer.INSTANCE.buildSpan("test-1").withReporters(TraceEventSpanReporter.REPORTER).withSpanProperty(Span.SpanProperty.TRACE_DECISION_PARAMETERS, new TraceDecisionParameters(Collections.emptyMap(), null)).start());
+        scope1 = ScopeManager.INSTANCE.activate(Tracer.INSTANCE.buildSpan("test-1").withReporters(new TraceEventSpanReporter(ReporterFactory.getInstance().createTestReporter())).withSpanProperty(Span.SpanProperty.TRACE_DECISION_PARAMETERS, new TraceDecisionParameters(Collections.emptyMap(), null)).start());
         span1Metadata = scope1.span().context().getMetadata();
         assertSame(Context.getMetadata(), span1Metadata);
         assertEquals(span1Metadata.taskHexString(), legacyContext.taskHexString());
@@ -181,7 +186,7 @@ public class ScopeManagerTest {
         assert(span1Metadata.isValid());
         assertSame(ScopeManager.INSTANCE.active(), scope1);
 
-        scope2 = ScopeManager.INSTANCE.activate(Tracer.INSTANCE.buildSpan("test-2").withReporters(TraceEventSpanReporter.REPORTER).start());
+        scope2 = ScopeManager.INSTANCE.activate(Tracer.INSTANCE.buildSpan("test-2").withReporters(new TraceEventSpanReporter(ReporterFactory.getInstance().createTestReporter())).start());
         span2Metadata = scope2.span().context().getMetadata();
         assertSame(Context.getMetadata(), span2Metadata);
         assertEquals(span2Metadata.taskHexString(), legacyContext.taskHexString());

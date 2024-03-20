@@ -8,7 +8,9 @@ import com.solarwinds.joboe.core.ebson.BsonReader;
 import com.solarwinds.joboe.core.ebson.BsonToken;
 import com.solarwinds.joboe.core.util.TestUtils;
 import com.solarwinds.joboe.sampling.Metadata;
+import com.solarwinds.joboe.sampling.SamplingConfiguration;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.net.DatagramPacket;
@@ -37,6 +39,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class EventImplTest {
     private final Logger log = Logger.getLogger(getClass().getName());
     private static final TestReporter reporter = TestUtils.initTraceReporter();
+
+    @BeforeEach
+    void setup(){
+        Metadata.setup(SamplingConfiguration.builder().build());
+    }
 
     @AfterEach
     protected void tearDown() throws Exception {

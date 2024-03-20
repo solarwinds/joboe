@@ -7,7 +7,7 @@ import java.util.Set;
 
 import com.solarwinds.joboe.core.Context;
 import com.solarwinds.joboe.core.Event;
-import com.solarwinds.joboe.core.OboeException;
+import com.solarwinds.joboe.core.EventReporter;
 import com.solarwinds.joboe.core.config.ConfigManager;
 import com.solarwinds.joboe.core.config.ConfigProperty;
 import com.solarwinds.joboe.core.span.impl.Span.SpanProperty;
@@ -30,7 +30,7 @@ import com.solarwinds.joboe.sampling.XTraceOptions;
  */
 public class TraceEventSpanReporter implements SpanReporter {
     private final Logger logger = LoggerFactory.getLogger();
-    public static final TraceEventSpanReporter REPORTER = new TraceEventSpanReporter();
+
     private static final boolean PROFILER_ENABLED;
 
     static  {
@@ -38,7 +38,10 @@ public class TraceEventSpanReporter implements SpanReporter {
         PROFILER_ENABLED = profilerSetting != null && profilerSetting.isEnabled();
     }
 
-    private TraceEventSpanReporter() {
+    private final EventReporter eventReporter;
+
+    public TraceEventSpanReporter(EventReporter eventReporter) {
+        this.eventReporter = eventReporter;
     }
 
     /**
@@ -114,7 +117,7 @@ public class TraceEventSpanReporter implements SpanReporter {
 
             entryEvent.setTimestamp(span.getStart());
 
-            entryEvent.report(spanMetadata);
+            entryEvent.report(spanMetadata, eventReporter);
 
             span.setSpanPropertyValue(SpanProperty.REPORTED_TAG_KEYS, tags.keySet()); //to avoid double reporting on exit
         }
@@ -180,7 +183,7 @@ public class TraceEventSpanReporter implements SpanReporter {
                 }
             }
 
-            exitEvent.report(spanMetadata);
+            exitEvent.report(spanMetadata, eventReporter);
 
             Span parentSpan = ScopeManager.INSTANCE.activeSpan(); //add the current exit edge to parent span
             if (parentSpan != null) {
@@ -213,7 +216,7 @@ public class TraceEventSpanReporter implements SpanReporter {
             }
             event.addInfo(logEntry.getFields());
             event.setTimestamp(logEntry.getTimestamp());
-            event.report(spanMetadata);
+            event.report(spanMetadata, eventReporter);
         }
     }
 }

@@ -49,10 +49,6 @@ public abstract class Event {
      */
     public abstract void report(EventReporter reporter);
 
-    public abstract void report();
-
-    public abstract void report(Metadata md);
-
     /**
      *  Report event to agent
      *

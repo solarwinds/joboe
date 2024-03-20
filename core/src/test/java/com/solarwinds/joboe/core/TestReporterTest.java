@@ -1,15 +1,19 @@
 package com.solarwinds.joboe.core;
 
-import com.solarwinds.joboe.core.Context;
-import com.solarwinds.joboe.core.Event;
-import com.solarwinds.joboe.core.ReporterFactory;
-import com.solarwinds.joboe.core.TestReporter;
 import com.solarwinds.joboe.core.config.InvalidConfigException;
+import com.solarwinds.joboe.sampling.Metadata;
+import com.solarwinds.joboe.sampling.SamplingConfiguration;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestReporterTest {
+
+    @BeforeEach
+    void setup(){
+        Metadata.setup(SamplingConfiguration.builder().build());
+    }
 
     @Test
     public void testReporterSameThread() throws InvalidConfigException {

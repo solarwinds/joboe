@@ -40,7 +40,6 @@ public class EventImpl extends Event {
     private Long timestamp = null;
     
     static final int MAX_KEY_COUNT = 1024;
-    private static /*final*/ EventReporter DEFAULT_REPORTER; //cannot make final due to unit testing problem...
     private static final Collection<String> BASIC_KEYS = Arrays.asList("Layer", "Label", Constants.XTR_ASYNC_KEY, Constants.XTR_EDGE_KEY, Constants.XTR_AO_EDGE_KEY, Constants.XTR_THREAD_ID_KEY, Constants.XTR_HOSTNAME_KEY, Constants.XTR_METADATA_KEY, Constants.XTR_XTRACE, Constants.XTR_PROCESS_ID_KEY, Constants.XTR_TIMESTAMP_U_KEY);
     
 
@@ -84,10 +83,6 @@ public class EventImpl extends Event {
         if (parentMetadata != null) {
             addEdge(parentMetadata);
         }
-    }
-    
-    public static EventReporter getEventReporter() {
-        return DEFAULT_REPORTER;
     }
 
     private void init() {
@@ -218,22 +213,6 @@ public class EventImpl extends Event {
         report(Context.getMetadata(), reporter);
     }
 
-    /* (non-Javadoc)
-     * @see com.solarwinds.joboe.core.Event#report()
-     */
-    @Override
-    public void report()  {
-        report(Context.getMetadata(), DEFAULT_REPORTER);
-    }
-    
-    /* (non-Javadoc)
-     * @see com.solarwinds.joboe.core.Event#report(com.solarwinds.joboe.sampling.Metadata)
-     */
-    @Override
-    public void report(Metadata md) {
-    	report(md, DEFAULT_REPORTER);
-    }
-    
     /* (non-Javadoc)
      * @see com.solarwinds.joboe.core.Event#report(com.solarwinds.joboe.sampling.Metadata, com.solarwinds.joboe.core.EventReporter)
      */
@@ -610,15 +589,5 @@ public class EventImpl extends Event {
         this.threadId = threadId;
     }
 
-    /**
-     * Sets the default reporter of Tracing event
-     * @param defaultReporter
-     * @return the original default reporter before the change
-     */
-    public static EventReporter setDefaultReporter(EventReporter defaultReporter) {
-        EventReporter originalReporter = DEFAULT_REPORTER;
-        DEFAULT_REPORTER = defaultReporter;
-        return originalReporter;
-    }
 }
 

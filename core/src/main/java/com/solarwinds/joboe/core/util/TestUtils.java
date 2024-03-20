@@ -5,6 +5,7 @@ import com.solarwinds.joboe.core.TestReporter;
 import com.solarwinds.joboe.core.config.ProfilerSetting;
 import com.solarwinds.joboe.core.profiler.Profiler;
 import com.solarwinds.joboe.core.settings.*;
+import com.solarwinds.joboe.sampling.SamplingConfiguration;
 import com.solarwinds.joboe.sampling.Settings;
 import com.solarwinds.joboe.sampling.SettingsArg;
 import com.solarwinds.joboe.sampling.SettingsManager;
@@ -19,16 +20,14 @@ public abstract class TestUtils {
 
     public static TestSettingsReader initSettingsReader() {
         TestSettingsReader reader = new TestSettingsReader();
-        SettingsManager.initializeFetcher(new SimpleSettingsFetcher(reader));
+        SettingsManager.initialize(new SimpleSettingsFetcher(reader), SamplingConfiguration.builder().build());
         return reader;
     }
 
     public static TestReporter initTraceReporter() {
         try {
-            TestReporter testTracingReporter = ReporterFactory.getInstance().createTestReporter();
-            return testTracingReporter;
+            return ReporterFactory.getInstance().createTestReporter();
         } catch (Exception e) {
-            e.printStackTrace();
             return null;
         }
     }
@@ -40,7 +39,6 @@ public abstract class TestUtils {
             Profiler.initialize(profilerSetting, testProfilingReporter);
             return testProfilingReporter;
         } catch (Exception e) {
-            e.printStackTrace();
             return null;
         }
 }

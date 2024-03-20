@@ -11,6 +11,8 @@ import com.solarwinds.joboe.core.ebson.BsonDocuments;
 import com.solarwinds.joboe.core.rpc.RpcClient.TaskType;
 import com.solarwinds.joboe.core.settings.PollingSettingsFetcherTest;
 import com.solarwinds.joboe.core.util.TimeUtils;
+import com.solarwinds.joboe.sampling.Metadata;
+import com.solarwinds.joboe.sampling.SamplingConfiguration;
 import com.solarwinds.joboe.sampling.Settings;
 import com.solarwinds.joboe.sampling.SettingsArg;
 import org.junit.jupiter.api.AfterEach;
@@ -42,15 +44,14 @@ public abstract class RpcClientTest {
     private static final int TEST_SERVER_PORT_BASE = 10148;
     protected static final String TEST_SERVER_HOST = "localhost";
     protected static final String TEST_CLIENT_ID = "123";
-    protected static final List<Event> TEST_EVENTS = generateTestEvents();
-    protected static final Event BIG_EVENT = generateBigEvent();
+    protected List<Event> testEvents = generateTestEvents();
+    protected Event bigEvent = generateBigEvent();
 
     private static final String TEST_SERVER_CERT_LOCATION = "src/test/java/com/solarwinds/joboe/core/rpc/test-collector-public.pem";
     private static final String INVALID_CERT_LOCATION = "src/test/java/com/solarwinds/joboe/core/rpc/invalid-collector.crt";
     private static int portWalker = TEST_SERVER_PORT_BASE;
     private static int testServerPort = TEST_SERVER_PORT_BASE;
     protected static final List<RpcSettings> TEST_SETTINGS = generateTestSettings();
-
 
     private static final RpcClient.RetryParamConstants QUICK_RETRY = new RpcClient.RetryParamConstants(100, 200, 3);
 
@@ -60,6 +61,10 @@ public abstract class RpcClientTest {
     public void setUp() throws Exception {
         testServerPort = locateAvailablePort();
         testCollector = startCollector(testServerPort);
+
+        Metadata.setup(SamplingConfiguration.builder().build());
+        testEvents = generateTestEvents();
+        bigEvent = generateBigEvent();
     }
 
 
@@ -135,8 +140,8 @@ public abstract class RpcClientTest {
         Client client = null;
         try {
             client = new RpcClient(TEST_SERVER_HOST, testServerPort, TEST_CLIENT_ID, getProtocolClientFactory(new File(getServerPublicKeyLocation()).toURI().toURL()));
-            assertEquals(com.solarwinds.joboe.core.rpc.ResultCode.OK, client.postEvents(TEST_EVENTS, null).get().getResultCode());
-            assertEventEquals(TEST_EVENTS, testCollector.flush());
+            assertEquals(com.solarwinds.joboe.core.rpc.ResultCode.OK, client.postEvents(testEvents, null).get().getResultCode());
+            assertEventEquals(testEvents, testCollector.flush());
         } finally {
             if (client != null) {
                 client.close();
@@ -167,7 +172,7 @@ public abstract class RpcClientTest {
         Client client = null;
         try {
             client = new RpcClient(TEST_SERVER_HOST, 19876, TEST_CLIENT_ID, QUICK_RETRY, getProtocolClientFactory(new File(getServerPublicKeyLocation()).toURI().toURL()));
-            client.postEvents(TEST_EVENTS, null).get(5, TimeUnit.SECONDS);
+            client.postEvents(testEvents, null).get(5, TimeUnit.SECONDS);
             fail("Expect exception thrown, but no exception found!");
         } catch (TimeoutException | ExecutionException e) {
             //expected;
@@ -189,13 +194,13 @@ public abstract class RpcClientTest {
 
         try {
             client = new RpcClient(TEST_SERVER_HOST, lazyServerPort, TEST_CLIENT_ID, getProtocolClientFactory(new File(getServerPublicKeyLocation()).toURI().toURL()));
-            Future<Result> futureResult = client.postEvents(TEST_EVENTS, null);
+            Future<Result> futureResult = client.postEvents(testEvents, null);
 
             TimeUnit.SECONDS.sleep(5); //lazy!!
             lazyServer = startCollector(lazyServerPort); //now start the lazy server
 
             assertEquals(com.solarwinds.joboe.core.rpc.ResultCode.OK, futureResult.get().getResultCode());
-            assertEventEquals(TEST_EVENTS, lazyServer.flush());
+            assertEventEquals(testEvents, lazyServer.flush());
 
 
         } finally {
@@ -217,7 +222,7 @@ public abstract class RpcClientTest {
             List<Event> events = new ArrayList<Event>();
 
             for (int i = 0 ; i < 1000; i ++) {
-                events.addAll(TEST_EVENTS);
+                events.addAll(testEvents);
             }
 
             assertEquals(com.solarwinds.joboe.core.rpc.ResultCode.OK, client.postEvents(events, null).get().getResultCode());
@@ -240,10 +245,10 @@ public abstract class RpcClientTest {
             List<Event> events = new ArrayList<Event>();
 
             int eventCount = 1000;
-            long totalSize = (long) eventCount * BIG_EVENT.toBytes().length; //just an approximation
+            long totalSize = (long) eventCount * bigEvent.toBytes().length; //just an approximation
 
             for (int i = 0 ; i < eventCount; i ++) { //1000 events, each event is around 100kb
-                events.add(BIG_EVENT);
+                events.add(bigEvent);
             }
 
             assertEquals(com.solarwinds.joboe.core.rpc.ResultCode.OK, client.postEvents(events, null).get().getResultCode());
@@ -493,7 +498,7 @@ public abstract class RpcClientTest {
         try {
             client = new RpcClient(TEST_SERVER_HOST, redirectPort, TEST_CLIENT_ID, getProtocolClientFactory(new File(getServerPublicKeyLocation()).toURI().toURL()));
 
-            assertEquals(com.solarwinds.joboe.core.rpc.ResultCode.REDIRECT, client.postEvents(TEST_EVENTS, null).get().getResultCode());
+            assertEquals(com.solarwinds.joboe.core.rpc.ResultCode.REDIRECT, client.postEvents(testEvents, null).get().getResultCode());
         } finally {
             if (client != null) {
                 client.close();
@@ -516,8 +521,8 @@ public abstract class RpcClientTest {
         try {
             client = new RpcClient(TEST_SERVER_HOST, redirectPort1, TEST_CLIENT_ID, getProtocolClientFactory(new File(getServerPublicKeyLocation()).toURI().toURL()));
 
-            assertEquals(com.solarwinds.joboe.core.rpc.ResultCode.OK, client.postEvents(TEST_EVENTS, null).get().getResultCode());
-            assertEventEquals(TEST_EVENTS, testCollector.flush());
+            assertEquals(com.solarwinds.joboe.core.rpc.ResultCode.OK, client.postEvents(testEvents, null).get().getResultCode());
+            assertEventEquals(testEvents, testCollector.flush());
         } finally {
             if (client != null) {
                 client.close();
@@ -537,7 +542,7 @@ public abstract class RpcClientTest {
 
         try {
             client = new RpcClient(TEST_SERVER_HOST, redirectPort, TEST_CLIENT_ID, getProtocolClientFactory(new File(getServerPublicKeyLocation()).toURI().toURL()));
-            client.postEvents(TEST_EVENTS, null).get();
+            client.postEvents(testEvents, null).get();
             fail("Expect exception thrown, but no exception found!");
         } catch (ExecutionException e) {
            //expected
@@ -560,7 +565,7 @@ public abstract class RpcClientTest {
         try {
             client = new RpcClient(TEST_SERVER_HOST, redirectPort, TEST_CLIENT_ID, QUICK_RETRY, getProtocolClientFactory(new File(getServerPublicKeyLocation()).toURI().toURL()));
 
-            client.postEvents(TEST_EVENTS, null).get(5, TimeUnit.SECONDS);
+            client.postEvents(testEvents, null).get(5, TimeUnit.SECONDS);
 
             fail("Expect exception thrown, but no exception found!");
         } catch (TimeoutException | ExecutionException e) {
@@ -595,8 +600,8 @@ public abstract class RpcClientTest {
             List<Future<Result>> futures = new ArrayList<Future<Result>>();
             List<Event> sentEvents = new ArrayList<Event>();
             for (int i = 0 ; i < 10; i ++) {
-                 futures.add(client.postEvents(TEST_EVENTS, null)); //post events, the handler will return TRY_LATER most of the time, but the client should be able to retry the request until it's OK eventually
-                 sentEvents.addAll(TEST_EVENTS);
+                 futures.add(client.postEvents(testEvents, null)); //post events, the handler will return TRY_LATER most of the time, but the client should be able to retry the request until it's OK eventually
+                 sentEvents.addAll(testEvents);
             }
 
             for (Future<Result> future : futures) {
@@ -633,8 +638,8 @@ public abstract class RpcClientTest {
             List<Future<Result>> futures = new ArrayList<Future<Result>>();
             List<Event> sentEvents = new ArrayList<Event>();
             for (int i = 0 ; i < 10; i ++) {
-                 futures.add(client.postEvents(TEST_EVENTS, null)); //post events, the handler will return LIMIT_EXCEEDED most of the time, but the client should be able to retry the request until it's OK eventually
-                 sentEvents.addAll(TEST_EVENTS);
+                 futures.add(client.postEvents(testEvents, null)); //post events, the handler will return LIMIT_EXCEEDED most of the time, but the client should be able to retry the request until it's OK eventually
+                 sentEvents.addAll(testEvents);
             }
 
             for (Future<Result> future : futures) {
@@ -736,8 +741,8 @@ public abstract class RpcClientTest {
             List<Future<Result>> futures = new ArrayList<Future<Result>>();
             List<Event> sentEvents = new ArrayList<Event>();
             for (int i = 0 ; i < 10; i ++) {
-                futures.add(client.postEvents(TEST_EVENTS, null)); //post events, the handler will return LIMIT_EXCEEDED most of the time, but the client should be able to retry the request until it's OK eventually
-                sentEvents.addAll(TEST_EVENTS);
+                futures.add(client.postEvents(testEvents, null)); //post events, the handler will return LIMIT_EXCEEDED most of the time, but the client should be able to retry the request until it's OK eventually
+                sentEvents.addAll(testEvents);
             }
 
 
@@ -766,7 +771,7 @@ public abstract class RpcClientTest {
         try {
             client = new RpcClient(TEST_SERVER_HOST, errorServerPort, TEST_CLIENT_ID, QUICK_RETRY, getProtocolClientFactory(new File(getServerPublicKeyLocation()).toURI().toURL()));
 
-            client.postEvents(TEST_EVENTS, null).get();//will fail and give up base on QUICK_RETRY
+            client.postEvents(testEvents, null).get();//will fail and give up base on QUICK_RETRY
 
             fail("Expect exception because of retry failures, but it's not thrown!");
         } catch (ExecutionException e) {
