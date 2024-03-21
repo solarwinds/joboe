@@ -66,7 +66,7 @@ public class CustomMetricsCollector extends AbstractMetricsEntryCollector {
 
     
     @Override
-    List<? extends MetricsEntry<?>> collectMetricsEntries() {
+   public List<? extends MetricsEntry<?>> collectMetricsEntries() {
         List<MeasurementMetricsEntry<?>> entries = new ArrayList<MeasurementMetricsEntry<?>>();
         
         ConcurrentMap<MetricKey, SummaryDoubleMeasurement> reportingSummaryMeasurements = summaryMeasurements.asMap();

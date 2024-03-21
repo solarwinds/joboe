@@ -14,10 +14,10 @@ import com.solarwinds.joboe.sampling.TraceDecisionUtil;
  * @author Patson Luk
  *
  */
-class TraceDecisionMetricsCollector extends AbstractMetricsEntryCollector {
+public class TraceDecisionMetricsCollector extends AbstractMetricsEntryCollector {
    
     @Override
-    List<? extends MetricsEntry<?>> collectMetricsEntries() {
+    public List<? extends MetricsEntry<?>> collectMetricsEntries() {
         List<SimpleMeasurementMetricsEntry> layerMetricsEntries = new ArrayList<SimpleMeasurementMetricsEntry>();
         
         

@@ -15,10 +15,10 @@ import java.util.List;
  *
  */
 @RequiredArgsConstructor
-class TracingReporterMetricsCollector extends AbstractMetricsEntryCollector {
+public class TracingReporterMetricsCollector extends AbstractMetricsEntryCollector {
     private final EventReporter eventReporter;
     @Override
-    List<SimpleMeasurementMetricsEntry> collectMetricsEntries() throws Exception {
+   public List<SimpleMeasurementMetricsEntry> collectMetricsEntries() throws Exception {
         EventReporterStats stats = eventReporter.consumeStats();
         
         List<SimpleMeasurementMetricsEntry> metricsEntries = new ArrayList<SimpleMeasurementMetricsEntry>();

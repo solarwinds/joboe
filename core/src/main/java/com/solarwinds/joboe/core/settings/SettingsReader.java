@@ -9,7 +9,7 @@ import java.util.Map;
  * @author pluk
  *
  */
-interface SettingsReader {
+public interface SettingsReader {
     Map<String, Settings> getSettings() throws OboeSettingsException;
     void close();
 }

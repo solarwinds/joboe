@@ -12,9 +12,9 @@ import java.util.List;
  * @author pluk
  *
  */
-class SystemMetricsCollector extends AbstractMetricsEntryCollector {
+public class SystemMetricsCollector extends AbstractMetricsEntryCollector {
     @Override
-    List<SimpleMeasurementMetricsEntry> collectMetricsEntries() throws Exception {
+    public List<SimpleMeasurementMetricsEntry> collectMetricsEntries() throws Exception {
         List<SimpleMeasurementMetricsEntry> info = new ArrayList<SimpleMeasurementMetricsEntry>();
         
         OperatingSystemMXBean operatingMXBean = ManagementFactory.getOperatingSystemMXBean();

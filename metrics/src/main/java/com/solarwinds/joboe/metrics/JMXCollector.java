@@ -299,7 +299,7 @@ class JMXCollector extends AbstractMetricsEntryCollector {
     }
 
     @Override
-    List<? extends MetricsEntry<?>> collectMetricsEntries() throws IntrospectionException, InstanceNotFoundException, AttributeNotFoundException, ReflectionException, MBeanException {
+    public List<? extends MetricsEntry<?>> collectMetricsEntries() throws IntrospectionException, InstanceNotFoundException, AttributeNotFoundException, ReflectionException, MBeanException {
         Map<MetricKey, Number> data = collect();
         List<SimpleMeasurementMetricsEntry> metricsEntries = new ArrayList<SimpleMeasurementMetricsEntry>();
         for (Entry<MetricKey, Number> entry : data.entrySet()) {

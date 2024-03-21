@@ -5,8 +5,8 @@ import com.solarwinds.joboe.core.config.ConfigProperty;
 import com.solarwinds.joboe.core.metrics.MetricKey;
 import com.solarwinds.joboe.core.metrics.MetricsEntry;
 import com.solarwinds.joboe.core.metrics.histogram.HistogramMetricsEntry;
-import com.solarwinds.joboe.metrics.histogram.MockHistogramAdapter;
 import com.solarwinds.joboe.core.metrics.measurement.SimpleMeasurementMetricsEntry;
+import com.solarwinds.joboe.metrics.histogram.MockHistogramAdapter;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
@@ -78,14 +78,14 @@ public class MetricsCollectorTest {
         
         collectorsMap.put(MetricsCategory.LAYER_COUNT, new AbstractMetricsEntryCollector() {
             @Override
-            List<? extends MetricsEntry<?>> collectMetricsEntries() throws Exception {
+            public List<? extends MetricsEntry<?>> collectMetricsEntries() throws Exception {
                 return testLayerCountMetrics;
             }
         });
         
         collectorsMap.put(MetricsCategory.SPAN_METRICS, new AbstractMetricsEntryCollector() {
             @Override
-            List<HistogramMetricsEntry> collectMetricsEntries() throws Exception {
+            public List<HistogramMetricsEntry> collectMetricsEntries() throws Exception {
                 return testLayerHistogramMetrics;
             }
         });
@@ -126,7 +126,7 @@ public class MetricsCollectorTest {
         
         collectorsMap.put(MetricsCategory.LAYER_COUNT, new AbstractMetricsEntryCollector() {
             @Override
-            List<? extends MetricsEntry<?>> collectMetricsEntries() throws Exception {
+            public List<? extends MetricsEntry<?>> collectMetricsEntries() throws Exception {
                 //make this really slow
                 Thread.sleep(30000); //30 secs
                 return testLayerCountMetrics;
@@ -135,7 +135,7 @@ public class MetricsCollectorTest {
         
         collectorsMap.put(MetricsCategory.SPAN_METRICS, new AbstractMetricsEntryCollector() {
             @Override
-            List<HistogramMetricsEntry> collectMetricsEntries() throws Exception {
+            public List<HistogramMetricsEntry> collectMetricsEntries() throws Exception {
                 return testLayerHistogramMetrics;
             }
         });

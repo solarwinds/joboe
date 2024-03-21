@@ -40,7 +40,7 @@ public class PollingSettingsFetcher implements SettingsFetcher {
         this(reader, DEAFULT_REFRESH_INTERVAL);
     }
     
-    PollingSettingsFetcher(SettingsReader reader, int refreshInterval) {
+   public PollingSettingsFetcher(SettingsReader reader, int refreshInterval) {
         this.reader = reader;
         this.refreshInterval = refreshInterval;
         startWorker();

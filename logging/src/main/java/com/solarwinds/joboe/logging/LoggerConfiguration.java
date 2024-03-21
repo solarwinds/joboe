@@ -8,7 +8,10 @@ import java.nio.file.Path;
 @Value
 @Builder
 public class LoggerConfiguration {
-    LogSetting logSetting;
+    @Builder.Default
+    LogSetting logSetting = new LogSetting(Logger.Level.INFO, true, true, null, null, null);
+
     boolean debug;
+
     Path logFile;
 }

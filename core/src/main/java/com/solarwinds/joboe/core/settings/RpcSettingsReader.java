@@ -29,7 +29,7 @@ public class RpcSettingsReader implements SettingsReader {
      * @param rpcClient client to use for retrieving settings
      *
      */
-    RpcSettingsReader(Client rpcClient) {
+    public RpcSettingsReader(Client rpcClient) {
         this.rpcClient = rpcClient;
     }
 

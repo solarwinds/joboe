@@ -40,7 +40,7 @@ public class SpanMetricsCollector extends AbstractMetricsEntryCollector {
     }
     
     @Override
-    List<? extends MetricsEntry<?>> collectMetricsEntries() {
+    public List<? extends MetricsEntry<?>> collectMetricsEntries() {
         return collectMetricsEntries(registeredReporters);
     }
     
