@@ -1,21 +1,25 @@
 package com.solarwinds.joboe.metrics;
 
+import com.solarwinds.joboe.core.EventReporter;
+import com.solarwinds.joboe.core.EventReporterStats;
+import com.solarwinds.joboe.core.metrics.measurement.SimpleMeasurementMetricsEntry;
+import lombok.RequiredArgsConstructor;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import com.solarwinds.joboe.core.EventImpl;
-import com.solarwinds.joboe.core.EventReporterStats;
-import com.solarwinds.joboe.core.metrics.measurement.SimpleMeasurementMetricsEntry;
-
 /**
- * Sub metrics collector that collects metrics specific to the Tracing event reporter such as number of tracing events sent, the largest queue size since last collection etc
+ * Sub metrics collector that collects metrics specific to the Tracing event reporter such as number of tracing events sent,
+ * the largest queue size since last collection etc
  * @author pluk
  *
  */
+@RequiredArgsConstructor
 class TracingReporterMetricsCollector extends AbstractMetricsEntryCollector {
+    private final EventReporter eventReporter;
     @Override
     List<SimpleMeasurementMetricsEntry> collectMetricsEntries() throws Exception {
-        EventReporterStats stats = EventImpl.getEventReporter().consumeStats();
+        EventReporterStats stats = eventReporter.consumeStats();
         
         List<SimpleMeasurementMetricsEntry> metricsEntries = new ArrayList<SimpleMeasurementMetricsEntry>();
         metricsEntries.add(new SimpleMeasurementMetricsEntry("NumSent", stats.getSentCount()));

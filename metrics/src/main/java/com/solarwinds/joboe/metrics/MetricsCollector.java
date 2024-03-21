@@ -1,16 +1,19 @@
 package com.solarwinds.joboe.metrics;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.*;
-
 import com.solarwinds.joboe.core.config.ConfigContainer;
 import com.solarwinds.joboe.core.config.ConfigProperty;
 import com.solarwinds.joboe.core.config.InvalidConfigException;
 import com.solarwinds.joboe.core.metrics.MetricsEntry;
 import com.solarwinds.joboe.core.util.DaemonThreadFactory;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Collects metrics by maintain a list of sub metric entry collector of type {@link AbstractMetricsEntryCollector}. 
@@ -33,8 +36,6 @@ public class MetricsCollector extends SystemCollector<MetricsCategory, List<? ex
 
     public MetricsCollector(ConfigContainer configs, SpanMetricsCollector spanMetricsCollector) throws InvalidConfigException {
         collectors.put(MetricsCategory.SYSTEM, new SystemMetricsCollector());
-        collectors.put(MetricsCategory.TRACING_REPORTER, new TracingReporterMetricsCollector());
-        
         if (configs.get(ConfigProperty.MONITOR_SPAN_METRICS_ENABLE) == null || (Boolean)configs.get(ConfigProperty.MONITOR_SPAN_METRICS_ENABLE)) { //default as true
             if (spanMetricsCollector == null) {
                 collectors.put(MetricsCategory.SPAN_METRICS, new SpanMetricsCollector());
@@ -42,17 +43,20 @@ public class MetricsCollector extends SystemCollector<MetricsCategory, List<? ex
                 collectors.put(MetricsCategory.SPAN_METRICS, spanMetricsCollector);
             }
         }
+
         collectors.put(MetricsCategory.LAYER_COUNT, new TraceDecisionMetricsCollector());
-        
         if (configs.get(ConfigProperty.MONITOR_JMX_ENABLE) == null || (Boolean)configs.get(ConfigProperty.MONITOR_JMX_ENABLE)) {
             collectors.put(MetricsCategory.JMX, new JMXCollector(configs));
         }
         
         collectors.put(MetricsCategory.CUSTOM, CustomMetricsCollector.INSTANCE);
-                
         executorService = Executors.newCachedThreadPool(DaemonThreadFactory.newInstance("metrics-collector"));
     }
-    
+
+    public void addCollector(MetricsCategory category, AbstractMetricsEntryCollector collector) {
+        collectors.put(category, collector);
+    }
+
     @Override
     protected Map<MetricsCategory, List<? extends MetricsEntry<?>>> collect() throws Exception {
         Map<MetricsCategory, Future<List<? extends MetricsEntry<?>>>> collectedFutures = new HashMap<MetricsCategory, Future<List<? extends MetricsEntry<?>>>>();
