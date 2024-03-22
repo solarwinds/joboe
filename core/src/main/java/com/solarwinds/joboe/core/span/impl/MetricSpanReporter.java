@@ -2,8 +2,8 @@ package com.solarwinds.joboe.core.span.impl;
 
 import java.util.List;
 
-import com.solarwinds.joboe.core.config.ConfigManager;
-import com.solarwinds.joboe.core.config.ConfigProperty;
+import com.solarwinds.joboe.config.ConfigManager;
+import com.solarwinds.joboe.config.ConfigProperty;
 import com.solarwinds.joboe.logging.Logger;
 import com.solarwinds.joboe.logging.LoggerFactory;
 import com.solarwinds.joboe.core.metrics.MetricsEntry;

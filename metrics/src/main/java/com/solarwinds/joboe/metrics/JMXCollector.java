@@ -16,9 +16,9 @@ import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.management.ReflectionException;
 
-import com.solarwinds.joboe.core.config.ConfigContainer;
-import com.solarwinds.joboe.core.config.ConfigProperty;
-import com.solarwinds.joboe.core.config.InvalidConfigException;
+import com.solarwinds.joboe.config.ConfigContainer;
+import com.solarwinds.joboe.config.ConfigProperty;
+import com.solarwinds.joboe.config.InvalidConfigException;
 import com.solarwinds.joboe.core.metrics.MetricKey;
 import com.solarwinds.joboe.core.metrics.MetricsEntry;
 import com.solarwinds.joboe.core.metrics.measurement.SimpleMeasurementMetricsEntry;

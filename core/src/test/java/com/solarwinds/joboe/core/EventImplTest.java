@@ -1,8 +1,8 @@
 package com.solarwinds.joboe.core;
 
 
+import com.solarwinds.joboe.config.InvalidConfigException;
 import com.solarwinds.joboe.core.TestReporter.DeserializedEvent;
-import com.solarwinds.joboe.core.config.InvalidConfigException;
 import com.solarwinds.joboe.core.ebson.BsonDocument;
 import com.solarwinds.joboe.core.ebson.BsonReader;
 import com.solarwinds.joboe.core.ebson.BsonToken;

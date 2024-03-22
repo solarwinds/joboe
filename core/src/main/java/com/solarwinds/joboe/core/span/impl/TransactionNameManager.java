@@ -10,8 +10,8 @@ import java.util.regex.Pattern;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.solarwinds.joboe.core.config.ConfigManager;
-import com.solarwinds.joboe.core.config.ConfigProperty;
+import com.solarwinds.joboe.config.ConfigManager;
+import com.solarwinds.joboe.config.ConfigProperty;
 import com.solarwinds.joboe.core.span.impl.Span.SpanProperty;
 import com.solarwinds.joboe.core.span.impl.Span.TraceProperty;
 import com.solarwinds.joboe.logging.Logger;

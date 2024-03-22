@@ -1,8 +1,8 @@
 package com.solarwinds.joboe.metrics;
 
-import com.solarwinds.joboe.core.config.ConfigContainer;
-import com.solarwinds.joboe.core.config.ConfigProperty;
-import com.solarwinds.joboe.core.config.InvalidConfigException;
+import com.solarwinds.joboe.config.ConfigContainer;
+import com.solarwinds.joboe.config.ConfigProperty;
+import com.solarwinds.joboe.config.InvalidConfigException;
 import com.solarwinds.joboe.core.metrics.MetricsEntry;
 import com.solarwinds.joboe.core.util.DaemonThreadFactory;
 

@@ -1,4 +1,4 @@
-package com.solarwinds.joboe.core.config;
+package com.solarwinds.joboe.config;
 
 public interface ConfigParser<T, R> {
     /**

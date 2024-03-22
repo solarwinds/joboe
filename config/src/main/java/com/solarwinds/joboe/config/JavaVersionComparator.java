@@ -1,4 +1,4 @@
-package com.solarwinds.joboe.core.util;
+package com.solarwinds.joboe.config;
 
 import java.util.ArrayList;
 import java.util.List;

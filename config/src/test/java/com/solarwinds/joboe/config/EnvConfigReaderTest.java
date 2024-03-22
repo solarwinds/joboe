@@ -1,18 +1,22 @@
-package com.solarwinds.joboe.core.config;
+package com.solarwinds.joboe.config;
 
 import org.junit.jupiter.api.Test;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
-public class JsonConfigReaderTest {
+public class EnvConfigReaderTest {
     @Test
     public void testValidRead() throws InvalidConfigException {
-        JsonConfigReader reader = new JsonConfigReader(JsonConfigReaderTest.class.getResourceAsStream("valid.json"));
+        Map<String, String> vars = new HashMap<String, String>();
+        vars.put(ConfigProperty.EnvPrefix.PRODUCT + "SERVICE_KEY", "some key");
+        EnvConfigReader reader = new EnvConfigReader(vars);
         ConfigContainer container = new ConfigContainer();
         reader.read(container);
 
-        assertEquals("info", container.get(ConfigProperty.AGENT_LOGGING));
         assertEquals("some key", container.get(ConfigProperty.AGENT_SERVICE_KEY));
     }
 
@@ -21,7 +25,10 @@ public class JsonConfigReaderTest {
      */
     @Test
     public void testPartialRead() {
-        JsonConfigReader reader = new JsonConfigReader(JsonConfigReaderTest.class.getResourceAsStream("invalid.json"));
+        Map<String, String> vars = new HashMap<String, String>();
+        vars.put(ConfigProperty.EnvPrefix.PRODUCT + "SERVICE_KEY", "some key");
+        vars.put(ConfigProperty.EnvPrefix.PRODUCT + "MAX_SQL_QUERY_LENGTH", "2.1");
+        EnvConfigReader reader = new EnvConfigReader(vars);
         ConfigContainer container = new ConfigContainer();
         try {
             reader.read(container);
@@ -30,8 +37,6 @@ public class JsonConfigReaderTest {
             //expected
         }
 
-        //the rest of the values should be read
-        assertEquals("info", container.get(ConfigProperty.AGENT_LOGGING));
         assertEquals("some key", container.get(ConfigProperty.AGENT_SERVICE_KEY));
     }
 }

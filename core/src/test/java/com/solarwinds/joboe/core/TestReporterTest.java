@@ -1,6 +1,6 @@
 package com.solarwinds.joboe.core;
 
-import com.solarwinds.joboe.core.config.InvalidConfigException;
+import com.solarwinds.joboe.config.InvalidConfigException;
 import com.solarwinds.joboe.sampling.Metadata;
 import com.solarwinds.joboe.sampling.SamplingConfiguration;
 import org.junit.jupiter.api.BeforeEach;

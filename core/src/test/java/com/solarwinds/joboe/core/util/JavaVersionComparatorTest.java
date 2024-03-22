@@ -1,6 +1,6 @@
 package com.solarwinds.joboe.core.util;
 
-import com.solarwinds.joboe.core.util.JavaVersionComparator;
+import com.solarwinds.joboe.config.JavaVersionComparator;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

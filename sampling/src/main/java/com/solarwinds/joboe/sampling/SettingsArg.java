@@ -106,7 +106,7 @@ public abstract class SettingsArg<T> {
     }
     
     
-    static class DoubleSettingsArg extends SettingsArg<Double> {
+    public static class DoubleSettingsArg extends SettingsArg<Double> {
         DoubleSettingsArg(String key) {
             super(key);
         }
@@ -137,9 +137,9 @@ public abstract class SettingsArg<T> {
             }
         }
     }
-    
-    
-    static class IntegerSettingsArg extends SettingsArg<Integer> {
+
+
+    public static class IntegerSettingsArg extends SettingsArg<Integer> {
         IntegerSettingsArg(String key) {
             super(key);
         }
@@ -170,8 +170,8 @@ public abstract class SettingsArg<T> {
             }
         }
     }
-    
-    static class BooleanSettingsArg extends SettingsArg<Boolean> {
+
+    public static class BooleanSettingsArg extends SettingsArg<Boolean> {
         BooleanSettingsArg(String key) {
             super(key);
         }
@@ -203,8 +203,8 @@ public abstract class SettingsArg<T> {
             }
         }
     }
-    
-    static class ByteArraySettingsArg extends SettingsArg<byte[]> {
+
+    public static class ByteArraySettingsArg extends SettingsArg<byte[]> {
          ByteArraySettingsArg(String key) {
             super(key);
         }

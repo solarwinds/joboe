@@ -3,7 +3,6 @@ package com.solarwinds.joboe.core.profiler;
 import com.solarwinds.joboe.core.Context;
 import com.solarwinds.joboe.core.Event;
 import com.solarwinds.joboe.core.EventReporter;
-import com.solarwinds.joboe.core.config.ProfilerSetting;
 import com.solarwinds.joboe.logging.Logger;
 import com.solarwinds.joboe.logging.LoggerFactory;
 

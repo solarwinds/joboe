@@ -10,8 +10,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import com.solarwinds.joboe.core.config.ConfigManager;
-import com.solarwinds.joboe.core.config.ConfigProperty;
+import com.solarwinds.joboe.config.ConfigManager;
+import com.solarwinds.joboe.config.ConfigProperty;
 import com.solarwinds.joboe.core.rpc.Client;
 import com.solarwinds.joboe.core.rpc.ClientLoggingCallback;
 import com.solarwinds.joboe.core.rpc.Result;

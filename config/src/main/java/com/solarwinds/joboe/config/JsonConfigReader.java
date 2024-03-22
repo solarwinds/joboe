@@ -1,4 +1,4 @@
-package com.solarwinds.joboe.core.config;
+package com.solarwinds.joboe.config;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,10 +25,7 @@ public class JsonConfigReader extends ConfigReader {
         super(ConfigSourceType.JSON_FILE);
         this.configStream = configStream;
     }
-    
-    /**
-     * 
-     */
+
     @Override
     public void read(ConfigContainer container) throws InvalidConfigException {
         if (configStream == null) {

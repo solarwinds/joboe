@@ -1,4 +1,4 @@
-package com.solarwinds.joboe.core.config;
+package com.solarwinds.joboe.core.profiler;
 
 import lombok.Getter;
 

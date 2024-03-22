@@ -1,4 +1,4 @@
-package com.solarwinds.joboe.core.config;
+package com.solarwinds.joboe.config;
 
 /**
  * Grouping for the configuration properties defined in <code>ConfigProperty</code>

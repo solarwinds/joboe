@@ -1,6 +1,5 @@
 package com.solarwinds.joboe.metrics.framework;
 
-import com.solarwinds.joboe.core.config.ConfigContainer;
 import com.solarwinds.joboe.core.rpc.ClientException;
 import com.solarwinds.joboe.metrics.SystemMonitorWithInterval;
 

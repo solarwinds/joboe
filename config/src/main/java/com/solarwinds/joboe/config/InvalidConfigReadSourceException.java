@@ -1,4 +1,4 @@
-package com.solarwinds.joboe.core.config;
+package com.solarwinds.joboe.config;
 
 import lombok.Getter;
 
@@ -8,10 +8,6 @@ import lombok.Getter;
  * This contains extra info on the source type read and a ConfigContainer with the config read so far
  */
 public class InvalidConfigReadSourceException extends InvalidConfigException {
-
-    /**
-     *
-     */
     private static final long serialVersionUID = 1L;
     private final ConfigSourceType configSourceType;
     @Getter

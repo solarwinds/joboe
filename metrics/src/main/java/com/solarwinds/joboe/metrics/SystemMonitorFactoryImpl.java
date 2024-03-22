@@ -1,6 +1,6 @@
 package com.solarwinds.joboe.metrics;
 
-import com.solarwinds.joboe.core.config.ConfigContainer;
+import com.solarwinds.joboe.config.ConfigContainer;
 import com.solarwinds.joboe.logging.Logger;
 import com.solarwinds.joboe.logging.LoggerFactory;
 import com.solarwinds.joboe.metrics.framework.FrameworkInfoMonitor;

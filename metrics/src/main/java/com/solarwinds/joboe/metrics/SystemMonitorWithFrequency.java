@@ -1,6 +1,6 @@
 package com.solarwinds.joboe.metrics;
 
-import com.solarwinds.joboe.core.config.InvalidConfigException;
+import com.solarwinds.joboe.config.InvalidConfigException;
 import com.solarwinds.joboe.core.util.TimeUtils;
 
 /**

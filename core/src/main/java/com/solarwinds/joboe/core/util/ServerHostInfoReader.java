@@ -1,10 +1,10 @@
 package com.solarwinds.joboe.core.util;
 
+import com.solarwinds.joboe.config.ConfigManager;
+import com.solarwinds.joboe.config.ConfigProperty;
 import com.solarwinds.joboe.core.Context;
 import com.solarwinds.joboe.core.HostId;
 import com.solarwinds.joboe.sampling.Metadata;
-import com.solarwinds.joboe.core.config.ConfigManager;
-import com.solarwinds.joboe.core.config.ConfigProperty;
 import com.solarwinds.joboe.logging.Logger;
 import com.solarwinds.joboe.logging.LoggerFactory;
 import com.solarwinds.joboe.core.span.impl.ScopeContextSnapshot;

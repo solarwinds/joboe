@@ -11,7 +11,12 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import com.solarwinds.joboe.core.config.*;
+import com.solarwinds.joboe.config.ConfigContainer;
+import com.solarwinds.joboe.config.ConfigGroup;
+import com.solarwinds.joboe.config.ConfigManager;
+import com.solarwinds.joboe.config.ConfigProperty;
+import com.solarwinds.joboe.config.InvalidConfigException;
+import com.solarwinds.joboe.config.ServiceKeyUtils;
 import com.solarwinds.joboe.logging.Logger;
 import com.solarwinds.joboe.logging.LoggerConfiguration;
 import com.solarwinds.joboe.logging.LoggerFactory;
@@ -21,8 +26,7 @@ import com.solarwinds.joboe.core.rpc.ResultCode;
 import com.solarwinds.joboe.core.rpc.RpcClientManager;
 import com.solarwinds.joboe.core.rpc.RpcClientManager.OperationType;
 import com.solarwinds.joboe.logging.LogSetting;
-import com.solarwinds.joboe.core.util.JavaRuntimeVersionChecker;
-import com.solarwinds.joboe.core.util.ServiceKeyUtils;
+import com.solarwinds.joboe.config.JavaRuntimeVersionChecker;
 
 /**
  * Diagnostic tools that verify service key and connectivity by connecting to the collector server

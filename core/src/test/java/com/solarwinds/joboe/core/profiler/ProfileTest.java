@@ -3,7 +3,6 @@ package com.solarwinds.joboe.core.profiler;
 import com.solarwinds.joboe.core.Context;
 import com.solarwinds.joboe.core.TestReporter;
 import com.solarwinds.joboe.core.TestReporter.DeserializedEvent;
-import com.solarwinds.joboe.core.config.ProfilerSetting;
 import com.solarwinds.joboe.core.profiler.Profiler.Profile;
 import com.solarwinds.joboe.core.span.impl.Span;
 import com.solarwinds.joboe.core.span.impl.Tracer;

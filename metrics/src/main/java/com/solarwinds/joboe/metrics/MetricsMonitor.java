@@ -2,9 +2,9 @@ package com.solarwinds.joboe.metrics;
 
 import java.util.List;
 
-import com.solarwinds.joboe.core.config.ConfigContainer;
-import com.solarwinds.joboe.core.config.ConfigProperty;
-import com.solarwinds.joboe.core.config.InvalidConfigException;
+import com.solarwinds.joboe.config.ConfigContainer;
+import com.solarwinds.joboe.config.ConfigProperty;
+import com.solarwinds.joboe.config.InvalidConfigException;
 import com.solarwinds.joboe.core.rpc.ClientException;
 import com.solarwinds.joboe.core.rpc.RpcClientManager;
 import com.solarwinds.joboe.core.rpc.RpcClientManager.OperationType;

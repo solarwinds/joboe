@@ -1,12 +1,12 @@
 package com.solarwinds.joboe.core.rpc.grpc;
 
 import com.google.protobuf.ByteString;
+import com.solarwinds.joboe.config.ConfigManager;
+import com.solarwinds.joboe.config.ConfigProperty;
+import com.solarwinds.joboe.config.ProxyConfig;
 import com.solarwinds.joboe.core.BsonBufferException;
 import com.solarwinds.joboe.core.Event;
 import com.solarwinds.joboe.core.HostId;
-import com.solarwinds.joboe.core.config.ConfigManager;
-import com.solarwinds.joboe.core.config.ConfigProperty;
-import com.solarwinds.joboe.core.config.ProxyConfig;
 import com.solarwinds.joboe.core.rpc.ClientException;
 import com.solarwinds.joboe.core.rpc.ClientFatalException;
 import com.solarwinds.joboe.core.rpc.ClientRecoverableException;

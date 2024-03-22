@@ -1,4 +1,4 @@
-package com.solarwinds.joboe.core.util;
+package com.solarwinds.joboe.config;
 
 public class JavaRuntimeVersionChecker {
     public static final String minVersionSupported = "1.8.0_252";

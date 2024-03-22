@@ -1,11 +1,9 @@
-package com.solarwinds.joboe.core.config;
+package com.solarwinds.joboe.config;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import com.solarwinds.joboe.core.util.ServiceKeyUtils;
 
 /**
  * Reads from system environment variables for {@link ConfigProperty}

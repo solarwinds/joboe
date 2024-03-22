@@ -2,8 +2,8 @@ package com.solarwinds.joboe.core.util;
 
 import com.solarwinds.joboe.core.ReporterFactory;
 import com.solarwinds.joboe.core.TestReporter;
-import com.solarwinds.joboe.core.config.ProfilerSetting;
 import com.solarwinds.joboe.core.profiler.Profiler;
+import com.solarwinds.joboe.core.profiler.ProfilerSetting;
 import com.solarwinds.joboe.core.settings.*;
 import com.solarwinds.joboe.sampling.SamplingConfiguration;
 import com.solarwinds.joboe.sampling.Settings;

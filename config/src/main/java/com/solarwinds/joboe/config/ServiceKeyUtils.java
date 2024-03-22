@@ -1,4 +1,4 @@
-package com.solarwinds.joboe.core.util;
+package com.solarwinds.joboe.config;
 
 public class ServiceKeyUtils {
     public static final char SEPARATOR_CHARACTER = ':'; //char that separates customer key and service name within the service key

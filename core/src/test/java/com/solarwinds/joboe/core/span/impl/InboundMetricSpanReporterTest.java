@@ -1,7 +1,7 @@
 package com.solarwinds.joboe.core.span.impl;
 
+import com.solarwinds.joboe.config.ConfigManager;
 import com.solarwinds.joboe.core.Context;
-import com.solarwinds.joboe.core.config.ConfigManager;
 import com.solarwinds.joboe.core.metrics.MetricKey;
 import com.solarwinds.joboe.core.metrics.histogram.Histogram;
 import com.solarwinds.joboe.core.metrics.measurement.SummaryLongMeasurement;

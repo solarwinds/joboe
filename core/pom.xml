@@ -48,6 +48,11 @@
     </dependency>
     <dependency>
       <groupId>com.solarwinds.joboe</groupId>
+      <artifactId>config</artifactId>
+      <version>${revision}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.solarwinds.joboe</groupId>
       <artifactId>sampling</artifactId>
       <version>${revision}</version>
     </dependency>
@@ -220,6 +225,12 @@
                   <artifact>com.google.auto.service:auto-service</artifact>
                   <includes>
                     <include>com/google/auto/service/auto-service/*</include>
+                  </includes>
+                </filter>
+                <filter>
+                  <artifact>com.solarwinds.joboe:config</artifact>
+                  <includes>
+                    <include>com/solarwinds/joboe/config/*</include>
                   </includes>
                 </filter>
               </filters>

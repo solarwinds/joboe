@@ -115,6 +115,7 @@
         <module>metrics</module>
         <module>logging</module>
         <module>sampling</module>
+        <module>config</module>
     </modules>
 
     <distributionManagement>
