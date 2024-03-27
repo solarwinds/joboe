@@ -1,15 +1,12 @@
 package com.solarwinds.joboe.core;
 
-import java.io.IOException;
-import java.util.Map;
-
 import com.solarwinds.joboe.core.rpc.Client;
-import com.solarwinds.joboe.core.rpc.ClientLoggingCallback;
-import com.solarwinds.joboe.core.rpc.HostType;
-import com.solarwinds.joboe.core.lambda.LambdaEventReporter;
 import com.solarwinds.joboe.logging.Logger;
 import com.solarwinds.joboe.logging.LoggerFactory;
 import lombok.Getter;
+
+import java.io.IOException;
+import java.util.Map;
 
 /**
  * Provide methods to create {@link EventReporter}
@@ -112,10 +109,6 @@ public class ReporterFactory {
         }
     }
 
-    public RpcEventReporter createRpcReporter(Client rpcClient) throws IOException {
-        return new RpcEventReporter(rpcClient);
-    }
-
     /**
      * Builds a {@link TestReporter}, take note that this reporter collects events from all threads
      *
@@ -135,20 +128,7 @@ public class ReporterFactory {
         return isThreadLocal ? new TestReporter() : new NonThreadLocalTestReporter();
     }
 
-    public LambdaEventReporter createLambdaReporter(Client client) {
-        return new LambdaEventReporter(client, new ClientLoggingCallback<>("sent lambda event"), new AtomicEventReporterStats(() -> 0));
-    }
-
     public QueuingEventReporter createQueuingEventReporter(Client client) {
         return new QueuingEventReporter(client);
-    }
-
-    public EventReporter createHostTypeReporter(Client client, HostType hostType) {
-        if (hostType == HostType.AWS_LAMBDA) {
-            return createLambdaReporter(client);
-        } else if (hostType == HostType.PERSISTENT) {
-            return createQueuingEventReporter(client);
-        }
-        throw new RuntimeException(String.format("Unsupported host type: %s", hostType));
     }
 }

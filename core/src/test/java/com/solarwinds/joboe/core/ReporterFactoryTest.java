@@ -1,12 +1,6 @@
 package com.solarwinds.joboe.core;
 
-import com.solarwinds.joboe.core.Constants;
-import com.solarwinds.joboe.core.QueuingEventReporter;
-import com.solarwinds.joboe.core.ReporterFactory;
-import com.solarwinds.joboe.core.UDPReporter;
 import com.solarwinds.joboe.core.rpc.Client;
-import com.solarwinds.joboe.core.rpc.HostType;
-import com.solarwinds.joboe.core.lambda.LambdaEventReporter;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,7 +10,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.lang.reflect.Field;
 import java.net.InetAddress;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(MockitoExtension.class)
 public class ReporterFactoryTest {
@@ -62,22 +57,7 @@ public class ReporterFactoryTest {
     }
 
     @Test
-    void testCreateLambdaReporter() {
-        assertNotNull(tested.createLambdaReporter(clientMock));
-    }
-
-    @Test
     void testCreateQueuingEventReporter() {
         assertNotNull(tested.createQueuingEventReporter(clientMock));
-    }
-
-    @Test
-    void testCreateHostTypeReporterForPersistentHost() {
-        assertTrue(tested.createHostTypeReporter(clientMock, HostType.PERSISTENT) instanceof QueuingEventReporter);
-    }
-
-    @Test
-    void testCreateHostTypeReporterForLambda() {
-        assertTrue(tested.createHostTypeReporter(clientMock, HostType.AWS_LAMBDA) instanceof LambdaEventReporter);
     }
 }
