@@ -1,11 +1,6 @@
 package com.solarwinds.joboe.sampling;
 
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.solarwinds.joboe.logging.Logger;
-import com.solarwinds.joboe.logging.LoggerFactory;
-
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -18,19 +13,12 @@ import java.util.Map.Entry;
  * @author pluk
  */
 public class TraceConfigs implements Serializable {
-    private final Logger logger = LoggerFactory.getLogger();
 
     private final Map<ResourceMatcher, TraceConfig> traceConfigsByMatcher;
 
-    private final Cache<String, TraceConfig> lruCache = CacheBuilder.newBuilder()
-            .recordStats()
-            .maximumSize(1048)
-            .build();
+    private final Map<String, TraceConfig> lruCache = new LruCache<>(1048);
 
-    private final Cache<String, String> lruCacheKey = CacheBuilder.newBuilder()
-            .recordStats()
-            .maximumSize(1048)
-            .build();
+    private final Map<String, String> lruCacheKey = new LruCache<>(1048);
 
 
     public TraceConfigs(Map<ResourceMatcher, TraceConfig> traceConfigsByMatcher) {
@@ -42,8 +30,8 @@ public class TraceConfigs implements Serializable {
         signals.forEach(key::append);
         TraceConfig result = null;
 
-        if (lruCacheKey.getIfPresent(key.toString()) != null) {
-            return lruCache.getIfPresent(key.toString());
+        if (lruCacheKey.get(key.toString()) != null) {
+            return lruCache.get(key.toString());
         }
 
         outer:
@@ -60,7 +48,6 @@ public class TraceConfigs implements Serializable {
             lruCache.put(key.toString(), result);
         }
 
-        logger.debug(lruCache.stats().toString());
         lruCacheKey.put(key.toString(), key.toString());
         return result;
     }

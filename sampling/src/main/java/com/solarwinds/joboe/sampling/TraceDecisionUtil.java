@@ -4,7 +4,6 @@ import com.solarwinds.joboe.logging.Logger;
 import com.solarwinds.joboe.logging.LoggerFactory;
 import lombok.Getter;
 
-import javax.annotation.Nonnull;
 import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.List;
@@ -279,7 +278,7 @@ public class TraceDecisionUtil {
      * @param localConfig
      * @return
      */
-    static TraceConfig computeTraceConfig(@Nonnull TraceConfig remoteConfig, TraceConfig localConfig, boolean localTriggerTraceEnabled) {
+    static TraceConfig computeTraceConfig(TraceConfig remoteConfig, TraceConfig localConfig, boolean localTriggerTraceEnabled) {
         boolean hasRemoteConfigOverride = remoteConfig.hasOverrideFlag();
 
         //consider sample rate:

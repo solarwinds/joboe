@@ -1,6 +1,5 @@
 package com.solarwinds.joboe.logging;
 
-import javax.annotation.Nonnull;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -21,7 +20,7 @@ public class LoggerThreadFactory implements ThreadFactory {
     }
 
     @Override
-    public Thread newThread(@Nonnull Runnable runnable) {
+    public Thread newThread(Runnable runnable) {
         Thread thread = threadFactory.newThread(runnable);
         thread.setDaemon(true);
         thread.setName(threadName + "-" + count.incrementAndGet());

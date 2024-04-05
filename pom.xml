@@ -10,7 +10,7 @@
     <name>joboe</name>
 
     <properties>
-        <revision>10.0.0-SNAPSHOT</revision>
+        <revision>10.0.1-SNAPSHOT</revision>
         <maven.plugin.version>1.0.0</maven.plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <repository.url>https://oss.sonatype.org/service/local/staging/deploy/maven2</repository.url>
@@ -126,12 +126,6 @@
         </repository>
     </distributionManagement>
     <dependencies>
-        <dependency>
-            <groupId>com.google.auto.service</groupId>
-            <artifactId>auto-service</artifactId>
-            <version>1.1.1</version>
-            <optional>true</optional>
-        </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
