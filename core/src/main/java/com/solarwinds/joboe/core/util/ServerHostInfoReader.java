@@ -4,11 +4,9 @@ import com.solarwinds.joboe.config.ConfigManager;
 import com.solarwinds.joboe.config.ConfigProperty;
 import com.solarwinds.joboe.core.Context;
 import com.solarwinds.joboe.core.HostId;
-import com.solarwinds.joboe.sampling.Metadata;
 import com.solarwinds.joboe.logging.Logger;
 import com.solarwinds.joboe.logging.LoggerFactory;
-import com.solarwinds.joboe.core.span.impl.ScopeContextSnapshot;
-import com.solarwinds.joboe.core.span.impl.ScopeManager;
+import com.solarwinds.joboe.sampling.Metadata;
 import lombok.Getter;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -352,13 +350,9 @@ public class ServerHostInfoReader implements HostInfoReader, AzureInstanceIdRead
     public HostId getHostId() {
         if (hostId == null) {
             Metadata existingMetdataContext = null;
-            ScopeContextSnapshot scopeContextSnapshot = null;
             try {
                 existingMetdataContext = Context.getMetadata();
-                scopeContextSnapshot = ScopeManager.INSTANCE.getSnapshot();
-
                 Context.clearMetadata(); //make sure our init route does not accidentally trigger tracing instrumentations
-                ScopeManager.INSTANCE.removeAllScopes(); //make sure no scope is active for this thread
 
                 //synchronously get it once first to ensure it's available at the return statement
                 hostId = buildHostId();
@@ -366,9 +360,6 @@ public class ServerHostInfoReader implements HostInfoReader, AzureInstanceIdRead
                 startHostIdChecker();
             } finally {
                 Context.setMetadata(existingMetdataContext); //set the existing context back
-                if (scopeContextSnapshot != null) {
-                    scopeContextSnapshot.restore();
-                }
             }
         }
         return hostId;

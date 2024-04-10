@@ -1,12 +1,9 @@
 package com.solarwinds.joboe.metrics;
 
-import com.solarwinds.joboe.core.span.impl.MetricSpanReporter;
-import com.solarwinds.joboe.core.span.impl.Span;
-import com.solarwinds.joboe.core.span.impl.TransactionNameManager;
+import com.solarwinds.joboe.core.MetricSpanReporter;
 import com.solarwinds.joboe.core.metrics.MetricsEntry;
 import com.solarwinds.joboe.core.metrics.TopLevelMetricsEntry;
 import com.solarwinds.joboe.core.metrics.measurement.SimpleMeasurementMetricsEntry;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -24,23 +21,13 @@ import static org.mockito.Mockito.verify;
  *
  */
 public class SpanMetricsCollectorTest {
-    private final SpanMetricsCollector tested = new SpanMetricsCollector();
-
-    @BeforeEach
-    protected void setUp() throws Exception {
-        TransactionNameManager.clearTransactionNames();
-    }
+    private SpanMetricsCollector tested = new SpanMetricsCollector(null);
 
     @Test
-    public void testCollect() throws Exception {
+    public void testCollect() {
         final List<MetricsEntry<?>> testMetricEntries = new ArrayList<MetricsEntry<?>>();
         testMetricEntries.add(new SimpleMeasurementMetricsEntry("test-key", 1));
-        
-        MetricSpanReporter testSpanReporter  =new MetricSpanReporter() {
-            @Override
-            protected void reportMetrics(Span span, long duration) {
-            }
-            
+        MetricSpanReporter testSpanReporter = new MetricSpanReporter() {
             @Override
             public List<MetricsEntry<?>> consumeMetricEntries() {
                 return testMetricEntries;
@@ -48,18 +35,11 @@ public class SpanMetricsCollectorTest {
         };
 
         assertEquals(testMetricEntries, tested.collectMetricsEntries(Collections.singleton(testSpanReporter)));
-        
-        //now test the extra transaction name limit kv 
-        for (int i = 0 ; i < TransactionNameManager.DEFAULT_MAX_NAME_COUNT + 1; i++) {
-            TransactionNameManager.addTransactionName(String.valueOf(i)); //trigger overflow
-        }
-
+        tested = new SpanMetricsCollector(() -> true);
         List<? extends MetricsEntry<?>> collectedMetricsEntries = tested.collectMetricsEntries(Collections.singleton(testSpanReporter));
+
         assertEquals(testMetricEntries.size() + 1, collectedMetricsEntries.size()); //+1 as it should have the extra overflow KV
         assertTrue(collectedMetricsEntries.contains(new TopLevelMetricsEntry<Boolean>(SpanMetricsCollector.TRANSACTION_NAME_OVERFLOW_LABEL, true)));
-        
-        //collect again, that overflow flag should be reset
-        assertEquals(testMetricEntries, tested.collectMetricsEntries(Collections.singleton(testSpanReporter)));
     }
 
     @Test

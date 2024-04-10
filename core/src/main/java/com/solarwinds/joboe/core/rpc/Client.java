@@ -13,7 +13,6 @@ import com.solarwinds.joboe.core.Event;
  *
  */
 public interface Client {
-//    Future<ResultCode> log(String...messages);
     Future<Result> postEvents(List<Event> events, Callback<Result> callback) throws ClientException;
     Future<Result> postMetrics(List<Map<String, Object>> messages, Callback<Result> callback) throws ClientException;
     Future<Result> postStatus(List<Map<String, Object>> messages, Callback<Result> callback) throws ClientException;

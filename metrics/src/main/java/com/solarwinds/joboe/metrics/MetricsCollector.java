@@ -38,7 +38,7 @@ public class MetricsCollector extends SystemCollector<MetricsCategory, List<? ex
         collectors.put(MetricsCategory.SYSTEM, new SystemMetricsCollector());
         if (configs.get(ConfigProperty.MONITOR_SPAN_METRICS_ENABLE) == null || (Boolean)configs.get(ConfigProperty.MONITOR_SPAN_METRICS_ENABLE)) { //default as true
             if (spanMetricsCollector == null) {
-                collectors.put(MetricsCategory.SPAN_METRICS, new SpanMetricsCollector());
+                collectors.put(MetricsCategory.SPAN_METRICS, new SpanMetricsCollector(null));
             } else {
                 collectors.put(MetricsCategory.SPAN_METRICS, spanMetricsCollector);
             }

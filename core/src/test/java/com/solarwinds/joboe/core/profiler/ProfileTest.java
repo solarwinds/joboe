@@ -1,16 +1,12 @@
 package com.solarwinds.joboe.core.profiler;
 
-import com.solarwinds.joboe.core.Context;
 import com.solarwinds.joboe.core.TestReporter;
 import com.solarwinds.joboe.core.TestReporter.DeserializedEvent;
 import com.solarwinds.joboe.core.profiler.Profiler.Profile;
-import com.solarwinds.joboe.core.span.impl.Span;
-import com.solarwinds.joboe.core.span.impl.Tracer;
 import com.solarwinds.joboe.core.util.TestUtils;
 import com.solarwinds.joboe.sampling.Metadata;
 import com.solarwinds.joboe.sampling.SamplingConfiguration;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -29,51 +25,6 @@ public class ProfileTest {
     private final ProfilerSetting profilerSetting = new ProfilerSetting(true, Collections.EMPTY_SET, ProfilerSetting.DEFAULT_INTERVAL, ProfilerSetting.DEFAULT_CIRCUIT_BREAKER_DURATION_THRESHOLD, ProfilerSetting.DEFAULT_CIRCUIT_BREAKER_COUNT_THRESHOLD);
     private final TestReporter profilingReporter = TestUtils.initProfilingReporter(profilerSetting);
 
-    @Test
-    public void testRecord() {
-        Profile profile = new Profile(profilerSetting);
-        Thread thread = Thread.currentThread();
-        
-        Context.getMetadata().randomize(true); //make valid context
-        Span parentSpan = Tracer.INSTANCE.buildSpan("profiling").startActive().span();
-        
-        StackTraceElement[] stackTrace = thread.getStackTrace();
-        profile.startProfilingOnThread(thread, parentSpan.context().getMetadata());
-
-        List<DeserializedEvent> sentEvents = profilingReporter.getSentEvents();
-        assertEquals(1, profilingReporter.getSentEvents().size());
-        Map<String, Object> entryEvent = sentEvents.get(0).getSentEntries();
-        assertEquals("entry", entryEvent.get("Label"));
-        assertEquals("java", entryEvent.get("Language"));
-        //assertEquals(50, entryEvent.get("Interval")); not starting the actual Profiler, so this will be 0
-        assertEquals("profiling", entryEvent.get("Spec"));
-        assertEquals(parentSpan.context().getMetadata().opHexString(), entryEvent.get("SpanRef"));
-        profilingReporter.reset();
-        
-        profile.record(thread, stackTrace, 0);
-        sentEvents = profilingReporter.getSentEvents();
-        assertEquals(1, profilingReporter.getSentEvents().size());
-        Map<String, Object> snapshotEvent = sentEvents.get(0).getSentEntries();
-        //printStack(stackTrace);
-        assertEquals(0, snapshotEvent.get("FramesExited"));
-        assertEquals(stackTrace.length, snapshotEvent.get("FramesCount"));
-        assertEquals(thread.getId(), snapshotEvent.get("TID"));
-        assertEquals(0, ((Map<?, ?>) snapshotEvent.get("SnapshotsOmitted")).size());
-        
-        assertNewFrames(stackTrace, (Map<String, Map<String, Object>>) snapshotEvent.get("NewFrames"));
-        profilingReporter.reset();
-        
-        profile.record(thread, stackTrace, 1); //nothing changed
-        sentEvents = profilingReporter.getSentEvents();
-        assertEquals(0, profilingReporter.getSentEvents().size());
-        profilingReporter.reset();
-        
-        methodA(profile);
-        recursion(profile, 500);
-    }
-    
-    
-    
     private void methodA(Profile profile) {
         Thread thread = Thread.currentThread();
         StackTraceElement[] stackTrace = thread.getStackTrace();

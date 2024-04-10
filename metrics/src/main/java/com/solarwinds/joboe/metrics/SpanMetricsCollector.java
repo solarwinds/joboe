@@ -1,11 +1,8 @@
 package com.solarwinds.joboe.metrics;
 
 
-import com.solarwinds.joboe.core.span.impl.InboundMetricMeasurementSpanReporter;
-import com.solarwinds.joboe.core.span.impl.MetricHistogramSpanReporter;
-import com.solarwinds.joboe.core.span.impl.MetricSpanReporter;
-import com.solarwinds.joboe.core.span.impl.TransactionNameManager;
 import com.solarwinds.joboe.core.metrics.MetricsEntry;
+import com.solarwinds.joboe.core.MetricSpanReporter;
 import com.solarwinds.joboe.core.metrics.TopLevelMetricsEntry;
 
 import java.util.ArrayList;
@@ -20,23 +17,17 @@ import java.util.Set;
  *
  */
 public class SpanMetricsCollector extends AbstractMetricsEntryCollector {
-    public static final String TRANSACTION_NAME_OVERFLOW_LABEL = "TransactionNameOverflow"; 
-    private Set<MetricSpanReporter> registeredReporters = new HashSet<MetricSpanReporter>();
+    public static final String TRANSACTION_NAME_OVERFLOW_LABEL = "TransactionNameOverflow";
+
+    private final Set<MetricSpanReporter> registeredReporters = new HashSet<MetricSpanReporter>();
 
     private MetricFlushListener metricFlushListener = () -> {};
 
-    private static final Set<MetricSpanReporter> DEFAULT_REPORTERS = new HashSet<MetricSpanReporter>();
-    static {
-        DEFAULT_REPORTERS.add(InboundMetricMeasurementSpanReporter.REPORTER);
-        DEFAULT_REPORTERS.add(MetricHistogramSpanReporter.REPORTER);
-    }
-    
-    public SpanMetricsCollector(MetricSpanReporter... reporters) {
-        if (reporters.length == 0) {
-            registeredReporters = DEFAULT_REPORTERS;
-        } else {
-            registeredReporters.addAll(Arrays.asList(reporters));
-        }
+    private final TransactionNameOverFlowSupplier transactionNameOverFlowSupplier;
+
+    public SpanMetricsCollector(TransactionNameOverFlowSupplier transactionNameOverFlowSupplier, MetricSpanReporter... reporters) {
+        this.transactionNameOverFlowSupplier = transactionNameOverFlowSupplier == null ? () -> false : transactionNameOverFlowSupplier;
+        registeredReporters.addAll(Arrays.asList(reporters));
     }
     
     @Override
@@ -51,13 +42,11 @@ public class SpanMetricsCollector extends AbstractMetricsEntryCollector {
         }
         
         //add an extra entry if TransactionName limit was reached
-        if (TransactionNameManager.isLimitExceeded()) {
+        if (transactionNameOverFlowSupplier.isLimitExceeded()) {
             entries.add(new TopLevelMetricsEntry<Boolean>(TRANSACTION_NAME_OVERFLOW_LABEL, true));
         }
         
-        TransactionNameManager.clearTransactionNames();
         metricFlushListener.onFlush();
-
         return entries;
     }
 
