@@ -239,6 +239,18 @@
                     <include>com/solarwinds/joboe/config/*</include>
                   </includes>
                 </filter>
+                <filter>
+                  <artifact>com.solarwinds.joboe:logging</artifact>
+                  <includes>
+                    <include>com/solarwinds/joboe/logging/*</include>
+                  </includes>
+                </filter>
+                <filter>
+                  <artifact>com.solarwinds.joboe:sampling</artifact>
+                  <includes>
+                    <include>com/solarwinds/joboe/sampling/*</include>
+                  </includes>
+                </filter>
               </filters>
               <relocations>
                 <relocation>

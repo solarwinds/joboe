@@ -10,7 +10,7 @@
     <name>joboe</name>
 
     <properties>
-        <revision>10.0.5-SNAPSHOT</revision>
+        <revision>10.0.6-SNAPSHOT</revision>
         <maven.plugin.version>1.0.0</maven.plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <repository.url>https://oss.sonatype.org/service/local/staging/deploy/maven2</repository.url>
