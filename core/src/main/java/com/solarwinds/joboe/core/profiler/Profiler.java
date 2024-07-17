@@ -3,19 +3,30 @@ package com.solarwinds.joboe.core.profiler;
 import com.solarwinds.joboe.core.Context;
 import com.solarwinds.joboe.core.Event;
 import com.solarwinds.joboe.core.EventReporter;
+import com.solarwinds.joboe.core.util.DaemonThreadFactory;
+import com.solarwinds.joboe.core.util.TimeUtils;
 import com.solarwinds.joboe.logging.Logger;
 import com.solarwinds.joboe.logging.LoggerFactory;
-
-import com.solarwinds.joboe.core.util.TimeUtils;
-import com.solarwinds.joboe.core.util.DaemonThreadFactory;
 import com.solarwinds.joboe.sampling.Metadata;
 import com.solarwinds.joboe.sampling.SettingsArg;
 import com.solarwinds.joboe.sampling.SettingsArgChangeListener;
 import com.solarwinds.joboe.sampling.SettingsManager;
 import lombok.Getter;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 /**
  * A Sampling Profiler that runs a single background thread to take stack trace snapshots of a list of "tracked threads" on a given interval
@@ -136,9 +147,9 @@ public class Profiler {
                         logger.info("Pause profiling for " + circuitBreakerPause + " secs. Previous profiling operation took " + duration + "ms. That's total of " +  circuitBreaker.getBreakCountThreshold() +  " consecutive profiling operation(s) that exceeded the circuit breaker duration threshold " + circuitBreaker.getBreakDurationThreshold() + " ms");
                         TimeUnit.SECONDS.sleep(circuitBreakerPause);
                     } else {
-                        long sleepTime = interval - System.currentTimeMillis() % interval; //snap the sleep time to the next closest time frame based on the interval
-
-                        TimeUnit.MILLISECONDS.sleep(sleepTime);
+                        // the previous sleep computes modulo hence can have a sleep time in range 1 - 20ms for default
+                        // which is inconsistent with documentation.
+                        TimeUnit.MILLISECONDS.sleep(interval);
                     }
                 } catch (InterruptedException e) {
                     logger.debug("Profiler interrupted: " + e.getMessage()); //hard to tell whether this is triggered by JVM shutdown
@@ -171,7 +182,7 @@ public class Profiler {
      */
     private static ProfilingDurationInfo checkThreads() {
         if (profileByTraceId.isEmpty()) {
-            return new ProfilingDurationInfo(-1, Collections.EMPTY_LIST);
+            return new ProfilingDurationInfo(-1, Collections.emptyList());
         }
 
         long start = System.currentTimeMillis();
@@ -301,7 +312,6 @@ public class Profiler {
             Event snapshotEntry = Context.createEventWithContext(entryMetadata, false);
             snapshotEntry.addInfo("Label", "entry",
                                   "Spec", "profiling",
-            //                      Constants.XTR_EDGE_KEY, parentSpan.context().getMetadata().opHexString(), //for now, easier to see trace in front-end
                                   "Language", "java",
                                   "Interval", (int) interval,
                                   "SpanRef", parentMetadata.opHexString());
@@ -366,13 +376,18 @@ public class Profiler {
                 if (newFrames != null || framesExited > 0) { //only update and report if things have changed
                     synchronized(tracker) {
                         if (!tracker.stopped) {
-                            reportSnapshot(tracker.metadata, framesExited, tracker.snapshotsOmitted.isEmpty() ? Collections.EMPTY_LIST : new ArrayList<Long>(tracker.snapshotsOmitted),  newFrames, originalFramesCount, threadId, collectionTime);
+                            reportSnapshot(tracker.metadata, framesExited, tracker.snapshotsOmitted.isEmpty() ? Collections.emptyList() : new ArrayList<Long>(tracker.snapshotsOmitted), newFrames, originalFramesCount, threadId, collectionTime);
                         }
                     }
                     tracker.stack = stack;
                     tracker.snapshotsOmitted.clear(); //reset snapshots omitted
                 } else {
-                    tracker.snapshotsOmitted.add(collectionTime);
+                    if (tracker.metadata.isExpired(collectionTime / 1000 /*collectionTime is in µs from the caller scope*/)) {
+                        logger.info(String.format("Metadata has expired and we're stopping profiling on thread - %s. Trace took to long!", thread.getName()));
+                        stopProfilingOnThread(thread);
+                    } else {
+                        tracker.snapshotsOmitted.add(collectionTime);
+                    }
                 }
             }
         }
@@ -470,6 +485,10 @@ public class Profiler {
             return new HashSet<Thread>(snapshotTrackersByThread.keySet());
         }
 
+        SnapshotTracker getSnapshotTracker(Thread thread) {
+            return snapshotTrackersByThread.get(thread);
+        }
+
         private void reportSnapshot(Metadata metadata, int framesExited, List<Long> snapshotsOmitted, StackTraceElement[] newFrames, int framesCount, long threadId, long timestamp) {
             Event event;
 
@@ -526,6 +545,7 @@ public class Profiler {
         private StackTraceElement[] stack;
         private final Metadata metadata;
         private boolean stopped = false;
+        @Getter
         private final ArrayList<Long> snapshotsOmitted = new ArrayList<Long>();
 
         public SnapshotTracker(Metadata metadata) {
