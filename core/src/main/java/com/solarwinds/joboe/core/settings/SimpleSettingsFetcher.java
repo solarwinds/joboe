@@ -23,14 +23,12 @@ public class SimpleSettingsFetcher implements SettingsFetcher {
         
         reader.onSettingsChanged(() -> fetch());
     }
-    
-    
+
     @Override
     public Settings getSettings() {
         try {
-            return reader.getSettings().get(DEFAULT_LAYER);
+            return reader.getSettings();
         } catch (OboeSettingsException e) {
-            e.printStackTrace();
             return null;
         }
     }

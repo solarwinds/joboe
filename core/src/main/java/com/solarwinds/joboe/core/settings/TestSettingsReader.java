@@ -1,45 +1,35 @@
 package com.solarwinds.joboe.core.settings;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CountDownLatch;
 import com.solarwinds.joboe.sampling.Settings;
-import com.solarwinds.joboe.sampling.SettingsFetcher;
 import com.solarwinds.joboe.sampling.SettingsArg;
 import com.solarwinds.joboe.sampling.TracingMode;
 
+import java.util.HashMap;
+import java.util.Map;
+
 
 public class TestSettingsReader implements SettingsReader {
-    private final Map<String, Settings> layerSettings = new ConcurrentHashMap<String, Settings>();
+    private volatile Settings layerSettings;
     private SettingsChangeCallback settingsChangeCallback;
     
     @Override
-    public Map<String, Settings> getSettings() throws OboeSettingsException {
-        return Collections.unmodifiableMap(layerSettings);
+    public Settings getSettings() throws OboeSettingsException {
+        return layerSettings;
     }
-    
-//    public void put(String layer, Settings settings) {
-//        layerSettings.put(layer, settings);
-//    }
     
     public void put(Settings settings) {
-        layerSettings.put(SettingsFetcher.DEFAULT_LAYER, settings);
+        layerSettings = settings;
         settingsChanged();
     }
-    
-    public void setAll(Map<String, Settings> allSettings) {
-        layerSettings.clear();
-        layerSettings.putAll(allSettings);
+
+    public void setAll(Settings allSettings) {
+        layerSettings = allSettings;
         settingsChanged();
     }
     
     public void reset() {
-        layerSettings.clear();
+        layerSettings = null;
         settingsChanged();
-    }
-    
-    public CountDownLatch isSettingsAvailableLatch() {
-        return new CountDownLatch(0);
     }
     
     @Override

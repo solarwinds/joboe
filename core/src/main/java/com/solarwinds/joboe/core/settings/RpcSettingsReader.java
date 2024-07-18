@@ -8,9 +8,6 @@ import com.solarwinds.joboe.logging.Logger;
 import com.solarwinds.joboe.logging.LoggerFactory;
 import com.solarwinds.joboe.sampling.Settings;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 /**
  * Reads {@link Settings} from the source provided by the rpc {@link Client} specified during instantiation
  *
@@ -39,23 +36,19 @@ public class RpcSettingsReader implements SettingsReader {
      * @see com.solarwinds.joboe.core.SettingsReader#getLayerSampleRate(java.lang.String)
      */
     @Override
-    public Map<String, Settings> getSettings() throws OboeSettingsException {
+    public Settings getSettings() throws OboeSettingsException {
         SettingsResult result;
         try {
             result = rpcClient.getSettings(SSL_CLIENT_VERSION, loggingCallback).get();
+            if (result.getResultCode() == ResultCode.OK) {
+                logger.debug("Got settings from collector: " + result.getSettings().get(0));
+                return result.getSettings().get(0);
+            }
         } catch (Exception e) {
             throw new OboeSettingsException("Exception from RPC call: " + e.getMessage(), e);
         }
-        if (result.getResultCode() == ResultCode.OK) {
-            Map<String, Settings> updatedSettings = new LinkedHashMap<String, Settings>();
-            for (Settings settingsForLayer : result.getSettings()) {
-                logger.debug("Got settings from collector: " + settingsForLayer);
-                updatedSettings.put(settingsForLayer.getLayer(), settingsForLayer);
-            }
-            return updatedSettings;
-        } else {
-            throw new OboeSettingsException("Rpc call returns non OK status code: " + result.getResultCode());
-        }
+
+        throw new OboeSettingsException("Rpc call returns non OK status code: " + result.getResultCode());
     }
 
     @Override
