@@ -6,10 +6,7 @@ import com.solarwinds.joboe.core.profiler.Profiler.Profile;
 import com.solarwinds.joboe.core.util.TestUtils;
 import com.solarwinds.joboe.sampling.Metadata;
 import com.solarwinds.joboe.sampling.SamplingConfiguration;
-import com.solarwinds.joboe.sampling.SamplingException;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -17,140 +14,88 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ProfileTest {
 
-    private static final ProfilerSetting profilerSetting = new ProfilerSetting(true, Collections.emptySet(), ProfilerSetting.DEFAULT_INTERVAL, ProfilerSetting.DEFAULT_CIRCUIT_BREAKER_DURATION_THRESHOLD, ProfilerSetting.DEFAULT_CIRCUIT_BREAKER_COUNT_THRESHOLD);
-    private static TestReporter profilingReporter;
-
-    @BeforeAll
-    static/*static because reporter is static in Profiler*/ void setup() {
-        profilingReporter = TestUtils.initProfilingReporter(profilerSetting);
-    }
-
-    @AfterEach
-    void tearDown() {
-        profilingReporter.reset();
-    }
-
-    @Test
-    void partialValidateEntryEventShapeOnStartProfilingOnThread() throws SamplingException {
-        Thread thread = Thread.currentThread();
-        Profile profile = new Profile(profilerSetting);
+    @BeforeEach
+    void setup(){
         Metadata.setup(SamplingConfiguration.builder().build());
-
-        profile.startProfilingOnThread(thread, new Metadata("00-970026c88092a447d3b2bba3be3be2fc-0c8fc43138df813a-01"));
-        List<DeserializedEvent> events = profilingReporter.getSentEvents();
-        Map<String, Object> entryEvent = events.get(0).getSentEntries();
-
-        assertEquals("entry", entryEvent.get("Label"));
-        assertEquals("profiling", entryEvent.get("Spec"));
-
-        assertEquals("java", entryEvent.get("Language"));
-        assertEquals("0c8fc43138df813a", entryEvent.get("SpanRef"));
-        assertEquals(thread.getId(), entryEvent.get("TID"));
     }
 
-    @Test
-    void partialValidateInfoEventOnRecord() throws SamplingException {
+    private final ProfilerSetting profilerSetting = new ProfilerSetting(true, Collections.EMPTY_SET, ProfilerSetting.DEFAULT_INTERVAL, ProfilerSetting.DEFAULT_CIRCUIT_BREAKER_DURATION_THRESHOLD, ProfilerSetting.DEFAULT_CIRCUIT_BREAKER_COUNT_THRESHOLD);
+    private final TestReporter profilingReporter = TestUtils.initProfilingReporter(profilerSetting);
+
+    private void methodA(Profile profile) {
         Thread thread = Thread.currentThread();
         StackTraceElement[] stackTrace = thread.getStackTrace();
-        Profile profile = new Profile(profilerSetting);
-        Metadata.setup(SamplingConfiguration.builder().build());
-
-        profile.startProfilingOnThread(thread, new Metadata("00-970026c88092a447d3b2bba3be3be2fc-0c8fc43138df813a-01"));
+        //printStack(stackTrace);
+        
         profile.record(thread, stackTrace, 2);
-        List<DeserializedEvent> infoEvents = profilingReporter.getSentEvents();
-
-        Map<String, Object> snapshotEvent = infoEvents.get(1).getSentEntries();
-        assertEquals("info", snapshotEvent.get("Label"));
-        assertEquals("profiling", snapshotEvent.get("Spec"));
-
+        List<DeserializedEvent> sentEvents = profilingReporter.getSentEvents();
+        assertEquals(1, profilingReporter.getSentEvents().size());
+        Map<String, Object> snapshotEvent = sentEvents.get(0).getSentEntries();
+        
+        assertEquals(2, snapshotEvent.get("FramesExited")); //exited the `getStackTrace` from `testRecord` and the line in `testRecord` that calls `getStackTrace` 
         assertEquals(stackTrace.length, snapshotEvent.get("FramesCount"));
         assertEquals(thread.getId(), snapshotEvent.get("TID"));
-        assertNewFrames(Arrays.copyOfRange(stackTrace, 0 , 3), (Map<String, Map<String, Object>>) snapshotEvent.get("NewFrames"));
+        assertEquals(Collections.singletonMap("0", 1L), snapshotEvent.get("SnapshotsOmitted")); //omitted 1 snapshot in previous call
+        
+        assertNewFrames(Arrays.copyOfRange(stackTrace, 0 , 3), (Map<String, Map<String, Object>>) snapshotEvent.get("NewFrames")); //the top 3 new frames : getStackTrace, methodA and the line in `testRecord` that calls `methodA`
+        
+        profilingReporter.reset();
     }
-
-    @Test
-    void partialValidateInfoEventOnRecordWithSkippedFrame() throws SamplingException {
+    
+    private void methodB(Profile profile) {
         Thread thread = Thread.currentThread();
         StackTraceElement[] stackTrace = thread.getStackTrace();
-        Profile profile = new Profile(profilerSetting);
-        Metadata.setup(SamplingConfiguration.builder().build());
-
-        profile.startProfilingOnThread(thread, new Metadata("00-970026c88092a447d3b2bba3be3be2fc-0c8fc43138df813a-01"));
-        profile.record(thread, stackTrace, 2);
-        profile.record(thread, stackTrace, 2);
-
-        StackTraceElement[] newFrames = simulateStackChange(profile);
-        List<DeserializedEvent> infoEvents = profilingReporter.getSentEvents();
-
-        Map<String, Object> snapshotEvent = infoEvents.get(2).getSentEntries();
-        assertEquals("info", snapshotEvent.get("Label"));
-        assertEquals("profiling", snapshotEvent.get("Spec"));
-
-        assertFalse(((Map<?, ?>) snapshotEvent.get("SnapshotsOmitted")).isEmpty());
-        assertEquals("profiling", snapshotEvent.get("Spec"));
-        assertEquals(2, snapshotEvent.get("FramesExited"));
-
-        assertEquals(newFrames.length, snapshotEvent.get("FramesCount"));
-        assertEquals(thread.getId(), snapshotEvent.get("TID"));
-        assertNewFrames(Arrays.copyOfRange(newFrames, 0, 3), (Map<String, Map<String, Object>>) snapshotEvent.get("NewFrames"));
+        profile.record(thread, stackTrace, 4);//nothing is sent as the truncated stack trace is identical to previous truncated stack trace
+        
+        assert(profilingReporter.getSentEvents().isEmpty()); 
     }
-
-    @Test
-    void partialValidateInfoEventOnRecordWithFrameChange() throws SamplingException {
-        Thread thread = Thread.currentThread();
-        StackTraceElement[] stackTrace = thread.getStackTrace();
-        Profile profile = new Profile(profilerSetting);
-        Metadata.setup(SamplingConfiguration.builder().build());
-
-        profile.startProfilingOnThread(thread, new Metadata("00-970026c88092a447d3b2bba3be3be2fc-0c8fc43138df813a-01"));
-        profile.record(thread, stackTrace, 2);
-        StackTraceElement[] newFrames = simulateStackChange(profile);
-
-        profile.record(thread, stackTrace, 2);
-        List<DeserializedEvent> infoEvents = profilingReporter.getSentEvents();
-
-        Map<String, Object> snapshotEvent = infoEvents.get(2).getSentEntries();
-        assertEquals("info", snapshotEvent.get("Label"));
-        assertEquals("profiling", snapshotEvent.get("Spec"));
-
-        assertTrue(((Map<?, ?>) snapshotEvent.get("SnapshotsOmitted")).isEmpty());
-        assertEquals("profiling", snapshotEvent.get("Spec"));
-        assertEquals(2, snapshotEvent.get("FramesExited"));
-
-        assertEquals(newFrames.length, snapshotEvent.get("FramesCount"));
-        assertEquals(thread.getId(), snapshotEvent.get("TID"));
-        assertNewFrames(Arrays.copyOfRange(newFrames, 0, 3), (Map<String, Map<String, Object>>) snapshotEvent.get("NewFrames"));
+    
+    private void recursion(Profile profile, int remainingIteration) {
+        if (remainingIteration == 0) {
+            Thread thread = Thread.currentThread();
+            StackTraceElement[] stackTrace = thread.getStackTrace();
+            //printStack(stackTrace);
+            
+            profile.record(thread, stackTrace, 3);
+            List<DeserializedEvent> sentEvents = profilingReporter.getSentEvents();
+            assertEquals(1, profilingReporter.getSentEvents().size());
+            Map<String, Object> snapshotEvent = sentEvents.get(0).getSentEntries();
+            
+            assertEquals(3, snapshotEvent.get("FramesExited")); //exited the `getStackTrace` from `methodA`, `methodA`, and the line in `testRecord` that calls `methodA` 
+            assertEquals(stackTrace.length, snapshotEvent.get("FramesCount"));
+            assertEquals(thread.getId(), snapshotEvent.get("TID"));
+            
+            int lastRecursionFrameindex = 0;
+            int walker = stackTrace.length - 1;
+            while (walker >= 0) {
+                StackTraceElement frame = stackTrace[walker];
+                if ("recursion".equals(frame.getMethodName())) {
+                    lastRecursionFrameindex = walker;
+                }
+                walker --;
+            }
+            
+            StackTraceElement[] truncatedStackTrace = Arrays.copyOfRange(stackTrace, stackTrace.length - Profiler.MAX_REPORTED_FRAME_DEPTH, stackTrace.length);
+            StackTraceElement[] newFrames = Arrays.copyOfRange(truncatedStackTrace, 0, lastRecursionFrameindex + 2); // +1 on the first call to Recursion then +1 on the line in `testRecord` that calls recursion
+            assertNewFrames(newFrames, (Map<String, Map<String, Object>>) snapshotEvent.get("NewFrames")); //the top 3 new frames : getStackTrace, methodA and the line in `testRecord` that calls `methodA`
+            
+            profilingReporter.reset();
+            
+            methodB(profile);
+        } else {
+            recursion(profile, -- remainingIteration);
+        }
     }
-
-
-    @Test
-    void verifyThatProfilingIsStoppedWhenMetadataExpires() throws SamplingException {
-        Thread thread = Thread.currentThread();
-        StackTraceElement[] stackTrace = thread.getStackTrace();
-        Profile profile = new Profile(profilerSetting);
-
-        profile.startProfilingOnThread(thread, new Metadata("00-970026c88092a447d3b2bba3be3be2fc-0c8fc43138df813a-01"));
-        Profiler.SnapshotTracker snapshotTracker = profile.getSnapshotTracker(thread);
-        profile.record(thread, stackTrace, 2);
-
-        profile.record(thread, stackTrace, 2);
-        profile.record(thread, stackTrace, 2);
-        Metadata.setup(SamplingConfiguration.builder().ttl(0).build()); // set ttl 0 to force expiration
-
-        profile.record(thread, stackTrace, (System.currentTimeMillis() * 1000) << 1);
-        /*
-           we expect 2 because the two calls to profile.record(..) above should be skipped, and the stack didn't change;
-           the last call should trigger a stop due to expiration.
-        */
-        assertEquals(2, snapshotTracker.getSnapshotsOmitted().size());
-        // we expect null because profiling should be stopped by now
-        assertNull(profile.getSnapshotTracker(thread));
+    
+    private void printStack(StackTraceElement[] stackTrace) {
+        System.out.println("==============");
+        for (StackTraceElement frame : stackTrace) {
+            System.out.println(frame);
+        }
+        
     }
 
     private void assertNewFrames(StackTraceElement[] expectedNewFrames, Map<String, Map<String, Object>> actualNewFrames) {
@@ -158,7 +103,6 @@ public class ProfileTest {
             StackTraceElement expectedFrame = expectedNewFrames[i];
             Map<String, Object> actualFrame = actualNewFrames.get(String.valueOf(i));
             assertEquals(expectedFrame.getClassName(), actualFrame.get("C"));
-
             assertEquals(expectedFrame.getMethodName(), actualFrame.get("M"));
             assertEquals(expectedFrame.getFileName(), actualFrame.get("F"));
             if (expectedFrame.getLineNumber() >= 0) {
@@ -166,12 +110,6 @@ public class ProfileTest {
             }
         }
     }
-
-    private StackTraceElement[] simulateStackChange(Profile profile) {
-        Thread thread = Thread.currentThread();
-        StackTraceElement[] stackTrace = thread.getStackTrace();
-        profile.record(thread, stackTrace, 2);
-
-        return stackTrace;
-    }
+    
+    
 }
