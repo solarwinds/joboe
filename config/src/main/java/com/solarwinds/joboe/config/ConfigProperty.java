@@ -25,7 +25,6 @@ public enum ConfigProperty {
     AGENT_DEBUG (new ConfigKey(null, null), ConfigGroup.AGENT, Boolean.class),
     AGENT_LOGGING (new ConfigKey("agent.logging", EnvPrefix.PRODUCT + "DEBUG_LEVEL"), ConfigGroup.AGENT, String.class),
     AGENT_TRACING_MODE (new ConfigKey("agent.tracingMode", null), ConfigGroup.AGENT, String.class),
-    AGENT_SAMPLE_RATE (new ConfigKey("agent.sampleRate", null), ConfigGroup.AGENT, Integer.class),
     AGENT_SERVICE_KEY (new ConfigKey("agent.serviceKey", EnvPrefix.PRODUCT + "SERVICE_KEY"), ConfigGroup.AGENT, String.class),
     AGENT_SQL_QUERY_MAX_LENGTH(new ConfigKey("agent.sqlQueryMaxLength", EnvPrefix.PRODUCT + "MAX_SQL_QUERY_LENGTH"), ConfigGroup.AGENT, Integer.class),
     AGENT_URL_SAMPLE_RATE (new ConfigKey("agent.urlSampleRates"), ConfigGroup.AGENT, String.class),

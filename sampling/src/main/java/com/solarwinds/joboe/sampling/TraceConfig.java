@@ -22,7 +22,7 @@ public class TraceConfig {
     private final Map<TokenBucketType, Double> bucketRates;
     
     public TraceConfig(Integer sampleRate, SampleRateSource sampleRateSource, Short flags) {
-        this(sampleRate, sampleRateSource, flags, Collections.EMPTY_MAP, Collections.EMPTY_MAP);
+        this(sampleRate, sampleRateSource, flags, Collections.emptyMap(), Collections.emptyMap());
     }
 
     public TraceConfig(Integer sampleRate, SampleRateSource sampleRateSource, Short flags, Map<TokenBucketType, Double> bucketCapacities, Map<TokenBucketType, Double> bucketRates) {
