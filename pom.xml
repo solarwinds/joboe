@@ -122,7 +122,7 @@
         <repository>
             <id>github-write</id>
             <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/solarwinds-cloud/maven-releases</url>
+            <url>https://maven.pkg.github.com/solarwinds/joboe</url>
         </repository>
     </distributionManagement>
     <dependencyManagement>

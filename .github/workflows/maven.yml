@@ -1,44 +1,43 @@
 # This workflow does the following things:
-# 1. build and test the core Joboe libs (core, metrics and dependencies)
+# 1. build and test the core Joboe libs (core, metrics, config, logging and sampling)
 # 2. publish the jars to Github Packages (which can be used by the NightHawk agent at https://github.com/appoptics/opentelemetry-java-instrumentation-custom-distro)
 # 3. make a **draft** release on Github and upload the jars as artifacts (you may need to publish the release manually after it)
 
 # The workflow needs to be triggered manually. (go to the Actions tab in the repo page, choose the workflow and click `Run Workflow`)
 # The draft release will be named based on the `revision` property in the pom file. For example, if the pom revision is 7.0.4, the release
 # will be named as "v7.0.4"
-name: Build and Publish Core libs with Maven
+name: Release
 
 on:
   workflow_dispatch:
 
+permissions:
+  packages: write
+  contents: write
+  id-token: write
+
 jobs:
-  publish:
+  release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 8
+        uses: actions/setup-java@v4
         with:
-          ref: ${{ github.ref_name }}
-      - name: Set up JDK 8 for Maven running on JDK9+
-        id: setup-jdk-8
-        uses: actions/setup-java@v1
-        with:
-          java-version: 8.0.112
-      - name: Set up JDK 11 for building the Joboe core libs
-        uses: actions/setup-java@v2
-        with:
-          java-version: '11'
+          java-version: 8.0.302
           distribution: 'temurin'
+
       - name: Set version env to pom version
         run: |
           echo "POM_VERSION=v$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
+
       - name: Publish package
-        run: mvn -Dmaven.resolver.transport=wagon --batch-mode deploy
+        run: |
+          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          NEW_VERSION=${VERSION%%-SNAPSHOT}
+          
+          mvn versions:set -DnewVersion=$NEW_VERSION
+          mvn -s .github/m2/settings.xml -Dmaven.resolver.transport=wagon --batch-mode deploy
         env:
-          JAVA_1_8_HOME: "${{ steps.setup-jdk-8.outputs.path }}"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Release and upload artifacts
-        run: gh release create ${{ env.POM_VERSION }} --title "${{ env.POM_VERSION }}" --notes "for the OpenTelemetry custom distro" --target ${{ github.ref_name }} --draft core/target/core-*.jar dependencies/target/dependencies-*.jar metrics/target/metrics-*.jar
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-
