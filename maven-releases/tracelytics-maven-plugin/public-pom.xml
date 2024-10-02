@@ -1,0 +1,74 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <groupId>com.appoptics.agent.java</groupId>
+  <artifactId>appoptics-maven-plugin</artifactId>
+  <packaging>maven-plugin</packaging>
+  <version>${maven.plugin.version}${is.snapshot}</version>
+
+  <name>AppOptics instrumentation agent installer plugin</name>
+  <description> A Maven plugin that installs the AppOptics Java instrumentation agent. Can be used within a pom or directly from command line. The supported goals are "install-agent" and "download-agent". The configuration properties are "agentVersion", "agentLocation" and "agentOperatingSystem"(the last one is only valid for "download-agent" goal), all are optional and may be specified as maven configuration properties or system properties. For other information on our Java agent please visit http://docs.appoptics.com/kb/apm_tracing/java/ .</description>
+  <url>https://www.appoptics.com/</url>
+  
+  <licenses>
+    <license>
+      <name>AppOptics Java Agent License</name>
+      <url>http://docs.appoptics.com/kb/apm_tracing/java/license/</url>
+    </license>
+  </licenses>
+  
+  <scm>
+    <connection>scm:git:git@github.com:librato/joboe.git</connection>
+    <url>git@github.librato/joboe.git</url>
+  </scm>
+  
+  <developers>
+    <developer>
+      <name>Patson Luk</name>
+      <email>patson@librato.com</email>
+      <organization>AppOptics</organization>
+      <organizationUrl>https://www.appoptics.com/</organizationUrl>
+    </developer>
+  </developers>
+  
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-api</artifactId>
+      <version>3.0</version>
+	  <scope>runtime</scope>
+    </dependency>
+ 
+    <dependency>
+      <groupId>org.apache.maven.plugin-tools</groupId>
+      <artifactId>maven-plugin-annotations</artifactId>
+      <version>3.4</version>
+      <scope>runtime</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-core</artifactId>
+      <version>3.3.9</version>
+	  <scope>runtime</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-compat</artifactId>
+      <version>3.3.9</version>
+	  <scope>runtime</scope>
+    </dependency>
+    
+    <dependency>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.10</version>
+	  <scope>runtime</scope>
+    </dependency>
+    
+  </dependencies>
+
+</project> 
+ 

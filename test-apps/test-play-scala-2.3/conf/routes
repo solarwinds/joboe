@@ -1,0 +1,28 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET     /                           controllers.Application.index
+GET     /async						controllers.Application.async
+GET     /promise					controllers.Application.promise
+GET		/api						controllers.Application.api
+GET		/api-hack					controllers.Application.apiHack
+GET		/helper						controllers.Application.helper
+GET     /actor                      controllers.Application.actor
+GET     /actor-other-context        controllers.Application.actorOtherContext
+GET     /stream                     controllers.Application.stream
+GET     /remote-actor               controllers.Application.remoteActor
+GET     /other-context              controllers.Application.otherContext
+GET     /hello                      controllers.Application.hello
+GET     /hello-simple               controllers.Application.helloSimple
+GET     /exception                  controllers.Application.exception
+GET     /future-exception           controllers.Application.futureException
+GET     /directions                 controllers.ServiceApplication.getLink
+POST    /get-directions             controllers.ServiceApplication.getDirections
+GET     /cross-server               controllers.ServiceApplication.crossServer
+GET     /get-stream                  controllers.ServiceApplication.getStream
+GET     /post-stream                  controllers.ServiceApplication.postStream
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.at(path="/public", file)

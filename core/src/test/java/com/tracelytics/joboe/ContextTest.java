@@ -1,0 +1,313 @@
+package com.tracelytics.joboe;
+
+import com.tracelytics.util.TestUtils;
+import com.tracelytics.joboe.TestReporter.DeserializedEvent;
+import com.tracelytics.joboe.settings.SettingsArg;
+import com.tracelytics.joboe.settings.SettingsManager;
+import com.tracelytics.joboe.settings.SimpleSettingsFetcher;
+import com.tracelytics.joboe.settings.TestSettingsReader;
+import com.tracelytics.joboe.settings.TestSettingsReader.SettingsMockupBuilder;
+import junit.framework.TestCase;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+
+public class ContextTest extends TestCase {
+    private static final TestSettingsReader testSettingsReader = TestUtils.initSettingsReader();
+    private static final TestReporter tracingReporter = TestUtils.initTraceReporter();
+
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+
+        testSettingsReader.reset();
+        tracingReporter.reset();
+    }
+
+    public void testContext()
+        throws Exception {
+
+        // Clear metadata: it may have been set by a previous test
+        Context.clearMetadata();
+        
+        // Make sure we can get metadata from our context:
+        final Metadata md = Context.getMetadata();
+        assertFalse(md.isValid());
+        
+        md.randomize();
+        assertTrue(md.isValid());
+
+        Metadata md2 = Context.getMetadata();
+        assertTrue(md == md2);
+
+        // Make sure we can set IDs:
+        Metadata rndMd = new Metadata();
+        rndMd.randomize();
+        
+        Context.setMetadata(rndMd.toHexString());
+        assertEquals(Context.getMetadata().toHexString(), rndMd.toHexString());
+
+        // Verify that the context is inherited in child thread
+        final Metadata parentMD = Context.getMetadata();
+        final AtomicReference<Error> assertionError = new AtomicReference<Error>(); 
+        
+        Thread thr = new Thread() {
+            public void run() {
+                try {
+                    Metadata childMD = Context.getMetadata();
+                    assertFalse(parentMD == childMD);     // different object
+                    assertEquals(parentMD.toHexString(), childMD.toHexString()); // but same metadata
+                    assertTrue(childMD.isValid());
+                } catch (Error e) {
+                    assertionError.set(e);
+                }
+            }
+        };
+        
+        thr.start();
+        thr.join();
+        
+        if (assertionError.get() != null) {
+            throw assertionError.get();
+        }
+    }
+    
+    public void testInheritContext() throws InterruptedException {
+        Metadata context = Context.getMetadata();
+        context.randomize(); //make a valid context
+        
+        TestThread thread;
+        
+        thread = new TestThread();
+        thread.start();
+        thread.join();
+        
+        assertEquals(context.toHexString(), thread.threadContext.toHexString()); //should have same xtrace id
+        assertNotSame(context, thread.threadContext); //but they should not be the same object, the inherited context should be a clone
+        
+        //test config flag
+        Context.setSkipInheritingContext(true);
+        thread = new TestThread();
+        thread.start();
+        thread.join();
+        Context.setSkipInheritingContext(false);
+        
+        assertEquals(false, thread.threadContext.isValid()); //no context inherited
+        
+        //test remote config changes
+        SimpleSettingsFetcher fetcher = (SimpleSettingsFetcher) SettingsManager.getFetcher();
+        //disable inherit context
+        testSettingsReader.put(new SettingsMockupBuilder().withFlags(TracingMode.ALWAYS).withSampleRate(TraceDecisionUtil.SAMPLE_RESOLUTION).withSettingsArg(SettingsArg.DISABLE_INHERIT_CONTEXT, true).build());
+        thread = new TestThread();
+        thread.start();
+        thread.join();
+        
+        assertEquals(false, thread.threadContext.isValid()); //no context inherited
+        
+        //re-enable inherit context
+        testSettingsReader.put(new SettingsMockupBuilder().withFlags(TracingMode.ALWAYS).withSampleRate(TraceDecisionUtil.SAMPLE_RESOLUTION).build());
+        thread = new TestThread();
+        thread.start();
+        thread.join();
+        
+        assertEquals(context.toHexString(), thread.threadContext.toHexString()); //should have same xtrace id
+        assertNotSame(context, thread.threadContext); //but they should not be the same object, the inherited context should be a clone
+    }
+    
+    public void testCreateEventWithContextTtl() throws InterruptedException {
+        Context.clearMetadata(); //this triggers creation of new metadata
+        Context.getMetadata().randomize(true); //make it a valid context
+        
+        //warm-up run...as first call can take a few secs (for getting host info)
+        Event event = Context.createEvent();
+        event.report(tracingReporter);
+        tracingReporter.reset();
+        
+        Context.clearMetadata(); //this triggers creation of new metadata
+        Context.getMetadata().randomize(); //make it a valid context
+        int newTtl = 2;
+        SimpleSettingsFetcher fetcher = (SimpleSettingsFetcher) SettingsManager.getFetcher();
+        //set to 2 secs
+        testSettingsReader.put(new SettingsMockupBuilder().withFlags(TracingMode.ALWAYS).withSampleRate(TraceDecisionUtil.SAMPLE_RESOLUTION).withSettingsArg(SettingsArg.MAX_CONTEXT_AGE, newTtl).build());
+        
+        event = Context.createEvent();
+        event.report(tracingReporter); //should be okay
+        
+        List<DeserializedEvent> deserializedEvents = tracingReporter.getSentEvents();
+        assertEquals(1, deserializedEvents.size()); //ok, since it's within 2 secs
+        tracingReporter.reset();
+        
+        TimeUnit.SECONDS.sleep(newTtl + 1);
+        
+        event = Context.createEvent();
+        event.report(tracingReporter); //not reported as this is more than 2 secs since creation
+        deserializedEvents = tracingReporter.getSentEvents();
+        assertTrue(deserializedEvents.isEmpty()); //no events
+        
+        Context.clearMetadata(); //ensure reset metadata also reset ttl
+        Context.getMetadata().randomize(); //make it a valid context
+        
+        event = Context.createEvent();
+        event.report(tracingReporter); //this event should now be reported as this is a new metadata
+        
+        deserializedEvents = tracingReporter.getSentEvents();
+        assertEquals(1, deserializedEvents.size());
+        
+        tracingReporter.reset();
+    }
+    
+    public void testCreateEventWithMaxEvents() throws InterruptedException {
+        Context.clearMetadata(); //this triggers creation of new metadata
+        Context.getMetadata().randomize(true); //make it a valid context
+        
+        List<DeserializedEvent> deserializedEvents;
+        
+        //now simulate a max event change
+        Context.clearMetadata(); //this triggers creation of new metadata
+        Context.getMetadata().randomize(true); //make it a valid context
+        int newMaxEvent = 10;
+        SimpleSettingsFetcher fetcher = (SimpleSettingsFetcher) SettingsManager.getFetcher();
+        testSettingsReader.put(new SettingsMockupBuilder().withFlags(TracingMode.ALWAYS).withSampleRate(TraceDecisionUtil.SAMPLE_RESOLUTION).withSettingsArg(SettingsArg.MAX_CONTEXT_EVENTS, newMaxEvent).build());
+        
+        for (int i = 0; i < newMaxEvent; i ++) {
+            Event event = Context.createEvent();
+            event.report(tracingReporter);
+        }
+        
+        deserializedEvents = tracingReporter.getSentEvents();
+        assertEquals(newMaxEvent, deserializedEvents.size()); //ok within limit
+        tracingReporter.reset();
+        
+        Event noopEvent = Context.createEvent(); //exceeding limit
+        noopEvent.report(tracingReporter);
+        deserializedEvents = tracingReporter.getSentEvents();
+        tracingReporter.reset();
+        assertTrue(deserializedEvents.isEmpty()); //no events
+        
+        assertTrue(Context.isValid()); //context should still be valid
+        assertTrue(Context.getMetadata().isSampled()); //and it should still be flagged as sampled
+        
+        Context.clearMetadata(); //this triggers creation of new metadata
+        Context.getMetadata().randomize(true); //make it a valid context
+        
+        ExecutorService threadPool = Executors.newCachedThreadPool();
+        
+        final AtomicInteger collectedEventsCount = new AtomicInteger();
+        
+        for (int i = 0; i < newMaxEvent + 50; i ++) {
+            threadPool.submit(new Runnable() {
+                public void run() {
+                    Event event = Context.createEvent();
+                    event.report(tracingReporter);
+                }
+            });
+        }
+        
+        
+        threadPool.shutdown();
+        threadPool.awaitTermination(10, TimeUnit.SECONDS);
+        
+        assertEquals(newMaxEvent, tracingReporter.getSentEvents().size()); //collected event count should be newMaxEvent (not +1)
+        tracingReporter.reset();
+        
+        
+        noopEvent = Context.createEvent(); //exceeding limit, this should return a noop
+        noopEvent.report(tracingReporter);
+        deserializedEvents = tracingReporter.getSentEvents();
+        assertTrue(deserializedEvents.isEmpty()); //no events
+        
+    }
+    
+    public void testMaxBacktraces() throws InterruptedException, ExecutionException {
+        Context.clearMetadata(); //this triggers creation of new metadata
+        Context.getMetadata().randomize(true); //make it a valid context
+        
+        List<DeserializedEvent> deserializedEvents;
+        
+        //now simulate a max event change
+        Context.clearMetadata(); //this triggers creation of new metadata
+        Context.getMetadata().randomize(true); //make it a valid context
+        int newBacktraces = 10;
+        SimpleSettingsFetcher fetcher = (SimpleSettingsFetcher) SettingsManager.getFetcher();
+        testSettingsReader.put(new SettingsMockupBuilder().withFlags(TracingMode.ALWAYS).withSampleRate(TraceDecisionUtil.SAMPLE_RESOLUTION).withSettingsArg(SettingsArg.MAX_CONTEXT_BACKTRACES, newBacktraces).build());
+        
+        for (int i = 0; i < newBacktraces; i ++) {
+            Event event = Context.createEvent();
+            event.addInfo("Backtrace", "some backtrace");
+            event.addInfo("OtherKv", "some value");
+            event.report(tracingReporter);
+        }
+        
+        deserializedEvents = tracingReporter.getSentEvents();
+        assertEquals(10, deserializedEvents.size());
+        for (DeserializedEvent deseralizedEvent : deserializedEvents) {
+            assertEquals("some backtrace", deseralizedEvent.getSentEntries().get("Backtrace"));
+            assertEquals("some value", deseralizedEvent.getSentEntries().get("OtherKv"));
+        }
+        tracingReporter.reset();
+        
+        Event event = Context.createEvent();
+        event.addInfo("Backtrace", "some backtrace"); //exceeding limit
+        event.addInfo("OtherKv", "some value"); //this should still get through
+        event.report(tracingReporter);
+        
+        deserializedEvents = tracingReporter.getSentEvents();
+        assertEquals(1, deserializedEvents.size());
+        DeserializedEvent deseralizedEvent = deserializedEvents.get(0);
+        assertEquals(null, deseralizedEvent.getSentEntries().get("Backtrace"));
+        assertEquals("some value", deseralizedEvent.getSentEntries().get("OtherKv"));
+        tracingReporter.reset();
+        
+        Context.clearMetadata(); //this triggers creation of new metadata
+        Context.getMetadata().randomize(true); //make it a valid context
+        
+        ExecutorService threadPool = Executors.newCachedThreadPool();
+        
+        
+        
+        
+        List<Future<?>> futures = new ArrayList<Future<?>>();
+        for (int i = 0; i < newBacktraces + 10; i ++) {  
+            futures.add(threadPool.submit(new Runnable() {
+                public void run() {
+                    Event event = Context.createEvent();
+                    event.addInfo("Backtrace", "some backtrace"); //10 backtraces will not be reported
+                    event.addInfo("OtherKv", "some value");
+                    event.report(tracingReporter);
+                }
+            }));
+        }
+        
+        threadPool.shutdown();
+        threadPool.awaitTermination(10, TimeUnit.SECONDS);
+        
+        for (Future<?> future : futures) {
+            future.get(); //check no assertion exception thrown in the runnable
+        }
+        
+        int backTraceCollected = 0;
+        for (DeserializedEvent deserializedEvent : tracingReporter.getSentEvents()) {
+            Map<String, Object> sentEntries = deserializedEvent.getSentEntries();
+            if (sentEntries.containsKey("Backtrace")) {
+                backTraceCollected ++;
+            }
+            assertEquals("some value", sentEntries.get("OtherKv"));
+        }
+        
+        tracingReporter.reset();
+        assertEquals(newBacktraces, backTraceCollected);
+    }
+    
+    
+    private static class TestThread extends Thread {
+        private Metadata threadContext;
+        @Override
+        public void run() {
+            threadContext = Context.getMetadata();
+        }
+    }
+}

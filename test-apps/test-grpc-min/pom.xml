@@ -1,0 +1,124 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.tracelytics.testapp</groupId>
+  <artifactId>test-grpc-min</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  
+  <name>test-grpc-min</name>
+  <url>http://maven.apache.org</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <grpc.version>1.0.0</grpc.version>
+  </properties>
+
+  <build>
+    <finalName>${project.artifactId}</finalName>
+    <extensions>
+      <extension>
+        <groupId>kr.motd.maven</groupId>
+        <artifactId>os-maven-plugin</artifactId>
+        <version>1.5.0.Final</version>
+      </extension>
+    </extensions>
+    <resources>
+      <resource>
+        <directory>${basedir}/src/main/java/io/grpc/examples/routeguide</directory>
+        <targetPath>${project.build.outputDirectory}/io/grpc/examples/routeguide</targetPath>
+        <filtering>true</filtering>
+        <includes>
+          <include>route_guide_db.json</include>
+        </includes>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.3.2</version>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.12</version>
+        <configuration>
+          <parallel>classes</parallel>
+        </configuration>
+      </plugin>
+<!--       uncomment below to regenerate source -->
+<!--       <plugin> -->
+<!--         <groupId>org.xolstice.maven.plugins</groupId> -->
+<!--         <artifactId>protobuf-maven-plugin</artifactId> -->
+<!--         <version>0.5.0</version> -->
+<!--         <configuration> -->
+<!--           <protocArtifact>com.google.protobuf:protoc:3.4.0:exe:${os.detected.classifier}</protocArtifact> -->
+<!--           <pluginId>grpc-java</pluginId> -->
+<!--           <pluginArtifact>io.grpc:protoc-gen-grpc-java:1.7.0:exe:${os.detected.classifier}</pluginArtifact> -->
+<!--         </configuration> -->
+<!--         <executions> -->
+<!--           <execution> -->
+<!--             <goals> -->
+<!--               <goal>compile</goal> -->
+<!--               <goal>compile-custom</goal> -->
+<!--             </goals> -->
+<!--           </execution> -->
+<!--         </executions> -->
+<!--       </plugin> -->
+      <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>2.4.1</version>
+          <configuration>
+              <!-- get all project dependencies -->
+              <descriptorRefs>
+                  <descriptorRef>jar-with-dependencies</descriptorRef>
+              </descriptorRefs>
+              <!-- MainClass in mainfest make a executable jar -->
+              <archive>
+                <manifest>
+                  <mainClass>io.grpc.examples.routeguide.RouteGuideServer</mainClass>
+<!--                   <mainClass>io.grpc.examples.routeguide.RouteGuideClient</mainClass> -->
+                </manifest>
+              </archive>
+          </configuration>
+          <executions>
+            <execution>
+              <id>make-assembly</id>
+              <phase>package</phase> 
+              <goals>
+                  <goal>single</goal>
+              </goals>
+            </execution>
+          </executions>
+      </plugin>
+    </plugins>
+  </build>
+  <dependencies>
+    <dependency>
+      <groupId>io.grpc</groupId>
+      <artifactId>grpc-netty</artifactId>
+      <version>${grpc.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.grpc</groupId>
+      <artifactId>grpc-protobuf</artifactId>
+      <version>${grpc.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.grpc</groupId>
+      <artifactId>grpc-stub</artifactId>
+      <version>${grpc.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.appoptics.agent.java</groupId>
+      <artifactId>appoptics-sdk</artifactId>
+      <version>6.0.0</version>
+    </dependency>
+  </dependencies>
+</project>

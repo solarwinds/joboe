@@ -1,0 +1,100 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.appoptics.agent.java</groupId>
+    <artifactId>appoptics-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>appoptics-parent</name>
+
+    <properties>
+        <agent.version>6.23.0</agent.version>
+        <api.version>6.23.0</api.version>
+        <maven.plugin.version>1.0.0</maven.plugin.version>
+        <is.snapshot></is.snapshot>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<repository.url>https://oss.sonatype.org/service/local/staging/deploy/maven2</repository.url>
+        <serverId>sonatype_staging</serverId>
+        <project.build.outputTimestamp>${git.commit.time}</project.build.outputTimestamp>
+    </properties>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <configuration>
+                        <skip>true</skip>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>3.2.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>3.2.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>3.2.0</version>
+                </plugin>
+				<plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>3.2.0</version>
+                    <configuration>
+                        <notimestamp>true</notimestamp>
+                    </configuration>
+                </plugin>
+
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>pl.project13.maven</groupId>
+                <artifactId>git-commit-id-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>retrieve-git-info</id>
+                        <phase>initialize</phase>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <injectAllReactorProjects>true</injectAllReactorProjects>
+                    <runOnlyOnce>true</runOnlyOnce>
+                    <skipPoms>false</skipPoms>
+                    <dateFormat>yyyy-MM-dd'T'HH:mm:ss'Z'</dateFormat>
+                    <dateFormatTimeZone>UTC</dateFormatTimeZone>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+
+    <modules>
+        <module>dependencies</module>
+        <module>core</module>
+        <module>instrumentation</module>
+        <module>instrumentation/kafka</module>
+        <module>instrumentation/reactor</module>
+        <module>instrumentation/mongo-2</module>
+        <module>instrumentation/mongo-3</module>
+        <module>instrumentation/mongo-4</module>
+        <module>instrumentation/rabbit-mq</module>
+        <module>instrumentation/redisson-2</module>
+        <module>instrumentation/redisson-3</module>
+        <module>agent</module>
+        <module>api</module>
+    </modules>
+
+</project>

@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://test.appoptics.com" xmlns:apachesoap="http://xml.apache.org/xml-soap" xmlns:impl="http://test.appoptics.com" xmlns:intf="http://test.appoptics.com" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsdlsoap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<!--WSDL created by Apache Axis version: 1.4
+Built on Apr 22, 2006 (06:55:48 PDT)-->
+ <wsdl:types>
+  <schema elementFormDefault="qualified" targetNamespace="http://test.appoptics.com" xmlns="http://www.w3.org/2001/XMLSchema">
+   <element name="testException">
+    <complexType>
+     <sequence>
+      <element name="input" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="testExceptionResponse">
+    <complexType>
+     <sequence>
+      <element name="testExceptionReturn" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="helloWorld">
+    <complexType/>
+   </element>
+   <element name="helloWorldResponse">
+    <complexType>
+     <sequence>
+      <element name="helloWorldReturn" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="processSomething">
+    <complexType>
+     <sequence>
+      <element name="input" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+   <element name="processSomethingResponse">
+    <complexType>
+     <sequence>
+      <element name="processSomethingReturn" type="xsd:string"/>
+     </sequence>
+    </complexType>
+   </element>
+  </schema>
+ </wsdl:types>
+
+   <wsdl:message name="helloWorldRequest">
+
+      <wsdl:part element="impl:helloWorld" name="parameters">
+
+      </wsdl:part>
+
+   </wsdl:message>
+
+   <wsdl:message name="processSomethingRequest">
+
+      <wsdl:part element="impl:processSomething" name="parameters">
+
+      </wsdl:part>
+
+   </wsdl:message>
+
+   <wsdl:message name="testExceptionRequest">
+
+      <wsdl:part element="impl:testException" name="parameters">
+
+      </wsdl:part>
+
+   </wsdl:message>
+
+   <wsdl:message name="testExceptionResponse">
+
+      <wsdl:part element="impl:testExceptionResponse" name="parameters">
+
+      </wsdl:part>
+
+   </wsdl:message>
+
+   <wsdl:message name="processSomethingResponse">
+
+      <wsdl:part element="impl:processSomethingResponse" name="parameters">
+
+      </wsdl:part>
+
+   </wsdl:message>
+
+   <wsdl:message name="helloWorldResponse">
+
+      <wsdl:part element="impl:helloWorldResponse" name="parameters">
+
+      </wsdl:part>
+
+   </wsdl:message>
+
+   <wsdl:portType name="TestService">
+
+      <wsdl:operation name="testException">
+
+         <wsdl:input message="impl:testExceptionRequest" name="testExceptionRequest">
+
+       </wsdl:input>
+
+         <wsdl:output message="impl:testExceptionResponse" name="testExceptionResponse">
+
+       </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="helloWorld">
+
+         <wsdl:input message="impl:helloWorldRequest" name="helloWorldRequest">
+
+       </wsdl:input>
+
+         <wsdl:output message="impl:helloWorldResponse" name="helloWorldResponse">
+
+       </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="processSomething">
+
+         <wsdl:input message="impl:processSomethingRequest" name="processSomethingRequest">
+
+       </wsdl:input>
+
+         <wsdl:output message="impl:processSomethingResponse" name="processSomethingResponse">
+
+       </wsdl:output>
+
+      </wsdl:operation>
+
+   </wsdl:portType>
+
+   <wsdl:binding name="TestServiceSoapBinding" type="impl:TestService">
+
+      <wsdlsoap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+      <wsdl:operation name="testException">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="testExceptionRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="testExceptionResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="helloWorld">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="helloWorldRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="helloWorldResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+      <wsdl:operation name="processSomething">
+
+         <wsdlsoap:operation soapAction=""/>
+
+         <wsdl:input name="processSomethingRequest">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:input>
+
+         <wsdl:output name="processSomethingResponse">
+
+            <wsdlsoap:body use="literal"/>
+
+         </wsdl:output>
+
+      </wsdl:operation>
+
+   </wsdl:binding>
+
+   <wsdl:service name="TestServiceService">
+
+      <wsdl:port binding="impl:TestServiceSoapBinding" name="TestService">
+
+         <wsdlsoap:address location="http://localhost:8080/test-axis-service/services/TestService"/>
+
+      </wsdl:port>
+
+   </wsdl:service>
+
+</wsdl:definitions>

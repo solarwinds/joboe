@@ -1,0 +1,34 @@
+There are 2 options for testing:
+
+Option 1: Run on pre-packaged jar
+
+3 pre-packaged jars are included in this project:
+undertow-examples-2.0.13.jar
+undertow-examples-1.3.10.jar
+undertow-examples-1.
+
+Simply run it as:
+c:\Program Files\Java\jdk1.8.0_05\bin>java -javaagent:C:\Program Files\AppNeta\TraceView\java\tracelyticsagent.jar -jar C:\Users\pluk\git\joboe\test-apps\test-undertow\undertow-examples-1.3.10.jar
+
+Take note that to run the http2 example, extra param is needed for the bootclasspath, run command like below instead (change the apln-boot-8.0.0.jar location)
+c:\Program Files\Java\jdk1.8.0_05\bin>java -Xbootclasspath/p:"C:\Users\pluk\.m2\repository\org\mortbay\jetty\alpn\alpn-boot\8.0.0\alpn-boot-8.0.0.jar"  -javaagent:C:\Program Files\AppNeta\TraceView\java\tracelyticsagent.jar C:\Users\pluk\git\joboe\test-apps\test-undertow\undertow-examples-1.3.10.jar
+
+
+Option 2: Build and Run it 
+Simply goto https://github.com/undertow-io/undertow/tree/master/examples
+
+clone the project
+
+and run at the project root:
+
+mvn clean package 
+
+
+To run the test servers, simply goto the target folder and run on the packaged jar
+
+for example:
+
+c:\Program Files\Java\jdk1.8.0_05\bin>java -javaagent:C:\Program Files\AppNeta\TraceView\java\tracelyticsagent.jar -jar C:\Users\pluk\git\undertow\examples\target\undertow-examples.jar
+
+Take note that to run the http2 example, extra param is needed for the bootclasspath, run command like below instead (change the apln-boot-8.0.0.jar location)
+c:\Program Files\Java\jdk1.8.0_05\bin>java -Xbootclasspath/p:"C:\Users\pluk\.m2\repository\org\mortbay\jetty\alpn\alpn-boot\8.0.0\alpn-boot-8.0.0.jar" -javaagent:C:\Program Files\AppNeta\TraceView\java\tracelyticsagent.jar -jar C:\Users\pluk\git\undertow\examples\target\undertow-examples.jar

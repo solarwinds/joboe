@@ -1,0 +1,6 @@
+{
+	"agent.serviceKey":"some key",
+	"agent.logging":"info",
+	"agent.jdbcInstAll":false
+}
+

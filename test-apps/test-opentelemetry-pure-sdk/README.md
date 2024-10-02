@@ -1,0 +1,9 @@
+For OT pure SDK/API usage, we are making the assumption that:
+
+1. The user uses pure OT API for most of the tracing operations - hence dependency on opentelemetry-api
+2. In order to have data exported to our backend, the user should use the OT SDK or our version of OT SDK (which is likely built on top of OT SDK) as the OT API implementation. This might sound different a bit different from https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/library-guidelines.md#requirements, in particular:
+   a. Third party libraries and frameworks that add instrumentation to their code will have a dependency only on the API of OpenTelemetry language library. The developers of third party libraries and frameworks do not care (and cannot know) what specific implementation of OpenTelemetry is used in the final application.
+   b. The developers of the final application normally decide how to configure OpenTelemetry SDK and what extensions to use. They should be also free to choose to not use any OpenTelemetry implementation at all, even though the application and/or its libraries are already instrumented. The rationale is that third-party libraries and frameworks which are instrumented with OpenTelemetry must still be fully usable in the applications which do not want to use OpenTelemetry (so this removes the need for framework developers to have "instrumented" and "non-instrumented" versions of their framework).
+However, we are either "an extension of OT SDK" or "an implementation of OT api" that is built on top of OT SDK. Therefore, we are NOT developers of third party libraries and frameworks as in point a.
+
+Developers of the final application can still configure OpenTelemetry SDK and choose extensions to use - but they SHOULD use opentelemetry SDK and configure our components (sampler, span exporter) if they want their data exported to our backend in our trace event format.   

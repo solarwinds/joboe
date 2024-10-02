@@ -1,0 +1,36 @@
+package com.tracelytics.joboe;
+
+/**
+ * Constants used throughout jboe code  (from oboe.h)
+ */
+public class Constants {
+    
+    public static final int
+            MAX_TASK_ID_LEN = 20,
+            MAX_OP_ID_LEN = 8,
+            MAX_METADATA_PACK_LEN = 512,
+            
+            MASK_TASK_ID_LEN = 0x03,
+            MASK_OP_ID_LEN  = 0x08,
+            MASK_HAS_OPTIONS = 0x04,  // unused?
+            MASK_VERSION = 0xF0,
+
+//            MAX_UDP_PKT_SZ = 65507, // (65535 max IP packet size - 20 IPv4 header - 8 UDP header)
+            MAX_EVENT_BUFFER_SIZE = 512 * 1024, //512kB. This should not be bound by UDP size anymore with SSL reporting, though we still want to have some limit
+            
+            MAX_BACK_TRACE_TOP_LINE_COUNT = 100,
+            MAX_BACK_TRACE_BOTTOM_LINE_COUNT = 20,
+            MAX_BACK_TRACE_LINE_COUNT = MAX_BACK_TRACE_TOP_LINE_COUNT + MAX_BACK_TRACE_BOTTOM_LINE_COUNT,
+
+            XTR_UDP_PORT = 7831;
+
+    public static final String
+            XTR_ASYNC_KEY = "Async",
+            XTR_EDGE_KEY = "Edge",
+            XTR_THREAD_ID_KEY = "TID",
+            XTR_HOSTNAME_KEY = "Hostname",
+            XTR_METADATA_KEY = "X-Trace",
+            XTR_PROCESS_ID_KEY = "PID",
+            XTR_TIMESTAMP_U_KEY = "Timestamp_u",
+            XTR_UDP_HOST = "127.0.0.1";
+}

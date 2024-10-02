@@ -1,0 +1,24 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET     /                           controllers.Application.index()
+GET     /file                       controllers.Application.file()
+GET     /chunked                    controllers.Application.chunkedFile()
+GET     /exception					controllers.Application.exception()
+GET     /future-exception           controllers.Application.futureException
+GET     /wait/:length               controllers.Application.doWait(length: Int)
+GET     /async                      controllers.Application.async()
+GET     /websocket                  controllers.Application.webSocket()
+GET     /post                       controllers.Application.post()
+POST     /post                       controllers.Application.post()
+GET     /directions                 controllers.ServiceApplication.getLink
+POST    /get-directions             controllers.ServiceApplication.getDirections
+GET		/cross-server				controllers.ServiceApplication.crossServer
+GET     /get-stream                  controllers.ServiceApplication.getStream
+GET     /post-stream                  controllers.ServiceApplication.postStream
+GET     /actor                     controllers.Application.actor
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.at(path="/public", file)

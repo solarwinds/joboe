@@ -1,0 +1,1 @@
+Test app for slf4j/logback context injection with MDC (latest slf4j 1.7.25 / logback 1.2.3)

@@ -1,0 +1,15 @@
+/target
+.settings/
+.classpath
+.project
+core/target
+dependencies/target
+api/target
+test-apps/target
+test-apps/*/target
+test-apps/*/target-eclipse
+*.iml
+.idea/
+.DS_Store
+dependencies/dependency-reduced-pom.xml
+out/

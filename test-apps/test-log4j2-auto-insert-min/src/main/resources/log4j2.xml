@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="DEBUG">
+    <Appenders>
+        <Console name="Json" target="SYSTEM_OUT">
+            <JsonLayout properties="true">
+            </JsonLayout>
+        </Console>
+        <Console name="Pattern" target="SYSTEM_OUT">
+            <PatternLayout>
+                <pattern>%d %highlight{%p} %style{%C{1.} [%t] - ao.traceId : %X{ao.traceId} %m}%n</pattern>
+            </PatternLayout>
+        </Console>
+        <Console name="Yaml" target="SYSTEM_OUT">
+            <YamlLayout>
+            </YamlLayout>
+        </Console>
+        <Console name="Xml" target="SYSTEM_OUT">
+            <XmlLayout>
+            </XmlLayout>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Root level="debug">
+            <AppenderRef ref="Json"/>
+            <AppenderRef ref="Pattern"/>
+            <AppenderRef ref="Yaml"/>
+            <AppenderRef ref="Xml"/>
+        </Root>
+    </Loggers>
+</Configuration>

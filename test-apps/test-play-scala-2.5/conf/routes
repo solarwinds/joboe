@@ -1,0 +1,34 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET     /                           controllers.Application.index
+GET     /val-action                 controllers.Application.valAction
+GET     /async                      controllers.Application.async
+GET     /promise                    controllers.Application.promise
+GET     /api                        controllers.Application.api
+GET     /api-hack                   controllers.Application.apiHack
+GET     /helper                     controllers.Application.helper
+GET     /actor                      controllers.Application.actor
+GET     /request                    controllers.Application.request
+GET     /exception                  controllers.Application.exception
+GET     /future-exception           controllers.Application.futureException
+GET     /directions                 controllers.ServiceApplication.getLink
+POST    /get-directions             controllers.ServiceApplication.getDirections
+DELETE  /delete                     controllers.Application.delete
+GET     /cross-server               controllers.ServiceApplication.crossServer
+GET     /cross-server-deprecated    controllers.DeprecatedServiceApplication.crossServer
+GET     /get-stream                 controllers.ServiceApplication.getStream
+GET     /get-stream-deprecated      controllers.DeprecatedServiceApplication.getStream
+GET     /post-stream                controllers.ServiceApplication.postStream
+GET     /post-stream-deprecated     controllers.DeprecatedServiceApplication.postStream
+GET     /actor-other-context        controllers.Application.actorOtherContext
+GET     /stream-file                controllers.StreamApplication.streamFile
+GET     /stream-entity              controllers.StreamApplication.streamEntity
+GET     /stream-chunked             controllers.StreamApplication.streamChunked
+GET     /feed-deprecated            controllers.DeprecatedStreamApplication.feed
+GET     /stream-chunked-deprecated  controllers.DeprecatedStreamApplication.streamChunked
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

@@ -1,0 +1,1 @@
+see javadoc in TestCGLibProxy and https://github.com/librato/joboe/issues/477 and https://github.com/librato/joboe/pull/601 for details

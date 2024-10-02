@@ -1,0 +1,46 @@
+<configuration>
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{50} ao trace
+        id %X{ao.trace_id} - %msg%n</pattern>
+    </encoder>
+  </appender>
+  <appender name="json-logstash" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+    </encoder>
+  </appender>
+  <appender name="json-contrib" class="ch.qos.logback.core.ConsoleAppender">
+    <layout class="ch.qos.logback.contrib.json.classic.JsonLayout">
+      <jsonFormatter
+        class="ch.qos.logback.contrib.jackson.JacksonJsonFormatter">
+        <prettyPrint>true</prettyPrint>
+      </jsonFormatter>
+      <timestampFormat>yyyy-MM-dd' 'HH:mm:ss.SSS</timestampFormat>
+    </layout>
+  </appender>
+  <appender name="html" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+      <layout class="ch.qos.logback.classic.html.HTMLLayout">
+        <pattern>%relative%thread%level%logger%msg%mdc{ao.trace_id}
+        </pattern>
+      </layout>
+    </encoder>
+  </appender>
+  <appender name="xml" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+      <layout class="ch.qos.logback.classic.log4j.XMLLayout">
+      </layout>
+    </encoder>
+  </appender>
+
+  <logger name="com.appoptics.test" additivity="true">
+    <appender-ref ref="json-logstash" />
+    <appender-ref ref="json-contrib" />
+    <appender-ref ref="html" />
+    <appender-ref ref="xml" />
+  </logger>
+
+  <root level="info">
+    <appender-ref ref="STDOUT" />
+  </root>
+</configuration>

@@ -1,0 +1,102 @@
+@startuml
+fork
+:Tracing Instrumentation;
+:RpcEventReporter.send (non blocking);
+if (eventQueue.offer QUEUE_CAPACITY @ 10000) then (has space)
+  while(RpcEventReporter background worker (single thread) \n consumes up to SEND_CAPACITY @ 1000 events in eventQueue)
+  endwhile
+  :ThriftClient.postEvents block and wait for result;
+  :Submit as a Task to the "tracing event" ThriftClient instance; 
+else (no space)
+  :Throw EventReporterQueueFullException;
+  detach
+endif
+fork again
+:MetricReporter;
+while (Sleep until the next 00 or 30th second of a minute)
+endwhile
+:ThriftClient.postMetrics non blocking;
+:Submit as a Task to the "non tracing event" ThriftClient instance; 
+fork again
+:FrameworkInfoReporter;
+while (Sleep for 60 Seconds)
+endwhile
+:ThriftClient.postStatus non blocking;
+:Submit as a Task to the "non tracing event" ThriftClient instance;
+fork again
+:SettingsReader;
+while (Sleep for 30 Seconds)
+endwhile
+:ThriftClient.getSettings block and wait for result;
+:Submit as a Task to the "non tracing event" ThriftClient instance;
+endfork
+
+partition ThriftClient {
+
+if (ThriftClient accepts Task) then(yes)
+  :ThriftClient background workers\n (up to n worker thread per ThriftClient instance\n 1 thread per message type - event, metrics etc)\n each bounded by a blocking queue capacity @ 1000;
+  fork
+  :Worker 1 : consume pending Thrift task from\n its own queue;
+  forkagain
+  :Worker 2 : consume pending Thrift task from\n its own queue;
+  forkagain
+  :Worker n : consume pending Thrift task from\n its own queue;
+  forkend
+  
+    repeat
+      :Sleep for delay if delay > 0;
+    partition ThriftTask {
+      :**Synchronized**\n 1 worker thread at a time;
+      repeat
+          :Initialize Thrift connection if connection is not established and Send out a "Connection init" message;
+          if (initialization successful) then (no)
+            :Shutdown Thrift connection;
+            :Increase delay\n (MAX_CONNECTION_RETRY_DELAY @ 60 sec);
+            :sleep for the delay;
+          endif
+      repeat while (connected) is (no)    
+      :Make Thrift call;
+      if (resultCode == TRY_LATER) then (yes)
+        :Increase delay\n (MAX_TRY_LATER_DELAY @ 60 sec)\n and retryCount on TRY_LATER;
+        :Flag retry if retryCount <= MAX_TRY_LATER_COUNT @ 20 (0 for getSettings call);
+      elseif (resultCode == LIMIT_EXCEED) then (yes)
+        :Increase delay\n (MAX_LIMIT_EXCEED_DELAY @ 60 sec)\n and retryCount on LIMIT_EXCEED;
+        :Flag retry if retryCount <= MAX_LIMIT_EXCEED_COUNT @ 20 (0 for getSettings call);
+      elseif (resultCode == REDIRECT) then (yes)
+        :Increase retryCount on REDIRECT\n clear other counts and delays;
+        if (retryCount <= MAX_REDIRECT_COUNT @ 20) then (yes)
+            :Flag retry due to REDIRECT; 
+            :Shutdown Thrift connectiont;
+            :Reset Host and Port;
+            repeat
+                :Connect to new Host/Port and Send out a "Connection init" message;
+                if (initialization successful) then (no)
+                  :Increase delay\n (MAX_CONNECTION_RETRY_DELAY @ 60 sec);
+                  :sleep for the delay;
+                endif
+            repeat while (connected) is (no) 
+        else (no)
+        endif
+      endif
+      if (Thrift connection exception - recoverable) then (yes)
+          repeat
+              :Shutdown Thrift connection;
+              :Initialize Thrift connection and Send out a "Connection init" message;
+              if (initialization successful) then (no)
+                :Increase delay\n (MAX_CONNECTION_RETRY_DELAY @ 60 sec);
+                :sleep for the delay;
+              endif
+          repeat while (connected) is (no)
+      elseif (unexpected and fatal exception) then (yes)
+          :throw ThriftClientException;
+      endif
+    }
+    repeat while (retry flagged AND connected) is (yes)
+    :return result; 
+    detach
+else (no)
+  :Throw ThriftClientRejectedExecutionException;
+  detach  
+endif
+}
+@enduml

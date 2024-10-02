@@ -1,0 +1,126 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>appoptics-telemetry-auto-agent-tracer</artifactId>
+  <version>${api.version}${is.snapshot}</version>
+  <parent>
+    <groupId>com.appoptics.agent.java</groupId>
+    <artifactId>appoptics-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+  <dependencies>
+  	<dependency>
+      <groupId>com.appoptics.agent.java</groupId>
+      <artifactId>agent</artifactId>
+      <version>${agent.version}</version>
+  	</dependency>
+      <!-- https://mvnrepository.com/artifact/io.opentelemetry/opentelemetry-sdk -->
+      <dependency>
+          <groupId>io.opentelemetry</groupId>
+          <artifactId>opentelemetry-sdk</artifactId>
+          <version>0.3.0</version>
+          <scope>provided</scope>
+      </dependency>
+
+      <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+      <dependency>
+          <groupId>com.google.guava</groupId>
+          <artifactId>guava</artifactId>
+          <version>28.2-jre</version>
+          <scope>provided</scope>
+      </dependency>
+
+
+      <dependency>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+          <version>4.10</version>
+          <scope>test</scope>
+        </dependency>
+      <dependency>
+          <groupId>com.google.auto.service</groupId>
+          <artifactId>auto-service</artifactId>
+          <version>1.0-rc6</version>
+          <optional>true</optional>
+      </dependency>
+  </dependencies>
+
+  <build>
+  	<finalName>appoptics-telemetry-auto-agent-tracer</finalName>
+  	<plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.3.2</version>
+        <configuration>
+            <source>1.6</source>
+            <target>1.6</target>
+<!--            <source>11</source>-->
+<!--            <target>11</target>-->
+            <testSource>11</testSource>
+            <testTarget>11</testTarget>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.4</version>
+        <configuration>
+          <archive>
+            <addMavenDescriptor>false</addMavenDescriptor>
+          </archive>
+        </configuration>
+      </plugin>
+
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.10.3</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+			<goals>
+              <goal>javadoc</goal>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <version>3.2.0</version>
+            <executions>
+                <execution>
+                    <phase>package</phase>
+                    <goals>
+                        <goal>shade</goal>
+                    </goals>
+                    <configuration>
+                        <artifactSet>
+                            <includes>
+                                <include>com.appoptics.agent.java:appoptics-telemetry-auto-agent-tracer</include>
+                            </includes>
+                        </artifactSet>
+                        <relocations>
+                            <relocation>
+                                <pattern>io.opentelemetry.trace</pattern>
+                                <shadedPattern>io.opentelemetry.auto.shaded.io.opentelemetry.trace</shadedPattern>
+                            </relocation>
+                        </relocations>
+                        <transformers>
+                            <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                        </transformers>
+                    </configuration>
+                </execution>
+            </executions>
+        </plugin>
+    </plugins>
+
+
+  </build>
+  
+  
+  
+</project>

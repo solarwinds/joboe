@@ -1,0 +1,48 @@
+{
+	"agent.serviceKey":"abc1234",
+	"agent.logging":"trace",
+	"agent.tracingMode":"never",
+	"agent.sampleRate":200000,
+	"agent.layer":"MyLayer(File)",
+	"agent.jdbcInstAll":true,
+	"agent.sqlSanitize":1,
+	"agent.mongoSanitize":true,
+	"agent.excludeClasses":["org.jboss"],
+	"agent.excludeModules": ["HBASE", "MONGODB", "WEBFLOW"],
+	"agent.urlSampleRates": 
+	[
+		{
+			".*\\.(?i)(png|jpg|jpeg|gif).*" : {
+		 	   "sampleRate" : 0
+			}
+		}
+		,
+		{
+			"skipdomain\\.com/.*" : {
+				"sampleRate" : 0
+			}
+		}
+	],
+	"agent.extendedBackTraces":true,
+	"agent.extendedBackTracesByModule":["PLAY","SLING"],
+	"agent.backtraceModules":["SERVLET", "JDBC"],
+	"agent.hbaseScannerNext":true,
+	"agent.hideParams":["SERVLET","NETTY"],
+	"agent.akkaActors":["my-akka-.*", "akka-controller"],
+	"agent.timeAdjustInterval":100,
+	"agent.contextTtl":200,
+	"agent.triggerTrace":"disabled",
+	
+	"transaction.namePattern": "p1,p2",
+	"transaction.prependDomain": true,
+	
+	"monitor.jmx.scopes": 
+	{
+		"java.lang:type=MemoryPool,*":["Usage"],
+		"java.lang:type=Memory":["HeapMemoryUsage","NonHeapMemoryUsage"]
+	},
+	"monitor.jmx.maxEntry":500,
+	"monitor.jmx.enable":false,
+	"monitor.spanMetrics.enable":false
+}
+

@@ -1,0 +1,12 @@
+{
+	"agent.debuggggggggggg":"",
+	"agent.tracingMode":"invalid",
+	"agent.sampleRate":1000000000000000000,
+	"agent.jdbcInstAll":"no",
+	"agent.sqlSanitize":"invalid",
+	
+	"monitor.jmx.interval":"abc",
+	"monitor.jmx.scopes":"notExist",
+	"monitor.jmx.enable":"invalid"
+}
+
