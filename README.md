@@ -11,11 +11,3 @@ Java Oboe
   http://www.oracle.com/technetwork/java/javase/downloads/index.html 
   
 * Recommended: IntelliJ IDE: http://www.jetbrains.com/idea/download/index.html
-
-# Dependencies:
-
-* See 'dependencies' maven module. We want all 3rd party dependencies to be under the com.solarwinds namespace to avoid version conflicts. 
-
-# Install instructions:
-
-* https://docs.appoptics.com/kb/apm_tracing/java/install/
