@@ -10,11 +10,8 @@
     <name>joboe</name>
 
     <properties>
-        <revision>10.0.12-SNAPSHOT</revision>
-        <maven.plugin.version>1.0.0</maven.plugin.version>
+        <revision>10.0.13-SNAPSHOT</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <repository.url>https://oss.sonatype.org/service/local/staging/deploy/maven2</repository.url>
-        <serverId>sonatype_staging</serverId>
         <project.build.outputTimestamp>${git.commit.time}</project.build.outputTimestamp>
     </properties>
 
@@ -24,6 +21,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
+                    <version>3.1.3</version>
                     <configuration>
                         <skip>false</skip>
                     </configuration>
