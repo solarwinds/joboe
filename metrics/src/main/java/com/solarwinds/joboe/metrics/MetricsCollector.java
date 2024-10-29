@@ -57,6 +57,10 @@ public class MetricsCollector extends SystemCollector<MetricsCategory, List<? ex
         collectors.put(category, collector);
     }
 
+    public void removeCollector(MetricsCategory category) {
+        collectors.remove(category);
+    }
+
     @Override
     protected Map<MetricsCategory, List<? extends MetricsEntry<?>>> collect() throws Exception {
         Map<MetricsCategory, Future<List<? extends MetricsEntry<?>>>> collectedFutures = new HashMap<MetricsCategory, Future<List<? extends MetricsEntry<?>>>>();
