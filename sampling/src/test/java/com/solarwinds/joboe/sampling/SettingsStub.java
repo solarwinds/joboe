@@ -46,14 +46,7 @@ public class SettingsStub extends Settings {
     }
 
     @Override
-    public String getLayer() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public long getTtl() {
-        // TODO Auto-generated method stub
         return 0;
     }
 

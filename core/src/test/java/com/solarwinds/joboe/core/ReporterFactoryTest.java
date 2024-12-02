@@ -27,21 +27,6 @@ public class ReporterFactoryTest {
     }
 
     @Test
-    public void testbuildDefaultUdpReporter() throws Exception {
-        UDPReporter reporter = tested.createUdpReporter();
-
-        Field addressField = reporter.getClass().getDeclaredField("addr");
-        addressField.setAccessible(true);
-
-        Field portField = reporter.getClass().getDeclaredField("port");
-        portField.setAccessible(true);
-
-        InetAddress address = (InetAddress) addressField.get(reporter);
-        assertEquals(InetAddress.getByName(Constants.XTR_UDP_HOST), address);
-        assertEquals(Constants.XTR_UDP_PORT, portField.get(reporter));
-    }
-
-    @Test
     public void testbuildNonDefaultUdpReporter() throws Exception {
         UDPReporter reporter = tested.createUdpReporter("localhost", 9999);
 

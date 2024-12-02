@@ -16,4 +16,12 @@ class LruCacheTest {
         assertEquals(1, tested.size());
         assertEquals("two", tested.get("two"));
     }
+
+    @Test
+    void testClone() {
+        tested.put("one", "one");
+        tested.put("two", "two");
+
+        assertEquals(tested, tested.clone());
+    }
 }

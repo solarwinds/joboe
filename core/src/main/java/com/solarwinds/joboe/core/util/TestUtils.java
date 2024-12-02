@@ -75,11 +75,6 @@ public abstract class TestUtils {
         }
 
         @Override
-        public String getLayer() {
-            return "";
-        }
-
-        @Override
         public long getTtl() {
             return Integer.MAX_VALUE; //don't use long, otherwise it might overflow...
         }

@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 
 import com.solarwinds.joboe.logging.Logger;
 import com.solarwinds.joboe.logging.LoggerFactory;
+import com.solarwinds.joboe.sampling.Settings;
 import com.solarwinds.joboe.sampling.SettingsArg;
 import com.solarwinds.joboe.sampling.TraceDecisionUtil;
 
@@ -21,12 +22,11 @@ public class RpcSettings extends com.solarwinds.joboe.sampling.Settings {
     private final short flags; // required
     private final long timestamp; // required, in millsec
     private final long value; // required
-    private final String layer; // required
     private final long ttl; //time to live this settings record
     private final Map<SettingsArg<?>, Object> args = new HashMap<SettingsArg<?>, Object>(); //other arguments
     
-    public RpcSettings(short type, String stringFlags, long timestamp, long value, long ttl, String layer, Map<String, ByteBuffer> args) {
-        this.type = type;
+    public RpcSettings(String stringFlags, long timestamp, long value, long ttl, Map<String, ByteBuffer> args) {
+        this.type = Settings.OBOE_SETTINGS_TYPE_DEFAULT_SAMPLE_RATE;
         this.flags = convertFlagsFromStringToShort(stringFlags);
         this.timestamp = timestamp;
         if (value < 0) {
@@ -39,7 +39,6 @@ public class RpcSettings extends com.solarwinds.joboe.sampling.Settings {
             this.value = value;
         }
         this.ttl = ttl;
-        this.layer = layer;
         readArgs(args);
     }
 
@@ -54,7 +53,6 @@ public class RpcSettings extends com.solarwinds.joboe.sampling.Settings {
         this.timestamp = timestamp; //take the new timestamp
         this.value = source.value;
         this.ttl = source.ttl;
-        this.layer = source.layer;
         this.args.putAll(source.args);
     }
     
@@ -117,11 +115,7 @@ public class RpcSettings extends com.solarwinds.joboe.sampling.Settings {
         return flags;
     }
     
-    @Override
-    public String getLayer() {
-        return layer;
-    }
-    
+
     @Override
     public long getTtl() {
         return ttl;

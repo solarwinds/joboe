@@ -59,7 +59,7 @@ public class PollingSettingsFetcherTest {
 //            MOCK_SETTINGS.add(new com.solarwinds.joboe.core.rpc.Settings(Settings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE, DEFAULT_FLAGS_STRING, Agent.currentTimeStamp(), layerSampleRate.getValue(), TTL, layerSampleRate.getKey(), args));
 //        }
         
-        MOCK_SETTINGS.add(new RpcSettings(RpcSettings.OBOE_SETTINGS_TYPE_DEFAULT_SAMPLE_RATE, DEFAULT_FLAGS_STRING, System.currentTimeMillis(), SAMPLE_RATE_FOR_DEFAULT_LAYER, TTL, "", ARGS));
+        MOCK_SETTINGS.add(new RpcSettings(DEFAULT_FLAGS_STRING, System.currentTimeMillis(), SAMPLE_RATE_FOR_DEFAULT_LAYER, TTL, ARGS));
     }
 
 
@@ -133,7 +133,7 @@ public class PollingSettingsFetcherTest {
         Settings sourceSettings;
         
         //test remote settings that give empty map for args
-        sourceSettings = new RpcSettings(RpcSettings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE, DEFAULT_FLAGS_STRING, System.currentTimeMillis(), 100000, TTL, "", Collections.emptyMap());
+        sourceSettings = new RpcSettings(DEFAULT_FLAGS_STRING, System.currentTimeMillis(), 100000, TTL, Collections.emptyMap());
         Client client = new MockRpcClient(Collections.singletonList(sourceSettings));
         fetcher = getFetcher(client);
         settings = fetcher.getSettings();
@@ -147,7 +147,7 @@ public class PollingSettingsFetcherTest {
         args.put(SettingsArg.BUCKET_CAPACITY.getKey(), ByteBuffer.allocate(0));
         args.put(SettingsArg.BUCKET_RATE.getKey(), ByteBuffer.allocate(0));
         args.put(SettingsArg.METRIC_FLUSH_INTERVAL.getKey(), ByteBuffer.allocate(0));
-        sourceSettings = new RpcSettings(RpcSettings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE, DEFAULT_FLAGS_STRING, System.currentTimeMillis(), 100000, TTL, "", args);
+        sourceSettings = new RpcSettings(DEFAULT_FLAGS_STRING, System.currentTimeMillis(), 100000, TTL, args);
         fetcher = getFetcher(new MockRpcClient(Collections.singletonList(sourceSettings)));
         settings = fetcher.getSettings();
         assertEquals(100000, (int)settings.getValue());
@@ -171,7 +171,7 @@ public class PollingSettingsFetcherTest {
         buffer.putInt(3);
         buffer.rewind();
         args.put(SettingsArg.METRIC_FLUSH_INTERVAL.getKey(), buffer);
-        sourceSettings = new RpcSettings(RpcSettings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE, DEFAULT_FLAGS_STRING, System.currentTimeMillis(), 100000, TTL, "", args);
+        sourceSettings = new RpcSettings(DEFAULT_FLAGS_STRING, System.currentTimeMillis(), 100000, TTL, args);
         fetcher = getFetcher(new MockRpcClient(Collections.singletonList(sourceSettings)));
         settings = fetcher.getSettings();
         assertEquals(100000, (int)settings.getValue());
@@ -190,7 +190,7 @@ public class PollingSettingsFetcherTest {
         Settings sourceSettings;
         
         //test remote settings that gives sample rate that is greater than 1000000
-        sourceSettings = new RpcSettings(RpcSettings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE, DEFAULT_FLAGS_STRING, System.currentTimeMillis(), 1111111, TTL, "", ARGS);
+        sourceSettings = new RpcSettings(DEFAULT_FLAGS_STRING, System.currentTimeMillis(), 1111111, TTL, ARGS);
         Client client = new MockRpcClient(Collections.singletonList(sourceSettings));
         fetcher = getFetcher(client);
         assert fetcher != null;
@@ -201,7 +201,7 @@ public class PollingSettingsFetcherTest {
         assertEquals(BUCKET_RATE, settings.getArgValue(SettingsArg.BUCKET_RATE));
         
         //test remote settings that gives sample rate that is negative
-        sourceSettings = new RpcSettings(RpcSettings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE, DEFAULT_FLAGS_STRING, System.currentTimeMillis(), -1, TTL, "", ARGS);
+        sourceSettings = new RpcSettings(DEFAULT_FLAGS_STRING, System.currentTimeMillis(), -1, TTL, ARGS);
         fetcher = getFetcher(new MockRpcClient(Collections.singletonList(sourceSettings)));
         settings = fetcher.getSettings();
         assertEquals(0, (int)settings.getValue()); //should be adjusted to 0
@@ -227,7 +227,7 @@ public class PollingSettingsFetcherTest {
     @Test
     public void testSettingsListener() throws InterruptedException {
         RpcSettings settings;
-        settings = new RpcSettings(RpcSettings.OBOE_SETTINGS_TYPE_LAYER_SAMPLE_RATE, DEFAULT_FLAGS_STRING, System.currentTimeMillis(), 1, TTL, "", ARGS);
+        settings = new RpcSettings(DEFAULT_FLAGS_STRING, System.currentTimeMillis(), 1, TTL, ARGS);
         Client client = new MockRpcClient(Collections.singletonList(settings));
         
         SettingsFetcher fetcher = new PollingSettingsFetcher(new RpcSettingsReader(client), 1); //refresh every second

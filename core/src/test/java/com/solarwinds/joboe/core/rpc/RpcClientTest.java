@@ -83,11 +83,11 @@ public abstract class RpcClientTest {
 
     protected abstract TestCollector startCollector(int port) throws IOException;
     protected abstract TestCollector startRedirectCollector(int port, String redirectArg) throws IOException;
-    protected abstract TestCollector startRatedCollector(int port, int processingTimePerMessage, ResultCode limitExceededCode) throws IOException;
-    protected abstract TestCollector startBiasedTestCollector(int port, Map<TaskType, ResultCode> taskToResponseCode) throws IOException;
+    protected abstract TestCollector startRatedCollector(int port, ResultCode limitExceededCode) throws IOException;
+    protected abstract TestCollector startBiasedTestCollector(int port) throws IOException;
     //Test server that throws Runtime exception on every other message
     protected abstract TestCollector startErroneousTestCollector(int port, double errorPercentage) throws IOException;
-    protected abstract TestCollector startSoftDisabledTestCollector(int port, String warning)  throws IOException;
+    protected abstract void startSoftDisabledTestCollector(int port, String warning)  throws IOException;
 
     protected static String getServerPublicKeyLocation() {
         return TEST_SERVER_CERT_LOCATION;
@@ -101,7 +101,7 @@ public abstract class RpcClientTest {
         arguments.put(SettingsArg.BUCKET_CAPACITY.getKey(), SettingsArg.BUCKET_CAPACITY.toByteBuffer(32.0));
         arguments.put(SettingsArg.BUCKET_RATE.getKey(), SettingsArg.BUCKET_RATE.toByteBuffer(2.0));
 
-        settings.add(new RpcSettings(RpcSettings.OBOE_SETTINGS_TYPE_DEFAULT_SAMPLE_RATE, PollingSettingsFetcherTest.DEFAULT_FLAGS_STRING, TimeUtils.getTimestampMicroSeconds(), 1000000, 600, "test-layer", arguments));
+        settings.add(new RpcSettings(PollingSettingsFetcherTest.DEFAULT_FLAGS_STRING, TimeUtils.getTimestampMicroSeconds(), 1000000, 600, arguments));
         return settings;
     }
 
@@ -274,7 +274,6 @@ public abstract class RpcClientTest {
 
             com.solarwinds.joboe.core.rpc.SettingsResult result = client.getSettings("", null).get();
             assertEquals(com.solarwinds.joboe.core.rpc.ResultCode.OK, result.getResultCode());
-
             assertEquals(TEST_SETTINGS.size(), result.getSettings().size());
 
             for (int i = 0 ; i < TEST_SETTINGS.size(); i ++) {
@@ -284,8 +283,6 @@ public abstract class RpcClientTest {
 
                 short expectedFlags = expectedSetting.getFlags();
                 assertEquals(expectedFlags, receivedSetting.getFlags());
-                assertEquals(expectedSetting.getLayer(), receivedSetting.getLayer());
-                //assertEquals(expectedSetting.getTimestamp(), receivedSetting.getTimestamp()); timestamp for now we will use the machine's current timestamp instead of the incoming one as TTL is tricky (otherwise we would have to keep 2 timestamps...)
                 assertEquals(expectedSetting.getValue(), receivedSetting.getValue());
                 assertEquals(expectedSetting.getArgValue(SettingsArg.BUCKET_CAPACITY), receivedSetting.getArgValue(SettingsArg.BUCKET_CAPACITY), 0);
                 assertEquals(expectedSetting.getArgValue(SettingsArg.BUCKET_RATE), receivedSetting.getArgValue(SettingsArg.BUCKET_RATE), 0);
@@ -588,10 +585,9 @@ public abstract class RpcClientTest {
     @Test
     public void testTryLater() throws Exception {
         System.out.println("running testTryLater");
-        final int TIME_PER_EVENT = 10;
         int tryLaterPort = locateAvailablePort();
 
-        TestCollector tryLaterCollector = startRatedCollector(tryLaterPort, TIME_PER_EVENT, ResultCode.TRY_LATER);
+        TestCollector tryLaterCollector = startRatedCollector(tryLaterPort, ResultCode.TRY_LATER);
         Client client = null;
 
         try {
@@ -626,10 +622,9 @@ public abstract class RpcClientTest {
     @Test
     public void testLimitExceed() throws Exception {
         System.out.println("running testLimitExceed");
-        final int TIME_PER_EVENT = 10;
         int tryLaterPort = locateAvailablePort();
 
-        TestCollector tryLaterServer = startRatedCollector(tryLaterPort, TIME_PER_EVENT, ResultCode.LIMIT_EXCEEDED);
+        TestCollector tryLaterServer = startRatedCollector(tryLaterPort, ResultCode.LIMIT_EXCEEDED);
         Client client = null;
 
         try {
@@ -798,7 +793,7 @@ public abstract class RpcClientTest {
         System.out.println("running testBiasedServer");
         int biasedServerPort = locateAvailablePort();
 
-        TestCollector basiedServer = startBiasedTestCollector(biasedServerPort, Collections.singletonMap(TaskType.POST_METRICS, ResultCode.TRY_LATER));
+        TestCollector basiedServer = startBiasedTestCollector(biasedServerPort);
         Client client =  new RpcClient(TEST_SERVER_HOST, biasedServerPort, TEST_CLIENT_ID, getProtocolClientFactory(new File(getServerPublicKeyLocation()).toURI().toURL()));
         assertThrows(TimeoutException.class, () -> client.postMetrics(new ArrayList<Map<String,Object>>(), null).get(5, TimeUnit.SECONDS),"Not expecting to return any result for this call!"); //this is supposed to get held up because of TRY_LAYER)
 
