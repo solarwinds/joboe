@@ -33,7 +33,6 @@ public abstract class Settings {
     public abstract long getTimestamp();
     public abstract short getType();
     public abstract short getFlags();
-    public abstract String getLayer();
     public abstract long getTtl();
     public abstract <T> T getArgValue(SettingsArg<T> arg);
     
@@ -46,8 +45,7 @@ public abstract class Settings {
     public String toString() {
         return "[Settings: timestamp=" + getTimestamp() + 
                 " type=" + getType() + 
-                " layer=" + getLayer() + 
-                " flags=" + getFlags() + 
+                " flags=" + getFlags() +
                 " value=" + getValue() +
                 " ttl=" + getTtl() +
                 " args=" + getArgsString() +
@@ -60,9 +58,9 @@ public abstract class Settings {
             Object value = getArgValue(arg);
             if (value != null) {
                 if (arg == SettingsArg.TRACE_OPTIONS_SECRET) {
-                    builder.append(arg.getKey() + "=<masked>, ");
+                    builder.append(arg.getKey()).append("=<masked>, ");
                 } else {
-                    builder.append(arg.getKey() + "=" + value + ", ");
+                    builder.append(arg.getKey()).append("=").append(value).append(", ");
                 }
 
             }

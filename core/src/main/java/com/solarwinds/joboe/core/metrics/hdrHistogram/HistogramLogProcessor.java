@@ -216,7 +216,7 @@ public class HistogramLogProcessor extends Thread {
         PrintStream timeIntervalLog = null;
         PrintStream movingWindowLog = null;
         PrintStream histogramPercentileLog = System.out;
-        Double firstStartTime = 0.0;
+        double firstStartTime = 0.0;
         boolean timeIntervalLogLegendWritten = false;
         boolean movingWindowLogLegendWritten = false;
 
@@ -442,8 +442,15 @@ public class HistogramLogProcessor extends Thread {
                         config.percentilesOutputTicksPerHalf, config.outputValueUnitRatio, config.logFormatCsv);
             }
         } finally {
-            if (config.outputFileName != null) {
+            if (timeIntervalLog != null) {
                 timeIntervalLog.close();
+            }
+
+            if (movingWindowLog != null) {
+                movingWindowLog.close();
+            }
+
+            if (config.outputFileName != null) {
                 histogramPercentileLog.close();
             }
         }

@@ -39,9 +39,8 @@ class SettingsUtilTest {
     void testTransformToKVSetting() {
         when(settingsMock.getTtl()).thenReturn(60L);
         SettingsResult settingsResult = new SettingsResult(ResultCode.OK, "arg", "we up", Collections.singletonList(settingsMock));
-        Map<String, Settings> settingsMap = SettingsUtil.transformToKVSetting(settingsResult);
 
-        boolean anyMatch = settingsMap.values().stream().anyMatch(settings -> settings.getTtl() == 60);
+        boolean anyMatch = settingsResult.getSettings().stream().anyMatch(settings -> settings.getTtl() == 60);
         assertTrue(anyMatch);
     }
 

@@ -40,7 +40,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 
-//@RunWith(Parameterized.class)
 public class GrpcClientTest extends RpcClientTest {
     private static final String TEST_SERVER_PRIVATE_KEY_LOCATION = "src/test/java/com/solarwinds/joboe/core/rpc/grpc/test-collector-private.pem";
 
@@ -57,11 +56,10 @@ public class GrpcClientTest extends RpcClientTest {
                     arguments.put(arg.getKey(), ByteString.copyFrom(arg.toByteBuffer(argValue)));
                 }
             }
-            Collector.OboeSetting setting = Collector.OboeSetting.newBuilder().setType(Collector.OboeSettingType.DEFAULT_SAMPLE_RATE)
+            Collector.OboeSetting setting = Collector.OboeSetting.newBuilder()
                     .setFlags(ByteString.copyFromUtf8(PollingSettingsFetcherTest.DEFAULT_FLAGS_STRING))
                     .setTimestamp(TimeUtils.getTimestampMicroSeconds())
                     .setValue(1000000)
-                    .setLayer(ByteString.copyFromUtf8(fromEntry.getLayer()))
                     .setTtl(600)
                     .putAllArguments(arguments)
                     .build();
@@ -105,12 +103,12 @@ public class GrpcClientTest extends RpcClientTest {
 
 
     @Override
-    protected TestCollector startRatedCollector(int port, int processingTimePerMessage, ResultCode limitExceededCode) throws IOException {
-        return new GrpcCollector(port, new GrpcRatedCollectorService(processingTimePerMessage, Collector.ResultCode.valueOf(limitExceededCode.name())));
+    protected TestCollector startRatedCollector(int port, ResultCode limitExceededCode) throws IOException {
+        return new GrpcCollector(port, new GrpcRatedCollectorService(10, Collector.ResultCode.valueOf(limitExceededCode.name())));
     }
 
     @Override
-    protected TestCollector startBiasedTestCollector(int port, Map<TaskType, ResultCode> taskToResponseCode) throws IOException {
+    protected TestCollector startBiasedTestCollector(int port) throws IOException {
         return new GrpcCollector(port, new GrpcBiasedCollectorService(Collections.singletonMap(TaskType.POST_METRICS, Collector.ResultCode.TRY_LATER)));
     }
 
@@ -120,12 +118,12 @@ public class GrpcClientTest extends RpcClientTest {
     }
 
     @Override
-    protected TestCollector startSoftDisabledTestCollector(int port, String warning) throws IOException {
-        return new GrpcCollector(port, new GrpcCollectorService(Collector.ResultCode.OK, "", warning));
+    protected void startSoftDisabledTestCollector(int port, String warning) throws IOException {
+        new GrpcCollector(port, new GrpcCollectorService(Collector.ResultCode.OK, "", warning));
     }
 
-    private TestCollector startExhaustedServer(int port) throws IOException {
-        return new GrpcCollector(port, new GrpcCollectorService() {
+    private void startExhaustedServer(int port) throws IOException {
+        new GrpcCollector(port, new GrpcCollectorService() {
             @Override
             public void postEvents(Collector.MessageRequest request, StreamObserver<Collector.MessageResult> responseObserver) {
                 responseObserver.onError(Status.RESOURCE_EXHAUSTED.withDescription("Testing resource exhaustion on server side").asRuntimeException());

@@ -16,15 +16,6 @@ import java.util.*;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class SettingsUtil {
 
-    public static Map<String, Settings> transformToKVSetting(SettingsResult settingsResult){
-        Map<String, Settings> updatedSettings = new LinkedHashMap<String, Settings>();
-        for (Settings settingsForLayer : settingsResult.getSettings()) {
-            LoggerFactory.getLogger().debug("Got settings from collector: " + settingsForLayer);
-            updatedSettings.put(settingsForLayer.getLayer(), settingsForLayer);
-        }
-        return updatedSettings;
-    }
-
     public static SettingsResult transformToLocalSettings(Collector.SettingsResult result){
         List<Settings> settings = new ArrayList<>();
         if (result.getResult() == Collector.ResultCode.OK) {
@@ -44,12 +35,10 @@ public final class SettingsUtil {
         }
 
         return new RpcSettings(
-                convertType(grpcOboeSetting.getType()),
                 grpcOboeSetting.getFlags().toStringUtf8(),
                 System.currentTimeMillis(), //use local timestamp for now, as it is easier to compare ttl with it
                 grpcOboeSetting.getValue(),
                 grpcOboeSetting.getTtl(),
-                grpcOboeSetting.getLayer().toStringUtf8(),
                 convertedArguments);
     }
 
