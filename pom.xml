@@ -10,7 +10,7 @@
     <name>joboe</name>
 
     <properties>
-        <revision>10.0.15-SNAPSHOT</revision>
+        <revision>10.0.16-SNAPSHOT</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.outputTimestamp>${git.commit.time}</project.build.outputTimestamp>
     </properties>
