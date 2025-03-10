@@ -1,5 +1,9 @@
 package com.solarwinds.joboe.sampling;
 
+import com.solarwinds.joboe.logging.Logger;
+import com.solarwinds.joboe.logging.LoggerFactory;
+import lombok.Getter;
+
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -7,10 +11,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.solarwinds.joboe.logging.Logger;
-import com.solarwinds.joboe.logging.LoggerFactory;
-import lombok.Getter;
 
 /**
  * Setting arguments used in {@link Settings}
@@ -59,6 +59,12 @@ public abstract class SettingsArg<T> {
      * @return
      */
     public abstract T readValue(ByteBuffer byteBuffer);
+
+
+    /**
+     * Converts the given {@link Object} to T
+     */
+    public abstract T readValue(Object object);
 
     /**
      * Reads the typed value of this SettingsArg and convert it to ByteBuffer
@@ -124,6 +130,18 @@ public abstract class SettingsArg<T> {
         }
 
         @Override
+        public Double readValue(Object object) {
+            if (object instanceof Integer) {
+                return ((Integer) object).doubleValue();
+
+            } else if (object instanceof Double) {
+                return (Double) object;
+            }
+
+            return null;
+        }
+
+        @Override
         public ByteBuffer toByteBuffer(Double value) {
             if (value != null) {
                 ByteBuffer buffer = ByteBuffer.allocate(8).order(ByteOrder.LITTLE_ENDIAN);
@@ -154,6 +172,18 @@ public abstract class SettingsArg<T> {
             } finally {
                 byteBuffer.rewind();  //cast for JDK 8- runtime compatibility
             }
+        }
+
+        @Override
+        public Integer readValue(Object object) {
+            if (object instanceof Double) {
+                return ((Double) object).intValue();
+
+            } else if (object instanceof Integer) {
+                return (Integer) object;
+            }
+
+            return null;
         }
 
         @Override
@@ -190,6 +220,15 @@ public abstract class SettingsArg<T> {
         }
 
         @Override
+        public Boolean readValue(Object object) {
+            if (object instanceof Boolean) {
+                return (Boolean) object;
+            }
+
+            return null;
+        }
+
+        @Override
         public ByteBuffer toByteBuffer(Boolean value) {
             if (value != null) {
                 ByteBuffer buffer = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN);
@@ -220,6 +259,18 @@ public abstract class SettingsArg<T> {
             } finally {
                 byteBuffer.rewind();
             }
+        }
+
+        @Override
+        public byte[] readValue(Object object) {
+            if (object instanceof byte[]) {
+                return (byte[]) object;
+
+            } else if (object instanceof String) {
+                return ((String) object).getBytes();
+            }
+
+            return null;
         }
 
         @Override
