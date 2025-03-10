@@ -4,9 +4,12 @@ import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class SettingsArgTest {
 
@@ -43,6 +46,38 @@ public class SettingsArgTest {
         buffer.putInt(0); //boolean uses int in bytebuffer (binary)
         buffer.flip();
         assertEquals(false, arg.readValue(buffer));
+    }
+
+    @Test
+    public void testDoubleSettingsArgReadValueWithObject() {
+        SettingsArg<Double> arg = new SettingsArg.DoubleSettingsArg("test-double");
+        assertEquals(3.0, arg.readValue(3), 0);
+        assertEquals(3.45, arg.readValue(3.45), 0);
+        assertNull(arg.readValue("3.0"));
+    }
+
+    @Test
+    public void testIntegerSettingsArgReadValueWithObject() {
+        SettingsArg<Integer> arg = new SettingsArg.IntegerSettingsArg("test-int");
+        assertEquals(3, arg.readValue(3));
+        assertEquals(3, arg.readValue(3.0));
+        assertNull(arg.readValue("3.0"));
+    }
+
+    @Test
+    public void testBooleanSettingsArgReadValueWithObject() {
+        SettingsArg<Boolean> arg = new SettingsArg.BooleanSettingsArg("test-boolean");
+        assertTrue(arg.readValue(true));
+        assertFalse(arg.readValue(false));
+        assertNull(arg.readValue("3.0"));
+    }
+
+    @Test
+    public void testByteSettingsArgReadValueWithObject() {
+        SettingsArg<byte[]> arg = new SettingsArg.ByteArraySettingsArg("test-bytes");
+        assertTrue(Arrays.equals(new byte[1], arg.readValue(new byte[1])));
+        assertTrue(Arrays.equals("bytes".getBytes(), arg.readValue("bytes")));
+        assertNull(arg.readValue(4));
     }
 
     @Test
