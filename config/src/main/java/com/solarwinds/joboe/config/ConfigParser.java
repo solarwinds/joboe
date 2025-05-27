@@ -8,5 +8,9 @@ public interface ConfigParser<T, R> {
      * @throws InvalidConfigException 
      */
     R convert(T input) throws InvalidConfigException;
+
+    default String configKey() {
+        return "";
+    }
 }
 

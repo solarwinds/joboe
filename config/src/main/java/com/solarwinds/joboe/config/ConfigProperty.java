@@ -135,7 +135,7 @@ public enum ConfigProperty {
      * @param key   the key used in configuration property file
      * @return      the corresponding ConfigProperty by the key. Null if the property is not defined under that key
      */
-    static ConfigProperty fromConfigFileKey(String key) {
+   public static ConfigProperty fromConfigFileKey(String key) {
         return ConfigPropertyRegistry.CONFIG_FILE_KEY_TO_PARAMETER.get(key);
     }
 

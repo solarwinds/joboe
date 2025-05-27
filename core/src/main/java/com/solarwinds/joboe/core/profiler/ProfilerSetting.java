@@ -1,5 +1,6 @@
 package com.solarwinds.joboe.core.profiler;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -7,6 +8,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+@EqualsAndHashCode
 public class ProfilerSetting implements Serializable {
     public static final int DEFAULT_INTERVAL = 20;
     public static final int MIN_INTERVAL = 10;
