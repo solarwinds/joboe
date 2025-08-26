@@ -14,7 +14,7 @@
   <name>core</name>
   <url>https://maven.apache.org</url>
   <properties>
-    <grpc.version>1.68.0</grpc.version>
+    <grpc.version>1.75.0</grpc.version>
   </properties>
 
   <repositories>
@@ -34,7 +34,7 @@
       <dependency>
         <groupId>io.netty</groupId>
         <artifactId>netty-bom</artifactId>
-        <version>4.1.118.Final</version>
+        <version>4.2.4.Final</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
