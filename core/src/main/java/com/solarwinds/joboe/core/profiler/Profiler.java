@@ -325,8 +325,7 @@ public class Profiler {
                                   "Interval", (int) interval,
                                   "SpanRef", parentMetadata.opHexString());
 
-
-            return entryMetadata;
+            return snapshotEntry.getMetadata();
         }
 
         public void stop() {
