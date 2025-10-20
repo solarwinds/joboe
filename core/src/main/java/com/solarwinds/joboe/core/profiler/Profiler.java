@@ -291,7 +291,15 @@ public class Profiler {
      */
     public static class Profile {
         private final Map<Thread, SnapshotTracker> snapshotTrackersByThread = new ConcurrentHashMap<Thread, SnapshotTracker>();
+
         private final ProfilerSetting setting;
+
+        @Getter
+        private boolean sampled = false;
+
+        private Event snapshotEntry;
+
+        private Metadata entryMetadata;
 
         private Profile() {
             this(Profiler.localSetting);
@@ -307,19 +315,17 @@ public class Profiler {
          * @return
          */
         private Metadata createProfileSpanEntry(Metadata parentMetadata) {
-            Metadata entryMetadata = new Metadata(parentMetadata);
+            entryMetadata = new Metadata(parentMetadata);
 
-            Event snapshotEntry = Context.createEventWithContext(entryMetadata, false);
+            snapshotEntry = Context.createEventWithContext(entryMetadata, false);
+            snapshotEntry.setTimestamp(TimeUtils.getTimestampMicroSeconds());
             snapshotEntry.addInfo("Label", "entry",
                                   "Spec", "profiling",
                                   "Language", "java",
                                   "Interval", (int) interval,
                                   "SpanRef", parentMetadata.opHexString());
 
-
-            snapshotEntry.report(entryMetadata, Profiler.reporter);
-
-            return entryMetadata;
+            return snapshotEntry.getMetadata();
         }
 
         public void stop() {
@@ -465,6 +471,7 @@ public class Profiler {
         }
 
         private void createProfileSpanExit(SnapshotTracker tracker) {
+            if (!sampled) return;
             Event snapshotExit = Context.createEventWithContext(tracker.metadata);
             snapshotExit.addInfo("Label", "exit",
                                  "Spec", "profiling",
@@ -527,8 +534,15 @@ public class Profiler {
                 event.addInfo("NewFrames", newFramesValue);
             }
 
-            event.report(metadata, reporter);
+            if (!sampled) {
+                snapshotEntry.report(entryMetadata, Profiler.reporter);
+                sampled = true;
 
+                snapshotEntry = null;
+                entryMetadata = null;
+            }
+
+            event.report(metadata, reporter);
         }
     }
 

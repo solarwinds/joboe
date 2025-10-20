@@ -43,6 +43,7 @@ public class ProfileTest {
         Metadata.setup(SamplingConfiguration.builder().build());
 
         profile.startProfilingOnThread(thread, new Metadata("00-970026c88092a447d3b2bba3be3be2fc-0c8fc43138df813a-01"));
+        simulateStackChange(profile);
         List<DeserializedEvent> events = profilingReporter.getSentEvents();
         Map<String, Object> entryEvent = events.get(0).getSentEntries();
 
@@ -52,6 +53,33 @@ public class ProfileTest {
         assertEquals("java", entryEvent.get("Language"));
         assertEquals("0c8fc43138df813a", entryEvent.get("SpanRef"));
         assertEquals(thread.getId(), entryEvent.get("TID"));
+    }
+
+    @Test
+    void doNotCreateTerminalEventsWhenSampleIsNotCollected() throws SamplingException {
+        Thread thread = Thread.currentThread();
+        Profile profile = new Profile(profilerSetting);
+        Metadata.setup(SamplingConfiguration.builder().build());
+
+        profile.startProfilingOnThread(thread, new Metadata("00-970026c88092a447d3b2bba3be3be2fc-0c8fc43138df813a-01"));
+        profile.stopProfilingOnThread(thread);
+        List<DeserializedEvent> events = profilingReporter.getSentEvents();
+
+        assertTrue(events.isEmpty());
+    }
+
+    @Test
+    void createTerminalEventsWhenSampleIsCollected() throws SamplingException {
+        Thread thread = Thread.currentThread();
+        Profile profile = new Profile(profilerSetting);
+        Metadata.setup(SamplingConfiguration.builder().build());
+
+        profile.startProfilingOnThread(thread, new Metadata("00-970026c88092a447d3b2bba3be3be2fc-0c8fc43138df813a-01"));
+        simulateStackChange(profile);
+        profile.stopProfilingOnThread(thread);
+
+        List<DeserializedEvent> events = profilingReporter.getSentEvents();
+        assertEquals(3, events.size());
     }
 
     @Test
