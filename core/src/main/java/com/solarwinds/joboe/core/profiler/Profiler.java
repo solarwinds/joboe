@@ -1,9 +1,12 @@
 package com.solarwinds.joboe.core.profiler;
 
+import com.solarwinds.joboe.core.Constants;
 import com.solarwinds.joboe.core.Context;
 import com.solarwinds.joboe.core.Event;
 import com.solarwinds.joboe.core.EventReporter;
 import com.solarwinds.joboe.core.util.DaemonThreadFactory;
+import com.solarwinds.joboe.core.util.HostInfoUtils;
+import com.solarwinds.joboe.core.util.JavaProcessUtils;
 import com.solarwinds.joboe.core.util.TimeUtils;
 import com.solarwinds.joboe.logging.Logger;
 import com.solarwinds.joboe.logging.LoggerFactory;
@@ -27,6 +30,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+
+import static com.solarwinds.joboe.core.EventImpl.w3cContextToXTrace;
 
 /**
  * A Sampling Profiler that runs a single background thread to take stack trace snapshots of a list of "tracked threads" on a given interval
@@ -55,6 +60,7 @@ public class Profiler {
 
     static final int MAX_REPORTED_FRAME_DEPTH = 400;
 
+    private static ProfileSampleEmitterSupplier supplier;
     /**
      * Listens to interval changes beamed down by collector
      */
@@ -237,7 +243,32 @@ public class Profiler {
         Profile profile;
         profile = profileByTraceId.get(traceId);
         if (profile == null) { //then this task is instrumented the first time, add profile
-            profile = new Profile();
+            profile = new Profile(null);
+            profileByTraceId.put(traceId, profile);
+        }
+
+        if (profile.startProfilingOnThread(thread, metadata)) {
+            logger.debug("Started profiling on Thread id: " + thread.getId() + " name: " + thread.getName() + " for trace: " + traceId);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static boolean addProfiledThread(Thread thread, Metadata metadata, String traceId, ProfileSampleEmitterSupplier supplier) {
+        if (thread.getName() != null && thread.getName().startsWith(SOLARWINDS_THREAD_PREFIX)) {
+            return false;
+        }
+
+        if (status != Status.RUNNING) {
+            logger.debug("Add profile thread operation skipped as profiler is not running, status : " + status);
+            return false;
+        }
+
+        Profile profile;
+        profile = profileByTraceId.get(traceId);
+        if (profile == null) {
+            profile = new Profile(supplier.get());
             profileByTraceId.put(traceId, profile);
         }
 
@@ -301,12 +332,15 @@ public class Profiler {
 
         private Metadata entryMetadata;
 
-        private Profile() {
-            this(Profiler.localSetting);
+        private final ProfileSampleEmitter emitter;
+
+        private Profile(ProfileSampleEmitter emitter) {
+            this(Profiler.localSetting, emitter);
         }
 
-        Profile(ProfilerSetting setting) {
+        Profile(ProfilerSetting setting, ProfileSampleEmitter emitter) {
             this.setting = setting;
+            this.emitter = emitter;
         }
 
         /**
@@ -316,9 +350,25 @@ public class Profiler {
          */
         private Metadata createProfileSpanEntry(Metadata parentMetadata) {
             entryMetadata = new Metadata(parentMetadata);
-
             snapshotEntry = Context.createEventWithContext(entryMetadata, false);
+            emitter.beginEntryEmit();
+
+            emitter.addAttribute("Label", "entry");
+            emitter.addAttribute("Spec", "profiling");
+            emitter.addAttribute("Language", "java");
+
+            emitter.addAttribute("Interval", interval);
+            emitter.addAttribute("SpanRef", parentMetadata.opHexString());
+            emitter.addAttribute(Constants.XTR_TIMESTAMP_U_KEY, TimeUtils.getTimestampMicroSeconds());
+
+            emitter.addAttribute(Constants.XTR_PROCESS_ID_KEY, JavaProcessUtils.getPid());
+            emitter.addAttribute(Constants.XTR_HOSTNAME_KEY, HostInfoUtils.getHostName());
+            String hexString = snapshotEntry.getMetadata().toHexString();
+
+            emitter.addAttribute(Constants.XTR_XTRACE, hexString);
+            emitter.addAttribute(Constants.XTR_METADATA_KEY, w3cContextToXTrace(hexString));
             snapshotEntry.setTimestamp(TimeUtils.getTimestampMicroSeconds());
+
             snapshotEntry.addInfo("Label", "entry",
                                   "Spec", "profiling",
                                   "Language", "java",
@@ -473,12 +523,30 @@ public class Profiler {
         private void createProfileSpanExit(SnapshotTracker tracker) {
             if (!sampled) return;
             Event snapshotExit = Context.createEventWithContext(tracker.metadata);
+            String hexString = snapshotExit.getMetadata().toHexString();
+
+            emitter.beginExitEmit();
+            emitter.addAttribute("Label", "exit");
+            emitter.addAttribute("Spec", "profiling");
+
+            emitter.addAttribute(Constants.XTR_TIMESTAMP_U_KEY, TimeUtils.getTimestampMicroSeconds());
+            emitter.addAttribute(Constants.XTR_EDGE_KEY, tracker.metadata.opHexString());
+            emitter.addAttribute(Constants.XTR_PROCESS_ID_KEY, JavaProcessUtils.getPid());
+
+            emitter.addAttribute(Constants.XTR_HOSTNAME_KEY, HostInfoUtils.getHostName());
+            emitter.addAttribute(Constants.XTR_XTRACE, hexString);
+            emitter.addAttribute(Constants.XTR_METADATA_KEY, w3cContextToXTrace(hexString));
+
+            emitter.addAttribute("SnapshotsOmitted", tracker.snapshotsOmitted);
             snapshotExit.addInfo("Label", "exit",
                                  "Spec", "profiling",
                                  "SnapshotsOmitted", tracker.snapshotsOmitted);
 
             synchronized(tracker) {
                 snapshotExit.addEdge(tracker.metadata);
+                if (emitter.endExitEmit()) {
+                    return;
+                }
                 snapshotExit.report(tracker.metadata, Profiler.reporter);
             }
 
@@ -500,6 +568,25 @@ public class Profiler {
             Event event;
 
             event = Context.createEventWithContext(metadata);
+            emitter.beginSampleEmit();
+            emitter.addAttribute("Label", "info");
+
+            emitter.addAttribute("Spec", "profiling");
+            emitter.addAttribute("FramesExited", framesExited);
+            emitter.addAttribute("SnapshotsOmitted", snapshotsOmitted);
+
+            emitter.addAttribute("FramesCount", framesCount);
+            emitter.addAttribute(Constants.XTR_TIMESTAMP_U_KEY, timestamp);
+            emitter.addAttribute(Constants.XTR_THREAD_ID_KEY, threadId);
+
+            emitter.addAttribute(Constants.XTR_EDGE_KEY, metadata.opHexString());
+            emitter.addAttribute(Constants.XTR_PROCESS_ID_KEY, JavaProcessUtils.getPid());
+            emitter.addAttribute(Constants.XTR_HOSTNAME_KEY, HostInfoUtils.getHostName());
+
+            String hexString = event.getMetadata().toHexString();
+            emitter.addAttribute(Constants.XTR_XTRACE, hexString);
+            emitter.addAttribute(Constants.XTR_METADATA_KEY, w3cContextToXTrace(hexString));
+
             event.addInfo("Label", "info",
                           "Spec", "profiling",
                           "FramesExited", framesExited,
@@ -532,16 +619,22 @@ public class Profiler {
                 }
 
                 event.addInfo("NewFrames", newFramesValue);
+                emitter.addAttribute("NewFrames", newFramesValue);
             }
 
             if (!sampled) {
-                snapshotEntry.report(entryMetadata, Profiler.reporter);
+                if (!emitter.endEntryEmit()) {
+                    snapshotEntry.report(entryMetadata, Profiler.reporter);
+                }
                 sampled = true;
 
                 snapshotEntry = null;
                 entryMetadata = null;
             }
 
+            if (emitter.endSampleEmit()) {
+                return;
+            }
             event.report(metadata, reporter);
         }
     }

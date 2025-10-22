@@ -39,7 +39,8 @@ public class ProfileTest {
     @Test
     void partialValidateEntryEventShapeOnStartProfilingOnThread() throws SamplingException {
         Thread thread = Thread.currentThread();
-        Profile profile = new Profile(profilerSetting);
+        Profile profile = new Profile(profilerSetting, new ProfileSampleEmitter() {
+        });
         Metadata.setup(SamplingConfiguration.builder().build());
 
         profile.startProfilingOnThread(thread, new Metadata("00-970026c88092a447d3b2bba3be3be2fc-0c8fc43138df813a-01"));
@@ -58,7 +59,8 @@ public class ProfileTest {
     @Test
     void doNotCreateTerminalEventsWhenSampleIsNotCollected() throws SamplingException {
         Thread thread = Thread.currentThread();
-        Profile profile = new Profile(profilerSetting);
+        Profile profile = new Profile(profilerSetting, new ProfileSampleEmitter() {
+        });
         Metadata.setup(SamplingConfiguration.builder().build());
 
         profile.startProfilingOnThread(thread, new Metadata("00-970026c88092a447d3b2bba3be3be2fc-0c8fc43138df813a-01"));
@@ -71,7 +73,8 @@ public class ProfileTest {
     @Test
     void createTerminalEventsWhenSampleIsCollected() throws SamplingException {
         Thread thread = Thread.currentThread();
-        Profile profile = new Profile(profilerSetting);
+        Profile profile = new Profile(profilerSetting, new ProfileSampleEmitter() {
+        });
         Metadata.setup(SamplingConfiguration.builder().build());
 
         profile.startProfilingOnThread(thread, new Metadata("00-970026c88092a447d3b2bba3be3be2fc-0c8fc43138df813a-01"));
@@ -86,7 +89,8 @@ public class ProfileTest {
     void partialValidateInfoEventOnRecord() throws SamplingException {
         Thread thread = Thread.currentThread();
         StackTraceElement[] stackTrace = thread.getStackTrace();
-        Profile profile = new Profile(profilerSetting);
+        Profile profile = new Profile(profilerSetting, new ProfileSampleEmitter() {
+        });
         Metadata.setup(SamplingConfiguration.builder().build());
 
         profile.startProfilingOnThread(thread, new Metadata("00-970026c88092a447d3b2bba3be3be2fc-0c8fc43138df813a-01"));
@@ -106,7 +110,8 @@ public class ProfileTest {
     void partialValidateInfoEventOnRecordWithSkippedFrame() throws SamplingException {
         Thread thread = Thread.currentThread();
         StackTraceElement[] stackTrace = thread.getStackTrace();
-        Profile profile = new Profile(profilerSetting);
+        Profile profile = new Profile(profilerSetting, new ProfileSampleEmitter() {
+        });
         Metadata.setup(SamplingConfiguration.builder().build());
 
         profile.startProfilingOnThread(thread, new Metadata("00-970026c88092a447d3b2bba3be3be2fc-0c8fc43138df813a-01"));
@@ -133,7 +138,8 @@ public class ProfileTest {
     void partialValidateInfoEventOnRecordWithFrameChange() throws SamplingException {
         Thread thread = Thread.currentThread();
         StackTraceElement[] stackTrace = thread.getStackTrace();
-        Profile profile = new Profile(profilerSetting);
+        Profile profile = new Profile(profilerSetting, new ProfileSampleEmitter() {
+        });
         Metadata.setup(SamplingConfiguration.builder().build());
 
         profile.startProfilingOnThread(thread, new Metadata("00-970026c88092a447d3b2bba3be3be2fc-0c8fc43138df813a-01"));
@@ -161,7 +167,8 @@ public class ProfileTest {
     void verifyThatProfilingIsStoppedWhenMetadataExpires() throws SamplingException {
         Thread thread = Thread.currentThread();
         StackTraceElement[] stackTrace = thread.getStackTrace();
-        Profile profile = new Profile(profilerSetting);
+        Profile profile = new Profile(profilerSetting, new ProfileSampleEmitter() {
+        });
 
         profile.startProfilingOnThread(thread, new Metadata("00-970026c88092a447d3b2bba3be3be2fc-0c8fc43138df813a-01"));
         Profiler.SnapshotTracker snapshotTracker = profile.getSnapshotTracker(thread);
