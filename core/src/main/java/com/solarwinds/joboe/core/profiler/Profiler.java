@@ -60,7 +60,6 @@ public class Profiler {
 
     static final int MAX_REPORTED_FRAME_DEPTH = 400;
 
-    private static ProfileSampleEmitterSupplier supplier;
     /**
      * Listens to interval changes beamed down by collector
      */
@@ -255,7 +254,7 @@ public class Profiler {
         }
     }
 
-    public static boolean addProfiledThread(Thread thread, Metadata metadata, String traceId, ProfileSampleEmitterSupplier supplier) {
+    public static boolean addProfiledThread(Thread thread, Metadata metadata, String traceId, ProfileSampleEmitter sampleEmitter) {
         if (thread.getName() != null && thread.getName().startsWith(SOLARWINDS_THREAD_PREFIX)) {
             return false;
         }
@@ -268,7 +267,7 @@ public class Profiler {
         Profile profile;
         profile = profileByTraceId.get(traceId);
         if (profile == null) {
-            profile = new Profile(supplier.get());
+            profile = new Profile(sampleEmitter);
             profileByTraceId.put(traceId, profile);
         }
 
