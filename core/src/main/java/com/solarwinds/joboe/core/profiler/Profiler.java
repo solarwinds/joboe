@@ -566,6 +566,16 @@ public class Profiler {
         private void reportSnapshot(Metadata metadata, int framesExited, List<Long> snapshotsOmitted, StackTraceElement[] newFrames, int framesCount, long threadId, long timestamp) {
             Event event;
 
+            if (!sampled) {
+                if (!emitter.endEntryEmit()) {
+                    snapshotEntry.report(entryMetadata, Profiler.reporter);
+                }
+                sampled = true;
+
+                snapshotEntry = null;
+                entryMetadata = null;
+            }
+
             event = Context.createEventWithContext(metadata);
             emitter.beginSampleEmit();
             emitter.addAttribute("Label", "info");
@@ -619,16 +629,6 @@ public class Profiler {
 
                 event.addInfo("NewFrames", newFramesValue);
                 emitter.addAttribute("NewFrames", newFramesValue);
-            }
-
-            if (!sampled) {
-                if (!emitter.endEntryEmit()) {
-                    snapshotEntry.report(entryMetadata, Profiler.reporter);
-                }
-                sampled = true;
-
-                snapshotEntry = null;
-                entryMetadata = null;
             }
 
             if (emitter.endSampleEmit()) {
