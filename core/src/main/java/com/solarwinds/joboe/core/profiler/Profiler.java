@@ -364,8 +364,8 @@ public class Profiler {
             emitter.addAttribute(Constants.XTR_HOSTNAME_KEY, HostInfoUtils.getHostName());
             String hexString = snapshotEntry.getMetadata().toHexString();
 
-            emitter.addAttribute(Constants.XTR_XTRACE, hexString);
-            emitter.addAttribute(Constants.XTR_METADATA_KEY, w3cContextToXTrace(hexString));
+            emitter.addAttribute(Constants.XTR_METADATA_KEY, hexString);
+            emitter.addAttribute(Constants.XTR_XTRACE, w3cContextToXTrace(hexString));
             snapshotEntry.setTimestamp(TimeUtils.getTimestampMicroSeconds());
 
             snapshotEntry.addInfo("Label", "entry",
@@ -533,8 +533,8 @@ public class Profiler {
             emitter.addAttribute(Constants.XTR_PROCESS_ID_KEY, JavaProcessUtils.getPid());
 
             emitter.addAttribute(Constants.XTR_HOSTNAME_KEY, HostInfoUtils.getHostName());
-            emitter.addAttribute(Constants.XTR_XTRACE, hexString);
-            emitter.addAttribute(Constants.XTR_METADATA_KEY, w3cContextToXTrace(hexString));
+            emitter.addAttribute(Constants.XTR_METADATA_KEY, hexString);
+            emitter.addAttribute(Constants.XTR_XTRACE, w3cContextToXTrace(hexString));
 
             emitter.addAttribute("SnapshotsOmitted", tracker.snapshotsOmitted);
             snapshotExit.addInfo("Label", "exit",
@@ -593,8 +593,8 @@ public class Profiler {
             emitter.addAttribute(Constants.XTR_HOSTNAME_KEY, HostInfoUtils.getHostName());
 
             String hexString = event.getMetadata().toHexString();
-            emitter.addAttribute(Constants.XTR_XTRACE, hexString);
-            emitter.addAttribute(Constants.XTR_METADATA_KEY, w3cContextToXTrace(hexString));
+            emitter.addAttribute(Constants.XTR_METADATA_KEY, hexString);
+            emitter.addAttribute(Constants.XTR_XTRACE, w3cContextToXTrace(hexString));
 
             event.addInfo("Label", "info",
                           "Spec", "profiling",
