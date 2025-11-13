@@ -5,6 +5,7 @@ import com.solarwinds.joboe.config.ConfigProperty;
 import com.solarwinds.joboe.config.InvalidConfigException;
 import com.solarwinds.joboe.core.metrics.MetricsEntry;
 import com.solarwinds.joboe.core.util.DaemonThreadFactory;
+import com.solarwinds.joboe.logging.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
@@ -30,11 +31,11 @@ public class MetricsCollector extends SystemCollector<MetricsCategory, List<? ex
     private static final int MAX_WAIT_TIME = 10; //max wait time for a collection task, in terms of second
 
 
-    public MetricsCollector(ConfigContainer configs) throws InvalidConfigException {
+    public MetricsCollector(ConfigContainer configs) {
         this(configs, null);
     }
 
-    public MetricsCollector(ConfigContainer configs, SpanMetricsCollector spanMetricsCollector) throws InvalidConfigException {
+    public MetricsCollector(ConfigContainer configs, SpanMetricsCollector spanMetricsCollector) {
         collectors.put(MetricsCategory.SYSTEM, new SystemMetricsCollector());
         if (configs.get(ConfigProperty.MONITOR_SPAN_METRICS_ENABLE) == null || (Boolean)configs.get(ConfigProperty.MONITOR_SPAN_METRICS_ENABLE)) { //default as true
             if (spanMetricsCollector == null) {
@@ -46,7 +47,7 @@ public class MetricsCollector extends SystemCollector<MetricsCategory, List<? ex
 
         collectors.put(MetricsCategory.LAYER_COUNT, new TraceDecisionMetricsCollector());
         if (configs.get(ConfigProperty.MONITOR_JMX_ENABLE) == null || (Boolean)configs.get(ConfigProperty.MONITOR_JMX_ENABLE)) {
-            collectors.put(MetricsCategory.JMX, new JMXCollector(configs));
+            LoggerFactory.getLogger().warn("JMX Metrics Collector has been removed. This will fail in future release.");
         }
         
         collectors.put(MetricsCategory.CUSTOM, CustomMetricsCollector.INSTANCE);
