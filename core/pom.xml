@@ -14,7 +14,7 @@
   <name>core</name>
   <url>https://maven.apache.org</url>
   <properties>
-    <grpc.version>1.76.0</grpc.version>
+    <grpc.version>1.77.0</grpc.version>
   </properties>
 
   <repositories>
