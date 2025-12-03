@@ -66,6 +66,20 @@ jobs:
             done
             exit $code
 
+      - name: Check shading(sampling)
+        run: |
+            VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+            code=0
+            for path in $(jar tf "sampling/target/sampling-$VERSION.jar" | grep -E -v '^((com/solarwinds|META))')
+            do
+              PACKAGE=$(echo "$path" | awk -F/ '{print $2}')
+              if [ -n "$PACKAGE" ]; then
+                echo "Package ($path) is not shaded"
+                code=1
+              fi
+            done
+            exit $code
+
   deploy_snapshot:
     runs-on: ubuntu-latest
     steps:
