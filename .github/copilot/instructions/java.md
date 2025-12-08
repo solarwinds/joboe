@@ -3,7 +3,7 @@
 When working with Java files in this repository:
 
 ## Java Version Compatibility
-- Use: traditional try-catch, explicit types, classic class definitions
+- Use: traditional try-catch, explicit types, traditional class syntax (i.e., without records or sealed modifiers)
 - Avoid: var keyword, text blocks, records, sealed classes, pattern matching
 - Do NOT use Java 9+ features unless module explicitly supports higher version
 - **Minimum supported: Java 8** (enforced in build configuration)
