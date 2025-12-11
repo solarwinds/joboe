@@ -1046,7 +1046,7 @@ public class ServerHostInfoReader implements HostInfoReader, AzureInstanceIdRead
 
         public static String SW_K8S_POD_UID = "SW_K8S_POD_UID";
 
-        public static String NAMESPACE_FILE_LOC_LINUX = "/run/secrets/kubernetes.io/serviceaccount/namespace";
+        public static String NAMESPACE_FILE_LOC_LINUX = "/var/run/secrets/kubernetes.io/serviceaccount/namespace";
 
         public static String NAMESPACE_FILE_LOC_WINDOWS = "C:\\var\\run\\secrets\\kubernetes.io\\serviceaccount\\namespace";
 
