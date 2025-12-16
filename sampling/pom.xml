@@ -46,15 +46,15 @@
                             <relocations>
                                 <relocation>
                                     <pattern>com.github.benmanes.caffeine</pattern>
-                                    <shadedPattern>com.solarwinds.joboe.shaded.caffeine</shadedPattern>
+                                    <shadedPattern>com.solarwinds.joboe.sampling.shaded.caffeine</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>org.checkerframework</pattern>
-                                    <shadedPattern>com.solarwinds.joboe.shaded.checkerframework</shadedPattern>
+                                    <shadedPattern>com.solarwinds.joboe.sampling.shaded.checkerframework</shadedPattern>
                                 </relocation>
                                 <relocation>
                                     <pattern>com.google.errorprone</pattern>
-                                    <shadedPattern>com.solarwinds.joboe.shaded.errorprone</shadedPattern>
+                                    <shadedPattern>com.solarwinds.joboe.sampling.shaded.errorprone</shadedPattern>
                                 </relocation>
                             </relocations>
                             <transformers>
