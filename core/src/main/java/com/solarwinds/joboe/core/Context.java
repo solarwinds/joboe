@@ -10,6 +10,12 @@ import com.solarwinds.joboe.sampling.SamplingException;
 import com.solarwinds.joboe.sampling.SettingsArg;
 import com.solarwinds.joboe.sampling.SettingsArgChangeListener;
 import com.solarwinds.joboe.sampling.SettingsManager;
+import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanContext;
+import io.opentelemetry.api.trace.Tracer;
+
+import java.util.Arrays;
 
 public class Context {
     private static final ThreadLocal<Boolean> skipInheritingContextThreadLocal = new ThreadLocal<Boolean>();
@@ -50,11 +56,6 @@ public class Context {
                 }
             }
         });
-    }
-
-    public static Event startTrace() {
-        getMetadata().randomize(true);
-        return createEventWithContext(getMetadata(), false); //do not add edge on trace start
     }
 
     public static Event createEvent() {
@@ -122,22 +123,41 @@ public class Context {
      * Returns metadata for current thread
      */
     public static Metadata getMetadata() {
-        return mdThreadLocal.get();
+        Metadata md = mdThreadLocal.get();
+        if (Arrays.equals(md.getTaskID(), Metadata.unsetTaskID)) {
+             SpanContext sc = Span.current().getSpanContext();
+             if (sc.isValid()) {
+                 return new Metadata(sc);
+             }
+        }
+        return md;
     }
     
     /**
-     * Sets  metadata for current thread
+     * Sets  metadata for current thread.
+     * <p>
+     * <b>Note:</b> This sets the metadata in the local thread storage only. It does NOT update the OpenTelemetry context.
+     * To propagate context via OpenTelemetry, please use {@code io.opentelemetry.context.Context.makeCurrent()}.
+     * </p>
      * @param md
+     * @deprecated Use OpenTelemetry Context propagation instead.
      */
+    @Deprecated
     public static void setMetadata(Metadata md) {
         setMap(md);
     }
 
     /**
-     *  Sets metadata for this thread from
+     *  Sets metadata for this thread from hex string
+     * <p>
+     * <b>Note:</b> This sets the metadata in the local thread storage only. It does NOT update the OpenTelemetry context.
+     * To propagate context via OpenTelemetry, please use {@code io.opentelemetry.context.Context.makeCurrent()}.
+     * </p>
      * @param hexStr
-     * @throws OboeException
+     * @throws SamplingException
+     * @deprecated Use OpenTelemetry Context propagation instead.
      */
+    @Deprecated
     public static void setMetadata(String hexStr) throws SamplingException {
         Metadata md = new Metadata();
         md.fromHexString(hexStr);
@@ -145,8 +165,13 @@ public class Context {
     }
 
     /**
-     * Clears metadata for current thread
+     * Clears metadata for current thread.
+     * <p>
+     * <b>Note:</b> This only clears the local thread storage. It does not affect any active OpenTelemetry Scope.
+     * </p>
+     * @deprecated Use OpenTelemetry Context propagation instead.
      */
+    @Deprecated
     public static void clearMetadata() {
         setMap(new Metadata());
     }

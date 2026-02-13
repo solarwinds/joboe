@@ -2,6 +2,7 @@ package com.solarwinds.joboe.sampling;
 
 import com.solarwinds.joboe.logging.Logger;
 import com.solarwinds.joboe.logging.LoggerFactory;
+import io.opentelemetry.api.trace.SpanContext;
 import lombok.Getter;
 
 import java.util.Arrays;
@@ -67,6 +68,15 @@ public class Metadata {
             fromHexString(hexStr);
         } else {
             throw new SamplingException("Must call Metadata#setup first");
+        }
+    }
+
+    public Metadata(SpanContext spanContext) {
+        initialize();
+        if (spanContext.isValid()) {
+            System.arraycopy(spanContext.getTraceIdBytes(), 0, this.taskID, 0, Constants.TASK_ID_LEN);
+            System.arraycopy(spanContext.getSpanIdBytes(), 0, this.opID, 0, Constants.OP_ID_LEN);
+            this.flags = spanContext.getTraceFlags().asByte();
         }
     }
 

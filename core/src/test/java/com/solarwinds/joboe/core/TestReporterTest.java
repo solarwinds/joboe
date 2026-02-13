@@ -22,10 +22,10 @@ public class TestReporterTest {
         
         Event event;
         
-        event = Context.startTrace();
+        event = startTrace();
         event.report(threadLocalReporter);
         
-        event = Context.startTrace();
+        event = startTrace();
         event.report(nonThreadLocalReporter);
         
         
@@ -41,10 +41,10 @@ public class TestReporterTest {
         Thread thread = new Thread(() -> {
             Event event;
 
-            event = Context.startTrace();
+            event = startTrace();
             event.report(threadLocalReporter);
 
-            event = Context.startTrace();
+            event = startTrace();
             event.report(nonThreadLocalReporter);
         });
         
@@ -54,5 +54,12 @@ public class TestReporterTest {
         
         assertEquals(0, threadLocalReporter.getSentEvents().size()); //different thread, should not get the event
         assertEquals(1, nonThreadLocalReporter.getSentEvents().size());
+    }
+
+    private Event startTrace() {
+        Metadata md = new Metadata();
+        md.randomize(true);
+        Context.setMetadata(md);
+        return Context.createEventWithContext(md, false);
     }
 }

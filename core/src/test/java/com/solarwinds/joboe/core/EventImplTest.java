@@ -186,7 +186,7 @@ public class EventImplTest {
     public void testOversizedEvent1() throws InvalidConfigException {
     	String bigValue = new String(new char[1000000]);
     	
-    	Event testEvent = Context.startTrace();
+    	Event testEvent = startTrace();
     	
     	testEvent.addInfo("key1", bigValue);
     	testEvent.addInfo("key2", new String[] { bigValue, bigValue, bigValue});
@@ -225,7 +225,7 @@ public class EventImplTest {
      */
     @Test
     public void testOversizedEvent2() throws InvalidConfigException {
-        Event testEvent = Context.startTrace();
+        Event testEvent = startTrace();
         
         for (int i = 0 ; i < 10000; i ++) {
             testEvent.addInfo(String.valueOf(i), i);
@@ -264,7 +264,7 @@ public class EventImplTest {
             hugeArray[i] = 0;
         }
         
-        Event testEvent = Context.startTrace();
+        Event testEvent = startTrace();
         testEvent.addInfo("HugeArray", hugeArray);
         
         TestReporter reporter = ReporterFactory.getInstance().createTestReporter();
@@ -299,7 +299,7 @@ public class EventImplTest {
             longString.append(i);
         }
         
-        Event testEvent = Context.startTrace();
+        Event testEvent = startTrace();
         testEvent.addInfo("LongString", longString.toString());
         
         TestReporter reporter = ReporterFactory.getInstance().createTestReporter();
@@ -335,7 +335,7 @@ public class EventImplTest {
         }
         final String longPrefix = longString.toString();        
         
-        Event testEvent = Context.startTrace();
+        Event testEvent = startTrace();
         for (int i = 0 ; i < 100; i++) {
             testEvent.addInfo(longPrefix + i, longPrefix + 1);
         }
@@ -372,7 +372,7 @@ public class EventImplTest {
             map.put(PREFIX + i, PREFIX);
         }
 
-        Event testEvent = Context.startTrace();
+        Event testEvent = startTrace();
         testEvent.addInfo("large-map", map);
 
         testEvent.addInfo("k1", 1); //these 2 should still make it
@@ -414,7 +414,7 @@ public class EventImplTest {
             list.add(PREFIX + i);
         }
 
-        Event testEvent = Context.startTrace();
+        Event testEvent = startTrace();
         testEvent.addInfo("long-list", list);
 
         testEvent.addInfo("k1", 1); //these 2 should still make it
@@ -521,5 +521,12 @@ public class EventImplTest {
     public void testW3cContextToXTrace() {
         assertEquals("2BA6A6D97A748BFC9F91A4DC46A0D15BBB00000000B6968E14AC09A25A01", EventImpl.w3cContextToXTrace("00-a6a6d97a748bfc9f91a4dc46a0d15bbb-b6968e14ac09a25a-01"));
         assertEquals("2BA6A6D97A748BFC9F91A4DC46A0D15BBB00000000B6968E14AC09A25A00", EventImpl.w3cContextToXTrace("00-a6a6d97a748bfc9f91a4dc46a0d15bbb-b6968e14ac09a25a-00"));
+    }
+
+    private Event startTrace() {
+        Metadata md = new Metadata();
+        md.randomize(true);
+        Context.setMetadata(md);
+        return Context.createEventWithContext(md, false);
     }
 }
