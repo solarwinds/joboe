@@ -8,55 +8,45 @@ permissions:
   contents: write
   id-token: write
 
+env:
+  GITHUB_USERNAME: ${{ github.actor }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up JDK 8
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 8.0.302
+          java-version: 17
           distribution: 'temurin'
 
-      - name: Run maven verify
-        run: |
-          mvn -s .github/m2/settings.xml clean verify
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Run Gradle build
+        run: ./gradlew build
 
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          path: core/target/coverage-report
+          path: core/build/reports
           name: coverage report
 
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          path: core/target/surefire-reports
+          path: core/build/reports/tests
           name: unit test report
 
       - name: Check shading(core)
         run: |
-            VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+            VERSION=$(grep 'projectVersion=' gradle.properties | cut -d= -f2)
             code=0
-            for path in $(jar tf "core/target/core-$VERSION.jar" | grep -E -v '^((com/solarwinds|META))')
-            do
-              PACKAGE=$(echo "$path" | awk -F/ '{print $2}')
-              if [ -n "$PACKAGE" ]; then
-                echo "Package ($path) is not shaded"
-                code=1
-              fi
-            done
-            exit $code
-
-      - name: Check shading(metric)
-        run: |
-            VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-            code=0
-            for path in $(jar tf "metrics/target/metrics-$VERSION.jar" | grep -E -v '^((com/solarwinds|META))')
+            for path in $(jar tf "core/build/libs/core-$VERSION.jar" | grep -E -v '^((com/solarwinds|META))')
             do
               PACKAGE=$(echo "$path" | awk -F/ '{print $2}')
               if [ -n "$PACKAGE" ]; then
@@ -68,9 +58,9 @@ jobs:
 
       - name: Check shading(sampling)
         run: |
-            VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+            VERSION=$(grep 'projectVersion=' gradle.properties | cut -d= -f2)
             code=0
-            for path in $(jar tf "sampling/target/sampling-$VERSION.jar" | grep -E -v '^((com/solarwinds|META))')
+            for path in $(jar tf "sampling/build/libs/sampling-$VERSION.jar" | grep -E -v '^((com/solarwinds|META))')
             do
               PACKAGE=$(echo "$path" | awk -F/ '{print $2}')
               if [ -n "$PACKAGE" ]; then
@@ -85,20 +75,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up JDK 8
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: 8.0.302
+          java-version: 17
           distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Deploy snapshot
         run: |
-          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          VERSION=$(.github/scripts/version.sh gradle.properties)
           BRANCH=$(echo -n "${GITHUB_REF_NAME}" | sed -e 's/[^0-9a-zA-Z\._\-]/./g' | tr '[:upper:]' '[:lower:]')
           GIT_HASH=$(git rev-parse --short "$GITHUB_SHA")
-        
+
           NEW_VERSION=${VERSION%%-SNAPSHOT}-$BRANCH-$GIT_HASH-SNAPSHOT
-          mvn versions:set -DnewVersion=$NEW_VERSION
-          mvn -s .github/m2/settings.xml -T 8 deploy -DskipTests
+          ./gradlew publish -DreleaseVersion=$NEW_VERSION
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

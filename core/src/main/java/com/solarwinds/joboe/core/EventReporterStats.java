@@ -6,9 +6,9 @@ import lombok.Value;
 @Value
 @Builder
 public class EventReporterStats {
-    long sentCount;
-    long overflowedCount;
-    long failedCount;
-    long queueLargestCount;
-    long processedCount;
+  long sentCount;
+  long overflowedCount;
+  long failedCount;
+  long queueLargestCount;
+  long processedCount;
 }

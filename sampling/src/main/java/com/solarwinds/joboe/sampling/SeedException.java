@@ -16,27 +16,24 @@
 package com.solarwinds.joboe.sampling;
 
 /**
- * Exception thrown by {@link SeedGenerator} implementations when
- * they are unable to generate a new seed for an RNG.
+ * Exception thrown by {@link SeedGenerator} implementations when they are unable to generate a new
+ * seed for an RNG.
+ *
  * @author Daniel Dyer
  */
-public class SeedException extends Exception
-{
-    /**
-     * @param message Details of the problem.
-     */
-    public SeedException(String message)
-    {
-        super(message);
-    }
+public class SeedException extends Exception {
+  /**
+   * @param message Details of the problem.
+   */
+  public SeedException(String message) {
+    super(message);
+  }
 
-
-    /**
-     * @param message Details of the problem.
-     * @param cause The root cause of the problem.
-     */
-    public SeedException(String message, Throwable cause)
-    {
-        super(message, cause);
-    }
+  /**
+   * @param message Details of the problem.
+   * @param cause The root cause of the problem.
+   */
+  public SeedException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

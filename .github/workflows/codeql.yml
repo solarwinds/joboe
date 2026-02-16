@@ -20,6 +20,10 @@ on:
   schedule:
     - cron: '0 7 * * 1'
 
+env:
+  GITHUB_USERNAME: ${{ github.actor }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
   analyze:
     name: Analyze
@@ -55,16 +59,17 @@ jobs:
           queries: +security-extended,security-and-quality
 
       # Autobuild fails so use custom build steps
-      - name: Set up JDK 17
+      - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          java-version: '8.0.302'
+          java-version: 17
           distribution: 'temurin'
 
-      - name: Run maven package
-        run: mvn -s .github/m2/settings.xml clean package
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Run Gradle build
+        run: ./gradlew assemble
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3

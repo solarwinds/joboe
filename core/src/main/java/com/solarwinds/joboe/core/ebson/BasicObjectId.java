@@ -1,10 +1,9 @@
 package com.solarwinds.joboe.core.ebson;
 
 import com.google.common.base.Objects;
-
-import javax.xml.bind.DatatypeConverter;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import javax.xml.bind.DatatypeConverter;
 
 final class BasicObjectId implements BsonObjectId {
 
@@ -20,7 +19,8 @@ final class BasicObjectId implements BsonObjectId {
   private final ByteBuffer processId;
   private final ByteBuffer increment;
 
-  private final ByteBuffer objectId = ByteBuffer.allocate(OBJECT_ID_LENGTH).order(ByteOrder.BIG_ENDIAN);
+  private final ByteBuffer objectId =
+      ByteBuffer.allocate(OBJECT_ID_LENGTH).order(ByteOrder.BIG_ENDIAN);
 
   BasicObjectId(ByteBuffer buffer) {
     int oldPosition = buffer.position();
@@ -33,9 +33,15 @@ final class BasicObjectId implements BsonObjectId {
     assert buffer.position() == oldPosition + OBJECT_ID_LENGTH;
 
     time = ByteBuffer.wrap(objectId.array(), 0, TIME_LENGTH).order(ByteOrder.BIG_ENDIAN);
-    machineId = ByteBuffer.wrap(objectId.array(), TIME_LENGTH, MACHINE_ID_LENGTH).order(ByteOrder.LITTLE_ENDIAN);
-    processId = ByteBuffer.wrap(objectId.array(), MACHINE_ID_LENGTH, PROCESS_ID_LENGTH).order(ByteOrder.LITTLE_ENDIAN);
-    increment = ByteBuffer.wrap(objectId.array(), PROCESS_ID_LENGTH, INCREMENT_LENGTH).order(ByteOrder.BIG_ENDIAN);
+    machineId =
+        ByteBuffer.wrap(objectId.array(), TIME_LENGTH, MACHINE_ID_LENGTH)
+            .order(ByteOrder.LITTLE_ENDIAN);
+    processId =
+        ByteBuffer.wrap(objectId.array(), MACHINE_ID_LENGTH, PROCESS_ID_LENGTH)
+            .order(ByteOrder.LITTLE_ENDIAN);
+    increment =
+        ByteBuffer.wrap(objectId.array(), PROCESS_ID_LENGTH, INCREMENT_LENGTH)
+            .order(ByteOrder.BIG_ENDIAN);
   }
 
   @Override

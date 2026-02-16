@@ -5,49 +5,36 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import javax.annotation.Nullable;
 
-/**
- * Representation of a <a href="http://bsonspec.org/">BSON</a> binary
- * (sub-)type.
- */
+/** Representation of a <a href="http://bsonspec.org/">BSON</a> binary (sub-)type. */
 public enum BsonBinary {
 
   /**
    * Generic binary.
-   * <p>
-   * <b>Note:</b> the most commonly used binary sub-type and should be the
-   * 'default' for drivers and tools.
-   * </p>
+   *
+   * <p><b>Note:</b> the most commonly used binary sub-type and should be the 'default' for drivers
+   * and tools.
    */
-  GENERIC(BsonBytes.GENERIC, DefaultPredicate.GENERIC, DefaultReader.GENERIC,
-      DefaultWriter.GENERIC),
+  GENERIC(
+      BsonBytes.GENERIC, DefaultPredicate.GENERIC, DefaultReader.GENERIC, DefaultWriter.GENERIC),
 
-  /**
-   * Function binary.
-   */
+  /** Function binary. */
   FUNCTION(BsonBytes.FUNCTION),
 
   /**
    * Old binary.
-   * <p>
-   * <b>Note:</b> this used to be the default subtype, but was deprecated in
-   * favor of the generic binary type.
-   * </p>
+   *
+   * <p><b>Note:</b> this used to be the default subtype, but was deprecated in favor of the generic
+   * binary type.
    */
   OLD(BsonBytes.OLD),
 
-  /**
-   * UUID binary.
-   */
+  /** UUID binary. */
   UUID(BsonBytes.UUID),
 
-  /**
-   * MD5 binary.
-   */
+  /** MD5 binary. */
   MD5(BsonBytes.MD5),
 
-  /**
-   * User-defined binary.
-   */
+  /** User-defined binary. */
   USER(BsonBytes.USER);
 
   private final byte terminal;
@@ -60,8 +47,7 @@ public enum BsonBinary {
     this(terminal, Predicates.alwaysFalse(), null, null);
   }
 
-  BsonBinary(byte terminal, Predicate<Class<?>> predicate,
-             BsonReader reader, BsonWriter writer) {
+  BsonBinary(byte terminal, Predicate<Class<?>> predicate, BsonReader reader, BsonWriter writer) {
     this.terminal = terminal;
     this.predicate = predicate;
     this.reader = reader;
@@ -70,7 +56,7 @@ public enum BsonBinary {
 
   /**
    * Returns this binary's associated terminal.
-   * 
+   *
    * @return this binary's associated terminal
    */
   public byte terminal() {
@@ -79,10 +65,9 @@ public enum BsonBinary {
 
   /**
    * Returns this binary's associated {@linkplain Predicate predicate}.
-   * 
+   *
    * @return this binary's associated predicate
-   * @throws IllegalStateException if this binary does not have an associated
-   * predicate
+   * @throws IllegalStateException if this binary does not have an associated predicate
    */
   public Predicate<Class<?>> predicate() {
     Preconditions.checkState(predicate != null, "'%s' does not have an associated predicate", this);
@@ -91,7 +76,7 @@ public enum BsonBinary {
 
   /**
    * Associates {@link Predicate predicate} with this binary.
-   * 
+   *
    * @param predicate the predicate to be associated with this binary
    */
   public void predicate(Predicate<Class<?>> predicate) {
@@ -101,10 +86,9 @@ public enum BsonBinary {
 
   /**
    * Returns this binary's associated {@linkplain BsonReader reader}.
-   * 
+   *
    * @return this binary's associated reader
-   * @throws IllegalStateException if this binary does not have an associated
-   * reader
+   * @throws IllegalStateException if this binary does not have an associated reader
    */
   public BsonReader reader() {
     Preconditions.checkState(reader != null, "'%s' does not have an associated reader", this);
@@ -113,7 +97,7 @@ public enum BsonBinary {
 
   /**
    * Associates {@link BsonReader reader} with this binary.
-   * 
+   *
    * @param reader the reader to be associated with this binary
    */
   public void reader(BsonReader reader) {
@@ -123,10 +107,9 @@ public enum BsonBinary {
 
   /**
    * Returns this binary's associated {@linkplain BsonWriter writer}.
-   * 
+   *
    * @return this binary's associated writer
-   * @throws IllegalStateException if this binary does not have an associated
-   * writer
+   * @throws IllegalStateException if this binary does not have an associated writer
    */
   public BsonWriter writer() {
     Preconditions.checkState(writer != null, "'%s' does not have an associated writer", this);
@@ -135,7 +118,7 @@ public enum BsonBinary {
 
   /**
    * Associates {@link BsonWriter writer} with this binary.
-   * 
+   *
    * @param writer the writer to be associated with this binary
    */
   public void writer(BsonWriter writer) {
@@ -145,33 +128,29 @@ public enum BsonBinary {
 
   /**
    * Returns the binary representing {@code clazz}.
-   * 
+   *
    * @param clazz the class to return a binary representation for
    * @return the binary representing {@code clazz}
-   * @throws IllegalArgumentException if no binary representing {@code clazz}
-   * was found
+   * @throws IllegalArgumentException if no binary representing {@code clazz} was found
    */
   public static BsonBinary find(@Nullable Class<?> clazz) {
-    for (BsonBinary binary : values())
-      if (binary.predicate().apply(clazz))
-        return binary;
-    throw new IllegalArgumentException(String.format("no binary "
-        + "representing the '%s' type value was found", clazz));
+    for (BsonBinary binary : values()) if (binary.predicate().apply(clazz)) return binary;
+    throw new IllegalArgumentException(
+        String.format("no binary " + "representing the '%s' type value was found", clazz));
   }
 
   /**
    * Returns the binary representing {@code terminal}.
-   * 
+   *
    * @param terminal the terminal to return a binary representation for
    * @return the binary representing {@code terminal}
-   * @throws IllegalArgumentException if no binary representing {@code terminal}
-   * was found
+   * @throws IllegalArgumentException if no binary representing {@code terminal} was found
    */
   public static BsonBinary find(byte terminal) {
-    for (BsonBinary binary : values())
-      if (binary.terminal() - terminal == 0)
-        return binary;
-    throw new IllegalArgumentException(String.format("no binary representing "
-        + "the '%s' terminal value was found", Byte.valueOf(terminal)));
+    for (BsonBinary binary : values()) if (binary.terminal() - terminal == 0) return binary;
+    throw new IllegalArgumentException(
+        String.format(
+            "no binary representing " + "the '%s' terminal value was found",
+            Byte.valueOf(terminal)));
   }
 }

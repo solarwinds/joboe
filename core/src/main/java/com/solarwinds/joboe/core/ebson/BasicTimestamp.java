@@ -1,10 +1,9 @@
 package com.solarwinds.joboe.core.ebson;
 
 import com.google.common.base.Objects;
-
-import javax.xml.bind.DatatypeConverter;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import javax.xml.bind.DatatypeConverter;
 
 final class BasicTimestamp implements BsonTimestamp {
 
@@ -15,7 +14,8 @@ final class BasicTimestamp implements BsonTimestamp {
   private final ByteBuffer time;
   private final ByteBuffer increment;
 
-  private final ByteBuffer timestamp = ByteBuffer.allocate(TIMESTAMP_LENGTH).order(ByteOrder.LITTLE_ENDIAN);
+  private final ByteBuffer timestamp =
+      ByteBuffer.allocate(TIMESTAMP_LENGTH).order(ByteOrder.LITTLE_ENDIAN);
 
   BasicTimestamp(ByteBuffer buffer) {
     int oldPosition = buffer.position();
@@ -28,7 +28,9 @@ final class BasicTimestamp implements BsonTimestamp {
     assert buffer.position() == oldPosition + TIMESTAMP_LENGTH;
 
     time = ByteBuffer.wrap(timestamp.array(), 0, TIME_LENGTH).order(ByteOrder.LITTLE_ENDIAN);
-    increment = ByteBuffer.wrap(timestamp.array(), INCREMENT_LENGTH, TIME_LENGTH).order(ByteOrder.LITTLE_ENDIAN);
+    increment =
+        ByteBuffer.wrap(timestamp.array(), INCREMENT_LENGTH, TIME_LENGTH)
+            .order(ByteOrder.LITTLE_ENDIAN);
   }
 
   @Override
