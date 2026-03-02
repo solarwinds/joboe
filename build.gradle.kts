@@ -31,8 +31,8 @@ subprojects {
     }
 
     dependencies {
-        testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
-        testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.2")
+        testImplementation("org.junit.jupiter:junit-jupiter-api:6.0.3")
+        testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:6.0.3")
         testImplementation("org.junit-pioneer:junit-pioneer:1.9.1")
         testImplementation("org.mockito:mockito-core:3.12.4")
         testImplementation("org.mockito:mockito-junit-jupiter:3.12.4")
