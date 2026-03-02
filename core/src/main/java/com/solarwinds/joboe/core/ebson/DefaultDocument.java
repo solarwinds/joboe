@@ -4,7 +4,6 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ForwardingMap;
 import com.google.common.collect.Maps;
-
 import java.util.Collections;
 import java.util.Map;
 
@@ -20,13 +19,10 @@ final class DefaultDocument extends ForwardingMap<String, Object> implements Bso
   public <T> T get(Object key, Class<T> type) {
     Object value = get(key);
     Preconditions.checkArgument(
-        type == null
-            ? value == null
-            : type.isInstance(value),
+        type == null ? value == null : type.isInstance(value),
         "expected '%s' instead of '%s'",
-        value == null
-            ? null
-            : value.getClass(), type);
+        value == null ? null : value.getClass(),
+        type);
     return type == null ? null : type.cast(value);
   }
 
@@ -46,12 +42,7 @@ final class DefaultDocument extends ForwardingMap<String, Object> implements Bso
 
   @Override
   public String toString() {
-    return "{" +
-            Joiner.on(", ")
-                    .withKeyValueSeparator(": ")
-                    .useForNull("null")
-                    .join(this) +
-            "}";
+    return "{" + Joiner.on(", ").withKeyValueSeparator(": ").useForNull("null").join(this) + "}";
   }
 
   @Override

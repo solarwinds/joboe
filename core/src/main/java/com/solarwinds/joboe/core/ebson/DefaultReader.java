@@ -5,7 +5,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Ints;
-
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Date;
@@ -13,7 +12,6 @@ import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 enum DefaultReader implements BsonReader {
-
   DOCUMENT {
 
     @Override
@@ -25,8 +23,8 @@ enum DefaultReader implements BsonReader {
         do {
           @SuppressWarnings("unchecked")
           Entry<String, Object> entry = (Entry<String, Object>) fieldReader.readFrom(buffer);
-          //document.put(entry.getKey(), entry.getValue()); 
-          document.putAllowMultiVal(entry.getKey(), entry.getValue()); //allow MULTIVAL
+          // document.put(entry.getKey(), entry.getValue());
+          document.putAllowMultiVal(entry.getKey(), entry.getValue()); // allow MULTIVAL
         } while (buffer.get(buffer.position()) != BsonBytes.EOO);
       buffer.get();
       return document.build();
@@ -40,8 +38,7 @@ enum DefaultReader implements BsonReader {
       BsonObject bsonObject = BsonObject.find(buffer.get());
       BsonReader keyReader = BsonToken.KEY.reader();
       BsonReader valueReader = bsonObject.reader();
-      return Maps.immutableEntry(keyReader.readFrom(buffer),
-          valueReader.readFrom(buffer));
+      return Maps.immutableEntry(keyReader.readFrom(buffer), valueReader.readFrom(buffer));
     }
   },
 
@@ -73,7 +70,7 @@ enum DefaultReader implements BsonReader {
       int stringLength = buffer.getInt();
       byte[] bytes = new byte[stringLength - 1];
       buffer.get(bytes).get();
-        return new String(bytes, Charsets.UTF_8);
+      return new String(bytes, Charsets.UTF_8);
     }
   },
 
@@ -154,8 +151,7 @@ enum DefaultReader implements BsonReader {
 
     private int optionsToFlags(String options) {
       int flags = 0;
-      for (char option : options.toCharArray())
-        flags |= flags + optionToFlag(option);
+      for (char option : options.toCharArray()) flags |= flags + optionToFlag(option);
       return flags;
     }
 
@@ -209,7 +205,8 @@ enum DefaultReader implements BsonReader {
   @Override
   public final Object readFrom(ByteBuffer buffer) {
     Preconditions.checkNotNull(buffer, "null buffer");
-    Preconditions.checkArgument(buffer.order() == ByteOrder.LITTLE_ENDIAN,
+    Preconditions.checkArgument(
+        buffer.order() == ByteOrder.LITTLE_ENDIAN,
         "buffer has big-endian byte order; expected little-endian");
     return checkedReadFrom(buffer);
   }

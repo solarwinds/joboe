@@ -18,36 +18,29 @@ package com.solarwinds.joboe.sampling;
 import java.security.SecureRandom;
 
 /**
- * <p>{@link SeedGenerator} implementation that uses Java's bundled
- * {@link SecureRandom} RNG to generate random seed data.</p>
+ * {@link SeedGenerator} implementation that uses Java's bundled {@link SecureRandom} RNG to
+ * generate random seed data.
  *
- * <p>The advantage of using SecureRandom for seeding but not as the
- * primary RNG is that we can use it to seed RNGs that are much faster
- * than SecureRandom.</p>
+ * <p>The advantage of using SecureRandom for seeding but not as the primary RNG is that we can use
+ * it to seed RNGs that are much faster than SecureRandom.
  *
- * <p>This is the only seeding strategy that is guaranteed to work on all
- * platforms and therefore is provided as a fall-back option should
- * none of the other provided {@link SeedGenerator} implementations be
- * useable.</p>
+ * <p>This is the only seeding strategy that is guaranteed to work on all platforms and therefore is
+ * provided as a fall-back option should none of the other provided {@link SeedGenerator}
+ * implementations be useable.
+ *
  * @author Daniel Dyer
  */
-public class SecureRandomSeedGenerator implements SeedGenerator
-{
-    private static final SecureRandom SOURCE = new SecureRandom();
+public class SecureRandomSeedGenerator implements SeedGenerator {
+  private static final SecureRandom SOURCE = new SecureRandom();
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public byte[] generateSeed(int length) throws SeedException
-    {
-        return SOURCE.generateSeed(length);
-    }
+  /** {@inheritDoc} */
+  @Override
+  public byte[] generateSeed(int length) throws SeedException {
+    return SOURCE.generateSeed(length);
+  }
 
-
-    @Override
-    public String toString()
-    {
-        return "java.security.SecureRandom";
-    }
+  @Override
+  public String toString() {
+    return "java.security.SecureRandom";
+  }
 }

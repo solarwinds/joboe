@@ -9,3 +9,5 @@
 out/
 **/.flattened-pom.xml
 .spotless/
+.gradle
+**/build

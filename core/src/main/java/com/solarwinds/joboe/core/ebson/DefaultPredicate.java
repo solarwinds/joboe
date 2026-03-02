@@ -1,14 +1,12 @@
 package com.solarwinds.joboe.core.ebson;
 
 import com.google.common.base.Predicate;
-
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 import java.util.regex.Pattern;
 
 enum DefaultPredicate implements Predicate<Class<?>> {
-
   DOUBLE {
 
     @Override
@@ -37,7 +35,9 @@ enum DefaultPredicate implements Predicate<Class<?>> {
 
     @Override
     public boolean apply(Class<?> input) {
-      return input != null && !byte[].class.isAssignableFrom(input) && (Collection.class.isAssignableFrom(input) || input.isArray());
+      return input != null
+          && !byte[].class.isAssignableFrom(input)
+          && (Collection.class.isAssignableFrom(input) || input.isArray());
     }
   },
 

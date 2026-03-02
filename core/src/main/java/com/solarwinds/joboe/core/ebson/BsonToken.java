@@ -2,24 +2,16 @@ package com.solarwinds.joboe.core.ebson;
 
 import com.google.common.base.Preconditions;
 
-/**
- * Representation of a <a href="http://bsonspec.org/">BSON</a> token type.
- */
+/** Representation of a <a href="http://bsonspec.org/">BSON</a> token type. */
 public enum BsonToken {
 
-  /**
-   * <a href="http://bsonspec.org/">BSON</a> document.
-   */
+  /** <a href="http://bsonspec.org/">BSON</a> document. */
   DOCUMENT(DefaultReader.DOCUMENT, DefaultWriter.DOCUMENT),
 
-  /**
-   * Key-value pair in a {@linkplain #DOCUMENT document}.
-   */
+  /** Key-value pair in a {@linkplain #DOCUMENT document}. */
   FIELD(DefaultReader.FIELD, DefaultWriter.FIELD),
 
-  /**
-   * Key in a {@linkplain #FIELD field} ({@code \0} delimited UTF-8 string).
-   */
+  /** Key in a {@linkplain #FIELD field} ({@code \0} delimited UTF-8 string). */
   KEY(DefaultReader.KEY, DefaultWriter.KEY);
 
   private BsonReader reader;
@@ -34,10 +26,9 @@ public enum BsonToken {
 
   /**
    * Returns this token's associated {@linkplain BsonReader reader}.
-   * 
+   *
    * @return this token's associated reader
-   * @throws IllegalStateException if this token does not have an associated
-   * reader
+   * @throws IllegalStateException if this token does not have an associated reader
    */
   public BsonReader reader() {
     Preconditions.checkState(reader != null, "'%s' does not have an associated reader", this);
@@ -46,7 +37,7 @@ public enum BsonToken {
 
   /**
    * Associates {@link BsonReader reader} with this token.
-   * 
+   *
    * @param reader the reader to be associated with this token
    */
   public void reader(BsonReader reader) {
@@ -56,10 +47,9 @@ public enum BsonToken {
 
   /**
    * Returns this token's associated {@linkplain BsonWriter writer}.
-   * 
+   *
    * @return this token's associated writer
-   * @throws IllegalStateException if this token does not have an associated
-   * writer
+   * @throws IllegalStateException if this token does not have an associated writer
    */
   public BsonWriter writer() {
     Preconditions.checkState(writer != null, "'%s' does not have an associated writer", this);
@@ -68,7 +58,7 @@ public enum BsonToken {
 
   /**
    * Associates {@link BsonWriter writer} with this token.
-   * 
+   *
    * @param writer the writer to be associated with this token
    */
   public void writer(BsonWriter writer) {

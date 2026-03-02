@@ -5,7 +5,6 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Ints;
-
 import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.util.Collection;
@@ -17,7 +16,6 @@ import java.util.SortedSet;
 import java.util.regex.Pattern;
 
 enum DefaultWriter implements BsonWriter {
-
   DOCUMENT {
 
     @Override
@@ -38,14 +36,13 @@ enum DefaultWriter implements BsonWriter {
     public void writeTo(ByteBuffer buffer, Object reference) {
       Entry<?, ?> entry = (Entry<?, ?>) reference;
       if (entry.getValue() instanceof MultiValList) {
-          MULTIVAL.writeTo(buffer, reference);
+        MULTIVAL.writeTo(buffer, reference);
       } else {
-          BsonObject bsonObject = BsonObject.find(entry.getValue() == null
-              ? null
-              : entry.getValue().getClass());
-          buffer.put(bsonObject.terminal());
-          BsonToken.KEY.writer().writeTo(buffer, entry.getKey());
-          bsonObject.writer().writeTo(buffer, entry.getValue());
+        BsonObject bsonObject =
+            BsonObject.find(entry.getValue() == null ? null : entry.getValue().getClass());
+        buffer.put(bsonObject.terminal());
+        BsonToken.KEY.writer().writeTo(buffer, entry.getKey());
+        bsonObject.writer().writeTo(buffer, entry.getValue());
       }
     }
   },
@@ -58,22 +55,19 @@ enum DefaultWriter implements BsonWriter {
       List list = (List) entry.getValue();
       // Write multiple key/values, each with the same key
       for (Object item : list) {
-          BsonObject bsonObject = BsonObject.find(item == null
-              ? null
-              : item.getClass());
-          buffer.put(bsonObject.terminal());
-          BsonToken.KEY.writer().writeTo(buffer, entry.getKey());
-          bsonObject.writer().writeTo(buffer, item);
+        BsonObject bsonObject = BsonObject.find(item == null ? null : item.getClass());
+        buffer.put(bsonObject.terminal());
+        BsonToken.KEY.writer().writeTo(buffer, entry.getKey());
+        bsonObject.writer().writeTo(buffer, item);
       }
     }
-
   },
 
   KEY {
 
     @Override
     public void writeTo(ByteBuffer buffer, Object reference) {
-        buffer.put(((String) reference).getBytes(Charsets.UTF_8)).put(BsonBytes.EOO);
+      buffer.put(((String) reference).getBytes(Charsets.UTF_8)).put(BsonBytes.EOO);
     }
   },
 
@@ -90,9 +84,8 @@ enum DefaultWriter implements BsonWriter {
     @Override
     public void writeTo(ByteBuffer buffer, Object reference) {
       byte[] bytes;
-        bytes = ((String) reference).getBytes(Charsets.UTF_8);
-        buffer.putInt(bytes.length + 1).put(bytes).put(BsonBytes.EOO);
-
+      bytes = ((String) reference).getBytes(Charsets.UTF_8);
+      buffer.putInt(bytes.length + 1).put(bytes).put(BsonBytes.EOO);
     }
   },
 
@@ -100,9 +93,8 @@ enum DefaultWriter implements BsonWriter {
 
     @Override
     public void writeTo(ByteBuffer buffer, Object reference) {
-      Object array = reference instanceof Collection
-          ? ((Collection<?>) reference).toArray()
-          : reference;
+      Object array =
+          reference instanceof Collection ? ((Collection<?>) reference).toArray() : reference;
       Map<Object, Object> document = Maps.newLinkedHashMap();
       for (int i = 0; i < Array.getLength(array); i++)
         document.put(String.valueOf(i), Array.get(array, i));
@@ -142,9 +134,7 @@ enum DefaultWriter implements BsonWriter {
 
     @Override
     public void writeTo(ByteBuffer buffer, Object reference) {
-      buffer.put(((Boolean) reference).booleanValue()
-          ? BsonBytes.TRUE
-          : BsonBytes.FALSE);
+      buffer.put(((Boolean) reference).booleanValue() ? BsonBytes.TRUE : BsonBytes.FALSE);
     }
   },
 
@@ -175,17 +165,13 @@ enum DefaultWriter implements BsonWriter {
     // @do-not-check CyclomaticComplexity
     private String flagsToOptions(int flags) {
       SortedSet<Character> options = Sets.newTreeSet();
-      if (hasFlag(flags, Pattern.CASE_INSENSITIVE))
-        options.add(Character.valueOf('i'));
+      if (hasFlag(flags, Pattern.CASE_INSENSITIVE)) options.add(Character.valueOf('i'));
 
-      if (hasFlag(flags, Pattern.COMMENTS))
-        options.add(Character.valueOf('x'));
+      if (hasFlag(flags, Pattern.COMMENTS)) options.add(Character.valueOf('x'));
 
-      if (hasFlag(flags, Pattern.DOTALL))
-        options.add(Character.valueOf('s'));
+      if (hasFlag(flags, Pattern.DOTALL)) options.add(Character.valueOf('s'));
 
-      if (hasFlag(flags, Pattern.MULTILINE))
-        options.add(Character.valueOf('m'));
+      if (hasFlag(flags, Pattern.MULTILINE)) options.add(Character.valueOf('m'));
 
       return Joiner.on("").join(options);
     }

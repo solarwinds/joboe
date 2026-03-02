@@ -1,12 +1,10 @@
 package com.solarwinds.joboe.core;
 
-/**
- * All event reporters must implement this interface.
- */
+/** All event reporters must implement this interface. */
 public interface EventReporter {
-    void send(Event event) throws EventReporterException;
+  void send(Event event) throws EventReporterException;
 
-    EventReporterStats consumeStats();
+  EventReporterStats consumeStats();
 
-    void close();
+  void close();
 }

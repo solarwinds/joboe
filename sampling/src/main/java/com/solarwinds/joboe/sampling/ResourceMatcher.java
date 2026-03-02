@@ -1,5 +1,5 @@
 package com.solarwinds.joboe.sampling;
 
 public interface ResourceMatcher {
-    boolean matches(String signal);
+  boolean matches(String signal);
 }

@@ -5,21 +5,18 @@ import com.solarwinds.joboe.logging.LoggerFactory;
 import lombok.Getter;
 
 public abstract class ConfigReader {
-    protected final Logger logger = LoggerFactory.getLogger();
-    @Getter
-    private final ConfigSourceType configSourceType;
+  protected final Logger logger = LoggerFactory.getLogger();
+  @Getter private final ConfigSourceType configSourceType;
 
-    protected ConfigReader(ConfigSourceType configSourceType) {
-        this.configSourceType = configSourceType;
-    }
+  protected ConfigReader(ConfigSourceType configSourceType) {
+    this.configSourceType = configSourceType;
+  }
 
-    /**
-     * Reads the configuration and puts the result in {@link ConfigContainer}
-     * 
-     * @param container 	the container which this config reader should write result into
-     * @throws Exception
-     */
-	
-    public abstract void read(ConfigContainer container) throws InvalidConfigException;
-
+  /**
+   * Reads the configuration and puts the result in {@link ConfigContainer}
+   *
+   * @param container the container which this config reader should write result into
+   * @throws Exception
+   */
+  public abstract void read(ConfigContainer container) throws InvalidConfigException;
 }

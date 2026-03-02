@@ -4,10 +4,11 @@ import com.solarwinds.joboe.sampling.Settings;
 
 /**
  * Reads {@link Settings}
- * @author pluk
  *
+ * @author pluk
  */
 public interface SettingsReader {
-    Settings getSettings() throws OboeSettingsException;
-    void close();
+  Settings getSettings() throws OboeSettingsException;
+
+  void close();
 }
