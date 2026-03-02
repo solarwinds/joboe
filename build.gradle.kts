@@ -34,9 +34,9 @@ subprojects {
         testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
         testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.2")
         testImplementation("org.junit-pioneer:junit-pioneer:1.9.1")
-        testImplementation("org.mockito:mockito-core:3.12.4")
-        testImplementation("org.mockito:mockito-junit-jupiter:3.12.4")
-        testImplementation("org.mockito:mockito-inline:3.12.4")
+        testImplementation("org.mockito:mockito-core:5.22.0")
+        testImplementation("org.mockito:mockito-junit-jupiter:5.22.0")
+        testImplementation("org.mockito:mockito-inline:5.22.0")
     }
 
     tasks {
