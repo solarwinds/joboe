@@ -21,7 +21,7 @@ dependencies {
     implementation("io.grpc:grpc-stub:1.79.0")
     implementation("io.grpc:grpc-protobuf:1.79.0")
 
-    compileOnly("org.json:json:20250517")
+    compileOnly("org.json:json:20251224")
     compileOnly("io.opentelemetry:opentelemetry-api:1.59.0")
     compileOnly("io.opentelemetry:opentelemetry-context:1.59.0")
     
@@ -37,7 +37,7 @@ dependencies {
     compileOnly("com.google.auto.service:auto-service:1.1.1")
     annotationProcessor("com.google.auto.service:auto-service:1.1.1")
 
-    testImplementation("org.json:json:20250517")
+    testImplementation("org.json:json:20251224")
     testImplementation("io.opentelemetry:opentelemetry-api:1.59.0")
     testImplementation("io.opentelemetry:opentelemetry-context:1.59.0")
 }
