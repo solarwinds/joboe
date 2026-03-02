@@ -5,7 +5,7 @@ plugins {
     `java-library`
     id("com.diffplug.spotless") version "6.25.0" apply false
     id("io.freefair.lombok") version "8.13" apply false
-    id("com.gradleup.shadow") version "8.3.9" apply false
+    id("com.gradleup.shadow") version "9.3.2" apply false
 }
 
 val projectVersion = System.getProperty("releaseVersion") ?: property("version").toString()
