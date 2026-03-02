@@ -27,7 +27,7 @@ dependencies {
     
     implementation("javax.xml.bind:jaxb-api:2.3.1")
     implementation("com.google.code.findbugs:jsr305:3.0.2")
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.squareup.okhttp3:okhttp:5.3.2")
     
     implementation("com.solarwinds:apm-proto:1.0.8") {
         exclude(group = "com.google.guava", module = "guava")
